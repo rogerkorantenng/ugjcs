@@ -14,7 +14,10 @@ const AVAILABLE_BY_STATUS: Record<ManuscriptStatus, DecisionType[]> = {
   under_screening: ["desk_reject", "send_to_review"],
   desk_rejected: [], under_review: [],
   reviews_complete: ["request_revision", "accept", "reject"],
-  revision_requested: [], resubmitted: [], accepted: [], rejected: [], scheduled: [], published: [], withdrawn: [],
+  // Legal per `domain/transitions.py`: RESUBMITTED -> UNDER_REVIEW directly, without a
+  // second screening pass — an editor may send a resubmission straight back to review.
+  revision_requested: [], resubmitted: ["send_to_review"],
+  accepted: [], rejected: [], scheduled: [], published: [], withdrawn: [],
 };
 
 export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode: string; status: ManuscriptStatus; onDecided: () => void }) {
@@ -47,7 +50,7 @@ export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode
       {problem && <ProblemAlert problem={problem} />}
       <Select label="Decision" name="decision" required>
         {available.map((decision) => (
-          <option key={decision} value={decision}>{decision.replace("_", " ")}</option>
+          <option key={decision} value={decision}>{decision.replaceAll("_", " ")}</option>
         ))}
       </Select>
       <Textarea label="Rationale" name="rationale" required minLength={20} />

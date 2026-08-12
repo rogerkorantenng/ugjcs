@@ -86,23 +86,45 @@ def test_a_non_reviewer_cannot_reach_my_assignments() -> None:
     assert response.status_code == 403
 
 
+def _review_body(**overrides: object) -> dict[str, object]:
+    body: dict[str, object] = {
+        "recommendation": "accept",
+        "originality_score": 5,
+        "rigour_score": 4,
+        "clarity_score": 4,
+        "significance_score": 5,
+        "comments_to_author": "Solid work.",
+        "confidential_comments_to_editor": "No concerns to flag.",
+    }
+    body.update(overrides)
+    return body
+
+
 def test_submitting_a_review_counts_it_and_records_the_content() -> None:
     manuscript = under_review_manuscript()
     client = make_client(manuscript)
     response = client.post(
-        f"/api/v1/reviews/{manuscript.tracking_code.value}/submit",
-        json={"recommendation": "accept", "comments": "Solid work."},
+        f"/api/v1/reviews/{manuscript.tracking_code.value}/submit", json=_review_body()
     )
     assert response.status_code == 204
     assert manuscript.submitted_reviews == 1
+
+
+def test_a_score_outside_one_to_five_is_rejected() -> None:
+    manuscript = under_review_manuscript()
+    client = make_client(manuscript)
+    response = client.post(
+        f"/api/v1/reviews/{manuscript.tracking_code.value}/submit",
+        json=_review_body(originality_score=6),
+    )
+    assert response.status_code == 422
 
 
 def test_submitting_without_an_assignment_is_forbidden() -> None:
     manuscript = under_review_manuscript()
     client = make_client(manuscript, assign=False)
     response = client.post(
-        f"/api/v1/reviews/{manuscript.tracking_code.value}/submit",
-        json={"recommendation": "accept", "comments": "x"},
+        f"/api/v1/reviews/{manuscript.tracking_code.value}/submit", json=_review_body()
     )
     assert response.status_code == 403
 
@@ -110,10 +132,7 @@ def test_submitting_without_an_assignment_is_forbidden() -> None:
 def test_submitting_a_review_for_a_missing_manuscript_is_404() -> None:
     manuscript = under_review_manuscript()
     client = make_client(manuscript)
-    response = client.post(
-        "/api/v1/reviews/UGJCS-2026-9999/submit",
-        json={"recommendation": "accept", "comments": "x"},
-    )
+    response = client.post("/api/v1/reviews/UGJCS-2026-9999/submit", json=_review_body())
     assert response.status_code == 404
 
 

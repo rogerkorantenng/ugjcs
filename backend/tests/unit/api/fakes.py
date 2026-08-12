@@ -128,6 +128,9 @@ class FakeManuscriptRepository:
     async def list_by_status(self, status: S) -> list[Manuscript]:
         return [m for m in self.store.values() if m.status == status]
 
+    async def list_by_statuses(self, statuses: frozenset[S]) -> list[Manuscript]:
+        return [m for m in self.store.values() if m.status in statuses]
+
     async def list_published(self) -> list[Manuscript]:
         return [m for m in self.store.values() if m.status is S.PUBLISHED]
 
@@ -148,7 +151,7 @@ class FakeAssignmentRepository:
     """
 
     assignments: list[tuple[ManuscriptId, UserId]] = field(default_factory=list)
-    submitted: dict[tuple[ManuscriptId, UserId], tuple[str, str]] = field(default_factory=dict)
+    submitted: dict[tuple[ManuscriptId, UserId], "FakeReviewContent"] = field(default_factory=dict)
 
     async def assign(
         self, manuscript_id: ManuscriptId, reviewer_id: UserId, *, occurred_at: datetime
@@ -177,23 +180,57 @@ class FakeAssignmentRepository:
         reviewer_id: UserId,
         *,
         recommendation: str,
-        comments: str,
+        originality_score: int,
+        rigour_score: int,
+        clarity_score: int,
+        significance_score: int,
+        comments_to_author: str,
+        confidential_comments_to_editor: str,
         occurred_at: datetime,
     ) -> None:
-        self.submitted[(manuscript_id, reviewer_id)] = (recommendation, comments)
+        self.submitted[(manuscript_id, reviewer_id)] = FakeReviewContent(
+            recommendation=recommendation,
+            originality_score=originality_score,
+            rigour_score=rigour_score,
+            clarity_score=clarity_score,
+            significance_score=significance_score,
+            comments_to_author=comments_to_author,
+            confidential_comments_to_editor=confidential_comments_to_editor,
+        )
 
     def _record(self, manuscript_id: ManuscriptId, reviewer_id: UserId) -> ReviewAssignmentRecord:
         pair = (manuscript_id, reviewer_id)
-        recommendation, comments = self.submitted.get(pair, (None, None))
+        content = self.submitted.get(pair)
         return ReviewAssignmentRecord(
             manuscript_id=manuscript_id,
             reviewer_id=reviewer_id,
-            status="submitted" if pair in self.submitted else "assigned",
-            recommendation=recommendation,
-            comments=comments,
+            status="submitted" if content is not None else "assigned",
+            recommendation=content.recommendation if content is not None else None,
+            originality_score=content.originality_score if content is not None else None,
+            rigour_score=content.rigour_score if content is not None else None,
+            clarity_score=content.clarity_score if content is not None else None,
+            significance_score=content.significance_score if content is not None else None,
+            comments_to_author=content.comments_to_author if content is not None else None,
+            confidential_comments_to_editor=(
+                content.confidential_comments_to_editor if content is not None else None
+            ),
             assigned_at=NOW,
-            submitted_at=NOW if pair in self.submitted else None,
+            submitted_at=NOW if content is not None else None,
         )
+
+
+@dataclass(frozen=True, slots=True)
+class FakeReviewContent:
+    """What `mark_submitted` recorded for one (manuscript, reviewer) pair — grouped so
+    `FakeAssignmentRepository.submitted` doesn't carry a seven-element tuple positionally."""
+
+    recommendation: str
+    originality_score: int
+    rigour_score: int
+    clarity_score: int
+    significance_score: int
+    comments_to_author: str
+    confidential_comments_to_editor: str
 
 
 @dataclass

@@ -12,4 +12,17 @@ describe("DecisionForm", () => {
     const { container } = render(<DecisionForm trackingCode="UGJCS-2026-0001" status="published" onDecided={vi.fn()} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("replaces every underscore in a label, not just the first", () => {
+    // `send_to_review` has two underscores — the exact case a single non-global
+    // `.replace("_", " ")` mangles into "send to_review".
+    render(<DecisionForm trackingCode="UGJCS-2026-0001" status="under_screening" onDecided={vi.fn()} />);
+    expect(screen.getByRole("option", { name: "send to review" })).toBeInTheDocument();
+    expect(screen.queryByText("send to_review")).not.toBeInTheDocument();
+  });
+
+  it("offers sending a resubmission straight back to review", () => {
+    render(<DecisionForm trackingCode="UGJCS-2026-0001" status="resubmitted" onDecided={vi.fn()} />);
+    expect(screen.getByRole("option", { name: "send to review" })).toBeInTheDocument();
+  });
 });

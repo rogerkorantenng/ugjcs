@@ -11,6 +11,7 @@ from ugjcs.api.schemas import (
     AssignReviewerRequest,
     ManuscriptOut,
     RecordDecisionRequest,
+    ReviewOut,
     ScheduleManuscriptRequest,
 )
 from ugjcs.api.wiring import UowDep
@@ -19,6 +20,23 @@ from ugjcs.domain.ids import UserId, mint_issue_id
 from ugjcs.domain.policies import Action, Actor
 
 router = APIRouter()
+
+# Every status an editor can still act on, or is waiting on an action already taken —
+# the full "open" set from `domain.transitions.LEGAL_TRANSITIONS`, minus the terminal
+# states (`domain.transitions.TERMINAL_STATES`) and `DRAFT`, which never reaches an
+# editor at all. A manuscript that has been screened must stay visible here, or an
+# editor who screened it has no other way back to it — see the router's module note.
+_QUEUE_STATUSES: frozenset[S] = frozenset(
+    {
+        S.SUBMITTED,
+        S.UNDER_SCREENING,
+        S.UNDER_REVIEW,
+        S.REVIEWS_COMPLETE,
+        S.REVISION_REQUESTED,
+        S.RESUBMITTED,
+        S.ACCEPTED,
+    }
+)
 
 # Route-specific aliases, built the same way as `wiring.UowDep`/`deps.ActorDep`: ruff's
 # B008 forbids `Depends(require(...))` as a bare default, so each role gate this router
@@ -35,7 +53,10 @@ PublishDep = Annotated[Actor, Depends(require_action(Action.PUBLISH))]
 
 @router.get("/queue", response_model=list[ManuscriptOut])
 async def screening_queue(actor: ScreenDep, uow: UowDep) -> list[ManuscriptOut]:
-    manuscripts = await uow.manuscripts.list_by_status(S.SUBMITTED)
+    """Every manuscript still awaiting some editorial action, not only fresh submissions —
+    see `_QUEUE_STATUSES`. Published, rejected, desk-rejected and withdrawn manuscripts
+    are excluded: none of them is work still owed to an editor."""
+    manuscripts = await uow.manuscripts.list_by_statuses(_QUEUE_STATUSES)
     return [ManuscriptOut.from_domain(m) for m in manuscripts]
 
 
@@ -79,6 +100,19 @@ async def assign_reviewer(
         manuscript.id, UserId(body.reviewer_id), occurred_at=datetime.now(UTC)
     )
     await uow.commit()
+
+
+@router.get("/{tracking_code}/reviews", response_model=list[ReviewOut])
+async def list_reviews(tracking_code: str, actor: DecideDep, uow: UowDep) -> list[ReviewOut]:
+    """The one place `confidential_comments_to_editor` (FR-11) is ever served: gated by
+    `Action.DECIDE`, the same grant `record_decision` requires, so no route an author can
+    reach ever returns this list — `ugjcs.api.routers.manuscripts`/`reviews` build no
+    response model that includes it, structurally, the same way `BlindedManuscriptOut`
+    has no author field to leak.
+    """
+    manuscript = await _get_or_404(uow, tracking_code)
+    records = await uow.assignments.list_for_manuscript(manuscript.id)
+    return [ReviewOut.from_record(record) for record in records]
 
 
 @router.post("/{tracking_code}/schedule", response_model=ManuscriptOut)

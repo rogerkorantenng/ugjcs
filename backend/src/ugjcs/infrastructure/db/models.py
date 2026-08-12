@@ -119,12 +119,34 @@ class ReviewAssignmentRow(Base):
     reviewer_id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), index=True)
     status: Mapped[str] = mapped_column(String(16), default="assigned")
     recommendation: Mapped[str | None] = mapped_column(String(32), nullable=True)
-    comments: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # FR-11's four criterion scores, 1-5, and the author/editor comment split. All five
+    # stay NULL until `mark_submitted` fills them in — an "assigned" row never has them.
+    originality_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    rigour_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    clarity_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    significance_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    comments_to_author: Mapped[str | None] = mapped_column(Text, nullable=True)
+    confidential_comments_to_editor: Mapped[str | None] = mapped_column(Text, nullable=True)
+    """Never serialised to an author — see `ugjcs.api.schemas.ReviewOut`."""
     assigned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         UniqueConstraint("manuscript_id", "reviewer_id", name="uq_review_assignments_pair"),
+        CheckConstraint(
+            "originality_score IS NULL OR originality_score BETWEEN 1 AND 5",
+            name="originality_score_range",
+        ),
+        CheckConstraint(
+            "rigour_score IS NULL OR rigour_score BETWEEN 1 AND 5", name="rigour_score_range"
+        ),
+        CheckConstraint(
+            "clarity_score IS NULL OR clarity_score BETWEEN 1 AND 5", name="clarity_score_range"
+        ),
+        CheckConstraint(
+            "significance_score IS NULL OR significance_score BETWEEN 1 AND 5",
+            name="significance_score_range",
+        ),
     )
 
 

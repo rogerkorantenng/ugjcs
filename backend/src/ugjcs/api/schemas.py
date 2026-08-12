@@ -1,11 +1,12 @@
 """Wire shapes. The domain must never import pydantic — these live here, not there."""
 
 from dataclasses import asdict
+from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from ugjcs.application.ports import AccountRepository
+from ugjcs.application.ports import AccountRepository, ReviewAssignmentRecord
 from ugjcs.domain.blinding import BlindedManuscript
 from ugjcs.domain.enums import DecisionType
 from ugjcs.domain.manuscript import Manuscript
@@ -96,8 +97,55 @@ class BlindedManuscriptOut(BaseModel):
 
 
 class SubmitReviewRequest(BaseModel):
+    """FR-11's structured review: four 1-5 criterion scores, an overall recommendation,
+    comments meant for the author, and comments meant for the editor alone.
+
+    `confidential_comments_to_editor` is the field that must never reach an author —
+    see `ReviewOut`'s docstring for where that guarantee is actually enforced.
+    """
+
     recommendation: str
-    comments: str
+    originality_score: int = Field(ge=1, le=5)
+    rigour_score: int = Field(ge=1, le=5)
+    clarity_score: int = Field(ge=1, le=5)
+    significance_score: int = Field(ge=1, le=5)
+    comments_to_author: str
+    confidential_comments_to_editor: str
+
+
+class ReviewOut(BaseModel):
+    """A submitted review, confidential comments included — see `list_reviews` in
+    `ugjcs.api.routers.editorial` for the one route this model is ever returned from.
+    No route reachable by an author or a reviewer builds this model; only the
+    `Action.DECIDE`-gated editorial route does."""
+
+    reviewer_id: UUID
+    status: str
+    recommendation: str | None
+    originality_score: int | None
+    rigour_score: int | None
+    clarity_score: int | None
+    significance_score: int | None
+    comments_to_author: str | None
+    confidential_comments_to_editor: str | None
+    assigned_at: datetime
+    submitted_at: datetime | None
+
+    @classmethod
+    def from_record(cls, record: ReviewAssignmentRecord) -> "ReviewOut":
+        return cls(
+            reviewer_id=UUID(str(record.reviewer_id)),
+            status=record.status,
+            recommendation=record.recommendation,
+            originality_score=record.originality_score,
+            rigour_score=record.rigour_score,
+            clarity_score=record.clarity_score,
+            significance_score=record.significance_score,
+            comments_to_author=record.comments_to_author,
+            confidential_comments_to_editor=record.confidential_comments_to_editor,
+            assigned_at=record.assigned_at,
+            submitted_at=record.submitted_at,
+        )
 
 
 class ArchivePaperOut(BaseModel):
@@ -115,6 +163,9 @@ class ArchivePaperOut(BaseModel):
     author_names: list[str]
     status: str
     version: int
+    has_document: bool
+    """Whether the published PDF can be downloaded — see FR-18 and
+    `GET /archive/{tracking_code}/document`. Mirrors `ManuscriptOut.has_document`."""
 
     @classmethod
     async def from_domain(
@@ -132,4 +183,5 @@ class ArchivePaperOut(BaseModel):
             author_names=names,
             status=manuscript.status.value,
             version=manuscript.version,
+            has_document=manuscript.original_document_key is not None,
         )

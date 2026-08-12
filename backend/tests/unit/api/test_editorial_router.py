@@ -55,6 +55,124 @@ def test_the_queue_lists_submitted_manuscripts_for_an_editor() -> None:
     assert len(response.json()) == 1
 
 
+def test_the_queue_includes_manuscripts_at_every_stage_needing_editorial_attention() -> None:
+    """The gap this closes: an editor who has already screened a manuscript must still be
+    able to find it, all the way through to ACCEPTED where the Editor-in-Chief schedules
+    it — see `_QUEUE_STATUSES` in `ugjcs.api.routers.editorial`."""
+    under_screening = submitted_manuscript(101)
+    under_screening.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+
+    under_review = submitted_manuscript(102)
+    under_review.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    under_review.record_decision(
+        decision=DecisionType.SEND_TO_REVIEW, actor_id=EDITOR, rationale="ok", occurred_at=NOW
+    )
+
+    reviews_complete = submitted_manuscript(103)
+    reviews_complete.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    reviews_complete.record_decision(
+        decision=DecisionType.SEND_TO_REVIEW, actor_id=EDITOR, rationale="ok", occurred_at=NOW
+    )
+    for _ in range(reviews_complete.minimum_reviews):
+        reviews_complete.record_review(reviewer_id=REVIEWER, occurred_at=NOW)
+
+    accepted = submitted_manuscript(104)
+    accepted.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    accepted.record_decision(
+        decision=DecisionType.SEND_TO_REVIEW, actor_id=EDITOR, rationale="ok", occurred_at=NOW
+    )
+    for _ in range(accepted.minimum_reviews):
+        accepted.record_review(reviewer_id=REVIEWER, occurred_at=NOW)
+    accepted.record_decision(
+        decision=DecisionType.ACCEPT, actor_id=EDITOR, rationale="ok", occurred_at=NOW
+    )
+
+    rejected = submitted_manuscript(105)
+    rejected.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    rejected.record_decision(
+        decision=DecisionType.DESK_REJECT, actor_id=EDITOR, rationale="ok", occurred_at=NOW
+    )
+
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    client = make_client(
+        actor,
+        submitted_manuscript(100),
+        under_screening,
+        under_review,
+        reviews_complete,
+        accepted,
+        rejected,
+    )
+    response = client.get("/api/v1/editorial/queue")
+    assert response.status_code == 200
+    statuses = {m["status"] for m in response.json()}
+    assert statuses == {
+        "submitted",
+        "under_screening",
+        "under_review",
+        "reviews_complete",
+        "accepted",
+    }
+    assert "desk_rejected" not in statuses
+
+
+def test_an_editor_can_list_the_reviews_recorded_for_a_manuscript() -> None:
+    manuscript = submitted_manuscript(106)
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    client = make_client(actor, manuscript)
+    response = client.get(f"/api/v1/editorial/{manuscript.tracking_code.value}/reviews")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_an_editor_sees_the_confidential_comments_a_reviewer_wrote() -> None:
+    """FR-11: confidential comments to the editor are recorded and are visible to the
+    editor who requests this manuscript's reviews — see `ReviewOut`."""
+    manuscript = submitted_manuscript(107)
+    manuscript.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.SEND_TO_REVIEW, actor_id=EDITOR, rationale="ok", occurred_at=NOW
+    )
+    app = create_app()
+    uow = FakeUnitOfWork()
+    uow.manuscripts.store[manuscript.id] = manuscript
+    uow.assignments.assignments.append((manuscript.id, REVIEWER))
+    reviewer_actor = Actor(id=REVIEWER, roles=frozenset({Role.REVIEWER}))
+
+    async def _uow() -> AsyncIterator[FakeUnitOfWork]:
+        yield uow
+
+    app.dependency_overrides[get_uow] = _uow
+    app.dependency_overrides[get_current_actor] = lambda: reviewer_actor
+    reviewer_client = TestClient(app)
+    reviewer_client.post(
+        f"/api/v1/reviews/{manuscript.tracking_code.value}/submit",
+        json={
+            "recommendation": "accept",
+            "originality_score": 5,
+            "rigour_score": 4,
+            "clarity_score": 4,
+            "significance_score": 5,
+            "comments_to_author": "Nice work.",
+            "confidential_comments_to_editor": "I know this author; disclosing for the record.",
+        },
+    )
+
+    app.dependency_overrides[get_current_actor] = lambda: Actor(
+        id=EDITOR, roles=frozenset({Role.EDITOR})
+    )
+    editor_client = TestClient(app)
+    response = editor_client.get(f"/api/v1/editorial/{manuscript.tracking_code.value}/reviews")
+    assert response.status_code == 200
+    [review] = response.json()
+    assert review["originality_score"] == 5
+    assert review["comments_to_author"] == "Nice work."
+    assert (
+        review["confidential_comments_to_editor"]
+        == "I know this author; disclosing for the record."
+    )
+
+
 def test_a_reviewer_may_not_see_the_screening_queue() -> None:
     actor = Actor(id=REVIEWER, roles=frozenset({Role.REVIEWER}))
     client = make_client(actor, submitted_manuscript())
