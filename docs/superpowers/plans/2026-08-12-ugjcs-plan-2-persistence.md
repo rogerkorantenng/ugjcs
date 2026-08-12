@@ -495,6 +495,15 @@ CREATE TRIGGER editorial_events_append_only
     FOR EACH ROW EXECUTE FUNCTION ugjcs_reject_event_mutation();
 """
 
+# PostgreSQL never fires row-level triggers on TRUNCATE, so the row-level trigger above
+# leaves the whole log deletable by a single statement. A statement-level trigger is the
+# only thing that closes it.
+NO_TRUNCATE_TRIGGER = """
+CREATE TRIGGER editorial_events_no_truncate
+    BEFORE TRUNCATE ON editorial_events
+    FOR EACH STATEMENT EXECUTE FUNCTION ugjcs_reject_event_mutation();
+"""
+
 
 def upgrade() -> None:
     op.create_table(
@@ -564,9 +573,11 @@ def upgrade() -> None:
 
     op.execute(APPEND_ONLY_FUNCTION)
     op.execute(APPEND_ONLY_TRIGGER)
+    op.execute(NO_TRUNCATE_TRIGGER)
 
 
 def downgrade() -> None:
+    op.execute("DROP TRIGGER IF EXISTS editorial_events_no_truncate ON editorial_events")
     op.execute("DROP TRIGGER IF EXISTS editorial_events_append_only ON editorial_events")
     op.execute("DROP FUNCTION IF EXISTS ugjcs_reject_event_mutation()")
     op.drop_table("editorial_events")
@@ -1020,6 +1031,15 @@ CREATE TRIGGER editorial_events_append_only
     FOR EACH ROW EXECUTE FUNCTION ugjcs_reject_event_mutation();
 """
 
+# PostgreSQL never fires row-level triggers on TRUNCATE, so the row-level trigger above
+# leaves the whole log deletable by a single statement. A statement-level trigger is the
+# only thing that closes it.
+NO_TRUNCATE_TRIGGER = """
+CREATE TRIGGER editorial_events_no_truncate
+    BEFORE TRUNCATE ON editorial_events
+    FOR EACH STATEMENT EXECUTE FUNCTION ugjcs_reject_event_mutation();
+"""
+
 
 @pytest.fixture(scope="session")
 def postgres_url() -> Iterator[str]:
@@ -1036,6 +1056,7 @@ async def session(postgres_url: str) -> AsyncIterator[AsyncSession]:
         await connection.run_sync(Base.metadata.create_all)
         await connection.exec_driver_sql(APPEND_ONLY_FUNCTION)
         await connection.exec_driver_sql(APPEND_ONLY_TRIGGER)
+        await connection.exec_driver_sql(NO_TRUNCATE_TRIGGER)
     factory = session_factory(engine)
     async with factory() as session:
         yield session
@@ -1245,7 +1266,7 @@ Create `backend/tests/integration/test_chain_persistence.py`:
 ```python
 """The chain must verify after a round trip, and keep verifying as events accumulate."""
 
-from datetime import UTC, datetime
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
@@ -1261,7 +1282,12 @@ pytestmark = pytest.mark.integration
 
 AUTHOR = UserId(uuid4())
 EDITOR = UserId(uuid4())
-NOW = datetime(2026, 8, 12, 12, 0, tzinfo=UTC)
+# Deliberately NOT UTC. PostgreSQL normalises timestamptz to UTC on storage, so an event
+# recorded at a different offset only hashes reproducibly because canonical_bytes()
+# normalises too. With a UTC fixture the round trip is a no-op and proves nothing.
+ACCRA = timezone(timedelta(hours=0))
+KAMPALA = timezone(timedelta(hours=3))
+NOW = datetime(2026, 8, 12, 15, 0, tzinfo=KAMPALA)
 
 
 def make_manuscript() -> Manuscript:
@@ -1452,6 +1478,7 @@ async def engine(postgres_url: str) -> AsyncIterator[AsyncEngine]:
         await connection.run_sync(Base.metadata.create_all)
         await connection.exec_driver_sql(APPEND_ONLY_FUNCTION)
         await connection.exec_driver_sql(APPEND_ONLY_TRIGGER)
+        await connection.exec_driver_sql(NO_TRUNCATE_TRIGGER)
     yield engine
     await engine.dispose()
 ```
