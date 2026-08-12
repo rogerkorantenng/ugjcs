@@ -27,12 +27,12 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 
 | | |
 |---|---|
-| **Debt** | The deployment toolchain authenticates to AWS as the account root user rather than a least-privilege IAM principal. |
-| **Cause** | Deliberate. The account was configured before the project began, and replacing root credentials was not on the critical path to a working domain core. |
-| **Impact** | Root credentials cannot be scoped, cannot be rotated per-service, and cannot be revoked without disrupting every other use of the account. Their compromise is unrecoverable within the account. |
-| **Priority** | **Critical** — must be resolved before any infrastructure is provisioned, not merely before real users. |
-| **Resolution** | Create an IAM deploy user restricted to App Runner, ECR, RDS, S3, Secrets Manager and CloudWatch actions on this project's resources, and store its credentials as GitHub Actions secrets so nothing runs as root. |
-| **Partially accepted** | Enabling MFA on the root account was considered and **deliberately declined by the owner** for this assessment period. Scoping day-to-day access to the IAM user removes root from the operational path, which addresses the larger share of the exposure; MFA would additionally protect root itself against credential compromise. This is a conscious, recorded acceptance rather than an oversight, and it is the entry to close first if this system were ever to carry real submissions. |
+| **Debt** | The system is provisioned and deployed using the AWS account root user rather than a least-privilege IAM principal. |
+| **Cause** | Deliberate, and decided explicitly by the owner under deadline pressure. Creating a scoped IAM deploy user was planned as the first task of deployment; it was dropped to protect the time needed to deliver the API, the frontend and the submission documents. Enabling MFA on root was separately considered and declined. |
+| **Impact** | Root credentials cannot be scoped to a service, cannot be rotated per-service, and cannot be revoked without disrupting every other use of the account. Their compromise is unrecoverable within the account. |
+| **Priority** | **Critical.** This is the highest-severity item in this register and the first that must be closed before the system carries real submissions. |
+| **Mitigation actually applied** | The root access keys are used only from the developer's local machine and are deliberately **not** stored as GitHub Actions secrets. Deployment is therefore run locally rather than from CI. This is a meaningful reduction in exposure — CI secret stores are a far broader attack surface than a single workstation — but it is a mitigation, not a fix. |
+| **Resolution** | Create an IAM deploy user restricted to App Runner, ECR, RDS, S3, Secrets Manager and CloudWatch on this project's resources; move the deployment pipeline to GitHub Actions using that user's credentials; enable MFA on root; and stop using root entirely. Estimated at under an hour. |
 
 ### TD-02 — A reviewer may be authorised to review their own manuscript
 
