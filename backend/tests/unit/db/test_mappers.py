@@ -4,7 +4,7 @@ from uuid import uuid4
 from ugjcs.domain.enums import EventType
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.hashchain import GENESIS_HASH, append
-from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
+from ugjcs.domain.ids import IssueId, ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.infrastructure.db.mappers import (
     event_to_row,
@@ -54,10 +54,37 @@ def test_round_trip_restores_the_aggregate() -> None:
     restored = to_domain(to_row(original), last_sequence=0)
     assert restored.id == original.id
     assert restored.tracking_code == original.tracking_code
+    assert restored.title == original.title
+    assert restored.abstract == original.abstract
     assert restored.author_ids == original.author_ids
     assert restored.corresponding_author_id == original.corresponding_author_id
     assert restored.status is original.status
     assert restored.keywords == original.keywords
+    assert restored.version == original.version
+    assert restored.minimum_reviews == original.minimum_reviews
+    assert restored.submitted_reviews == original.submitted_reviews
+    assert restored.issue_id is None
+
+
+def test_round_trip_restores_non_default_scalars() -> None:
+    """The defaults happen to match the dataclass's, so only varied values prove the mapping."""
+    original = make_manuscript()
+    original.version = 3
+    original.minimum_reviews = 4
+    original.submitted_reviews = 2
+    restored = to_domain(to_row(original), last_sequence=0)
+    assert restored.version == 3
+    assert restored.minimum_reviews == 4
+    assert restored.submitted_reviews == 2
+
+
+def test_round_trip_restores_a_populated_issue_id() -> None:
+    """The `issue_id is not None` arm is otherwise never executed by any test."""
+    original = make_manuscript()
+    issue_id = IssueId(uuid4())
+    original.issue_id = issue_id
+    restored = to_domain(to_row(original), last_sequence=0)
+    assert restored.issue_id == issue_id
 
 
 def test_rehydration_seeds_the_sequence_counter() -> None:
