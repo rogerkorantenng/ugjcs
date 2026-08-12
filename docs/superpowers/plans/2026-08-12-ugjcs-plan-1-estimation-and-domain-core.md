@@ -342,7 +342,7 @@ git commit -m "chore: scaffold backend with ruff, mypy strict, import-linter and
 
 **Interfaces:**
 - Produces:
-  - `DomainError`, `IllegalTransition`, `GuardViolation`, `AuthorizationDenied` (all in `errors.py`)
+  - `DomainError`, `IllegalTransitionError`, `GuardViolationError`, `AuthorizationDeniedError` (all in `errors.py`)
   - `Role`, `ManuscriptStatus`, `Recommendation`, `DecisionType`, `AssignmentStatus`, `EventType` (all `StrEnum`, in `enums.py`)
   - `UserId`, `ManuscriptId`, `ReviewId`, `IssueId` (`NewType` over `UUID`); `TrackingCode` with `TrackingCode.mint(year: int, sequence: int) -> TrackingCode` and `.value: str`
 
@@ -402,15 +402,15 @@ class DomainError(Exception):
     """Base class for every domain rule violation."""
 
 
-class IllegalTransition(DomainError):
+class IllegalTransitionError(DomainError):
     """A manuscript state transition that the lifecycle does not permit."""
 
 
-class GuardViolation(DomainError):
+class GuardViolationError(DomainError):
     """A transition is structurally legal but its precondition is unmet."""
 
 
-class AuthorizationDenied(DomainError):
+class AuthorizationDeniedError(DomainError):
     """The actor may not perform this action on this resource."""
 ```
 
@@ -549,12 +549,12 @@ git commit -m "feat: add domain primitives — errors, enums and typed identifie
 - Test: `backend/tests/unit/domain/test_transitions.py`
 
 **Interfaces:**
-- Consumes: `ManuscriptStatus` from `enums.py`; `IllegalTransition` from `errors.py`.
+- Consumes: `ManuscriptStatus` from `enums.py`; `IllegalTransitionError` from `errors.py`.
 - Produces:
   - `TERMINAL_STATES: frozenset[ManuscriptStatus]`
   - `LEGAL_TRANSITIONS: Mapping[ManuscriptStatus, frozenset[ManuscriptStatus]]`
   - `is_legal(source: ManuscriptStatus, target: ManuscriptStatus) -> bool`
-  - `assert_legal(source: ManuscriptStatus, target: ManuscriptStatus) -> None` raising `IllegalTransition`
+  - `assert_legal(source: ManuscriptStatus, target: ManuscriptStatus) -> None` raising `IllegalTransitionError`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -564,7 +564,7 @@ Create `backend/tests/unit/domain/test_transitions.py`:
 import pytest
 
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.errors import IllegalTransition
+from ugjcs.domain.errors import IllegalTransitionError
 from ugjcs.domain.transitions import (
     LEGAL_TRANSITIONS,
     TERMINAL_STATES,
@@ -627,7 +627,7 @@ def test_assert_legal_is_silent_for_a_legal_transition() -> None:
 
 
 def test_assert_legal_raises_naming_both_states() -> None:
-    with pytest.raises(IllegalTransition, match="draft.*published"):
+    with pytest.raises(IllegalTransitionError, match="draft.*published"):
         assert_legal(S.DRAFT, S.PUBLISHED)
 ```
 
@@ -650,7 +650,7 @@ without touching aggregate behaviour, and the table can be exhaustively tested.
 from collections.abc import Mapping
 
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.errors import IllegalTransition
+from ugjcs.domain.errors import IllegalTransitionError
 
 TERMINAL_STATES: frozenset[S] = frozenset(
     {S.DESK_REJECTED, S.REJECTED, S.PUBLISHED, S.WITHDRAWN}
@@ -691,9 +691,9 @@ def is_legal(source: S, target: S) -> bool:
 
 
 def assert_legal(source: S, target: S) -> None:
-    """Raise `IllegalTransition` unless the move is permitted."""
+    """Raise `IllegalTransitionError` unless the move is permitted."""
     if not is_legal(source, target):
-        raise IllegalTransition(
+        raise IllegalTransitionError(
             f"cannot move manuscript from {source.value} to {target.value}"
         )
 ```
@@ -875,7 +875,7 @@ git commit -m "feat: add editorial event with canonical serialisation"
   - `chain_hash(event: EditorialEvent, previous_hash: str) -> str`
   - `ChainedEvent` frozen dataclass wrapping `event: EditorialEvent`, `previous_hash: str`, `event_hash: str`
   - `append(chain: Sequence[ChainedEvent], event: EditorialEvent) -> ChainedEvent`
-  - `verify(chain: Sequence[ChainedEvent]) -> None` raising `ChainBroken` (a `DomainError` subclass defined in this module)
+  - `verify(chain: Sequence[ChainedEvent]) -> None` raising `ChainBrokenError` (a `DomainError` subclass defined in this module)
 
 - [ ] **Step 1: Write the failing test**
 
@@ -892,7 +892,7 @@ from ugjcs.domain.enums import EventType
 from ugjcs.domain.events import EditorialEvent
 from ugjcs.domain.hashchain import (
     GENESIS_HASH,
-    ChainBroken,
+    ChainBrokenError,
     ChainedEvent,
     append,
     chain_hash,
@@ -954,20 +954,20 @@ def test_verify_accepts_an_empty_chain() -> None:
 def test_verify_detects_a_modified_payload() -> None:
     chain = build_chain(3)
     chain[1] = replace(chain[1], event=event(2, note="tampered"))
-    with pytest.raises(ChainBroken, match="sequence 2"):
+    with pytest.raises(ChainBrokenError, match="sequence 2"):
         verify(chain)
 
 
 def test_verify_detects_a_removed_event() -> None:
     chain = build_chain(3)
     del chain[1]
-    with pytest.raises(ChainBroken):
+    with pytest.raises(ChainBrokenError):
         verify(chain)
 
 
 def test_append_rejects_a_non_consecutive_sequence() -> None:
     chain = build_chain(1)
-    with pytest.raises(ChainBroken, match="expected sequence 2"):
+    with pytest.raises(ChainBrokenError, match="expected sequence 2"):
         append(chain, event(5))
 ```
 
@@ -998,7 +998,7 @@ from ugjcs.domain.events import EditorialEvent
 GENESIS_HASH = "0" * 64
 
 
-class ChainBroken(DomainError):
+class ChainBrokenError(DomainError):
     """The event chain does not verify against its recorded hashes."""
 
 
@@ -1021,7 +1021,7 @@ def append(chain: Sequence[ChainedEvent], event: EditorialEvent) -> ChainedEvent
     """Link `event` onto the end of `chain`, enforcing consecutive sequencing."""
     expected_sequence = len(chain) + 1
     if event.sequence != expected_sequence:
-        raise ChainBroken(
+        raise ChainBrokenError(
             f"expected sequence {expected_sequence}, received {event.sequence}"
         )
     previous_hash = chain[-1].event_hash if chain else GENESIS_HASH
@@ -1033,17 +1033,17 @@ def append(chain: Sequence[ChainedEvent], event: EditorialEvent) -> ChainedEvent
 
 
 def verify(chain: Sequence[ChainedEvent]) -> None:
-    """Raise `ChainBroken` at the first link that does not reconcile."""
+    """Raise `ChainBrokenError` at the first link that does not reconcile."""
     previous_hash = GENESIS_HASH
     for position, link in enumerate(chain, start=1):
         if link.event.sequence != position:
-            raise ChainBroken(
+            raise ChainBrokenError(
                 f"expected sequence {position}, found {link.event.sequence}"
             )
         if link.previous_hash != previous_hash:
-            raise ChainBroken(f"broken link at sequence {link.event.sequence}")
+            raise ChainBrokenError(f"broken link at sequence {link.event.sequence}")
         if chain_hash(link.event, previous_hash) != link.event_hash:
-            raise ChainBroken(f"hash mismatch at sequence {link.event.sequence}")
+            raise ChainBrokenError(f"hash mismatch at sequence {link.event.sequence}")
         previous_hash = link.event_hash
 ```
 
@@ -1087,7 +1087,7 @@ from uuid import uuid4
 import pytest
 
 from ugjcs.domain.enums import DecisionType, EventType, ManuscriptStatus as S
-from ugjcs.domain.errors import GuardViolation, IllegalTransition
+from ugjcs.domain.errors import GuardViolationError, IllegalTransitionError
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 
@@ -1150,7 +1150,7 @@ def test_pull_events_drains_the_buffer() -> None:
 
 def test_cannot_submit_twice() -> None:
     manuscript = submitted()
-    with pytest.raises(IllegalTransition):
+    with pytest.raises(IllegalTransitionError):
         manuscript.submit(actor_id=AUTHOR, occurred_at=NOW)
 
 
@@ -1166,7 +1166,7 @@ def test_desk_rejection_requires_no_reviews() -> None:
 
 def test_desk_rejection_is_illegal_once_under_review() -> None:
     manuscript = under_review()
-    with pytest.raises(IllegalTransition):
+    with pytest.raises(IllegalTransitionError):
         manuscript.record_decision(
             decision=DecisionType.DESK_REJECT, actor_id=EDITOR,
             rationale="Too late", occurred_at=NOW,
@@ -1176,7 +1176,7 @@ def test_desk_rejection_is_illegal_once_under_review() -> None:
 def test_acceptance_requires_the_minimum_review_count() -> None:
     manuscript = under_review()
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    with pytest.raises(GuardViolation, match="requires 2 reviews, has 1"):
+    with pytest.raises(GuardViolationError, match="requires 2 reviews, has 1"):
         manuscript.record_decision(
             decision=DecisionType.ACCEPT, actor_id=EDITOR,
             rationale="Strong", occurred_at=NOW,
@@ -1210,7 +1210,7 @@ def test_only_the_corresponding_author_may_resubmit() -> None:
         decision=DecisionType.REQUEST_REVISION, actor_id=EDITOR,
         rationale="Clarify method", occurred_at=NOW,
     )
-    with pytest.raises(GuardViolation, match="corresponding author"):
+    with pytest.raises(GuardViolationError, match="corresponding author"):
         manuscript.resubmit(actor_id=UserId(uuid4()), occurred_at=NOW)
 
 
@@ -1235,7 +1235,7 @@ def test_publication_requires_an_issue() -> None:
         decision=DecisionType.ACCEPT, actor_id=EDITOR,
         rationale="Strong", occurred_at=NOW,
     )
-    with pytest.raises(IllegalTransition):
+    with pytest.raises(IllegalTransitionError):
         manuscript.publish(actor_id=EDITOR, occurred_at=NOW)
 
 
@@ -1267,7 +1267,7 @@ from datetime import datetime
 
 from ugjcs.domain.enums import DecisionType, EventType
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.errors import GuardViolation
+from ugjcs.domain.errors import GuardViolationError
 from ugjcs.domain.events import EditorialEvent
 from ugjcs.domain.ids import IssueId, ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.transitions import assert_legal
@@ -1334,7 +1334,7 @@ class Manuscript:
         editor cannot decide while reviews are still outstanding.
         """
         if self.status is not S.UNDER_REVIEW:
-            raise GuardViolation(
+            raise GuardViolationError(
                 f"reviews accepted only while under review, not in {self.status.value}"
             )
         self.submitted_reviews += 1
@@ -1361,7 +1361,7 @@ class Manuscript:
             decision in _DECISIONS_REQUIRING_REVIEWS
             and self.submitted_reviews < self.minimum_reviews
         ):
-            raise GuardViolation(
+            raise GuardViolationError(
                 f"{decision.value} requires {self.minimum_reviews} reviews, "
                 f"has {self.submitted_reviews}"
             )
@@ -1372,7 +1372,7 @@ class Manuscript:
 
     def resubmit(self, *, actor_id: UserId, occurred_at: datetime) -> EditorialEvent:
         if actor_id != self.corresponding_author_id:
-            raise GuardViolation("only the corresponding author may resubmit")
+            raise GuardViolationError("only the corresponding author may resubmit")
         event = self._transition(
             S.RESUBMITTED, EventType.REVISION_SUBMITTED, actor_id, occurred_at,
             {"version": self.version + 1},
@@ -1460,12 +1460,12 @@ git commit -m "feat: add manuscript aggregate with guarded transitions and event
 - Test: `backend/tests/unit/domain/test_policies.py`
 
 **Interfaces:**
-- Consumes: `Role` from `enums.py`; `AuthorizationDenied` from `errors.py`; `Manuscript` from `manuscript.py`; `UserId` from `ids.py`.
+- Consumes: `Role` from `enums.py`; `AuthorizationDeniedError` from `errors.py`; `Manuscript` from `manuscript.py`; `UserId` from `ids.py`.
 - Produces:
   - `Action` (`StrEnum`): `VIEW`, `SUBMIT`, `SCREEN`, `ASSIGN_REVIEWER`, `REVIEW`, `DECIDE`, `RESUBMIT`, `PUBLISH`, `MANAGE_USERS`, `VIEW_AUDIT`
   - `Actor` frozen dataclass: `id: UserId`, `roles: frozenset[Role]`
   - `can(actor: Actor, action: Action, manuscript: Manuscript | None = None) -> bool`
-  - `authorize(actor: Actor, action: Action, manuscript: Manuscript | None = None) -> None` raising `AuthorizationDenied`
+  - `authorize(actor: Actor, action: Action, manuscript: Manuscript | None = None) -> None` raising `AuthorizationDeniedError`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1478,7 +1478,7 @@ from uuid import uuid4
 import pytest
 
 from ugjcs.domain.enums import Role
-from ugjcs.domain.errors import AuthorizationDenied
+from ugjcs.domain.errors import AuthorizationDeniedError
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Action, Actor, authorize, can
@@ -1555,7 +1555,7 @@ def test_authorize_is_silent_when_permitted() -> None:
 
 
 def test_authorize_raises_when_denied() -> None:
-    with pytest.raises(AuthorizationDenied, match="screen"):
+    with pytest.raises(AuthorizationDeniedError, match="screen"):
         authorize(actor(Role.AUTHOR), Action.SCREEN, manuscript())
 ```
 
@@ -1581,7 +1581,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from ugjcs.domain.enums import Role
-from ugjcs.domain.errors import AuthorizationDenied
+from ugjcs.domain.errors import AuthorizationDeniedError
 from ugjcs.domain.ids import UserId
 from ugjcs.domain.manuscript import Manuscript
 
@@ -1645,9 +1645,9 @@ def _can_view(actor: Actor, manuscript: Manuscript | None) -> bool:
 def authorize(
     actor: Actor, action: Action, manuscript: Manuscript | None = None
 ) -> None:
-    """Raise `AuthorizationDenied` unless the action is permitted."""
+    """Raise `AuthorizationDeniedError` unless the action is permitted."""
     if not can(actor, action, manuscript):
-        raise AuthorizationDenied(f"actor {actor.id} may not {action.value}")
+        raise AuthorizationDeniedError(f"actor {actor.id} may not {action.value}")
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
@@ -1820,7 +1820,7 @@ from hypothesis import strategies as st
 from ugjcs.domain.enums import EventType
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.events import EditorialEvent
-from ugjcs.domain.hashchain import ChainBroken, append, verify
+from ugjcs.domain.hashchain import ChainBrokenError, append, verify
 from ugjcs.domain.ids import ManuscriptId, UserId
 from ugjcs.domain.transitions import LEGAL_TRANSITIONS, TERMINAL_STATES, is_legal
 
@@ -1915,7 +1915,7 @@ def test_removing_any_event_breaks_the_chain(
     del chain[victim % len(chain)]
     try:
         verify(chain)
-    except ChainBroken:
+    except ChainBrokenError:
         return
     raise AssertionError("removing an event should always break verification")
 ```
