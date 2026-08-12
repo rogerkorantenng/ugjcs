@@ -789,23 +789,74 @@ export function searchArchive(query: string) {
 
 `searchArchive` takes no `page` argument and returns a flat array, not `{results, total}` — Plan 4's `/archive/search` is unpaginated (see "Backend contract" above).
 
-- [ ] **Step 2: `manuscript-card` and its test**
+- [ ] **Step 2: The masthead, `manuscript-card`, and their tests**
+
+Create `frontend/src/components/layout/site-header.tsx`:
+
+```tsx
+import Link from "next/link";
+
+/**
+ * The masthead: dark `ink` chrome under an `amber` hairline, the one place in the public
+ * tier that departs from the `paper` background. A journal's cover carries its authority
+ * before the reader gets to the contents page — this is that cover, rendered every page.
+ */
+export function SiteHeader() {
+  return (
+    <header className="border-b border-amber/40 bg-ink text-paper">
+      <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-5">
+        <Link
+          href="/"
+          className="font-serif text-lg font-semibold tracking-tight focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+        >
+          University of Ghana Journal of Computing Science
+        </Link>
+        <nav aria-label="Site" className="flex items-center gap-6 text-sm">
+          <Link href="/search" className="text-paper/80 hover:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber">
+            Search
+          </Link>
+          <Link href="/login" className="text-paper/80 hover:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber">
+            Sign in
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
+}
+```
+
+Create `frontend/src/app/(public)/layout.tsx`:
+
+```tsx
+import { SiteHeader } from "@/components/layout/site-header";
+
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <SiteHeader />
+      {children}
+    </>
+  );
+}
+```
 
 Create `frontend/src/components/manuscript-card.tsx`:
 
 ```tsx
 import Link from "next/link";
 import { formatAuthors } from "@/lib/format";
+import { TrackingChip } from "@/components/ui/tracking-chip";
 import type { ArchivePaperOut } from "@/types/api";
 
 export function PaperCard({ paper }: { paper: ArchivePaperOut }) {
   return (
     <Link
       href={`/papers/${paper.tracking_code}`}
-      className="block rounded-lg border border-gray-200 bg-white p-4 hover:border-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+      className="block rounded-[3px] border border-rule bg-white/70 p-5 transition-colors hover:border-teal/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
     >
-      <h3 className="text-base font-semibold text-gray-900">{paper.title}</h3>
-      <p className="mt-1 text-sm text-gray-600">{formatAuthors(paper.author_names)}</p>
+      <TrackingChip code={paper.tracking_code} />
+      <h3 className="mt-2 font-serif text-lg font-semibold text-ink">{paper.title}</h3>
+      <p className="mt-1 text-sm text-ink/60">{formatAuthors(paper.author_names)}</p>
     </Link>
   );
 }
@@ -859,16 +910,21 @@ export default async function HomePage() {
   const recent = papers.slice(0, 5);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-3xl font-bold">University of Ghana Journal of Computing Science</h1>
-      <p className="mt-2 text-gray-600">A double-blind peer-reviewed journal.</p>
-      <Link href="/search" className="mt-6 inline-block text-blue-700 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+    <main className="mx-auto max-w-3xl px-4 py-14">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-teal-dark">A double-blind peer-reviewed journal</p>
+      <h1 className="mt-3 font-serif text-3xl font-semibold leading-tight text-ink">
+        University of Ghana Journal of Computing Science
+      </h1>
+      <Link
+        href="/search"
+        className="mt-6 inline-block border-b border-teal text-sm font-medium text-teal-dark hover:border-amber hover:text-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+      >
         Search the archive
       </Link>
       {recent.length > 0 && (
-        <section className="mt-10">
-          <h2 className="text-xl font-semibold">Recently published</h2>
-          <div className="mt-4 grid gap-4">
+        <section className="mt-14">
+          <h2 className="border-b border-rule pb-2 font-serif text-lg font-semibold text-ink">Recently published</h2>
+          <div className="mt-6 grid gap-4">
             {recent.map((paper) => (
               <PaperCard key={paper.tracking_code} paper={paper} />
             ))}
@@ -888,6 +944,7 @@ Create `frontend/src/app/(public)/papers/[trackingCode]/page.tsx`:
 import type { Metadata } from "next";
 import { getPaper } from "@/lib/archive";
 import { formatAuthors } from "@/lib/format";
+import { TrackingChip } from "@/components/ui/tracking-chip";
 
 interface Params { trackingCode: string }
 
@@ -918,7 +975,7 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
+    <main className="mx-auto max-w-3xl px-4 py-14">
       {/* Highwire Press tags for Google Scholar indexing */}
       <meta name="citation_title" content={paper.title} />
       {paper.author_names.map((name) => (
@@ -926,10 +983,10 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
       ))}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <p className="text-sm text-gray-500">{paper.tracking_code}</p>
-      <h1 className="mt-1 text-2xl font-bold">{paper.title}</h1>
-      <p className="mt-2 text-gray-600">{formatAuthors(paper.author_names)}</p>
-      <p className="mt-6 leading-relaxed text-gray-800">{paper.abstract}</p>
+      <TrackingChip code={paper.tracking_code} />
+      <h1 className="mt-3 font-serif text-2xl font-semibold leading-tight text-ink">{paper.title}</h1>
+      <p className="mt-2 text-sm text-ink/60">{formatAuthors(paper.author_names)}</p>
+      <p className="mt-8 border-t border-rule pt-8 leading-relaxed text-ink/80">{paper.abstract}</p>
       {/*
         No "Download PDF" link: Plan 4 stores no document of any kind (no `pdf_url` field,
         no file storage anywhere in the domain built by Plans 1–4 — see "File upload" in
@@ -957,19 +1014,19 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const results = q ? await searchArchive(q) : [];
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-2xl font-bold">Search</h1>
-      <form className="mt-4" role="search">
+    <main className="mx-auto max-w-3xl px-4 py-14">
+      <h1 className="font-serif text-2xl font-semibold text-ink">Search</h1>
+      <form className="mt-6" role="search">
         <label htmlFor="q" className="sr-only">Search papers</label>
         <input
           id="q"
           name="q"
           defaultValue={q}
           placeholder="Title, abstract or keyword"
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          className="w-full rounded-[3px] border border-rule bg-white px-3 py-2 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
         />
       </form>
-      <div className="mt-6 grid gap-4">
+      <div className="mt-8 grid gap-4">
         {results.map((paper) => (
           <PaperCard key={paper.tracking_code} paper={paper} />
         ))}
@@ -1012,7 +1069,7 @@ Expected: 6 unit tests pass (the 4 from Task 1 plus the 2 `PaperCard` tests); ty
 
 ```bash
 git add frontend/src/lib/format.ts frontend/src/lib/archive.ts frontend/src/components/manuscript-card.tsx \
-  frontend/src/components/manuscript-card.test.tsx \
+  frontend/src/components/manuscript-card.test.tsx frontend/src/components/layout/site-header.tsx \
   "frontend/src/app/(public)" frontend/src/app/sitemap.ts
 git commit -m "feat: add statically rendered public archive with scholarly metadata"
 ```
@@ -1323,16 +1380,19 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm px-4 py-16">
-      <h1 className="text-2xl font-bold">Sign in</h1>
-      {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
-      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
-        <Input label="Email" name="email" type="email" required autoComplete="email" />
-        <Input label="Password" name="password" type="password" required autoComplete="current-password" />
-        <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? "Signing in…" : "Sign in"}
-        </Button>
-      </form>
+    <main className="flex min-h-screen items-center justify-center bg-ink px-4 py-16">
+      <div className="w-full max-w-sm border border-amber/30 bg-paper p-8">
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-teal-dark">UGJCS</p>
+        <h1 className="mt-2 font-serif text-2xl font-semibold text-ink">Sign in</h1>
+        {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
+        <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
+          <Input label="Email" name="email" type="email" required autoComplete="email" />
+          <Input label="Password" name="password" type="password" required autoComplete="current-password" />
+          <Button type="submit" disabled={submitting} className="w-full">
+            {submitting ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
+      </div>
     </main>
   );
 }
@@ -1418,19 +1478,24 @@ export function AppNav({ user }: { user: SessionUser }) {
   }
 
   return (
-    <nav aria-label="Account navigation" className="flex items-center justify-between border-b bg-white px-4 py-3">
-      <div className="flex gap-4">
+    <nav aria-label="Account navigation" className="flex items-center justify-between border-b border-amber/40 bg-ink px-4 py-4 text-paper">
+      <div className="flex items-center gap-6">
+        <span className="font-serif text-sm font-semibold tracking-tight">UGJCS</span>
         {links.map((link) => (
-          <Link key={link.href} href={link.href} className="text-sm font-medium text-gray-700 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+          <Link
+            key={link.href}
+            href={link.href}
+            className="text-sm font-medium text-paper/75 hover:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+          >
             {link.label}
           </Link>
         ))}
       </div>
-      <div className="flex items-center gap-3 text-sm text-gray-600">
+      <div className="flex items-center gap-4 text-sm text-paper/75">
         {/* `SessionUser` has no `name` — `GET /auth/me` (`ActorOut`) serialises only
             `{id, roles}`; `email` is the one human-readable field the session carries. */}
-        <span>{user.email}</span>
-        <button onClick={signOut} className="font-medium text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+        <span className="font-mono text-xs">{user.email}</span>
+        <button onClick={signOut} className="font-medium text-amber hover:text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber">
           Sign out
         </button>
       </div>
