@@ -48,8 +48,12 @@ def chain_hash(event: EditorialEvent, previous_hash: str) -> str:
 
 
 def append(chain: Sequence[ChainedEvent], event: EditorialEvent) -> ChainedEvent:
-    """Link `event` onto the end of `chain`, enforcing consecutive sequencing."""
-    expected_sequence = len(chain) + 1
+    """Link `event` onto the end of `chain`, enforcing consecutive sequencing.
+
+    Only the last link is read, so a caller may pass the chain's tail rather than its
+    whole history; `verify` still validates from genesis and needs the complete chain.
+    """
+    expected_sequence = chain[-1].event.sequence + 1 if chain else 1
     if event.sequence != expected_sequence:
         raise ChainBrokenError(f"expected sequence {expected_sequence}, received {event.sequence}")
     previous_hash = chain[-1].event_hash if chain else GENESIS_HASH

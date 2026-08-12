@@ -95,6 +95,16 @@ def test_verify_detects_a_spliced_chain() -> None:
         verify(spliced)
 
 
+def test_the_predecessor_hash_changes_the_digest() -> None:
+    """Without this, deleting the chaining step from chain_hash passes every other test.
+
+    The digest must depend on the predecessor's hash, or `event_hash` is merely a per-event
+    checksum and altering an event no longer invalidates everything after it.
+    """
+    subject = event(1)
+    assert chain_hash(subject, GENESIS_HASH) != chain_hash(subject, "f" * 64)
+
+
 def test_append_rejects_a_non_consecutive_sequence() -> None:
     chain = build_chain(1)
     with pytest.raises(ChainBrokenError, match="expected sequence 2"):
