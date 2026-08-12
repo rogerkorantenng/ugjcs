@@ -7,7 +7,7 @@ is testable on its own and stays stable if the hash algorithm is ever replaced.
 import json
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 
 from ugjcs.domain.enums import EventType
 from ugjcs.domain.ids import ManuscriptId, UserId
@@ -50,6 +50,11 @@ class EditorialEvent:
         PostgreSQL `jsonb` column rejects, so the event would hash here and then fail at
         persistence. Failing loudly at the point of construction is the same reasoning
         that refuses values with no stable serialisation at all.
+
+        The timestamp is normalised to UTC before rendering. Two events at the same instant but
+        recorded with different offsets must hash identically, because PostgreSQL stores
+        `timestamptz` normalised to UTC and would otherwise return bytes that no longer match the
+        hash computed at write time — a tamper alert for an event nobody touched.
         """
         document = {
             "manuscript_id": str(self.manuscript_id),
@@ -57,7 +62,7 @@ class EditorialEvent:
             "event_type": self.event_type.value,
             "payload": dict(self.payload),
             "actor_id": str(self.actor_id) if self.actor_id is not None else None,
-            "occurred_at": self.occurred_at.isoformat(),
+            "occurred_at": self.occurred_at.astimezone(UTC).isoformat(),
         }
         return json.dumps(document, sort_keys=True, separators=(",", ":"), allow_nan=False).encode(
             "utf-8"

@@ -109,7 +109,7 @@ The default run excludes integration tests so `make check` stays fast and Docker
 
 - [ ] **Step 3: Extend the architecture contract**
 
-Replace `backend/.importlinter` with:
+**Do not replace the whole file blindly.** Plan 1's final review strengthened the `domain-purity` denylist after this plan was drafted; an earlier version of this step carried the stale seven-name list and would have silently undone that fix. Add the `layers` contract, and leave `domain-purity` as it stands. The finished file is:
 
 ```ini
 [importlinter]
@@ -117,7 +117,7 @@ root_package = ugjcs
 include_external_packages = True
 
 [importlinter:contract:domain-purity]
-name = Domain layer imports no frameworks or I/O libraries
+name = Domain layer imports no framework, vendor SDK, or I/O module
 type = forbidden
 source_modules =
     ugjcs.domain
@@ -129,6 +129,20 @@ forbidden_modules =
     arq
     redis
     httpx
+    requests
+    os
+    io
+    socket
+    sqlite3
+    subprocess
+    pathlib
+    asyncio
+    threading
+    multiprocessing
+    logging
+    http
+    smtplib
+    urllib
 
 [importlinter:contract:layers]
 name = Dependencies point inwards only
@@ -315,7 +329,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, UUID as PgUUID
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ugjcs.infrastructure.db.base import Base
@@ -324,17 +338,17 @@ from ugjcs.infrastructure.db.base import Base
 class ManuscriptRow(Base):
     __tablename__ = "manuscripts"
 
-    id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True)
+    id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
     tracking_code: Mapped[str] = mapped_column(String(32), unique=True, index=True)
     title: Mapped[str] = mapped_column(Text)
     abstract: Mapped[str] = mapped_column(Text)
-    keywords: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
-    corresponding_author_id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True))
+    keywords: Mapped[list[str]] = mapped_column(postgresql.ARRAY(Text), default=list)
+    corresponding_author_id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True))
     status: Mapped[str] = mapped_column(String(32), index=True)
     version: Mapped[int] = mapped_column(Integer, default=1)
     minimum_reviews: Mapped[int] = mapped_column(Integer, default=2)
     submitted_reviews: Mapped[int] = mapped_column(Integer, default=0)
-    issue_id: Mapped[UUID | None] = mapped_column(PgUUID(as_uuid=True), nullable=True)
+    issue_id: Mapped[UUID | None] = mapped_column(postgresql.UUID(as_uuid=True), nullable=True)
 
     authors: Mapped[list["ManuscriptAuthorRow"]] = relationship(
         back_populates="manuscript",
@@ -353,12 +367,17 @@ class ManuscriptAuthorRow(Base):
     __tablename__ = "manuscript_authors"
 
     manuscript_id: Mapped[UUID] = mapped_column(
-        PgUUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="CASCADE"), primary_key=True
+        postgresql.UUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="CASCADE"), primary_key=True
     )
-    author_id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True)
+    author_id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
     position: Mapped[int] = mapped_column(Integer)
 
     manuscript: Mapped[ManuscriptRow] = relationship(back_populates="authors")
+
+    # Byline order is meaningful on a paper, and `order_by` alone resolves ties arbitrarily.
+    __table_args__ = (
+        UniqueConstraint("manuscript_id", "position", name="author_position_unique"),
+    )
 
 
 class EditorialEventRow(Base):
@@ -367,12 +386,12 @@ class EditorialEventRow(Base):
     __tablename__ = "editorial_events"
 
     manuscript_id: Mapped[UUID] = mapped_column(
-        PgUUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="RESTRICT"), primary_key=True
+        postgresql.UUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="RESTRICT"), primary_key=True
     )
     sequence: Mapped[int] = mapped_column(Integer, primary_key=True)
     event_type: Mapped[str] = mapped_column(String(48))
     payload: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
-    actor_id: Mapped[UUID | None] = mapped_column(PgUUID(as_uuid=True), nullable=True)
+    actor_id: Mapped[UUID | None] = mapped_column(postgresql.UUID(as_uuid=True), nullable=True)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     previous_hash: Mapped[str] = mapped_column(String(64))
     event_hash: Mapped[str] = mapped_column(String(64))
@@ -476,6 +495,15 @@ CREATE TRIGGER editorial_events_append_only
     FOR EACH ROW EXECUTE FUNCTION ugjcs_reject_event_mutation();
 """
 
+# PostgreSQL never fires row-level triggers on TRUNCATE, so the row-level trigger above
+# leaves the whole log deletable by a single statement. A statement-level trigger is the
+# only thing that closes it.
+NO_TRUNCATE_TRIGGER = """
+CREATE TRIGGER editorial_events_no_truncate
+    BEFORE TRUNCATE ON editorial_events
+    FOR EACH STATEMENT EXECUTE FUNCTION ugjcs_reject_event_mutation();
+"""
+
 
 def upgrade() -> None:
     op.create_table(
@@ -491,10 +519,14 @@ def upgrade() -> None:
         sa.Column("minimum_reviews", sa.Integer(), nullable=False),
         sa.Column("submitted_reviews", sa.Integer(), nullable=False),
         sa.Column("issue_id", postgresql.UUID(as_uuid=True), nullable=True),
-        sa.CheckConstraint("version >= 1", name="ck_manuscripts_version_positive"),
-        sa.CheckConstraint("submitted_reviews >= 0", name="ck_manuscripts_reviews_non_negative"),
+        sa.CheckConstraint("version >= 1", name="version_positive"),
+        sa.CheckConstraint("submitted_reviews >= 0", name="reviews_non_negative"),
         sa.PrimaryKeyConstraint("id", name="pk_manuscripts"),
-        sa.UniqueConstraint("tracking_code", name="uq_manuscripts_tracking_code"),
+    )
+    # `unique=True, index=True` on the column compiles to ONE unique index, not a separate
+    # UniqueConstraint. The migration must create the same object, or Task 8's parity test fails.
+    op.create_index(
+        "ix_manuscripts_tracking_code", "manuscripts", ["tracking_code"], unique=True
     )
     op.create_index("ix_manuscripts_status", "manuscripts", ["status"])
 
@@ -510,6 +542,7 @@ def upgrade() -> None:
             ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("manuscript_id", "author_id", name="pk_manuscript_authors"),
+        sa.UniqueConstraint("manuscript_id", "position", name="author_position_unique"),
     )
 
     op.create_table(
@@ -522,7 +555,7 @@ def upgrade() -> None:
         sa.Column("occurred_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("previous_hash", sa.String(length=64), nullable=False),
         sa.Column("event_hash", sa.String(length=64), nullable=False),
-        sa.CheckConstraint("sequence >= 1", name="ck_editorial_events_sequence_positive"),
+        sa.CheckConstraint("sequence >= 1", name="sequence_positive"),
         sa.ForeignKeyConstraint(
             ["manuscript_id"],
             ["manuscripts.id"],
@@ -530,7 +563,7 @@ def upgrade() -> None:
             ondelete="RESTRICT",
         ),
         sa.PrimaryKeyConstraint("manuscript_id", "sequence", name="pk_editorial_events"),
-        sa.UniqueConstraint("manuscript_id", "event_hash", name="uq_editorial_events_event_hash"),
+        sa.UniqueConstraint("manuscript_id", "event_hash", name="event_hash_unique"),
     )
     op.create_index(
         "ix_editorial_events_manuscript_sequence",
@@ -540,15 +573,32 @@ def upgrade() -> None:
 
     op.execute(APPEND_ONLY_FUNCTION)
     op.execute(APPEND_ONLY_TRIGGER)
+    op.execute(NO_TRUNCATE_TRIGGER)
 
 
 def downgrade() -> None:
+    op.execute("DROP TRIGGER IF EXISTS editorial_events_no_truncate ON editorial_events")
     op.execute("DROP TRIGGER IF EXISTS editorial_events_append_only ON editorial_events")
     op.execute("DROP FUNCTION IF EXISTS ugjcs_reject_event_mutation()")
     op.drop_table("editorial_events")
     op.drop_table("manuscript_authors")
     op.drop_table("manuscripts")
 ```
+
+**Pass CHECK constraint names as bare fragments, not expanded.** `op.create_table` inherits
+`target_metadata.naming_convention` from `env.py`, and the `ck` template contains
+`%(constraint_name)s` — so an already-expanded name like `ck_manuscripts_version_positive` gets
+expanded a second time into `ck_manuscripts_ck_manuscripts_version_positive`. Pass the same bare
+fragment `models.py` passes (`version_positive`) and let the convention expand it once. Primary,
+foreign and unique keys are unaffected: their templates carry no `%(constraint_name)s` token, which
+is also why an explicit unique name is used verbatim.
+
+**Two constraint names look inconsistent, and that is correct.** The naming convention's `uq`
+template is `uq_%(table_name)s_%(column_0_name)s`, which contains no `%(constraint_name)s` token,
+so SQLAlchemy uses an explicitly supplied `name=` verbatim rather than expanding it. `event_hash_unique`
+and `author_position_unique` therefore keep those exact names, while the `ck` template does contain
+the token and so expands `version_positive` into `ck_manuscripts_version_positive`. The migration must
+match the metadata exactly or Task 8's parity test will fail — which is what that test is for.
 
 - [ ] **Step 4: Verify the migration applies and reverses**
 
@@ -981,6 +1031,15 @@ CREATE TRIGGER editorial_events_append_only
     FOR EACH ROW EXECUTE FUNCTION ugjcs_reject_event_mutation();
 """
 
+# PostgreSQL never fires row-level triggers on TRUNCATE, so the row-level trigger above
+# leaves the whole log deletable by a single statement. A statement-level trigger is the
+# only thing that closes it.
+NO_TRUNCATE_TRIGGER = """
+CREATE TRIGGER editorial_events_no_truncate
+    BEFORE TRUNCATE ON editorial_events
+    FOR EACH STATEMENT EXECUTE FUNCTION ugjcs_reject_event_mutation();
+"""
+
 
 @pytest.fixture(scope="session")
 def postgres_url() -> Iterator[str]:
@@ -997,11 +1056,17 @@ async def session(postgres_url: str) -> AsyncIterator[AsyncSession]:
         await connection.run_sync(Base.metadata.create_all)
         await connection.exec_driver_sql(APPEND_ONLY_FUNCTION)
         await connection.exec_driver_sql(APPEND_ONLY_TRIGGER)
+        await connection.exec_driver_sql(NO_TRUNCATE_TRIGGER)
     factory = session_factory(engine)
     async with factory() as session:
         yield session
     await engine.dispose()
 ```
+
+**`get_settings()` is `@lru_cache`d, so never let a test depend on it.** The fixture passes both
+`postgres_url` and `echo` explicitly, which is what keeps `create_engine` from reading settings at
+all. Anything that does call `get_settings()` in a test must call `get_settings.cache_clear()` first,
+or it silently receives configuration captured by an earlier test in the same process.
 
 The trigger is created here as well as in the migration because these tests build the schema from metadata rather than by running Alembic. Task 8 adds a separate check that the migration itself produces the same trigger, so the duplication cannot drift unnoticed.
 
@@ -1201,7 +1266,7 @@ Create `backend/tests/integration/test_chain_persistence.py`:
 ```python
 """The chain must verify after a round trip, and keep verifying as events accumulate."""
 
-from datetime import UTC, datetime
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
@@ -1217,7 +1282,12 @@ pytestmark = pytest.mark.integration
 
 AUTHOR = UserId(uuid4())
 EDITOR = UserId(uuid4())
-NOW = datetime(2026, 8, 12, 12, 0, tzinfo=UTC)
+# Deliberately NOT UTC. PostgreSQL normalises timestamptz to UTC on storage, so an event
+# recorded at a different offset only hashes reproducibly because canonical_bytes()
+# normalises too. With a UTC fixture the round trip is a no-op and proves nothing.
+ACCRA = timezone(timedelta(hours=0))
+KAMPALA = timezone(timedelta(hours=3))
+NOW = datetime(2026, 8, 12, 15, 0, tzinfo=KAMPALA)
 
 
 def make_manuscript() -> Manuscript:
@@ -1408,6 +1478,7 @@ async def engine(postgres_url: str) -> AsyncIterator[AsyncEngine]:
         await connection.run_sync(Base.metadata.create_all)
         await connection.exec_driver_sql(APPEND_ONLY_FUNCTION)
         await connection.exec_driver_sql(APPEND_ONLY_TRIGGER)
+        await connection.exec_driver_sql(NO_TRUNCATE_TRIGGER)
     yield engine
     await engine.dispose()
 ```

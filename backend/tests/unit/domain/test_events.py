@@ -1,5 +1,5 @@
 import json
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
@@ -83,3 +83,12 @@ def test_a_system_event_has_no_actor() -> None:
     """Some events originate from the system, not a person; the serialiser must handle it."""
     event = make_event(actor_id=None)
     assert json.loads(event.canonical_bytes())["actor_id"] is None
+
+
+def test_the_same_instant_hashes_identically_regardless_of_offset() -> None:
+    """Postgres normalises timestamptz to UTC, so the offset must not reach the digest."""
+    utc = make_event(occurred_at=datetime(2026, 8, 12, 9, 30, tzinfo=UTC))
+    elsewhere = make_event(
+        occurred_at=datetime(2026, 8, 12, 14, 30, tzinfo=timezone(timedelta(hours=5)))
+    )
+    assert utc.canonical_bytes() == elsewhere.canonical_bytes()

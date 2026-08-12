@@ -29,3 +29,11 @@ forbidden_modules =
     http
     smtplib
     urllib
+
+[importlinter:contract:layers]
+name = Dependencies point inwards only
+type = layers
+layers =
+    ugjcs.infrastructure
+    ugjcs.application
+    ugjcs.domain
