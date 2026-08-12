@@ -26,6 +26,14 @@ class Settings(BaseSettings):
         description="Comma-separated browser origins allowed to call the API, e.g. "
         "https://ugjcs.example.edu,http://localhost:3000. Empty means none allowed.",
     )
+    s3_bucket_name: str = Field(
+        default="ugjcs-manuscripts-9bdf45b0",
+        description="The manuscripts bucket (see infra/s3.tf). Defaulted, not secret: "
+        "the bucket blocks all public access, so knowing its name grants nothing without "
+        "the instance role's credentials, and defaulting it means deploying this feature "
+        "needs no change to App Runner's runtime environment configuration.",
+    )
+    aws_region: str = Field(default="us-east-1", description="Region the bucket lives in.")
 
     @property
     def cors_origins(self) -> list[str]:

@@ -12,6 +12,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from ugjcs.application.documents import DocumentTooLargeError, UnsupportedDocumentTypeError
 from ugjcs.domain.errors import (
     AuthorizationDeniedError,
     DomainError,
@@ -27,6 +28,8 @@ _STATUS_BY_ERROR: dict[type[DomainError], int] = {
     IllegalTransitionError: status.HTTP_409_CONFLICT,
     GuardViolationError: status.HTTP_409_CONFLICT,
     AuthorizationDeniedError: status.HTTP_403_FORBIDDEN,
+    UnsupportedDocumentTypeError: status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+    DocumentTooLargeError: status.HTTP_413_CONTENT_TOO_LARGE,
 }
 
 

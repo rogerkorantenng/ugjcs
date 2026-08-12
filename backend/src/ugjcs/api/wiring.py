@@ -13,12 +13,13 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from ugjcs.application.identity import IdentityService, SessionService
-from ugjcs.application.ports import UnitOfWork
+from ugjcs.application.ports import DocumentStore, UnitOfWork
 from ugjcs.infrastructure.config import get_settings
 from ugjcs.infrastructure.db.engine import create_engine, session_factory
 from ugjcs.infrastructure.db.uow import SqlAlchemyUnitOfWork
 from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
 from ugjcs.infrastructure.security.tokens import JwtTokenService, SystemClock
+from ugjcs.infrastructure.storage.s3_store import S3DocumentStore
 
 
 @lru_cache
@@ -75,3 +76,18 @@ async def get_session_service(uow: UowDep) -> SessionService:
     return SessionService(
         uow.accounts, uow.refresh_tokens, _tokens(), Argon2PasswordHasher(), SystemClock()
     )
+
+
+@lru_cache
+def _document_store() -> S3DocumentStore:
+    settings = get_settings()
+    return S3DocumentStore(bucket=settings.s3_bucket_name, region=settings.aws_region)
+
+
+async def get_document_store() -> DocumentStore:
+    return _document_store()
+
+
+# See `UowDep`'s note: routes depend on this alias, not a bare `Depends(...)` default,
+# because ruff's B008 forbids a function call as a default argument value.
+DocumentStoreDep = Annotated[DocumentStore, Depends(get_document_store)]

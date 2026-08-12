@@ -44,6 +44,18 @@ class Manuscript:
     minimum_reviews: int = 2
     submitted_reviews: int = 0
     issue_id: IssueId | None = None
+    original_document_key: str | None = None
+    """Where the current version's unmodified upload lives in object storage.
+
+    Never served to a reviewer — see `anonymised_document_key`. `None` until a document
+    has been attached, which happens in the same request as `submit()`/`resubmit()`, not
+    as a separate transition of its own."""
+    anonymised_document_key: str | None = None
+    """Where the metadata-stripped derivative reviewers are served lives.
+
+    Produced by `infrastructure.storage.anonymize.strip_pdf_metadata`, which strips
+    DocInfo and XMP only — it cannot remove an author's name printed in the visible body
+    text (TD-05)."""
     _sequence: int = 0
     _events: list[EditorialEvent] = field(default_factory=list, repr=False)
 
@@ -64,13 +76,31 @@ class Manuscript:
         self._events.clear()
         return drained
 
-    def submit(self, *, actor_id: UserId, occurred_at: datetime) -> EditorialEvent:
+    def submit(
+        self,
+        *,
+        actor_id: UserId,
+        occurred_at: datetime,
+        original_document_key: str | None = None,
+        anonymised_document_key: str | None = None,
+    ) -> EditorialEvent:
+        """Move to SUBMITTED, optionally attaching this version's document keys.
+
+        Both key arguments default to `None` so every existing caller that submits
+        without a document — the seed script, and every domain/API test that predates
+        upload support — keeps working unchanged. A caller that does supply them gets
+        both the aggregate fields set and the keys recorded in the event payload, so the
+        attachment is part of the auditable history, not merely a side-channel update.
+        """
+        payload: dict[str, PayloadValue] = {"version": self.version}
+        if original_document_key is not None:
+            self.original_document_key = original_document_key
+            payload["original_document_key"] = original_document_key
+        if anonymised_document_key is not None:
+            self.anonymised_document_key = anonymised_document_key
+            payload["anonymised_document_key"] = anonymised_document_key
         return self._transition(
-            S.SUBMITTED,
-            EventType.MANUSCRIPT_SUBMITTED,
-            actor_id,
-            occurred_at,
-            {"version": self.version},
+            S.SUBMITTED, EventType.MANUSCRIPT_SUBMITTED, actor_id, occurred_at, payload
         )
 
     def begin_screening(self, *, actor_id: UserId, occurred_at: datetime) -> EditorialEvent:
@@ -138,15 +168,36 @@ class Manuscript:
             {"decision": decision.value, "rationale": rationale},
         )
 
-    def resubmit(self, *, actor_id: UserId, occurred_at: datetime) -> EditorialEvent:
+    def resubmit(
+        self,
+        *,
+        actor_id: UserId,
+        occurred_at: datetime,
+        original_document_key: str | None = None,
+        anonymised_document_key: str | None = None,
+        response_to_reviewers: str | None = None,
+    ) -> EditorialEvent:
+        """Move to RESUBMITTED, optionally attaching the revised document and a letter.
+
+        See `submit()` for why the new keyword arguments default to `None` rather than
+        being required: every caller that predates upload support must keep working.
+        `response_to_reviewers` has nowhere else to live — there is no separate entity
+        for it — so it is recorded in the event payload only, which is exactly where an
+        editor reviewing the resubmission's history would look for it.
+        """
         if actor_id != self.corresponding_author_id:
             raise GuardViolationError("only the corresponding author may resubmit")
+        payload: dict[str, PayloadValue] = {"version": self.version + 1}
+        if original_document_key is not None:
+            self.original_document_key = original_document_key
+            payload["original_document_key"] = original_document_key
+        if anonymised_document_key is not None:
+            self.anonymised_document_key = anonymised_document_key
+            payload["anonymised_document_key"] = anonymised_document_key
+        if response_to_reviewers is not None:
+            payload["response_to_reviewers"] = response_to_reviewers
         event = self._transition(
-            S.RESUBMITTED,
-            EventType.REVISION_SUBMITTED,
-            actor_id,
-            occurred_at,
-            {"version": self.version + 1},
+            S.RESUBMITTED, EventType.REVISION_SUBMITTED, actor_id, occurred_at, payload
         )
         self.version += 1
         self.submitted_reviews = 0

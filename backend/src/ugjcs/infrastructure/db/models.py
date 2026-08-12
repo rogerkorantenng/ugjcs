@@ -40,6 +40,8 @@ class ManuscriptRow(Base):
     minimum_reviews: Mapped[int] = mapped_column(Integer, default=2)
     submitted_reviews: Mapped[int] = mapped_column(Integer, default=0)
     issue_id: Mapped[UUID | None] = mapped_column(postgresql.UUID(as_uuid=True), nullable=True)
+    original_document_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    anonymised_document_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
     authors: Mapped[list["ManuscriptAuthorRow"]] = relationship(
         back_populates="manuscript",

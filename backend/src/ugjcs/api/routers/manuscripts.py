@@ -2,43 +2,71 @@
 
 from datetime import UTC, datetime
 from random import randint
-from typing import Annotated
-from uuid import uuid4
+from typing import Annotated, Literal
+from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile, status
 
 from ugjcs.api.deps import ActorDep, require
-from ugjcs.api.schemas import ManuscriptOut, SubmitManuscriptRequest
-from ugjcs.api.wiring import UowDep
+from ugjcs.api.schemas import DocumentUrlOut, ManuscriptOut
+from ugjcs.api.wiring import DocumentStoreDep, UowDep
+from ugjcs.application.documents import (
+    PRESIGNED_URL_TTL,
+    anonymised_key,
+    original_key,
+    validate_document,
+)
 from ugjcs.application.ports import UnitOfWork
+from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Action, Actor, authorize
+from ugjcs.infrastructure.storage.anonymize import strip_pdf_metadata
 
 router = APIRouter()
 
 # A route-specific alias, built the same way as `wiring.UowDep`/`deps.ActorDep`: the
 # `require(Action.SUBMIT)` call must not appear as a bare `Depends(...)` default (ruff
 # B008), and this is the only route in this file that needs role enforcement before the
-# handler runs — `retrieve`/`withdraw` authorise against the loaded manuscript instead.
+# handler runs — `retrieve`/`withdraw`/`resubmit`/`get_document` authorise against the
+# loaded manuscript instead.
 SubmitDep = Annotated[Actor, Depends(require(Action.SUBMIT))]
+
+_EDITORIAL_ROLES = frozenset({Role.EDITOR, Role.EDITOR_IN_CHIEF, Role.ADMINISTRATOR})
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=ManuscriptOut)
 async def submit_manuscript(
-    body: SubmitManuscriptRequest, actor: SubmitDep, uow: UowDep
+    actor: SubmitDep,
+    uow: UowDep,
+    documents: DocumentStoreDep,
+    title: Annotated[str, Form()],
+    abstract: Annotated[str, Form()],
+    file: UploadFile,
+    keywords: Annotated[str, Form()] = "",
+    co_author_ids: Annotated[str, Form()] = "",
 ) -> ManuscriptOut:
-    author_ids = (UserId(actor.id), *(UserId(uid) for uid in body.co_author_ids))
+    """Multipart only: FR-04/05/06 require a manuscript to carry a document from the
+    moment it exists, so there is no submission path that skips `file`."""
+    data = await file.read()
+    validate_document(data)
+    author_ids = (UserId(actor.id), *(UserId(cid) for cid in _parse_uuids(co_author_ids)))
     manuscript = Manuscript(
         id=ManuscriptId(uuid4()),
         tracking_code=_mint_tracking_code(),
-        title=body.title,
-        abstract=body.abstract,
-        keywords=body.keywords,
+        title=title,
+        abstract=abstract,
+        keywords=_parse_list(keywords),
         author_ids=author_ids,
         corresponding_author_id=UserId(actor.id),
     )
-    manuscript.submit(actor_id=UserId(actor.id), occurred_at=datetime.now(UTC))
+    o_key, a_key = await _store_document(documents, manuscript.id, manuscript.version, data)
+    manuscript.submit(
+        actor_id=UserId(actor.id),
+        occurred_at=datetime.now(UTC),
+        original_document_key=o_key,
+        anonymised_document_key=a_key,
+    )
     await uow.manuscripts.add(manuscript)
     await uow.commit()
     return ManuscriptOut.from_domain(manuscript)
@@ -65,6 +93,92 @@ async def withdraw(tracking_code: str, actor: ActorDep, uow: UowDep) -> Manuscri
     await uow.manuscripts.save(manuscript)
     await uow.commit()
     return ManuscriptOut.from_domain(manuscript)
+
+
+@router.post("/{tracking_code}/resubmit", response_model=ManuscriptOut)
+async def resubmit(
+    tracking_code: str,
+    actor: ActorDep,
+    uow: UowDep,
+    documents: DocumentStoreDep,
+    file: UploadFile,
+    response_to_reviewers: Annotated[str, Form()],
+) -> ManuscriptOut:
+    """The corresponding author's only route back into the workflow from
+    `REVISION_REQUESTED` — see `Manuscript.resubmit`. Ownership-checked the same way
+    `withdraw` is: `Action.RESUBMIT` is granted by `policies.can()` only to the
+    manuscript's own corresponding author, never by role alone.
+    """
+    manuscript = await _get_or_404(uow, tracking_code)
+    authorize(actor, Action.RESUBMIT, manuscript)
+    data = await file.read()
+    validate_document(data)
+    next_version = manuscript.version + 1
+    o_key, a_key = await _store_document(documents, manuscript.id, next_version, data)
+    manuscript.resubmit(
+        actor_id=UserId(actor.id),
+        occurred_at=datetime.now(UTC),
+        original_document_key=o_key,
+        anonymised_document_key=a_key,
+        response_to_reviewers=response_to_reviewers,
+    )
+    await uow.manuscripts.save(manuscript)
+    await uow.commit()
+    return ManuscriptOut.from_domain(manuscript)
+
+
+@router.get("/{tracking_code}/document", response_model=DocumentUrlOut)
+async def get_document(
+    tracking_code: str,
+    actor: ActorDep,
+    uow: UowDep,
+    documents: DocumentStoreDep,
+    variant: Literal["original", "anonymised"] = "original",
+) -> DocumentUrlOut:
+    """An author gets the original; an editor gets either, by `variant`; a reviewer's
+    equivalent route lives on `ugjcs.api.routers.reviews` and serves only the
+    anonymised copy — see that module for why it cannot reuse this one.
+    """
+    manuscript = await _get_or_404(uow, tracking_code)
+    authorize(actor, Action.VIEW, manuscript)
+    if variant == "anonymised" and not (actor.roles & _EDITORIAL_ROLES):
+        raise HTTPException(
+            status_code=403, detail="only an editor may request the anonymised copy"
+        )
+    key = (
+        manuscript.anonymised_document_key
+        if variant == "anonymised"
+        else manuscript.original_document_key
+    )
+    if key is None:
+        raise HTTPException(status_code=404, detail="no document has been attached")
+    return await _presigned(documents, key)
+
+
+async def _store_document(
+    documents: DocumentStoreDep, manuscript_id: ManuscriptId, version: int, data: bytes
+) -> tuple[str, str]:
+    o_key = original_key(manuscript_id, version=version)
+    a_key = anonymised_key(manuscript_id, version=version)
+    await documents.put(o_key, data, content_type="application/pdf")
+    await documents.put(a_key, strip_pdf_metadata(data), content_type="application/pdf")
+    return o_key, a_key
+
+
+async def _presigned(documents: DocumentStoreDep, key: str) -> DocumentUrlOut:
+    url = await documents.presigned_url(key, expires_in=PRESIGNED_URL_TTL)
+    return DocumentUrlOut(url=url, expires_in_seconds=int(PRESIGNED_URL_TTL.total_seconds()))
+
+
+def _parse_list(raw: str) -> tuple[str, ...]:
+    return tuple(item.strip() for item in raw.split(",") if item.strip())
+
+
+def _parse_uuids(raw: str) -> tuple[UUID, ...]:
+    try:
+        return tuple(UUID(item) for item in _parse_list(raw))
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail="co_author_ids must be valid UUIDs") from error
 
 
 async def _get_or_404(uow: UnitOfWork, tracking_code: str) -> Manuscript:

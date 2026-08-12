@@ -28,6 +28,10 @@ class ManuscriptOut(BaseModel):
     version: int
     minimum_reviews: int
     submitted_reviews: int
+    has_document: bool
+    """Whether a document has been attached, without exposing its storage key: the key
+    is an implementation detail reached only through `GET .../document`'s pre-signed URL,
+    never echoed on the manuscript resource itself."""
 
     @classmethod
     def from_domain(cls, manuscript: Manuscript) -> "ManuscriptOut":
@@ -42,14 +46,8 @@ class ManuscriptOut(BaseModel):
             version=manuscript.version,
             minimum_reviews=manuscript.minimum_reviews,
             submitted_reviews=manuscript.submitted_reviews,
+            has_document=manuscript.original_document_key is not None,
         )
-
-
-class SubmitManuscriptRequest(BaseModel):
-    title: str
-    abstract: str
-    keywords: tuple[str, ...]
-    co_author_ids: tuple[UUID, ...] = ()
 
 
 class RecordDecisionRequest(BaseModel):
@@ -59,6 +57,22 @@ class RecordDecisionRequest(BaseModel):
 
 class AssignReviewerRequest(BaseModel):
     reviewer_id: UUID
+
+
+class ScheduleManuscriptRequest(BaseModel):
+    """Which issue to schedule into. Issues are not a persisted entity (see
+    `ugjcs.domain.ids.mint_issue_id`), so the caller names one by volume and number
+    rather than by an id it would otherwise have to invent or look up."""
+
+    volume: int
+    number: int
+
+
+class DocumentUrlOut(BaseModel):
+    """A short-lived, single-use-in-spirit link — see `DocumentStore.presigned_url`."""
+
+    url: str
+    expires_in_seconds: int
 
 
 class BlindedManuscriptOut(BaseModel):
