@@ -109,7 +109,7 @@ The default run excludes integration tests so `make check` stays fast and Docker
 
 - [ ] **Step 3: Extend the architecture contract**
 
-Replace `backend/.importlinter` with:
+**Do not replace the whole file blindly.** Plan 1's final review strengthened the `domain-purity` denylist after this plan was drafted; an earlier version of this step carried the stale seven-name list and would have silently undone that fix. Add the `layers` contract, and leave `domain-purity` as it stands. The finished file is:
 
 ```ini
 [importlinter]
@@ -117,7 +117,7 @@ root_package = ugjcs
 include_external_packages = True
 
 [importlinter:contract:domain-purity]
-name = Domain layer imports no frameworks or I/O libraries
+name = Domain layer imports no framework, vendor SDK, or I/O module
 type = forbidden
 source_modules =
     ugjcs.domain
@@ -129,6 +129,20 @@ forbidden_modules =
     arq
     redis
     httpx
+    requests
+    os
+    io
+    socket
+    sqlite3
+    subprocess
+    pathlib
+    asyncio
+    threading
+    multiprocessing
+    logging
+    http
+    smtplib
+    urllib
 
 [importlinter:contract:layers]
 name = Dependencies point inwards only
