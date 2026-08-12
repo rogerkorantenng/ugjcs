@@ -3,6 +3,7 @@
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.hashchain import ChainedEvent, append
 from ugjcs.domain.ids import ManuscriptId, TrackingCode
 from ugjcs.domain.manuscript import Manuscript
@@ -52,6 +53,29 @@ class SqlAlchemyManuscriptRepository:
             .order_by(EditorialEventRow.sequence)
         )
         return [row_to_chained(row) for row in result.scalars()]
+
+    async def list_published(self) -> list[Manuscript]:
+        # Not implemented in terms of a `list_by_status` helper: that method belongs to
+        # Task 5 (the editorial queue), which is out of scope for this pass — Task 5
+        # needs an authenticated `Actor` and this worktree has no authentication yet
+        # (Plan 3, landing concurrently). Reconciling the two into one helper is left for
+        # whoever finishes Task 5.
+        result = await self._session.execute(
+            select(ManuscriptRow).where(ManuscriptRow.status == S.PUBLISHED.value)
+        )
+        rows = result.scalars().all()
+        return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
+
+    async def search_published(self, query: str) -> list[Manuscript]:
+        result = await self._session.execute(
+            select(ManuscriptRow).where(
+                ManuscriptRow.status == S.PUBLISHED.value,
+                (ManuscriptRow.title.ilike(f"%{query}%"))
+                | (ManuscriptRow.abstract.ilike(f"%{query}%")),
+            )
+        )
+        rows = result.scalars().all()
+        return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
 
     async def _rehydrate(self, row: ManuscriptRow | None) -> Manuscript | None:
         if row is None:

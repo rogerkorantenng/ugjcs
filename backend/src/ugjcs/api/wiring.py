@@ -14,9 +14,12 @@ here, alongside a `_tokens()` helper building `JwtTokenService`, once Plan 3 lan
 
 from collections.abc import AsyncIterator
 from functools import lru_cache
+from typing import Annotated
 
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from ugjcs.application.ports import UnitOfWork
 from ugjcs.infrastructure.config import get_settings
 from ugjcs.infrastructure.db.engine import create_engine, session_factory
 from ugjcs.infrastructure.db.uow import SqlAlchemyUnitOfWork
@@ -44,3 +47,14 @@ def _sessions() -> async_sessionmaker[AsyncSession]:
 async def get_uow() -> AsyncIterator[SqlAlchemyUnitOfWork]:
     async with SqlAlchemyUnitOfWork(_sessions()) as uow:
         yield uow
+
+
+# A route parameter written `uow: UowDep` gets a `UnitOfWork` via `get_uow`, and mypy
+# treats it as one — `Annotated` strips the `Depends(...)` metadata for type-checking
+# purposes, leaving the first argument as the effective type. Routes depend on this
+# alias, not a bare `uow: UnitOfWork = Depends(get_uow)` default, because ruff's
+# bugbear B008 (function-call-in-default-argument, part of this project's selected "B"
+# rule set) flags `Depends(...)` used as a default value; only the alias form has no
+# default to flag, since the call now lives in a module-level assignment instead of a
+# function signature.
+UowDep = Annotated[UnitOfWork, Depends(get_uow)]

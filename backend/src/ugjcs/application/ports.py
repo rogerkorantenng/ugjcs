@@ -38,6 +38,14 @@ class ManuscriptRepository(Protocol):
         """Return the full audit chain in sequence order, for verification."""
         ...
 
+    async def list_published(self) -> list[Manuscript]:
+        """Every published manuscript — the public archive's contents."""
+        ...
+
+    async def search_published(self, query: str) -> list[Manuscript]:
+        """Published manuscripts whose title or abstract contains `query`, case-insensitively."""
+        ...
+
 
 class AccountRepository(Protocol):
     """Persistence for the account aggregate and its role grants."""

@@ -17,8 +17,27 @@ from datetime import UTC, datetime
 from uuid import uuid4
 
 from ugjcs.domain.enums import ManuscriptStatus as S
+from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import ManuscriptId, UserId
 from ugjcs.domain.manuscript import Manuscript
+
+
+@dataclass
+class FakeAccount:
+    id: UserId
+    email: str
+    roles: frozenset[Role]
+    full_name: str = "Test Author"
+    is_active: bool = True
+    is_verified: bool = True
+
+
+@dataclass
+class FakeAccountRepository:
+    accounts: dict[UserId, FakeAccount] = field(default_factory=dict)
+
+    async def get(self, user_id: UserId) -> FakeAccount | None:
+        return self.accounts.get(user_id)
 
 
 @dataclass
@@ -63,6 +82,7 @@ class FakeManuscriptRepository:
 @dataclass
 class FakeUnitOfWork:
     manuscripts: FakeManuscriptRepository = field(default_factory=FakeManuscriptRepository)
+    accounts: FakeAccountRepository = field(default_factory=FakeAccountRepository)
 
     async def __aenter__(self) -> "FakeUnitOfWork":
         return self

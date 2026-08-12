@@ -44,9 +44,8 @@ def create_app() -> FastAPI:
     # 3) — not available in this worktree. They are deliberately not wired here; see
     # `ugjcs.api.deps` for the stubbed `get_current_actor`/`require()` this leaves
     # behind for that work to finish against.
-    #
-    # Task 7 (this task) appends the public archive router below once it exists:
-    # from ugjcs.api.routers import archive
-    # app.include_router(archive.router, prefix="/api/v1/archive", tags=["archive"])
+    from ugjcs.api.routers import archive
+
+    app.include_router(archive.router, prefix="/api/v1/archive", tags=["archive"])
 
     return app
