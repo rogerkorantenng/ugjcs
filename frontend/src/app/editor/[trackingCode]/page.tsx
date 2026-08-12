@@ -7,7 +7,7 @@ import { Button, buttonClasses } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerAssignForm } from "@/components/reviewer-assign-form";
-import { DecisionForm } from "@/components/decision-form";
+import { DecisionForm, hasAvailableDecision } from "@/components/decision-form";
 import { PublicationPanel } from "@/components/publication-panel";
 import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
 
@@ -79,10 +79,12 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         </div>
       )}
 
-      <div className="mt-6 border-t border-rule pt-6">
-        <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
-        <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
-      </div>
+      {hasAvailableDecision(data.status) && (
+        <div className="mt-6 border-t border-rule pt-6">
+          <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
+          <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
+        </div>
+      )}
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">

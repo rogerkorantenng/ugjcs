@@ -34,6 +34,10 @@ describe("LoginPage", () => {
   it("is fully keyboard-operable: Tab reaches email, password, then the submit button in order", async () => {
     vi.stubGlobal("fetch", vi.fn());
     render(<LoginPage />);
+    // The masthead's home link is the page's first focusable element, ahead of the form —
+    // the same order a sighted user's eye meets them in, top to bottom.
+    await userEvent.tab();
+    expect(screen.getByRole("link", { name: "UGJCS" })).toHaveFocus();
     await userEvent.tab();
     expect(screen.getByLabelText("Email")).toHaveFocus();
     await userEvent.tab();

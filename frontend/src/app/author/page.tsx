@@ -6,6 +6,7 @@ import { ProblemAlert } from "@/components/ui/alert";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonClasses } from "@/components/ui/button";
+import { cardLinkClasses } from "@/components/ui/card";
 import { ManuscriptListSkeleton } from "@/components/skeletons";
 import type { Manuscript } from "@/types/api";
 
@@ -38,10 +39,7 @@ export default function AuthorDashboard() {
         <ul className="mt-4 space-y-3">
           {data.map((manuscript) => (
             <li key={manuscript.tracking_code}>
-              <Link
-                href={`/author/${manuscript.tracking_code}`}
-                className="flex items-center justify-between rounded-[3px] border border-rule bg-white/70 p-4 transition-colors hover:border-teal/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
-              >
+              <Link href={`/author/${manuscript.tracking_code}`} className={cardLinkClasses("flex items-center justify-between")}>
                 <div>
                   <p className="font-medium text-ink">{manuscript.title}</p>
                   <TrackingChip code={manuscript.tracking_code} className="mt-1" />

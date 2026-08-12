@@ -20,9 +20,10 @@ export const Input = forwardRef<HTMLInputElement, FieldProps>(function Input(
         id={inputId}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${inputId}-error` : undefined}
-        className={`w-full rounded-[3px] border bg-white px-3 py-2 text-sm text-ink
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber
-          ${error ? "border-brick" : "border-rule"} ${className}`}
+        className={`w-full rounded-[3px] border bg-white px-3 py-2 text-sm text-ink shadow-[inset_0_1px_2px_rgba(18,32,58,0.04)]
+          transition-colors duration-150 placeholder:text-ink/35
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:border-amber/60
+          ${error ? "border-brick" : "border-rule hover:border-teal/40"} ${className}`}
         {...props}
       />
       {error && (
