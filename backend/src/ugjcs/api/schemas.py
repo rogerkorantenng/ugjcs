@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from ugjcs.application.ports import AccountRepository
+from ugjcs.domain.enums import DecisionType
 from ugjcs.domain.manuscript import Manuscript
 
 
@@ -47,6 +48,15 @@ class SubmitManuscriptRequest(BaseModel):
     abstract: str
     keywords: tuple[str, ...]
     co_author_ids: tuple[UUID, ...] = ()
+
+
+class RecordDecisionRequest(BaseModel):
+    decision: DecisionType
+    rationale: str
+
+
+class AssignReviewerRequest(BaseModel):
+    reviewer_id: UUID
 
 
 class ArchivePaperOut(BaseModel):

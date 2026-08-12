@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from ugjcs.application.identity import AuthenticationError
+from ugjcs.application.ports import ReviewAssignmentRecord
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import ManuscriptId, UserId
@@ -134,9 +135,69 @@ class FakeManuscriptRepository:
 
 
 @dataclass
+class FakeAssignmentRepository:
+    """Enough of `ReviewAssignmentRepository` for router tests: two in-memory collections.
+
+    `assignments` mirrors the (manuscript_id, reviewer_id) pairs a real `assign()` call
+    would insert; `submitted` records what a `mark_submitted()` call attached. Both are
+    kept separate from `FakeManuscriptRepository`, matching the real schema's split
+    between the `manuscripts` and `review_assignments` tables.
+    """
+
+    assignments: list[tuple[ManuscriptId, UserId]] = field(default_factory=list)
+    submitted: dict[tuple[ManuscriptId, UserId], tuple[str, str]] = field(default_factory=dict)
+
+    async def assign(
+        self, manuscript_id: ManuscriptId, reviewer_id: UserId, *, occurred_at: datetime
+    ) -> None:
+        self.assignments.append((manuscript_id, reviewer_id))
+
+    async def list_for_reviewer(self, reviewer_id: UserId) -> list[ReviewAssignmentRecord]:
+        return [
+            self._record(manuscript_id, reviewer)
+            for manuscript_id, reviewer in self.assignments
+            if reviewer == reviewer_id
+        ]
+
+    async def list_for_manuscript(
+        self, manuscript_id: ManuscriptId
+    ) -> list[ReviewAssignmentRecord]:
+        return [
+            self._record(manuscript, reviewer)
+            for manuscript, reviewer in self.assignments
+            if manuscript == manuscript_id
+        ]
+
+    async def mark_submitted(
+        self,
+        manuscript_id: ManuscriptId,
+        reviewer_id: UserId,
+        *,
+        recommendation: str,
+        comments: str,
+        occurred_at: datetime,
+    ) -> None:
+        self.submitted[(manuscript_id, reviewer_id)] = (recommendation, comments)
+
+    def _record(self, manuscript_id: ManuscriptId, reviewer_id: UserId) -> ReviewAssignmentRecord:
+        pair = (manuscript_id, reviewer_id)
+        recommendation, comments = self.submitted.get(pair, (None, None))
+        return ReviewAssignmentRecord(
+            manuscript_id=manuscript_id,
+            reviewer_id=reviewer_id,
+            status="submitted" if pair in self.submitted else "assigned",
+            recommendation=recommendation,
+            comments=comments,
+            assigned_at=NOW,
+            submitted_at=NOW if pair in self.submitted else None,
+        )
+
+
+@dataclass
 class FakeUnitOfWork:
     manuscripts: FakeManuscriptRepository = field(default_factory=FakeManuscriptRepository)
     accounts: FakeAccountRepository = field(default_factory=FakeAccountRepository)
+    assignments: FakeAssignmentRepository = field(default_factory=FakeAssignmentRepository)
 
     async def __aenter__(self) -> "FakeUnitOfWork":
         return self
