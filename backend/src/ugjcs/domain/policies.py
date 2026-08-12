@@ -3,6 +3,14 @@
 Role grants cover actions that depend only on who the actor is. Actions that also
 depend on the actor's relationship to a specific manuscript are handled by explicit
 predicates, because encoding ownership in a role table silently over-grants.
+
+What this does NOT do, stated plainly so no caller assumes more than it provides:
+`REVIEW` is a role grant with no per-manuscript predicate. There is no assignment to
+check against yet, so the policy cannot ask whether this reviewer was invited to this
+manuscript, nor whether they are one of its authors. Conflict-of-interest exclusion and
+assignment checking arrive with reviewer assignment in a later plan; until then an actor
+holding both AUTHOR and REVIEWER is not prevented here from reviewing their own work.
+That gap is recorded in the technical debt register.
 """
 
 from collections.abc import Mapping

@@ -93,10 +93,13 @@ def test_author_may_not_view_someone_elses_manuscript() -> None:
 
 
 def test_reviewer_has_no_unblinded_view() -> None:
-    """Reviewers read manuscripts through the blinded projection, never through VIEW.
+    """VIEW is denied to a bare reviewer, so no reviewer obtains the unblinded aggregate.
 
-    If this ever returns True the double-blind guarantee is gone, because VIEW yields the
-    full aggregate including author identities.
+    VIEW yields the full aggregate including author identities, so if this ever returns
+    True the double-blind guarantee is gone. What the policy layer does not yet do is
+    grant reviewers the blinded projection: no `Action` maps to `blind()`, so this test
+    proves the denial and nothing about the permitted path. Wiring `blinding.blind` to an
+    authorisation action is future work.
     """
     assert not can(actor(Role.REVIEWER), Action.VIEW, manuscript())
 

@@ -2,7 +2,11 @@
 
 Blinding is structural: `BlindedManuscript` has no author attributes, so there is no
 field a future change could accidentally populate. Filtering a full object would leave
-that possibility open; omitting the fields from the type does not.
+that possibility open; omitting the fields from the type does not. That structural
+guarantee covers the aggregate only: the editorial event log carries `actor_id` and an
+editor's free-text `rationale`, there is no `BlindedEvent` projection, and the log is
+kept from reviewers by authorisation policy (`Action.VIEW_AUDIT`) rather than by
+construction.
 
 What this does NOT do: `title`, `abstract` and `keywords` are copied verbatim. If an
 author writes their name into the title, or the abstract says "extending our earlier work

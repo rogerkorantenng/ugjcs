@@ -84,6 +84,14 @@ class Manuscript:
         The automatic move to REVIEWS_COMPLETE is what makes a decision reachable:
         ACCEPTED and REJECTED are deliberately unreachable from UNDER_REVIEW, so an
         editor cannot decide while reviews are still outstanding.
+
+        What this does NOT do: `submitted_reviews` is a counter, not a set of reviewers.
+        `reviewer_id` is recorded on the event but is checked against nothing — not
+        against an assignment, not against `author_ids`, and not against reviewers who
+        have already submitted. One reviewer calling this twice therefore reaches the
+        quorum alone. Assignment tracking, which is what makes identity checkable here,
+        arrives with reviewer assignment in a later plan; the fix belongs there rather
+        than in a counter.
         """
         if self.status is not S.UNDER_REVIEW:
             raise GuardViolationError(
