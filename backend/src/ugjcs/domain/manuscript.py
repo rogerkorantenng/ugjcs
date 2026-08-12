@@ -23,9 +23,11 @@ _DECISION_TARGETS: dict[DecisionType, S] = {
     DecisionType.REJECT: S.REJECTED,
 }
 
-_DECISIONS_REQUIRING_REVIEWS = frozenset(
-    {DecisionType.ACCEPT, DecisionType.REJECT, DecisionType.REQUEST_REVISION}
-)
+# Only these need a quorum. REQUEST_REVISION is deliberately absent: FR-07 lets an editor
+# return a manuscript for pre-review changes during screening, when no reviews exist yet.
+# Post-review revision is already gated by the table, which reaches REVISION_REQUESTED from
+# REVIEWS_COMPLETE and nowhere else after review begins.
+_DECISIONS_REQUIRING_REVIEWS = frozenset({DecisionType.ACCEPT, DecisionType.REJECT})
 
 
 @dataclass(slots=True)
@@ -42,6 +44,7 @@ class Manuscript:
     minimum_reviews: int = 2
     submitted_reviews: int = 0
     issue_id: IssueId | None = None
+    _sequence: int = 0
     _events: list[EditorialEvent] = field(default_factory=list, repr=False)
 
     @property
@@ -49,7 +52,14 @@ class Manuscript:
         return tuple(self._events)
 
     def pull_events(self) -> tuple[EditorialEvent, ...]:
-        """Return buffered events and clear the buffer, for the caller to persist."""
+        """Return buffered events and clear the buffer, for the caller to persist.
+
+        `_sequence` is deliberately NOT reset. Sequence numbers must stay monotonic across
+        the whole lifetime of the manuscript, not just the current buffer, because
+        `hashchain.append` requires each event to follow its predecessor consecutively.
+        A repository rehydrating this aggregate must seed `_sequence` from the last
+        persisted event, otherwise the next event collides with one already in the chain.
+        """
         drained = tuple(self._events)
         self._events.clear()
         return drained
@@ -89,7 +99,7 @@ class Manuscript:
         if self.submitted_reviews >= self.minimum_reviews:
             self._transition(
                 S.REVIEWS_COMPLETE,
-                EventType.REVIEW_SUBMITTED,
+                EventType.REVIEW_ROUND_CLOSED,
                 reviewer_id,
                 occurred_at,
                 {"reviews_complete": True},
@@ -176,9 +186,10 @@ class Manuscript:
         occurred_at: datetime,
         payload: dict[str, PayloadValue],
     ) -> EditorialEvent:
+        self._sequence += 1
         event = EditorialEvent(
             manuscript_id=self.id,
-            sequence=len(self._events) + 1,
+            sequence=self._sequence,
             event_type=event_type,
             payload=payload,
             actor_id=actor_id,

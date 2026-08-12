@@ -56,6 +56,7 @@ class EventType(StrEnum):
     REVIEWER_ASSIGNED = "reviewer_assigned"
     INVITATION_ANSWERED = "invitation_answered"
     REVIEW_SUBMITTED = "review_submitted"
+    REVIEW_ROUND_CLOSED = "review_round_closed"
     DECISION_RECORDED = "decision_recorded"
     REVISION_SUBMITTED = "revision_submitted"
     MANUSCRIPT_WITHDRAWN = "manuscript_withdrawn"
