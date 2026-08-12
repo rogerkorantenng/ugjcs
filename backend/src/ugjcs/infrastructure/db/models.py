@@ -66,6 +66,9 @@ class ManuscriptAuthorRow(Base):
 
     manuscript: Mapped[ManuscriptRow] = relationship(back_populates="authors")
 
+    # Byline order is meaningful on a paper, and `order_by` alone resolves ties arbitrarily.
+    __table_args__ = (UniqueConstraint("manuscript_id", "position", name="author_position_unique"),)
+
 
 class EditorialEventRow(Base):
     """Append-only. A database trigger added in Task 3 rejects UPDATE and DELETE."""
