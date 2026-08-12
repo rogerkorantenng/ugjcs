@@ -4,10 +4,10 @@ from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
-from tests.unit.api.fakes import FakeUnitOfWork, new_user_id
+from tests.unit.api.fakes import FakeDocumentStore, FakeUnitOfWork, new_user_id
 from ugjcs.api.app import create_app
 from ugjcs.api.deps import get_current_actor
-from ugjcs.api.wiring import get_uow
+from ugjcs.api.wiring import get_document_store, get_uow
 from ugjcs.domain.enums import DecisionType, Role
 from ugjcs.domain.ids import ManuscriptId, TrackingCode
 from ugjcs.domain.manuscript import Manuscript
@@ -114,4 +114,44 @@ def test_submitting_a_review_for_a_missing_manuscript_is_404() -> None:
         "/api/v1/reviews/UGJCS-2026-9999/submit",
         json={"recommendation": "accept", "comments": "x"},
     )
+    assert response.status_code == 404
+
+
+def test_an_assigned_reviewer_gets_the_anonymised_documents_presigned_url() -> None:
+    manuscript = under_review_manuscript()
+    manuscript.original_document_key = "manuscripts/x/v1/original.pdf"
+    manuscript.anonymised_document_key = "manuscripts/x/v1/anonymised.pdf"
+    app = create_app()
+    uow = FakeUnitOfWork()
+    uow.manuscripts.store[manuscript.id] = manuscript
+    uow.assignments.assignments.append((manuscript.id, REVIEWER))
+    documents = FakeDocumentStore()
+    actor = Actor(id=REVIEWER, roles=frozenset({Role.REVIEWER}))
+
+    async def _uow() -> AsyncIterator[FakeUnitOfWork]:
+        yield uow
+
+    app.dependency_overrides[get_uow] = _uow
+    app.dependency_overrides[get_document_store] = lambda: documents
+    app.dependency_overrides[get_current_actor] = lambda: actor
+    response = TestClient(app).get(f"/api/v1/reviews/{manuscript.tracking_code.value}/document")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "anonymised.pdf" in body["url"]
+    assert "original.pdf" not in body["url"]
+
+
+def test_an_unassigned_reviewer_cannot_fetch_the_document() -> None:
+    manuscript = under_review_manuscript()
+    manuscript.anonymised_document_key = "manuscripts/x/v1/anonymised.pdf"
+    client = make_client(manuscript, assign=False)
+    response = client.get(f"/api/v1/reviews/{manuscript.tracking_code.value}/document")
+    assert response.status_code == 403
+
+
+def test_fetching_a_document_with_none_attached_is_404() -> None:
+    manuscript = under_review_manuscript()
+    client = make_client(manuscript)
+    response = client.get(f"/api/v1/reviews/{manuscript.tracking_code.value}/document")
     assert response.status_code == 404

@@ -223,6 +223,55 @@ def test_reviews_are_refused_outside_the_review_stage() -> None:
         manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
 
 
+def test_submit_without_document_keys_leaves_them_unset() -> None:
+    """Every caller that predates upload support — the seed script, every other test in
+    this file — must keep working unchanged."""
+    manuscript = draft()
+    manuscript.submit(actor_id=AUTHOR, occurred_at=NOW)
+    assert manuscript.original_document_key is None
+    assert manuscript.anonymised_document_key is None
+
+
+def test_submit_attaches_document_keys_and_records_them_in_the_event() -> None:
+    manuscript = draft()
+    event = manuscript.submit(
+        actor_id=AUTHOR,
+        occurred_at=NOW,
+        original_document_key="manuscripts/x/v1/original.pdf",
+        anonymised_document_key="manuscripts/x/v1/anonymised.pdf",
+    )
+    assert manuscript.original_document_key == "manuscripts/x/v1/original.pdf"
+    assert manuscript.anonymised_document_key == "manuscripts/x/v1/anonymised.pdf"
+    assert event.payload["original_document_key"] == "manuscripts/x/v1/original.pdf"
+    assert event.payload["anonymised_document_key"] == "manuscripts/x/v1/anonymised.pdf"
+
+
+def test_resubmit_replaces_the_document_keys_and_records_the_letter() -> None:
+    manuscript = under_review()
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.REQUEST_REVISION,
+        actor_id=EDITOR,
+        rationale="Clarify method",
+        occurred_at=NOW,
+    )
+    manuscript.original_document_key = "manuscripts/x/v1/original.pdf"
+    manuscript.anonymised_document_key = "manuscripts/x/v1/anonymised.pdf"
+
+    event = manuscript.resubmit(
+        actor_id=AUTHOR,
+        occurred_at=NOW,
+        original_document_key="manuscripts/x/v2/original.pdf",
+        anonymised_document_key="manuscripts/x/v2/anonymised.pdf",
+        response_to_reviewers="Addressed the concern about the baseline.",
+    )
+    assert manuscript.original_document_key == "manuscripts/x/v2/original.pdf"
+    assert manuscript.anonymised_document_key == "manuscripts/x/v2/anonymised.pdf"
+    assert event.payload["response_to_reviewers"] == "Addressed the concern about the baseline."
+    assert event.payload["original_document_key"] == "manuscripts/x/v2/original.pdf"
+
+
 def test_revision_may_be_requested_at_screening_without_any_reviews() -> None:
     """FR-07: an editor may return a manuscript for pre-review changes."""
     manuscript = submitted()

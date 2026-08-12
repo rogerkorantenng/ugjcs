@@ -37,6 +37,8 @@ def to_row(manuscript: Manuscript) -> ManuscriptRow:
         minimum_reviews=manuscript.minimum_reviews,
         submitted_reviews=manuscript.submitted_reviews,
         issue_id=manuscript.issue_id,
+        original_document_key=manuscript.original_document_key,
+        anonymised_document_key=manuscript.anonymised_document_key,
         authors=[
             ManuscriptAuthorRow(manuscript_id=manuscript.id, author_id=author_id, position=position)
             for position, author_id in enumerate(manuscript.author_ids)
@@ -64,6 +66,8 @@ def to_domain(row: ManuscriptRow, *, last_sequence: int) -> Manuscript:
         minimum_reviews=row.minimum_reviews,
         submitted_reviews=row.submitted_reviews,
         issue_id=IssueId(row.issue_id) if row.issue_id is not None else None,
+        original_document_key=row.original_document_key,
+        anonymised_document_key=row.anonymised_document_key,
     )
     manuscript._sequence = last_sequence
     return manuscript

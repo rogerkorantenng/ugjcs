@@ -8,8 +8,11 @@ serialisation only.
 """
 
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
+from io import BytesIO
 from uuid import UUID, uuid4
+
+from pypdf import PdfWriter
 
 from ugjcs.application.identity import AuthenticationError
 from ugjcs.application.ports import ReviewAssignmentRecord
@@ -194,6 +197,20 @@ class FakeAssignmentRepository:
 
 
 @dataclass
+class FakeDocumentStore:
+    """Records what would have been written to S3, and hands back a fake URL that
+    encodes the key so a test can assert which object a route resolved to."""
+
+    objects: dict[str, bytes] = field(default_factory=dict)
+
+    async def put(self, key: str, data: bytes, *, content_type: str) -> None:
+        self.objects[key] = data
+
+    async def presigned_url(self, key: str, *, expires_in: timedelta) -> str:
+        return f"https://fake-s3.test/{key}?ttl={int(expires_in.total_seconds())}"
+
+
+@dataclass
 class FakeUnitOfWork:
     manuscripts: FakeManuscriptRepository = field(default_factory=FakeManuscriptRepository)
     accounts: FakeAccountRepository = field(default_factory=FakeAccountRepository)
@@ -217,3 +234,15 @@ NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
 
 def new_user_id() -> UserId:
     return UserId(uuid4())
+
+
+def minimal_pdf_bytes() -> bytes:
+    """A genuinely parseable one-page PDF carrying an author name in its DocInfo, not
+    merely four magic bytes: the anonymiser route calls `pypdf.PdfReader` on whatever a
+    test uploads, and the identifying metadata is what proves stripping actually ran."""
+    writer = PdfWriter()
+    writer.add_blank_page(width=200, height=200)
+    writer.add_metadata({"/Author": "Sentinel Author Name", "/Title": "Sentinel Title"})
+    buffer = BytesIO()
+    writer.write(buffer)
+    return buffer.getvalue()

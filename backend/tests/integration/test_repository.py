@@ -81,3 +81,45 @@ async def test_state_changes_survive_a_round_trip(session: AsyncSession) -> None
     reloaded = await repository.get(manuscript.id)
     assert reloaded is not None
     assert reloaded.status is S.UNDER_SCREENING
+
+
+async def test_document_keys_attached_on_submission_survive_a_round_trip(
+    session: AsyncSession,
+) -> None:
+    repository = SqlAlchemyManuscriptRepository(session)
+    manuscript = make_manuscript(sequence=51)
+    manuscript.submit(
+        actor_id=AUTHOR,
+        occurred_at=NOW,
+        original_document_key=f"manuscripts/{manuscript.id}/v1/original.pdf",
+        anonymised_document_key=f"manuscripts/{manuscript.id}/v1/anonymised.pdf",
+    )
+    await repository.add(manuscript)
+    await session.commit()
+
+    loaded = await repository.get(manuscript.id)
+    assert loaded is not None
+    assert loaded.original_document_key == f"manuscripts/{manuscript.id}/v1/original.pdf"
+    assert loaded.anonymised_document_key == f"manuscripts/{manuscript.id}/v1/anonymised.pdf"
+
+
+async def test_document_keys_attached_by_save_persist_too(session: AsyncSession) -> None:
+    """`save()` sets `row.original_document_key`/`anonymised_document_key` explicitly,
+    unlike `add()` which gets them for free from `to_row`. This proves that write path too."""
+    repository = SqlAlchemyManuscriptRepository(session)
+    manuscript = make_manuscript(sequence=52)
+    manuscript.submit(actor_id=AUTHOR, occurred_at=NOW)
+    await repository.add(manuscript)
+    await session.commit()
+
+    loaded = await repository.get(manuscript.id)
+    assert loaded is not None
+    loaded.original_document_key = f"manuscripts/{loaded.id}/v2/original.pdf"
+    loaded.anonymised_document_key = f"manuscripts/{loaded.id}/v2/anonymised.pdf"
+    await repository.save(loaded)
+    await session.commit()
+
+    reloaded = await repository.get(manuscript.id)
+    assert reloaded is not None
+    assert reloaded.original_document_key == f"manuscripts/{manuscript.id}/v2/original.pdf"
+    assert reloaded.anonymised_document_key == f"manuscripts/{manuscript.id}/v2/anonymised.pdf"

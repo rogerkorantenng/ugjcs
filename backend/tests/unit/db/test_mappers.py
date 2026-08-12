@@ -87,6 +87,21 @@ def test_round_trip_restores_a_populated_issue_id() -> None:
     assert restored.issue_id == issue_id
 
 
+def test_round_trip_restores_document_keys() -> None:
+    original = make_manuscript()
+    original.original_document_key = f"manuscripts/{original.id}/v1/original.pdf"
+    original.anonymised_document_key = f"manuscripts/{original.id}/v1/anonymised.pdf"
+    restored = to_domain(to_row(original), last_sequence=0)
+    assert restored.original_document_key == original.original_document_key
+    assert restored.anonymised_document_key == original.anonymised_document_key
+
+
+def test_round_trip_with_no_document_attached_keeps_the_keys_none() -> None:
+    restored = to_domain(to_row(make_manuscript()), last_sequence=0)
+    assert restored.original_document_key is None
+    assert restored.anonymised_document_key is None
+
+
 def test_rehydration_seeds_the_sequence_counter() -> None:
     """Without this, the next event collides with one already in the chain."""
     restored = to_domain(to_row(make_manuscript()), last_sequence=7)

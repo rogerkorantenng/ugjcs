@@ -70,3 +70,21 @@ async def test_tracking_code_has_a_unique_index_not_a_unique_constraint(
         )
     )
     assert constraint.first() is None
+
+
+async def test_document_key_columns_exist_and_are_nullable(session: AsyncSession) -> None:
+    """Manually cross-checked against `alembic upgrade head` on a throwaway container as
+    part of writing `0004_manuscript_document_keys.py` — this asserts the same shape
+    `to_row`/`to_domain` depend on, the same way the rest of this file does."""
+    result = await session.execute(
+        text(
+            "SELECT column_name, is_nullable, character_maximum_length "
+            "FROM information_schema.columns WHERE table_name = 'manuscripts' "
+            "AND column_name IN ('original_document_key', 'anonymised_document_key')"
+        )
+    )
+    columns = {row[0]: (row[1], row[2]) for row in result}
+    assert columns == {
+        "original_document_key": ("YES", 512),
+        "anonymised_document_key": ("YES", 512),
+    }

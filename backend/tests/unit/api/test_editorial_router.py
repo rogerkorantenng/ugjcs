@@ -8,8 +8,8 @@ from tests.unit.api.fakes import FakeUnitOfWork, new_user_id
 from ugjcs.api.app import create_app
 from ugjcs.api.deps import get_current_actor
 from ugjcs.api.wiring import get_uow
-from ugjcs.domain.enums import Role
-from ugjcs.domain.ids import ManuscriptId, TrackingCode
+from ugjcs.domain.enums import DecisionType, Role
+from ugjcs.domain.ids import ManuscriptId, TrackingCode, mint_issue_id
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Actor
 
@@ -121,5 +121,101 @@ def test_assigning_a_reviewer_to_a_missing_manuscript_is_404() -> None:
     response = client.post(
         "/api/v1/editorial/UGJCS-2026-9999/reviewers",
         json={"reviewer_id": str(REVIEWER)},
+    )
+    assert response.status_code == 404
+
+
+def accepted_manuscript(sequence: int = 61) -> Manuscript:
+    manuscript = submitted_manuscript(sequence)
+    manuscript.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.SEND_TO_REVIEW, actor_id=EDITOR, rationale="ok", occurred_at=NOW
+    )
+    for _ in range(manuscript.minimum_reviews):
+        manuscript.record_review(reviewer_id=REVIEWER, occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.ACCEPT, actor_id=EDITOR, rationale="Accepted", occurred_at=NOW
+    )
+    return manuscript
+
+
+EIC = new_user_id()
+
+
+def test_the_editor_in_chief_can_schedule_an_accepted_manuscript() -> None:
+    manuscript = accepted_manuscript()
+    actor = Actor(id=EIC, roles=frozenset({Role.EDITOR_IN_CHIEF}))
+    client = make_client(actor, manuscript)
+    response = client.post(
+        f"/api/v1/editorial/{manuscript.tracking_code.value}/schedule",
+        json={"volume": 3, "number": 1},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "scheduled"
+    assert manuscript.issue_id == mint_issue_id(3, 1)
+
+
+def test_a_plain_editor_cannot_schedule() -> None:
+    manuscript = accepted_manuscript()
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    client = make_client(actor, manuscript)
+    response = client.post(
+        f"/api/v1/editorial/{manuscript.tracking_code.value}/schedule",
+        json={"volume": 3, "number": 1},
+    )
+    assert response.status_code == 403
+
+
+def test_scheduling_the_same_volume_and_number_twice_yields_the_same_issue_id() -> None:
+    first = accepted_manuscript(sequence=62)
+    second = accepted_manuscript(sequence=63)
+    actor = Actor(id=EIC, roles=frozenset({Role.EDITOR_IN_CHIEF}))
+    client = make_client(actor, first, second)
+    client.post(
+        f"/api/v1/editorial/{first.tracking_code.value}/schedule",
+        json={"volume": 5, "number": 2},
+    )
+    client.post(
+        f"/api/v1/editorial/{second.tracking_code.value}/schedule",
+        json={"volume": 5, "number": 2},
+    )
+    assert first.issue_id == second.issue_id
+
+
+def test_the_editor_in_chief_can_publish_a_scheduled_manuscript() -> None:
+    manuscript = accepted_manuscript(sequence=64)
+    actor = Actor(id=EIC, roles=frozenset({Role.EDITOR_IN_CHIEF}))
+    client = make_client(actor, manuscript)
+    client.post(
+        f"/api/v1/editorial/{manuscript.tracking_code.value}/schedule",
+        json={"volume": 1, "number": 1},
+    )
+    response = client.post(f"/api/v1/editorial/{manuscript.tracking_code.value}/publish")
+    assert response.status_code == 200
+    assert response.json()["status"] == "published"
+
+
+def test_publishing_without_scheduling_first_is_a_conflict() -> None:
+    manuscript = accepted_manuscript(sequence=65)
+    actor = Actor(id=EIC, roles=frozenset({Role.EDITOR_IN_CHIEF}))
+    client = make_client(actor, manuscript)
+    response = client.post(f"/api/v1/editorial/{manuscript.tracking_code.value}/publish")
+    assert response.status_code == 409
+
+
+def test_a_plain_editor_cannot_publish() -> None:
+    manuscript = accepted_manuscript(sequence=66)
+    manuscript.schedule(issue_id=mint_issue_id(1, 1), actor_id=EIC, occurred_at=NOW)
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    client = make_client(actor, manuscript)
+    response = client.post(f"/api/v1/editorial/{manuscript.tracking_code.value}/publish")
+    assert response.status_code == 403
+
+
+def test_scheduling_a_missing_manuscript_is_404() -> None:
+    actor = Actor(id=EIC, roles=frozenset({Role.EDITOR_IN_CHIEF}))
+    client = make_client(actor)
+    response = client.post(
+        "/api/v1/editorial/UGJCS-2026-9999/schedule", json={"volume": 1, "number": 1}
     )
     assert response.status_code == 404

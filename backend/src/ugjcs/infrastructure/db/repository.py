@@ -44,6 +44,8 @@ class SqlAlchemyManuscriptRepository:
         row.version = manuscript.version
         row.submitted_reviews = manuscript.submitted_reviews
         row.issue_id = manuscript.issue_id
+        row.original_document_key = manuscript.original_document_key
+        row.anonymised_document_key = manuscript.anonymised_document_key
         await self._flush_events(manuscript)
 
     async def chain_for(self, manuscript_id: ManuscriptId) -> list[ChainedEvent]:

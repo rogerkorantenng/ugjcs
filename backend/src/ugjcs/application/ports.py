@@ -211,3 +211,26 @@ class TokenService(Protocol):
 
 class EmailSender(Protocol):
     async def send_verification(self, to: str, link: str) -> None: ...
+
+
+class DocumentStore(Protocol):
+    """Object storage for manuscript documents.
+
+    Deliberately ignorant of "original" vs "anonymised": that distinction lives entirely
+    in the key an `application`-layer caller chooses (see `application.documents`), so
+    this port stays a plain key/bytes store an adapter can satisfy without knowing
+    anything about manuscripts. The S3 adapter lives in `infrastructure.storage`; this
+    layer must never import `boto3` itself.
+    """
+
+    async def put(self, key: str, data: bytes, *, content_type: str) -> None:
+        """Write `data` under `key`, replacing whatever was there before."""
+        ...
+
+    async def presigned_url(self, key: str, *, expires_in: timedelta) -> str:
+        """A short-lived, time-limited URL a client can fetch `key` from directly.
+
+        The bucket itself blocks all public access; a pre-signed URL is the only way
+        any document ever reaches a browser, and it is never proxied through this API.
+        """
+        ...

@@ -1,6 +1,6 @@
 import pytest
 
-from ugjcs.domain.ids import TrackingCode
+from ugjcs.domain.ids import TrackingCode, mint_issue_id
 
 
 def test_tracking_code_formats_year_and_zero_padded_sequence() -> None:
@@ -41,3 +41,18 @@ def test_the_constructor_rejects_a_value_parse_would_reject() -> None:
     """Validation on `parse` alone leaves `TrackingCode("garbage")` a legal object."""
     with pytest.raises(ValueError, match="malformed tracking code"):
         TrackingCode("garbage")
+
+
+def test_mint_issue_id_is_deterministic_for_the_same_volume_and_number() -> None:
+    assert mint_issue_id(3, 1) == mint_issue_id(3, 1)
+
+
+def test_mint_issue_id_differs_across_volumes_and_numbers() -> None:
+    assert mint_issue_id(3, 1) != mint_issue_id(3, 2)
+    assert mint_issue_id(3, 1) != mint_issue_id(4, 1)
+
+
+@pytest.mark.parametrize(("volume", "number"), [(0, 1), (1, 0), (-1, 1)])
+def test_mint_issue_id_rejects_non_positive_volume_or_number(volume: int, number: int) -> None:
+    with pytest.raises(ValueError, match="volume and number must be positive"):
+        mint_issue_id(volume, number)
