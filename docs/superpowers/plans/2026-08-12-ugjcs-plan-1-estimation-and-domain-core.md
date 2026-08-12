@@ -627,7 +627,7 @@ def test_assert_legal_is_silent_for_a_legal_transition() -> None:
 
 
 def test_assert_legal_raises_naming_both_states() -> None:
-    with pytest.raises(IllegalTransitionError, match="draft.*published"):
+    with pytest.raises(IllegalTransitionError, match=r"draft.*published"):
         assert_legal(S.DRAFT, S.PUBLISHED)
 ```
 
