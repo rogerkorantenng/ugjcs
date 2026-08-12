@@ -3,7 +3,7 @@
 from collections.abc import AsyncIterator, Iterator
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from testcontainers.postgres import PostgresContainer
 
 from ugjcs.infrastructure.db.base import Base
@@ -50,4 +50,18 @@ async def session(postgres_url: str) -> AsyncIterator[AsyncSession]:
     factory = session_factory(engine)
     async with factory() as session:
         yield session
+    await engine.dispose()
+
+
+@pytest.fixture
+async def engine(postgres_url: str) -> AsyncIterator[AsyncEngine]:
+    """A clean schema per test, exposed as an engine for unit-of-work tests."""
+    engine = create_engine(postgres_url, echo=False)
+    async with engine.begin() as connection:
+        await connection.run_sync(Base.metadata.drop_all)
+        await connection.run_sync(Base.metadata.create_all)
+        await connection.exec_driver_sql(APPEND_ONLY_FUNCTION)
+        await connection.exec_driver_sql(APPEND_ONLY_TRIGGER)
+        await connection.exec_driver_sql(NO_TRUNCATE_TRIGGER)
+    yield engine
     await engine.dispose()
