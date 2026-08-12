@@ -529,9 +529,7 @@ def upgrade() -> None:
             ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("manuscript_id", "author_id", name="pk_manuscript_authors"),
-        sa.UniqueConstraint(
-            "manuscript_id", "position", name="uq_manuscript_authors_author_position_unique"
-        ),
+        sa.UniqueConstraint("manuscript_id", "position", name="author_position_unique"),
     )
 
     op.create_table(
@@ -552,7 +550,7 @@ def upgrade() -> None:
             ondelete="RESTRICT",
         ),
         sa.PrimaryKeyConstraint("manuscript_id", "sequence", name="pk_editorial_events"),
-        sa.UniqueConstraint("manuscript_id", "event_hash", name="uq_editorial_events_event_hash"),
+        sa.UniqueConstraint("manuscript_id", "event_hash", name="event_hash_unique"),
     )
     op.create_index(
         "ix_editorial_events_manuscript_sequence",
@@ -571,6 +569,13 @@ def downgrade() -> None:
     op.drop_table("manuscript_authors")
     op.drop_table("manuscripts")
 ```
+
+**Two constraint names look inconsistent, and that is correct.** The naming convention's `uq`
+template is `uq_%(table_name)s_%(column_0_name)s`, which contains no `%(constraint_name)s` token,
+so SQLAlchemy uses an explicitly supplied `name=` verbatim rather than expanding it. `event_hash_unique`
+and `author_position_unique` therefore keep those exact names, while the `ck` template does contain
+the token and so expands `version_positive` into `ck_manuscripts_version_positive`. The migration must
+match the metadata exactly or Task 8's parity test will fail — which is what that test is for.
 
 - [ ] **Step 4: Verify the migration applies and reverses**
 
