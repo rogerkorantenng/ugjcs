@@ -18,6 +18,9 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://user:pass@host:5432/ugjcs",
     )
     sql_echo: bool = Field(default=False, description="Log every statement; never in production")
+    jwt_secret: str = Field(description="HMAC signing key; no default, must be supplied")
+    access_token_minutes: int = Field(default=15, description="Access token lifetime")
+    refresh_token_days: int = Field(default=7, description="Refresh token lifetime")
 
 
 @lru_cache
