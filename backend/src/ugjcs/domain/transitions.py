@@ -11,6 +11,10 @@ from ugjcs.domain.errors import IllegalTransitionError
 
 TERMINAL_STATES: frozenset[S] = frozenset({S.DESK_REJECTED, S.REJECTED, S.PUBLISHED, S.WITHDRAWN})
 
+# ACCEPTED and SCHEDULED are deliberately absent: once a manuscript is accepted this
+# table offers no route to WITHDRAWN. Undoing an acceptance is retraction, an editorial
+# action with its own notice and record-of-version obligations, and it is not modelled
+# here.
 _WITHDRAWABLE_FROM = (
     S.SUBMITTED,
     S.UNDER_SCREENING,

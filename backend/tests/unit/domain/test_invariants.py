@@ -1,6 +1,7 @@
 """Universal invariants, asserted over generated inputs rather than chosen examples."""
 
 import dataclasses
+import json
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
@@ -14,13 +15,24 @@ from ugjcs.domain.events import EditorialEvent, PayloadValue
 from ugjcs.domain.hashchain import ChainBrokenError, ChainedEvent, append, verify
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
-from ugjcs.domain.transitions import LEGAL_TRANSITIONS, TERMINAL_STATES, is_legal
+from ugjcs.domain.transitions import (
+    _WITHDRAWABLE_FROM,
+    LEGAL_TRANSITIONS,
+    TERMINAL_STATES,
+    is_legal,
+)
 
 BASE_TIME = datetime(2026, 8, 12, tzinfo=UTC)
 
 payloads = st.dictionaries(
     st.text(min_size=1, max_size=12),
-    st.one_of(st.integers(), st.text(max_size=20), st.booleans()),
+    st.one_of(
+        st.integers(),
+        st.text(max_size=20),
+        st.booleans(),
+        st.floats(allow_nan=False, allow_infinity=False),
+        st.none(),
+    ),
     max_size=5,
 )
 
@@ -76,15 +88,10 @@ def test_accepted_is_reachable_only_from_reviews_complete(source: S) -> None:
         assert source is S.REVIEWS_COMPLETE
 
 
-def test_withdrawal_is_reachable_from_every_non_terminal_state_except_draft() -> None:
-    expected = {
-        state
-        for state in S
-        if state not in TERMINAL_STATES
-        and state not in {S.DRAFT, S.RESUBMITTED, S.ACCEPTED, S.SCHEDULED}
-    }
-    actual = {state for state in S if S.WITHDRAWN in LEGAL_TRANSITIONS[state]}
-    assert actual == expected
+def test_the_table_matches_the_declared_withdrawal_policy() -> None:
+    """`_WITHDRAWABLE_FROM` documents the policy; this is what makes it authoritative."""
+    reachable = {state for state in S if S.WITHDRAWN in LEGAL_TRANSITIONS[state]}
+    assert reachable == set(_WITHDRAWABLE_FROM)
 
 
 @settings(max_examples=100)
@@ -153,3 +160,18 @@ def test_the_blinded_projection_never_carries_author_identity(
     )
     serialised = repr(dataclasses.asdict(blind(manuscript)))
     assert str(author) not in serialised
+
+
+@settings(max_examples=100)
+@given(payload=payloads)
+def test_canonical_bytes_always_parse_as_json(payload: dict[str, PayloadValue]) -> None:
+    """The precondition for events reaching a jsonb column at all."""
+    event = EditorialEvent(
+        manuscript_id=ManuscriptId(uuid4()),
+        sequence=1,
+        event_type=EventType.DECISION_RECORDED,
+        payload=payload,
+        actor_id=UserId(uuid4()),
+        occurred_at=BASE_TIME,
+    )
+    assert json.loads(event.canonical_bytes())["payload"] == payload

@@ -108,14 +108,15 @@ def test_desk_rejection_is_illegal_once_under_review() -> None:
         )
 
 
-def test_acceptance_requires_the_minimum_review_count() -> None:
+@pytest.mark.parametrize("decision", [DecisionType.ACCEPT, DecisionType.REJECT])
+def test_a_decision_requires_the_minimum_review_count(decision: DecisionType) -> None:
     manuscript = under_review()
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
     with pytest.raises(GuardViolationError, match="requires 2 reviews, has 1"):
         manuscript.record_decision(
-            decision=DecisionType.ACCEPT,
+            decision=decision,
             actor_id=EDITOR,
-            rationale="Strong",
+            rationale="Premature",
             occurred_at=NOW,
         )
 
