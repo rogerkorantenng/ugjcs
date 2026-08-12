@@ -9,6 +9,7 @@ from types import TracebackType
 from typing import Protocol, Self
 from uuid import UUID
 
+from ugjcs.domain.account import Account, EmailAddress
 from ugjcs.domain.hashchain import ChainedEvent
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
@@ -38,10 +39,29 @@ class ManuscriptRepository(Protocol):
         ...
 
 
+class AccountRepository(Protocol):
+    """Persistence for the account aggregate and its role grants."""
+
+    async def add(self, account: Account) -> None:
+        """Persist an account that has never been stored before."""
+        ...
+
+    async def get(self, user_id: UserId) -> Account | None: ...
+
+    async def get_by_email(self, email: EmailAddress) -> Account | None:
+        """Look up by the normalised address. Case and whitespace never distinguish accounts."""
+        ...
+
+    async def save(self, account: Account) -> None:
+        """Persist scalar field changes and replace the role rows to match `account.roles`."""
+        ...
+
+
 class UnitOfWork(Protocol):
     """A transactional boundary. Exiting without `commit` rolls back."""
 
     manuscripts: ManuscriptRepository
+    accounts: AccountRepository
 
     async def __aenter__(self) -> Self: ...
 
