@@ -727,7 +727,7 @@ git commit -m "feat: add guarded manuscript lifecycle state machine"
 
 **Interfaces:**
 - Consumes: `EventType` from `enums.py`; `ManuscriptId`, `UserId` from `ids.py`.
-- Produces: `EditorialEvent` frozen dataclass with fields `manuscript_id: ManuscriptId`, `sequence: int`, `event_type: EventType`, `payload: Mapping[str, object]`, `actor_id: UserId | None`, `occurred_at: datetime`, and method `canonical_bytes() -> bytes`.
+- Produces: `EditorialEvent` frozen dataclass with fields `manuscript_id: ManuscriptId`, `sequence: int`, `event_type: EventType`, `payload: Mapping[str, PayloadValue]`, `actor_id: UserId | None`, `occurred_at: datetime`, and method `canonical_bytes() -> bytes`. Also exports `type PayloadValue = str | int | float | bool | None`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -789,6 +789,18 @@ def test_canonical_bytes_change_when_payload_changes() -> None:
     a = make_event(payload={"alpha": 1})
     b = make_event(payload={"alpha": 2})
     assert a.canonical_bytes() != b.canonical_bytes()
+
+
+def test_canonical_bytes_refuses_a_value_it_cannot_serialise_stably() -> None:
+    """A set's str() follows iteration order, which varies with the process hash seed.
+
+    Serialising it would produce different bytes for the same event in a different
+    process, so the chain would report tampering that never happened. Refusing loudly
+    is the only safe behaviour.
+    """
+    event = make_event(payload={"tags": {"a", "b"}})
+    with pytest.raises(TypeError):
+        event.canonical_bytes()
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -815,13 +827,24 @@ from datetime import datetime
 from ugjcs.domain.enums import EventType
 from ugjcs.domain.ids import ManuscriptId, UserId
 
+type PayloadValue = str | int | float | bool | None
+"""Payload values are restricted to JSON-native scalars.
+
+The hash chain in `hashchain.py` is only tamper-evident if equal events always
+serialise to equal bytes. A `set` would serialise through its iteration order, which
+varies with Python's per-process hash seed; an arbitrary object would fall back to a
+`repr` containing a memory address. Either would make an untampered event fail
+verification in a different process, which is a false tamper alert — worse than no
+check at all. Restricting the type makes that unrepresentable.
+"""
+
 
 @dataclass(frozen=True, slots=True)
 class EditorialEvent:
     manuscript_id: ManuscriptId
     sequence: int
     event_type: EventType
-    payload: Mapping[str, object]
+    payload: Mapping[str, PayloadValue]
     actor_id: UserId | None
     occurred_at: datetime
 
@@ -841,13 +864,11 @@ class EditorialEvent:
             "manuscript_id": str(self.manuscript_id),
             "sequence": self.sequence,
             "event_type": self.event_type.value,
-            "payload": self.payload,
-            "actor_id": str(self.actor_id) if self.actor_id else None,
+            "payload": dict(self.payload),
+            "actor_id": str(self.actor_id) if self.actor_id is not None else None,
             "occurred_at": self.occurred_at.isoformat(),
         }
-        return json.dumps(
-            document, sort_keys=True, separators=(",", ":"), default=str
-        ).encode("utf-8")
+        return json.dumps(document, sort_keys=True, separators=(",", ":")).encode("utf-8")
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
@@ -896,7 +917,7 @@ from uuid import uuid4
 import pytest
 
 from ugjcs.domain.enums import EventType
-from ugjcs.domain.events import EditorialEvent
+from ugjcs.domain.events import EditorialEvent, PayloadValue
 from ugjcs.domain.hashchain import (
     GENESIS_HASH,
     ChainBrokenError,
@@ -910,7 +931,7 @@ from ugjcs.domain.ids import ManuscriptId, UserId
 MANUSCRIPT = ManuscriptId(uuid4())
 
 
-def event(sequence: int, **payload: object) -> EditorialEvent:
+def event(sequence: int, **payload: PayloadValue) -> EditorialEvent:
     return EditorialEvent(
         manuscript_id=MANUSCRIPT,
         sequence=sequence,
@@ -1275,7 +1296,7 @@ from datetime import datetime
 from ugjcs.domain.enums import DecisionType, EventType
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.errors import GuardViolationError
-from ugjcs.domain.events import EditorialEvent
+from ugjcs.domain.events import EditorialEvent, PayloadValue
 from ugjcs.domain.ids import IssueId, ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.transitions import assert_legal
 
@@ -1414,7 +1435,7 @@ class Manuscript:
         event_type: EventType,
         actor_id: UserId,
         occurred_at: datetime,
-        payload: dict[str, object],
+        payload: dict[str, PayloadValue],
     ) -> EditorialEvent:
         assert_legal(self.status, target)
         self.status = target
@@ -1425,7 +1446,7 @@ class Manuscript:
         event_type: EventType,
         actor_id: UserId,
         occurred_at: datetime,
-        payload: dict[str, object],
+        payload: dict[str, PayloadValue],
     ) -> EditorialEvent:
         event = EditorialEvent(
             manuscript_id=self.id,
@@ -1826,7 +1847,7 @@ from hypothesis import strategies as st
 
 from ugjcs.domain.enums import EventType
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.events import EditorialEvent
+from ugjcs.domain.events import EditorialEvent, PayloadValue
 from ugjcs.domain.hashchain import ChainBrokenError, append, verify
 from ugjcs.domain.ids import ManuscriptId, UserId
 from ugjcs.domain.transitions import LEGAL_TRANSITIONS, TERMINAL_STATES, is_legal
@@ -1872,7 +1893,7 @@ def test_withdrawal_is_reachable_from_every_non_terminal_state_except_draft() ->
 @settings(max_examples=100)
 @given(payload_list=st.lists(payloads, min_size=1, max_size=12))
 def test_a_chain_built_by_append_always_verifies(
-    payload_list: list[dict[str, object]],
+    payload_list: list[dict[str, PayloadValue]],
 ) -> None:
     manuscript_id = ManuscriptId(uuid4())
     actor_id = UserId(uuid4())
@@ -1900,7 +1921,7 @@ def test_a_chain_built_by_append_always_verifies(
     victim=st.integers(min_value=0),
 )
 def test_removing_any_event_breaks_the_chain(
-    payload_list: list[dict[str, object]], victim: int
+    payload_list: list[dict[str, PayloadValue]], victim: int
 ) -> None:
     manuscript_id = ManuscriptId(uuid4())
     actor_id = UserId(uuid4())
