@@ -475,6 +475,7 @@ class EventType(StrEnum):
     REVIEWER_ASSIGNED = "reviewer_assigned"
     INVITATION_ANSWERED = "invitation_answered"
     REVIEW_SUBMITTED = "review_submitted"
+    REVIEW_ROUND_CLOSED = "review_round_closed"
     DECISION_RECORDED = "decision_recorded"
     REVISION_SUBMITTED = "revision_submitted"
     MANUSCRIPT_WITHDRAWN = "manuscript_withdrawn"
@@ -1143,7 +1144,7 @@ import pytest
 
 from ugjcs.domain.enums import DecisionType, EventType, ManuscriptStatus as S
 from ugjcs.domain.errors import GuardViolationError, IllegalTransitionError
-from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
+from ugjcs.domain.ids import IssueId, ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 
 AUTHOR = UserId(uuid4())
@@ -1304,6 +1305,81 @@ def test_withdrawal_is_permitted_before_a_decision() -> None:
     manuscript = under_review()
     manuscript.withdraw(actor_id=AUTHOR, occurred_at=NOW)
     assert manuscript.status is S.WITHDRAWN
+
+
+def accepted() -> Manuscript:
+    manuscript = under_review()
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.ACCEPT, actor_id=EDITOR,
+        rationale="Strong contribution", occurred_at=NOW,
+    )
+    return manuscript
+
+
+def test_accepted_manuscript_can_be_scheduled_then_published() -> None:
+    """The terminal path. Everything else is preparation for this happening."""
+    manuscript = accepted()
+    issue_id = IssueId(uuid4())
+    scheduled = manuscript.schedule(issue_id=issue_id, actor_id=EDITOR, occurred_at=NOW)
+    assert manuscript.status is S.SCHEDULED
+    assert manuscript.issue_id == issue_id
+    assert scheduled.event_type is EventType.SCHEDULED_FOR_ISSUE
+    published = manuscript.publish(actor_id=EDITOR, occurred_at=NOW)
+    assert manuscript.status is S.PUBLISHED
+    assert published.event_type is EventType.MANUSCRIPT_PUBLISHED
+
+
+def test_reviews_are_refused_outside_the_review_stage() -> None:
+    manuscript = submitted()
+    with pytest.raises(GuardViolationError, match="only while under review"):
+        manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+
+
+def test_revision_may_be_requested_at_screening_without_any_reviews() -> None:
+    """FR-07: an editor may return a manuscript for pre-review changes."""
+    manuscript = submitted()
+    manuscript.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.REQUEST_REVISION, actor_id=EDITOR,
+        rationale="Anonymise the manuscript before review", occurred_at=NOW,
+    )
+    assert manuscript.status is S.REVISION_REQUESTED
+
+
+def test_closing_the_review_round_emits_a_distinct_event_type() -> None:
+    """Counting REVIEW_SUBMITTED must not include the event that closes the round."""
+    manuscript = under_review()
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    submitted_count = sum(
+        1 for event in manuscript.pending_events
+        if event.event_type is EventType.REVIEW_SUBMITTED
+    )
+    assert submitted_count == 2
+    assert manuscript.pending_events[-1].event_type is EventType.REVIEW_ROUND_CLOSED
+
+
+def test_sequence_numbers_continue_after_the_buffer_is_drained() -> None:
+    """hashchain.append demands consecutive sequences across the manuscript's whole life.
+
+    Draining the buffer is how a repository persists events, so numbering that restarts
+    at 1 after a drain would collide with an event already in the chain.
+    """
+    manuscript = submitted()
+    manuscript.pull_events()
+    event = manuscript.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    assert event.sequence == 2
+
+
+def test_decision_payload_carries_the_decision_and_rationale() -> None:
+    """Payload keys are hashed into the audit chain, so their names are part of the contract."""
+    manuscript = accepted()
+    decision = manuscript.pending_events[-1]
+    assert decision.payload["decision"] == "accept"
+    assert decision.payload["rationale"] == "Strong contribution"
+    assert decision.payload["status"] == "accepted"
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1341,9 +1417,11 @@ _DECISION_TARGETS: dict[DecisionType, S] = {
     DecisionType.REJECT: S.REJECTED,
 }
 
-_DECISIONS_REQUIRING_REVIEWS = frozenset(
-    {DecisionType.ACCEPT, DecisionType.REJECT, DecisionType.REQUEST_REVISION}
-)
+# Only these need a quorum. REQUEST_REVISION is deliberately absent: FR-07 lets an editor
+# return a manuscript for pre-review changes during screening, when no reviews exist yet.
+# Post-review revision is already gated by the table, which reaches REVISION_REQUESTED from
+# REVIEWS_COMPLETE and nowhere else after review begins.
+_DECISIONS_REQUIRING_REVIEWS = frozenset({DecisionType.ACCEPT, DecisionType.REJECT})
 
 
 @dataclass(slots=True)
@@ -1360,6 +1438,7 @@ class Manuscript:
     minimum_reviews: int = 2
     submitted_reviews: int = 0
     issue_id: IssueId | None = None
+    _sequence: int = 0
     _events: list[EditorialEvent] = field(default_factory=list, repr=False)
 
     @property
@@ -1367,7 +1446,14 @@ class Manuscript:
         return tuple(self._events)
 
     def pull_events(self) -> tuple[EditorialEvent, ...]:
-        """Return buffered events and clear the buffer, for the caller to persist."""
+        """Return buffered events and clear the buffer, for the caller to persist.
+
+        `_sequence` is deliberately NOT reset. Sequence numbers must stay monotonic across
+        the whole lifetime of the manuscript, not just the current buffer, because
+        `hashchain.append` requires each event to follow its predecessor consecutively.
+        A repository rehydrating this aggregate must seed `_sequence` from the last
+        persisted event, otherwise the next event collides with one already in the chain.
+        """
         drained = tuple(self._events)
         self._events.clear()
         return drained
@@ -1405,7 +1491,7 @@ class Manuscript:
         )
         if self.submitted_reviews >= self.minimum_reviews:
             self._transition(
-                S.REVIEWS_COMPLETE, EventType.REVIEW_SUBMITTED, reviewer_id,
+                S.REVIEWS_COMPLETE, EventType.REVIEW_ROUND_CLOSED, reviewer_id,
                 occurred_at, {"reviews_complete": True},
             )
         return event
@@ -1481,9 +1567,10 @@ class Manuscript:
         occurred_at: datetime,
         payload: dict[str, PayloadValue],
     ) -> EditorialEvent:
+        self._sequence += 1
         event = EditorialEvent(
             manuscript_id=self.id,
-            sequence=len(self._events) + 1,
+            sequence=self._sequence,
             event_type=event_type,
             payload=payload,
             actor_id=actor_id,
