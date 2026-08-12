@@ -1,0 +1,45 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=20 <21"
+  },
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "iron-session": "^8.0.4",
+    "next": "15.5.23",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "swr": "^2.5.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.5",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.23",
+    "jsdom": "^29.1.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.12",
+    "typescript": "^5",
+    "vitest": "^4.1.10"
+  }
+}

@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #12203a;
+  --color-paper: #f7f5ef;
+  --color-teal: #1f6f78;
+  --color-teal-dark: #163f45;
+  --color-amber: #c68a2e;
+  --color-moss: #4c6b4f;
+  --color-brick: #9c4a3c;
+  --color-rule: #ded7c6;
+
+  --font-serif: var(--font-source-serif), Georgia, serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
