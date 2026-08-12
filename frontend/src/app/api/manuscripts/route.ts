@@ -1,15 +1,7 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-import { authedFetch } from "@/lib/auth-fetch";
+import { authedFetch, authedFetchStream } from "@/lib/auth-fetch";
 import { ProblemDetailsError } from "@/lib/backend";
 import type { Manuscript } from "@/types/api";
-
-const SubmitInput = z.object({
-  title: z.string().min(5),
-  abstract: z.string().min(100),
-  keywords: z.array(z.string()),
-  co_author_ids: z.array(z.string().uuid()).default([]),
-});
 
 export async function GET() {
   try {
@@ -20,20 +12,32 @@ export async function GET() {
   }
 }
 
-/** JSON only — Plan 4 has no file storage anywhere, so there is no attachment to forward. */
+/**
+ * Multipart only — the live API requires `title`, `abstract`, `file` (a PDF) and accepts
+ * `keywords`/`co_author_ids` as the rest of the form fields (this supersedes
+ * docs/05-api-contract.md §6, which still describes a JSON-only body; see the frontend
+ * wiring notes for the full discrepancy). The incoming request's body is forwarded to the
+ * backend as a stream via `authedFetchStream` — this route never buffers the uploaded file
+ * into memory itself, so it never re-parses the multipart body into a JS `FormData` either.
+ */
 export async function POST(request: Request) {
-  const parsed = SubmitInput.safeParse(await request.json());
-  if (!parsed.success) {
+  const contentType = request.headers.get("content-type");
+  if (!contentType?.startsWith("multipart/form-data")) {
     return NextResponse.json(
-      { type: "about:blank", title: "Invalid input", status: 422, detail: parsed.error.issues[0]?.message },
+      {
+        type: "about:blank",
+        title: "Invalid input",
+        status: 422,
+        detail: "Expected a multipart/form-data submission with a manuscript file attached.",
+      },
       { status: 422 },
     );
   }
   try {
-    const manuscript = await authedFetch<Manuscript>("/manuscripts", {
+    const manuscript = await authedFetchStream<Manuscript>("/manuscripts", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(parsed.data),
+      body: request.body,
+      contentType,
     });
     return NextResponse.json(manuscript, { status: 201 });
   } catch (error) {

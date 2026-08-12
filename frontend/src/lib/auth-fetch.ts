@@ -84,3 +84,45 @@ export async function authedFetch<T>(path: string, init: RequestInit = {}): Prom
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
+
+/** Node's `fetch` (undici) requires `duplex: "half"` to send a `ReadableStream` request
+ * body, but `lib.dom.d.ts` does not declare that field on `RequestInit` — this local
+ * extension is the typed alternative to an `any` cast or a `@ts-expect-error`. */
+type StreamingRequestInit = RequestInit & { duplex?: "half" };
+
+/**
+ * The streaming counterpart to `authedFetch`, used only for multipart file uploads
+ * (`POST /manuscripts`, `POST /manuscripts/{trackingCode}/resubmit`). The incoming Route
+ * Handler's `request.body` is piped straight through as `init.body` rather than being
+ * read into a buffer first, so this process never holds a full manuscript PDF in memory.
+ *
+ * A streamed body can only be consumed once, so — unlike `authedFetch` — there is no
+ * reactive retry-on-401 here: buffering the body to allow a replay would defeat the point
+ * of streaming it through in the first place. The proactive refresh below (identical to
+ * `authedFetch`'s) is this path's only defence against a token that expires mid-upload.
+ */
+export async function authedFetchStream<T>(
+  path: string,
+  init: { method: string; body: ReadableStream<Uint8Array> | null; contentType: string },
+): Promise<T> {
+  const session = await getSession();
+  if (!session.accessToken || !session.user) {
+    throw new ProblemDetailsError(
+      { type: "about:blank", title: "Not signed in", status: 401 },
+      401,
+    );
+  }
+  if (session.accessTokenExpiresAt && session.accessTokenExpiresAt < Date.now() + 5_000) {
+    await refresh(session);
+  }
+
+  const response = await fetch(`${env.API_BASE_URL}${path}`, {
+    method: init.method,
+    headers: { Authorization: `Bearer ${session.accessToken}`, "Content-Type": init.contentType },
+    body: init.body,
+    duplex: "half",
+  } as StreamingRequestInit);
+  if (!response.ok) throw new ProblemDetailsError(await toProblem(response), response.status);
+  if (response.status === 204) return undefined as T;
+  return (await response.json()) as T;
+}

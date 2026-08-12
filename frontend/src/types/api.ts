@@ -45,10 +45,16 @@ export interface SessionUser {
 /**
  * Mirrors `ManuscriptOut` exactly — the one shape Plan 4 returns from every manuscript
  * route (`POST /manuscripts`, `GET /manuscripts/mine`, `GET /manuscripts/{trackingCode}`,
- * `POST /manuscripts/{trackingCode}/withdraw`, `GET /editorial/queue`). There is no
- * separate "summary" and "detail" shape on the backend, so there is only one type here.
+ * `POST /manuscripts/{trackingCode}/withdraw`, `POST /manuscripts/{trackingCode}/resubmit`,
+ * `GET /editorial/queue`, `POST /editorial/{trackingCode}/schedule`,
+ * `POST /editorial/{trackingCode}/publish`). There is no separate "summary" and "detail"
+ * shape on the backend, so there is only one type here.
  *
- * Deliberately absent, because Plan 4 does not serialise them anywhere: `id` (the
+ * `has_document` was added to the live API alongside file upload (docs/05-api-contract.md
+ * §8 previously recorded "no file upload ... exists anywhere in the domain" — that gap is
+ * now closed; see the frontend wiring notes for the discrepancy).
+ *
+ * Deliberately absent, because the API does not serialise them anywhere: `id` (the
  * `tracking_code` string is the only identifier the wire ever carries — use it as the
  * React key and the route param), `submitted_at`/`updated_at` (no response carries a
  * timestamp), and `events`/an audit trail (no endpoint exposes one).
@@ -64,6 +70,7 @@ export interface Manuscript {
   version: number;
   minimum_reviews: number;
   submitted_reviews: number;
+  has_document: boolean;
 }
 
 /**
@@ -95,4 +102,16 @@ export interface ArchivePaperOut {
   author_names: string[];
   status: ManuscriptStatus;
   version: number;
+}
+
+/**
+ * Mirrors `DocumentUrlOut` — a short-lived, pre-signed link to a stored document, returned
+ * by `GET /manuscripts/{trackingCode}/document` and `GET /reviews/{trackingCode}/document`.
+ * The live API answers with this JSON body (200), not an HTTP redirect; the BFF route
+ * handlers for both endpoints fetch it server-side and turn it into a redirect for the
+ * browser to follow, so no page ever needs this type directly.
+ */
+export interface DocumentUrlOut {
+  url: string;
+  expires_in_seconds: number;
 }

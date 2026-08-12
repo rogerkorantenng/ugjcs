@@ -3,16 +3,24 @@ import { use, useState } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { StatusBadge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerAssignForm } from "@/components/reviewer-assign-form";
 import { DecisionForm } from "@/components/decision-form";
-import type { Manuscript, ProblemDetails } from "@/types/api";
+import { PublicationPanel } from "@/components/publication-panel";
+import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
+
+const PUBLICATION_STATUSES = new Set(["accepted", "scheduled"]);
 
 export default function EditorialManuscriptPage({ params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = use(params);
   const { data, error, isLoading, mutate } = useApi<Manuscript>(`/api/manuscripts/${trackingCode}`);
+  // Only an Editor-in-Chief may schedule or publish (`Action.PUBLISH` in
+  // `backend/src/ugjcs/domain/policies.py`); `GET /api/auth/me` is the only place the
+  // client learns the signed-in actor's roles.
+  const { data: session } = useApi<{ user: SessionUser | null }>("/api/auth/me");
+  const isEditorInChief = session?.user?.roles.includes("editor_in_chief") ?? false;
   const [screening, setScreening] = useState(false);
   const [screenProblem, setScreenProblem] = useState<ProblemDetails | null>(null);
 
@@ -47,6 +55,11 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
       <TrackingChip code={data.tracking_code} className="mt-1" />
       <p className="mt-4 leading-relaxed text-ink/80">{data.abstract}</p>
       <p className="mt-4 text-sm text-ink/60">{data.submitted_reviews} of {data.minimum_reviews} reviews submitted</p>
+      {data.has_document && (
+        <a href={`/api/manuscripts/${trackingCode}/document`} className={buttonClasses("secondary", "mt-4")}>
+          Download manuscript
+        </a>
+      )}
 
       {data.status === "submitted" && (
         <div className="mt-6 border-t border-rule pt-6">
@@ -70,6 +83,13 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
         <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
       </div>
+
+      {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
+        <div className="mt-6 border-t border-rule pt-6">
+          <h2 className="font-serif text-lg font-semibold text-ink">Publication</h2>
+          <PublicationPanel trackingCode={trackingCode} status={data.status} onChanged={mutate} />
+        </div>
+      )}
     </>
   );
 }
