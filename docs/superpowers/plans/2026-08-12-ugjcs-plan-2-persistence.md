@@ -510,8 +510,8 @@ def upgrade() -> None:
         sa.Column("minimum_reviews", sa.Integer(), nullable=False),
         sa.Column("submitted_reviews", sa.Integer(), nullable=False),
         sa.Column("issue_id", postgresql.UUID(as_uuid=True), nullable=True),
-        sa.CheckConstraint("version >= 1", name="ck_manuscripts_version_positive"),
-        sa.CheckConstraint("submitted_reviews >= 0", name="ck_manuscripts_reviews_non_negative"),
+        sa.CheckConstraint("version >= 1", name="version_positive"),
+        sa.CheckConstraint("submitted_reviews >= 0", name="reviews_non_negative"),
         sa.PrimaryKeyConstraint("id", name="pk_manuscripts"),
     )
     # `unique=True, index=True` on the column compiles to ONE unique index, not a separate
@@ -546,7 +546,7 @@ def upgrade() -> None:
         sa.Column("occurred_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("previous_hash", sa.String(length=64), nullable=False),
         sa.Column("event_hash", sa.String(length=64), nullable=False),
-        sa.CheckConstraint("sequence >= 1", name="ck_editorial_events_sequence_positive"),
+        sa.CheckConstraint("sequence >= 1", name="sequence_positive"),
         sa.ForeignKeyConstraint(
             ["manuscript_id"],
             ["manuscripts.id"],
@@ -573,6 +573,14 @@ def downgrade() -> None:
     op.drop_table("manuscript_authors")
     op.drop_table("manuscripts")
 ```
+
+**Pass CHECK constraint names as bare fragments, not expanded.** `op.create_table` inherits
+`target_metadata.naming_convention` from `env.py`, and the `ck` template contains
+`%(constraint_name)s` — so an already-expanded name like `ck_manuscripts_version_positive` gets
+expanded a second time into `ck_manuscripts_ck_manuscripts_version_positive`. Pass the same bare
+fragment `models.py` passes (`version_positive`) and let the convention expand it once. Primary,
+foreign and unique keys are unaffected: their templates carry no `%(constraint_name)s` token, which
+is also why an explicit unique name is used verbatim.
 
 **Two constraint names look inconsistent, and that is correct.** The naming convention's `uq`
 template is `uq_%(table_name)s_%(column_0_name)s`, which contains no `%(constraint_name)s` token,
