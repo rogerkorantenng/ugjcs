@@ -1,25 +1,22 @@
 """In-memory fakes for API-layer unit tests.
 
-These stand in for the query surface of `ManuscriptRepository` and `UnitOfWork` so that
-routes wire correctly without a database. Correctness of the real adapters is proven
-against a live Postgres in `tests/integration`; this package tests routing, authorisation
-and serialisation only.
-
-`FakeIdentityService` and any other authentication fake are deliberately not defined
-here: `ugjcs.application.identity.SessionService` does not exist in this worktree yet
-(Plan 3 is being written concurrently in another worktree), and this task's scope
-excludes anything that authenticates a caller or produces an `Actor`. Add those fakes
-back here when the auth router's task resumes after the merge.
+These stand in for the query surface of `ManuscriptRepository`, `UnitOfWork`,
+`IdentityService` and `SessionService` so that routes wire correctly without a database
+or a real token/hasher stack. Correctness of the real adapters is proven against a live
+Postgres in `tests/integration`; this package tests routing, authorisation and
+serialisation only.
 """
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from uuid import uuid4
+from uuid import UUID, uuid4
 
+from ugjcs.application.identity import AuthenticationError
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import ManuscriptId, UserId
 from ugjcs.domain.manuscript import Manuscript
+from ugjcs.domain.policies import Actor
 
 
 @dataclass
@@ -38,6 +35,63 @@ class FakeAccountRepository:
 
     async def get(self, user_id: UserId) -> FakeAccount | None:
         return self.accounts.get(user_id)
+
+
+class FakeIdentityService:
+    """`actor_for` looks a token up as if it were a validated access token's subject.
+
+    The token is literally the account id, as text — enough to prove routing and
+    authorisation without a real `JwtTokenService`.
+    """
+
+    def __init__(self, accounts: dict[UserId, FakeAccount]) -> None:
+        self._accounts = accounts
+
+    async def actor_for(self, access_token: str) -> Actor:
+        try:
+            subject = UserId(UUID(access_token))
+        except ValueError as error:
+            raise AuthenticationError("token is not valid") from error
+        account = self._accounts.get(subject)
+        if account is None or not account.is_active or not account.is_verified:
+            raise AuthenticationError("no usable account for this credential")
+        return Actor(id=account.id, roles=account.roles)
+
+
+@dataclass(frozen=True, slots=True)
+class FakeTokenPair:
+    access_token: str
+    refresh_token: str
+
+
+class FakeSessionService:
+    """Stands in for `SessionService`: one fixed account, one live refresh token.
+
+    `log_in` is deliberately timing-shaped like the real thing is documented to be —
+    both an unknown email and a wrong password raise the identical `AuthenticationError`
+    message, so a test asserting the two responses are indistinguishable proves
+    something about the router, not about this fake.
+    """
+
+    def __init__(self, *, email: str, password: str, account_id: UserId) -> None:
+        self._email = email
+        self._password = password
+        self.account_id = account_id
+        self._live_refresh = "refresh-token-abc"
+
+    async def log_in(self, email: str, password: str) -> FakeTokenPair:
+        if email != self._email or password != self._password:
+            raise AuthenticationError("email or password is incorrect")
+        return FakeTokenPair(access_token=str(self.account_id), refresh_token=self._live_refresh)
+
+    async def refresh(self, refresh_token: str) -> FakeTokenPair:
+        if refresh_token != self._live_refresh:
+            raise AuthenticationError("refresh token is not valid")
+        self._live_refresh = "refresh-token-rotated"
+        return FakeTokenPair(access_token=str(self.account_id), refresh_token=self._live_refresh)
+
+    async def log_out(self, refresh_token: str) -> None:
+        self._live_refresh = ""
 
 
 @dataclass
