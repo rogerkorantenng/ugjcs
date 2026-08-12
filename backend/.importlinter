@@ -34,6 +34,7 @@ forbidden_modules =
 name = Dependencies point inwards only
 type = layers
 layers =
+    ugjcs.api
     ugjcs.infrastructure
     ugjcs.application
     ugjcs.domain
