@@ -113,6 +113,7 @@ frontend/
 │   │   │   ├── card.tsx                                     Task 1
 │   │   │   ├── alert.tsx                                    Task 1  renders a ProblemDetails
 │   │   │   ├── badge.tsx                                    Task 1  status pill
+│   │   │   ├── tracking-chip.tsx                             Task 1  the accession-stamp signature
 │   │   │   ├── select.tsx                                   Task 6
 │   │   │   └── textarea.tsx                                 Task 5
 │   │   ├── layout/
@@ -125,7 +126,7 @@ frontend/
 │   │   └── decision-form.tsx                                  Task 6
 │   └── app/
 │       ├── layout.tsx                                        Task 1
-│       ├── globals.css                                       Task 1  (Tailwind v4 `@import`)
+│       ├── globals.css                                       Task 1  (Tailwind v4 `@theme` — colour/type tokens)
 │       ├── (public)/
 │       │   ├── page.tsx                                      Task 2  home
 │       │   ├── papers/[trackingCode]/page.tsx                 Task 2  paper detail (+ JSON-LD)
@@ -381,9 +382,9 @@ Create `frontend/src/components/ui/button.tsx`:
 import { type ButtonHTMLAttributes, forwardRef } from "react";
 
 const VARIANTS = {
-  primary: "bg-blue-700 text-white hover:bg-blue-800 disabled:bg-blue-300",
-  secondary: "bg-white text-blue-700 border border-blue-700 hover:bg-blue-50",
-  danger: "bg-red-700 text-white hover:bg-red-800 disabled:bg-red-300",
+  primary: "bg-teal text-paper hover:bg-teal-dark disabled:bg-teal/40",
+  secondary: "border border-teal/50 bg-transparent text-teal-dark hover:bg-teal/5",
+  danger: "bg-brick text-paper hover:bg-brick/90 disabled:bg-brick/40",
 } as const;
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -397,8 +398,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   return (
     <button
       ref={ref}
-      className={`rounded-md px-4 py-2 text-sm font-medium transition-colors
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2
+      className={`rounded-[3px] px-4 py-2 text-sm font-medium tracking-wide transition-colors
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:ring-offset-2 focus-visible:ring-offset-paper
         disabled:cursor-not-allowed ${VARIANTS[variant]} ${className}`}
       {...props}
     />
@@ -427,27 +428,33 @@ const LABELS: Record<ManuscriptStatus, string> = {
   withdrawn: "Withdrawn",
 };
 
-// Every colour pair here is >= 4.5:1 against its own background (WCAG 2.1 AA, checked
-// against the rendered Tailwind palette, not assumed from the class name).
+// An outlined pill with a coloured dot, not a solid fill block — a screening queue of a
+// dozen badges should read as a calm list, not a wall of colour. `text-*` carries the
+// tone (>= 4.5:1 against `bg-paper`, WCAG 2.1 AA, checked against the rendered palette);
+// `before:bg-*` colours only the 6px dot.
 const TONES: Record<ManuscriptStatus, string> = {
-  draft: "bg-gray-100 text-gray-800",
-  submitted: "bg-blue-100 text-blue-900",
-  under_screening: "bg-blue-100 text-blue-900",
-  desk_rejected: "bg-red-100 text-red-900",
-  under_review: "bg-indigo-100 text-indigo-900",
-  reviews_complete: "bg-indigo-100 text-indigo-900",
-  revision_requested: "bg-amber-100 text-amber-900",
-  resubmitted: "bg-amber-100 text-amber-900",
-  accepted: "bg-green-100 text-green-900",
-  rejected: "bg-red-100 text-red-900",
-  scheduled: "bg-teal-100 text-teal-900",
-  published: "bg-green-100 text-green-900",
-  withdrawn: "bg-gray-100 text-gray-800",
+  draft: "text-ink/60 before:bg-ink/30",
+  submitted: "text-teal-dark before:bg-teal",
+  under_screening: "text-teal-dark before:bg-teal",
+  desk_rejected: "text-brick before:bg-brick",
+  under_review: "text-teal-dark before:bg-teal",
+  reviews_complete: "text-teal-dark before:bg-teal",
+  revision_requested: "text-amber before:bg-amber",
+  resubmitted: "text-amber before:bg-amber",
+  accepted: "text-moss before:bg-moss",
+  rejected: "text-brick before:bg-brick",
+  scheduled: "text-amber before:bg-amber",
+  published: "text-moss before:bg-moss",
+  withdrawn: "text-ink/60 before:bg-ink/30",
 };
 
 export function StatusBadge({ status }: { status: ManuscriptStatus }) {
   return (
-    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${TONES[status]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border border-rule px-2.5 py-0.5
+        text-xs font-semibold uppercase tracking-wide before:h-1.5 before:w-1.5 before:rounded-full
+        before:content-[''] ${TONES[status]}`}
+    >
       {LABELS[status]}
     </span>
   );
@@ -461,9 +468,9 @@ import type { ProblemDetails } from "@/types/api";
 
 export function ProblemAlert({ problem }: { problem: ProblemDetails }) {
   return (
-    <div role="alert" className="rounded-md border border-red-300 bg-red-50 p-4 text-red-900">
-      <p className="font-semibold">{problem.title}</p>
-      {problem.detail && <p className="mt-1 text-sm">{problem.detail}</p>}
+    <div role="alert" className="border-l-2 border-brick bg-brick/5 px-4 py-3">
+      <p className="font-semibold text-brick">{problem.title}</p>
+      {problem.detail && <p className="mt-1 text-sm text-ink/70">{problem.detail}</p>}
     </div>
   );
 }
@@ -475,7 +482,12 @@ Create `frontend/src/components/ui/card.tsx`:
 import type { HTMLAttributes } from "react";
 
 export function Card({ className = "", ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm ${className}`} {...props} />;
+  return (
+    <div
+      className={`rounded-[3px] border border-rule bg-white/70 p-5 shadow-[0_1px_2px_rgba(18,32,58,0.06)] ${className}`}
+      {...props}
+    />
+  );
 }
 ```
 
@@ -496,7 +508,7 @@ export const Input = forwardRef<HTMLInputElement, FieldProps>(function Input(
   const inputId = id ?? props.name ?? label.toLowerCase().replace(/\s+/g, "-");
   return (
     <div>
-      <label htmlFor={inputId} className="mb-1 block text-sm font-medium text-gray-900">
+      <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-ink">
         {label}
       </label>
       <input
@@ -504,13 +516,13 @@ export const Input = forwardRef<HTMLInputElement, FieldProps>(function Input(
         id={inputId}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${inputId}-error` : undefined}
-        className={`w-full rounded-md border px-3 py-2 text-sm
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600
-          ${error ? "border-red-500" : "border-gray-300"} ${className}`}
+        className={`w-full rounded-[3px] border bg-white px-3 py-2 text-sm text-ink
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber
+          ${error ? "border-brick" : "border-rule"} ${className}`}
         {...props}
       />
       {error && (
-        <p id={`${inputId}-error`} className="mt-1 text-sm text-red-700">
+        <p id={`${inputId}-error`} className="mt-1 text-sm text-brick">
           {error}
         </p>
       )}
@@ -563,9 +575,9 @@ describe("StatusBadge", () => {
 
   it("distinguishes rejection tones from acceptance tones", () => {
     const { rerender } = render(<StatusBadge status="rejected" />);
-    expect(screen.getByText("Rejected")).toHaveClass("bg-red-100");
+    expect(screen.getByText("Rejected")).toHaveClass("text-brick");
     rerender(<StatusBadge status="accepted" />);
-    expect(screen.getByText("Accepted")).toHaveClass("bg-green-100");
+    expect(screen.getByText("Accepted")).toHaveClass("text-moss");
   });
 });
 ```
@@ -598,13 +610,57 @@ describe("ProblemAlert", () => {
 Run: `cd frontend && npx vitest run`
 Expected: 4 tests pass.
 
-- [ ] **Step 8: Root layout and Makefile**
+- [ ] **Step 8: Design tokens, root layout and Makefile**
+
+**A considered visual identity, stated once so no later task re-invents it.** UGJCS is a bound scholarly record before it is a workflow tool — the design should read like a well-kept journal, not a generic SaaS dashboard. Three decisions carry that through every screen without every page needing to restate them:
+
+- **Colour** — six named tokens, not the default Tailwind palette: `ink` (deep indigo-black, primary text and the masthead), `paper` (warm, non-clinical background), `teal` (the one interactive colour — links, primary buttons, focus states), `amber` (a signature accent, spent sparingly: the tracking-code stamp, active states, nothing else), `moss` (accepted/published), `brick` (rejected/error). Every other task's `bg-blue-*`/`text-gray-*` Tailwind defaults are superseded by these; where an earlier step in this plan still names a default Tailwind colour, read it as the corresponding token here.
+- **Type** — three faces, each doing one job: `Source Serif 4` for headings and the masthead wordmark (the one place the journal's authority is announced), `IBM Plex Sans` for all interface and body text (precise, legible, not the ubiquitous Inter), `IBM Plex Mono` for tracking codes and other data-shaped text.
+- **Signature element** — the manuscript tracking code (`UGJCS-2026-0413`) is set in `font-mono`, letter-spaced, inside a hairline-bordered chip, wherever a manuscript is referenced: cards, detail headers, nav. It is this journal's accession stamp — the one recurring detail that says "this is a permanent, citable record," which is the actual brief. `frontend/src/components/ui/tracking-chip.tsx`, created below, is the only place this pattern is implemented; every later task that displays a tracking code uses it rather than hand-rolling `<span className="font-mono">`.
+
+Extend `frontend/src/app/globals.css` (created by `create-next-app`; keep its `@import "tailwindcss";` line and append below it):
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #12203a;
+  --color-paper: #f7f5ef;
+  --color-teal: #1f6f78;
+  --color-teal-dark: #163f45;
+  --color-amber: #c68a2e;
+  --color-moss: #4c6b4f;
+  --color-brick: #9c4a3c;
+  --color-rule: #ded7c6;
+
+  --font-serif: var(--font-source-serif), Georgia, serif;
+  --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+}
+```
 
 Create `frontend/src/app/layout.tsx`:
 
 ```tsx
 import type { Metadata } from "next";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-source-serif",
+  weight: ["500", "600", "700"],
+});
+const plexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  variable: "--font-plex-sans",
+  weight: ["400", "500", "600"],
+});
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-plex-mono",
+  weight: ["400", "500"],
+});
 
 export const metadata: Metadata = {
   title: { default: "UGJCS", template: "%s · UGJCS" },
@@ -613,9 +669,26 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">{children}</body>
+    <html lang="en" className={`${sourceSerif.variable} ${plexSans.variable} ${plexMono.variable}`}>
+      <body className="min-h-screen bg-paper font-sans text-ink antialiased">{children}</body>
     </html>
+  );
+}
+```
+
+Create `frontend/src/components/ui/tracking-chip.tsx`:
+
+```tsx
+/** The journal's one recurring signature detail — every reference to a manuscript's
+ * tracking code renders through here, never as an inline `font-mono` span written by hand. */
+export function TrackingChip({ code, className = "" }: { code: string; className?: string }) {
+  return (
+    <span
+      className={`inline-block rounded-[3px] border border-rule px-1.5 py-0.5 font-mono text-xs
+        tracking-wider text-ink/70 ${className}`}
+    >
+      {code}
+    </span>
   );
 }
 ```
