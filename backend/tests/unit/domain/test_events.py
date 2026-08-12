@@ -1,3 +1,4 @@
+import json
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -64,3 +65,21 @@ def test_canonical_bytes_refuses_a_value_it_cannot_serialise_stably() -> None:
     event = make_event(payload={"tags": {"a", "b"}})
     with pytest.raises(TypeError):
         event.canonical_bytes()
+
+
+def test_canonical_bytes_refuses_a_non_finite_float() -> None:
+    """json.dumps would emit bare NaN, which is not valid JSON and no jsonb column accepts."""
+    event = make_event(payload={"score": float("nan")})
+    with pytest.raises(ValueError):
+        event.canonical_bytes()
+
+
+def test_canonical_bytes_are_valid_json() -> None:
+    event = make_event(payload={"score": 4.5, "note": "ok", "flag": True, "absent": None})
+    assert json.loads(event.canonical_bytes())["payload"]["score"] == 4.5
+
+
+def test_a_system_event_has_no_actor() -> None:
+    """Some events originate from the system, not a person; the serialiser must handle it."""
+    event = make_event(actor_id=None)
+    assert json.loads(event.canonical_bytes())["actor_id"] is None

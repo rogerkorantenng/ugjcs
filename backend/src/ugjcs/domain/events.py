@@ -44,6 +44,12 @@ class EditorialEvent:
 
         Sorted keys and fixed separators make the encoding independent of dictionary
         insertion order, which is what allows the hash chain to be reproducible.
+
+        `allow_nan=False` makes a non-finite float raise rather than serialise. Python
+        would emit bare `NaN` or `Infinity`, which is not valid JSON and which a
+        PostgreSQL `jsonb` column rejects, so the event would hash here and then fail at
+        persistence. Failing loudly at the point of construction is the same reasoning
+        that refuses values with no stable serialisation at all.
         """
         document = {
             "manuscript_id": str(self.manuscript_id),
@@ -53,4 +59,6 @@ class EditorialEvent:
             "actor_id": str(self.actor_id) if self.actor_id is not None else None,
             "occurred_at": self.occurred_at.isoformat(),
         }
-        return json.dumps(document, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        return json.dumps(document, sort_keys=True, separators=(",", ":"), allow_nan=False).encode(
+            "utf-8"
+        )
