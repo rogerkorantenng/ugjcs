@@ -4,11 +4,13 @@ These are protocols, not base classes. Infrastructure supplies implementations; 
 application layer never imports them, which is what the layers contract enforces.
 """
 
+from datetime import datetime
 from types import TracebackType
 from typing import Protocol, Self
+from uuid import UUID
 
 from ugjcs.domain.hashchain import ChainedEvent
-from ugjcs.domain.ids import ManuscriptId, TrackingCode
+from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 
 
@@ -53,3 +55,39 @@ class UnitOfWork(Protocol):
     async def commit(self) -> None: ...
 
     async def rollback(self) -> None: ...
+
+
+class Clock(Protocol):
+    """Time as a dependency, so expiry logic is testable without sleeping."""
+
+    def now(self) -> datetime: ...
+
+
+class PasswordHasher(Protocol):
+    def hash(self, password: str) -> str: ...
+
+    def verify(self, password: str, password_hash: str) -> bool:
+        """Constant-time where the algorithm allows. Returns False; never raises on mismatch."""
+        ...
+
+    def needs_rehash(self, password_hash: str) -> bool:
+        """True when the hash was produced with weaker parameters than current policy."""
+        ...
+
+
+class TokenService(Protocol):
+    def issue_access(self, subject: UserId) -> str: ...
+
+    def read_access(self, token: str) -> UserId:
+        """Return the subject, or raise `InvalidTokenError` if absent, expired or tampered with."""
+        ...
+
+    def issue_refresh(self, subject: UserId, family_id: UUID) -> tuple[str, str]:
+        """Return `(token, token_hash)`. Only the hash is ever stored."""
+        ...
+
+    def hash_refresh(self, token: str) -> str: ...
+
+
+class EmailSender(Protocol):
+    async def send_verification(self, to: str, link: str) -> None: ...
