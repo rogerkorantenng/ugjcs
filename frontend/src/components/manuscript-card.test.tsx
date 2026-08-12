@@ -10,6 +10,7 @@ const PAPER = {
   author_names: ["A. Mensah", "B. Owusu", "C. Boateng"],
   status: "published" as const,
   version: 1,
+  has_document: true,
 };
 
 describe("PaperCard", () => {

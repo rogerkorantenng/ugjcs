@@ -15,6 +15,11 @@ export type ManuscriptStatus = (typeof MANUSCRIPT_STATUSES)[number];
 export const RECOMMENDATIONS = ["accept", "minor_revision", "major_revision", "reject"] as const;
 export type Recommendation = (typeof RECOMMENDATIONS)[number];
 
+// FR-11's four criterion scores are each an integer 1-5 (`Field(ge=1, le=5)` on
+// `SubmitReviewRequest` in `backend/src/ugjcs/api/schemas.py`).
+export const SCORES = [1, 2, 3, 4, 5] as const;
+export type Score = (typeof SCORES)[number];
+
 export const DECISION_TYPES = [
   "desk_reject", "send_to_review", "request_revision", "accept", "reject",
 ] as const;
@@ -102,6 +107,27 @@ export interface ArchivePaperOut {
   author_names: string[];
   status: ManuscriptStatus;
   version: number;
+  has_document: boolean;
+}
+
+/**
+ * Mirrors `ReviewOut` — the editor-only shape returned by
+ * `GET /editorial/{trackingCode}/reviews`. `confidential_comments_to_editor` is real
+ * data here, deliberately: no author-facing type in this file carries it, and no
+ * author-facing route ever returns this shape.
+ */
+export interface ReviewOut {
+  reviewer_id: string;
+  status: string;
+  recommendation: string | null;
+  originality_score: number | null;
+  rigour_score: number | null;
+  clarity_score: number | null;
+  significance_score: number | null;
+  comments_to_author: string | null;
+  confidential_comments_to_editor: string | null;
+  assigned_at: string;
+  submitted_at: string | null;
 }
 
 /**

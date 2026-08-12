@@ -65,6 +65,15 @@ class SqlAlchemyManuscriptRepository:
         rows = result.scalars().all()
         return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
 
+    async def list_by_statuses(self, statuses: frozenset[S]) -> list[Manuscript]:
+        result = await self._session.execute(
+            select(ManuscriptRow)
+            .where(ManuscriptRow.status.in_([status.value for status in statuses]))
+            .order_by(ManuscriptRow.id)
+        )
+        rows = result.scalars().all()
+        return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
+
     async def list_published(self) -> list[Manuscript]:
         return await self.list_by_status(S.PUBLISHED)
 

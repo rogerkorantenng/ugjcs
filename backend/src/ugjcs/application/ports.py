@@ -56,6 +56,11 @@ class ManuscriptRepository(Protocol):
         """Every manuscript currently in this state — the screening queue's source."""
         ...
 
+    async def list_by_statuses(self, statuses: frozenset[ManuscriptStatus]) -> list[Manuscript]:
+        """Every manuscript currently in any of these states — the editorial queue's
+        source, which needs several non-terminal states at once, not just one."""
+        ...
+
 
 class AccountRepository(Protocol):
     """Persistence for the account aggregate and its role grants."""
@@ -106,13 +111,24 @@ class RefreshTokenRepository(Protocol):
 @dataclass(frozen=True, slots=True)
 class ReviewAssignmentRecord:
     """A read model, not an aggregate — there is no invariant here for a domain type to
-    protect. See Plan 4's scope decision for why."""
+    protect. See Plan 4's scope decision for why.
+
+    FR-11 requires a structured review: four criterion scores (1-5), an overall
+    recommendation, comments to the author, and comments to the editor alone. The last
+    field is the one that must never reach an author-facing response model — see
+    `ugjcs.api.schemas.ReviewOut`, which is built only from an editor-gated route.
+    """
 
     manuscript_id: ManuscriptId
     reviewer_id: UserId
     status: str
     recommendation: str | None
-    comments: str | None
+    originality_score: int | None
+    rigour_score: int | None
+    clarity_score: int | None
+    significance_score: int | None
+    comments_to_author: str | None
+    confidential_comments_to_editor: str | None
     assigned_at: datetime
     submitted_at: datetime | None
 
@@ -138,7 +154,12 @@ class ReviewAssignmentRepository(Protocol):
         reviewer_id: UserId,
         *,
         recommendation: str,
-        comments: str,
+        originality_score: int,
+        rigour_score: int,
+        clarity_score: int,
+        significance_score: int,
+        comments_to_author: str,
+        confidential_comments_to_editor: str,
         occurred_at: datetime,
     ) -> None: ...
 

@@ -30,7 +30,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <button type="submit" className={buttonClasses("primary", "shrink-0")}>Search</button>
       </form>
       {!q && (
-        <p className="mt-8 text-sm text-ink/60">Enter a title, abstract keyword, or author name to search the archive.</p>
+        <p className="mt-8 text-sm text-ink/60">Enter a title, abstract or keyword to search the archive.</p>
       )}
       {results.length > 0 && (
         <div className="mt-8 grid gap-4">
@@ -40,7 +40,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </div>
       )}
       {q && results.length === 0 && (
-        <EmptyState title={`No papers matched “${q}”`} hint="Try a different title, keyword or author name." />
+        <EmptyState title={`No papers matched “${q}”`} hint="Try a different title or keyword." />
       )}
       {/*
         No pagination control: `/archive/search` returns a flat, unbounded array. A

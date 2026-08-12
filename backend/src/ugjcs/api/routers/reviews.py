@@ -55,7 +55,12 @@ async def submit_review(
         manuscript.id,
         UserId(actor.id),
         recommendation=body.recommendation,
-        comments=body.comments,
+        originality_score=body.originality_score,
+        rigour_score=body.rigour_score,
+        clarity_score=body.clarity_score,
+        significance_score=body.significance_score,
+        comments_to_author=body.comments_to_author,
+        confidential_comments_to_editor=body.confidential_comments_to_editor,
         occurred_at=datetime.now(UTC),
     )
     await uow.commit()

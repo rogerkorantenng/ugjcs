@@ -58,7 +58,12 @@ class SqlAlchemyReviewAssignmentRepository:
         reviewer_id: UserId,
         *,
         recommendation: str,
-        comments: str,
+        originality_score: int,
+        rigour_score: int,
+        clarity_score: int,
+        significance_score: int,
+        comments_to_author: str,
+        confidential_comments_to_editor: str,
         occurred_at: datetime,
     ) -> None:
         result = await self._session.execute(
@@ -70,5 +75,10 @@ class SqlAlchemyReviewAssignmentRepository:
         row = result.scalar_one()
         row.status = "submitted"
         row.recommendation = recommendation
-        row.comments = comments
+        row.originality_score = originality_score
+        row.rigour_score = rigour_score
+        row.clarity_score = clarity_score
+        row.significance_score = significance_score
+        row.comments_to_author = comments_to_author
+        row.confidential_comments_to_editor = confidential_comments_to_editor
         row.submitted_at = occurred_at

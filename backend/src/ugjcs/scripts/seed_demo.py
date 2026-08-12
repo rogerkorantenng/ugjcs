@@ -355,18 +355,50 @@ def _rationale_for(decision: DecisionType, title: str) -> str:
     return f"Reviews support acceptance; '{title}' is accepted for publication."
 
 
-def _review_feedback(reviewer_email: str, title: str) -> tuple[str, str]:
-    """A plausible `(recommendation, comments)` pair, varied by which reviewer wrote it."""
+@dataclass(frozen=True, slots=True)
+class _ReviewFeedback:
+    """A plausible structured review, varied by which reviewer wrote it — FR-11's four
+    criterion scores plus the author/editor comment split, mirroring what
+    `ReviewAssignmentRepository.mark_submitted` now requires."""
+
+    recommendation: str
+    originality_score: int
+    rigour_score: int
+    clarity_score: int
+    significance_score: int
+    comments_to_author: str
+    confidential_comments_to_editor: str
+
+
+def _review_feedback(reviewer_email: str, title: str) -> _ReviewFeedback:
     if reviewer_email == REVIEWER_EMAIL:
-        return (
-            "accept",
-            f"The evaluation of '{title}' is thorough and the results are convincing; "
-            "I recommend acceptance with only minor copy-editing.",
+        return _ReviewFeedback(
+            recommendation="accept",
+            originality_score=5,
+            rigour_score=4,
+            clarity_score=4,
+            significance_score=5,
+            comments_to_author=(
+                f"The evaluation of '{title}' is thorough and the results are convincing; "
+                "I recommend acceptance with only minor copy-editing."
+            ),
+            confidential_comments_to_editor=(
+                "No conflicts of interest to declare. I am confident in this recommendation."
+            ),
         )
-    return (
-        "minor_revision",
-        f"'{title}' is a solid contribution; the related-work section should cite two or "
-        "three more recent baselines, but the core result stands.",
+    return _ReviewFeedback(
+        recommendation="minor_revision",
+        originality_score=4,
+        rigour_score=3,
+        clarity_score=3,
+        significance_score=4,
+        comments_to_author=(
+            f"'{title}' is a solid contribution; the related-work section should cite two or "
+            "three more recent baselines, but the core result stands."
+        ),
+        confidential_comments_to_editor=(
+            "Agree with the other reviewer's assessment; minor revision is the right call."
+        ),
     )
 
 
@@ -576,12 +608,17 @@ async def _submit_one_review(
     reviewer_id = ids[reviewer_email]
     manuscript.record_review(reviewer_id=reviewer_id, occurred_at=NOW)
     await uow.manuscripts.save(manuscript)
-    recommendation, comments = _review_feedback(reviewer_email, title)
+    feedback = _review_feedback(reviewer_email, title)
     await uow.assignments.mark_submitted(
         manuscript.id,
         reviewer_id,
-        recommendation=recommendation,
-        comments=comments,
+        recommendation=feedback.recommendation,
+        originality_score=feedback.originality_score,
+        rigour_score=feedback.rigour_score,
+        clarity_score=feedback.clarity_score,
+        significance_score=feedback.significance_score,
+        comments_to_author=feedback.comments_to_author,
+        confidential_comments_to_editor=feedback.confidential_comments_to_editor,
         occurred_at=NOW,
     )
     await uow.commit()

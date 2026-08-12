@@ -7,11 +7,26 @@ import { Button, buttonClasses } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerAssignForm } from "@/components/reviewer-assign-form";
-import { DecisionForm, hasAvailableDecision } from "@/components/decision-form";
+import { DecisionForm } from "@/components/decision-form";
 import { PublicationPanel } from "@/components/publication-panel";
+import { ReviewsPanel } from "@/components/reviews-panel";
 import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
 
 const PUBLICATION_STATUSES = new Set(["accepted", "scheduled"]);
+// `begin_screening` is legal from both SUBMITTED and RESUBMITTED (`domain/transitions.py`)
+// — a resubmission goes through screening again, the same way a first submission does.
+const SCREENABLE_STATUSES = new Set(["submitted", "resubmitted"]);
+// Reviews only ever exist once a manuscript has left screening for the first time.
+const REVIEWABLE_STATUSES = new Set([
+  "under_review",
+  "reviews_complete",
+  "revision_requested",
+  "resubmitted",
+  "accepted",
+  "scheduled",
+  "published",
+  "rejected",
+]);
 
 export default function EditorialManuscriptPage({ params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = use(params);
@@ -61,7 +76,7 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         </a>
       )}
 
-      {data.status === "submitted" && (
+      {SCREENABLE_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">
           {screenProblem && (
             <div className="mb-4">
@@ -79,12 +94,17 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         </div>
       )}
 
-      {hasAvailableDecision(data.status) && (
+      {REVIEWABLE_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">
-          <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
-          <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
+          <h2 className="font-serif text-lg font-semibold text-ink">Reviews</h2>
+          <ReviewsPanel trackingCode={trackingCode} />
         </div>
       )}
+
+      <div className="mt-6 border-t border-rule pt-6">
+        <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
+        <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
+      </div>
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">

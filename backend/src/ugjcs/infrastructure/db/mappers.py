@@ -176,7 +176,12 @@ def assignment_row_to_record(row: ReviewAssignmentRow) -> ReviewAssignmentRecord
         reviewer_id=UserId(row.reviewer_id),
         status=row.status,
         recommendation=row.recommendation,
-        comments=row.comments,
+        originality_score=row.originality_score,
+        rigour_score=row.rigour_score,
+        clarity_score=row.clarity_score,
+        significance_score=row.significance_score,
+        comments_to_author=row.comments_to_author,
+        confidential_comments_to_editor=row.confidential_comments_to_editor,
         assigned_at=row.assigned_at,
         submitted_at=row.submitted_at,
     )

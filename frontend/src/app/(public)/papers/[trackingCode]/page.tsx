@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getPaper } from "@/lib/archive";
 import { formatAuthors } from "@/lib/format";
 import { TrackingChip } from "@/components/ui/tracking-chip";
+import { buttonClasses } from "@/components/ui/button";
 
 interface Params { trackingCode: string }
 
@@ -53,11 +54,14 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
         </ul>
       )}
       <p className="mt-8 border-t border-rule pt-8 leading-relaxed text-ink/80">{paper.abstract}</p>
-      {/*
-        No "Download PDF" link: Plan 4 stores no document of any kind (no `pdf_url` field,
-        no file storage anywhere in the domain built by Plans 1–4). Re-add this once a
-        document-storage capability exists.
-      */}
+      {paper.has_document && (
+        <a
+          href={`/api/archive/${paper.tracking_code}/document`}
+          className={buttonClasses("primary", "mt-8")}
+        >
+          Download PDF
+        </a>
+      )}
     </main>
   );
 }

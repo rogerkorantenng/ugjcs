@@ -80,14 +80,28 @@ async def test_marking_submitted_records_the_review_content(session: AsyncSessio
     await session.commit()
 
     await repository.mark_submitted(
-        manuscript_id, REVIEWER, recommendation="accept", comments="Solid work.", occurred_at=NOW
+        manuscript_id,
+        REVIEWER,
+        recommendation="accept",
+        originality_score=5,
+        rigour_score=4,
+        clarity_score=4,
+        significance_score=5,
+        comments_to_author="Solid work.",
+        confidential_comments_to_editor="No concerns.",
+        occurred_at=NOW,
     )
     await session.commit()
 
     [record] = await repository.list_for_reviewer(REVIEWER)
     assert record.status == "submitted"
     assert record.recommendation == "accept"
-    assert record.comments == "Solid work."
+    assert record.originality_score == 5
+    assert record.rigour_score == 4
+    assert record.clarity_score == 4
+    assert record.significance_score == 5
+    assert record.comments_to_author == "Solid work."
+    assert record.confidential_comments_to_editor == "No concerns."
     assert record.submitted_at == NOW
 
 

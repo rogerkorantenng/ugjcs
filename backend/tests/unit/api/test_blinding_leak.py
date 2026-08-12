@@ -107,7 +107,15 @@ def test_submitting_a_review_never_echoes_author_identifiers_either() -> None:
     manuscript = leak_fixture_manuscript()
     response = make_client(manuscript).post(
         f"/api/v1/reviews/{manuscript.tracking_code.value}/submit",
-        json={"recommendation": "accept", "comments": "Solid work."},
+        json={
+            "recommendation": "accept",
+            "originality_score": 5,
+            "rigour_score": 4,
+            "clarity_score": 4,
+            "significance_score": 5,
+            "comments_to_author": "Solid work.",
+            "confidential_comments_to_editor": "No concerns to flag.",
+        },
     )
     assert response.status_code == 204
     _assert_no_sentinel_leaks(response.text)
