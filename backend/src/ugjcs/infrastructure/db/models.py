@@ -10,6 +10,7 @@ from uuid import UUID
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -93,3 +94,52 @@ class EditorialEventRow(Base):
         CheckConstraint("sequence >= 1", name="sequence_positive"),
         Index("ix_editorial_events_manuscript_sequence", "manuscript_id", "sequence"),
     )
+
+
+class UserRow(Base):
+    __tablename__ = "users"
+
+    id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
+    email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    full_name: Mapped[str] = mapped_column(String(255))
+    affiliation: Mapped[str] = mapped_column(String(255))
+    expertise: Mapped[list[str]] = mapped_column(postgresql.ARRAY(Text), default=list)
+    reviewer_capacity: Mapped[int] = mapped_column(Integer, default=3)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    roles: Mapped[list["UserRoleRow"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", lazy="selectin"
+    )
+
+    __table_args__ = (CheckConstraint("reviewer_capacity >= 0", name="capacity_non_negative"),)
+
+
+class UserRoleRow(Base):
+    __tablename__ = "user_roles"
+
+    user_id: Mapped[UUID] = mapped_column(
+        postgresql.UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    role: Mapped[str] = mapped_column(String(32), primary_key=True)
+
+    user: Mapped[UserRow] = relationship(back_populates="roles")
+
+
+class RefreshTokenRow(Base):
+    """Only hashes are stored. A stolen database yields no usable refresh token."""
+
+    __tablename__ = "refresh_tokens"
+
+    id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(
+        postgresql.UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    family_id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), index=True)
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    issued_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    replaced_by: Mapped[UUID | None] = mapped_column(postgresql.UUID(as_uuid=True), nullable=True)
