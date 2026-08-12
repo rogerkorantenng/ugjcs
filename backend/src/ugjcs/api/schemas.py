@@ -1,10 +1,12 @@
 """Wire shapes. The domain must never import pydantic — these live here, not there."""
 
+from dataclasses import asdict
 from uuid import UUID
 
 from pydantic import BaseModel
 
 from ugjcs.application.ports import AccountRepository
+from ugjcs.domain.blinding import BlindedManuscript
 from ugjcs.domain.enums import DecisionType
 from ugjcs.domain.manuscript import Manuscript
 
@@ -57,6 +59,31 @@ class RecordDecisionRequest(BaseModel):
 
 class AssignReviewerRequest(BaseModel):
     reviewer_id: UUID
+
+
+class BlindedManuscriptOut(BaseModel):
+    """The reviewer-facing shape — built from `BlindedManuscript`, never from `Manuscript`.
+
+    Exactly the six fields `ugjcs.domain.blinding.BlindedManuscript` carries: there is no
+    `author_ids` or `corresponding_author_id` field on this model at all, matching the
+    domain type's structural guarantee rather than merely filtering one that has them.
+    """
+
+    tracking_code: str
+    title: str
+    abstract: str
+    keywords: tuple[str, ...]
+    version: int
+    status: str
+
+    @classmethod
+    def from_domain(cls, blinded: BlindedManuscript) -> "BlindedManuscriptOut":
+        return cls(**asdict(blinded))
+
+
+class SubmitReviewRequest(BaseModel):
+    recommendation: str
+    comments: str
 
 
 class ArchivePaperOut(BaseModel):
