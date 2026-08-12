@@ -1239,11 +1239,17 @@ def test_acceptance_requires_the_minimum_review_count() -> None:
 
 
 def test_review_quorum_closes_the_review_round() -> None:
+    # The statuses are captured into annotated locals before either is asserted. Asserting
+    # `manuscript.status is S.UNDER_REVIEW` inline would narrow the attribute's type to that
+    # literal for the rest of the function, and mypy cannot see that record_review mutates it,
+    # so the second assertion would be rejected as a non-overlapping identity check.
     manuscript = under_review()
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    assert manuscript.status is S.UNDER_REVIEW
+    after_first: S = manuscript.status
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    assert manuscript.status is S.REVIEWS_COMPLETE
+    after_second: S = manuscript.status
+    assert after_first is S.UNDER_REVIEW
+    assert after_second is S.REVIEWS_COMPLETE
 
 
 def test_acceptance_succeeds_once_the_minimum_is_met() -> None:
