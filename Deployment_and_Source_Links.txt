@@ -1,0 +1,91 @@
+UGJCS — University of Ghana Journal of Computing Science
+Advanced Software Engineering — Individual Capstone
+
+Student Name:   Roger Koranteng Obeng
+Student ID:     22424140
+Project Title:  UGJCS — A Double-Blind Peer-Reviewed Journal Management Platform
+
+--------------------------------------------------------------------------------
+LIVE APPLICATION
+--------------------------------------------------------------------------------
+
+Live Application (frontend):  https://ugjcs-frontend.vercel.app
+Backend API:                  https://tsxsbf9rzp.us-east-1.awsapprunner.com
+API documentation (OpenAPI):  https://tsxsbf9rzp.us-east-1.awsapprunner.com/docs
+Health endpoint:              https://tsxsbf9rzp.us-east-1.awsapprunner.com/health
+
+Admin URL:                    https://ugjcs-frontend.vercel.app/login
+                              (there is no separate admin site; administrative
+                              capability is granted by role, not by a distinct
+                              application)
+
+Source Code Repository:       https://github.com/rogerkorantenng/ugjcs
+
+--------------------------------------------------------------------------------
+TEST CREDENTIALS
+--------------------------------------------------------------------------------
+
+All accounts are pre-verified and were created through the application's own
+registration service, so they behave exactly as a self-registered user would.
+
+Role              Email                     Password
+----------------  ------------------------  ------------------------
+Author            author@ugjcs.test         Ugjcs-Author-2026!
+Reviewer          reviewer@ugjcs.test       Ugjcs-Reviewer-2026!
+Editor            editor@ugjcs.test         Ugjcs-Editor-2026!
+Editor-in-Chief   eic@ugjcs.test            Ugjcs-EditorChief-2026!
+Administrator     admin@ugjcs.test          Ugjcs-Admin-2026!
+
+Test Username:    editor@ugjcs.test
+Test Password:    Ugjcs-Editor-2026!
+Admin Username:   admin@ugjcs.test
+Admin Password:   Ugjcs-Admin-2026!
+
+--------------------------------------------------------------------------------
+SUGGESTED WALKTHROUGH FOR ASSESSMENT
+--------------------------------------------------------------------------------
+
+1. Open the live application. The public archive requires no login and lists
+   four papers published through the full editorial lifecycle.
+
+2. Open any paper to see its record and citation metadata.
+
+3. Sign in as the Editor. The screening queue shows a manuscript awaiting
+   screening; the editorial actions available are constrained by the manuscript's
+   current lifecycle state, not by the interface hiding buttons.
+
+4. Sign in as the Reviewer. The assigned manuscript is shown in its BLINDED form:
+   no author name, no affiliation, no author identifier. This is enforced by the
+   type the API returns, which has no author fields at all, rather than by
+   filtering them out at the edge.
+
+5. Sign in as the Author to view submissions and their status timelines.
+
+--------------------------------------------------------------------------------
+INFRASTRUCTURE
+--------------------------------------------------------------------------------
+
+Frontend:   Vercel (Next.js 15, App Router, acting as a Backend-For-Frontend)
+Backend:    AWS App Runner (FastAPI on Python 3.13, container from ECR)
+Database:   Amazon RDS PostgreSQL 16 (private; not publicly accessible)
+Storage:    Amazon S3 (all public access blocked)
+Secrets:    AWS Secrets Manager
+Region:     us-east-1
+Infrastructure as code: Terraform, in infra/
+
+--------------------------------------------------------------------------------
+NOTES FOR THE JUDGES
+--------------------------------------------------------------------------------
+
+- The deployed architecture is smaller than the one specified in the design
+  document, which describes ECS Fargate behind an Application Load Balancer with
+  CloudFront. That decision, its reasoning and its repayment cost are recorded as
+  entry TD-14 in the technical debt register.
+
+- The technical debt register (docs/04-technical-debt-register.md) contains
+  fourteen entries. Ten were found by independent review of code that had already
+  passed linting, strict type checking, an architecture contract and a full test
+  suite at 100% coverage.
+
+- The application must remain reachable for grading. Please note that the AWS
+  infrastructure is billed continuously at roughly USD 29 per month while running.
