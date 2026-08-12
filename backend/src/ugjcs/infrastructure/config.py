@@ -21,6 +21,15 @@ class Settings(BaseSettings):
     jwt_secret: str = Field(description="HMAC signing key; no default, must be supplied")
     access_token_minutes: int = Field(default=15, description="Access token lifetime")
     refresh_token_days: int = Field(default=7, description="Refresh token lifetime")
+    cors_allowed_origins: str = Field(
+        default="",
+        description="Comma-separated browser origins allowed to call the API, e.g. "
+        "https://ugjcs.example.edu,http://localhost:3000. Empty means none allowed.",
+    )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_allowed_origins.split(",") if origin.strip()]
 
 
 @lru_cache
