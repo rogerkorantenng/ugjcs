@@ -1,8 +1,21 @@
 """Tamper-evident chaining over the editorial event log.
 
-Each event's hash covers its predecessor's hash, so altering, reordering or removing
-any event invalidates every hash after it. This detects tampering; it does not prevent
-it, which is why the database also denies UPDATE and DELETE on the event table.
+Each event's hash covers its predecessor's hash, so altering, reordering or removing an
+event in the interior of the chain invalidates every hash after it. This detects
+tampering; it does not prevent it, which is why the database also denies UPDATE and
+DELETE on the event table.
+
+What this construction cannot detect on its own, stated plainly so no caller assumes
+more than it provides:
+
+- Truncation of the tail. Any prefix of a valid chain is itself a valid chain.
+- A forged event appended through `append`, which is indistinguishable from a genuine one.
+- A wholly fabricated history rebuilt from the genesis hash using these same functions.
+
+All three need an external anchor the forger cannot reproduce: a periodically published
+or signed checkpoint of the latest `event_hash`, plus an expected event count asserted at
+the persistence boundary. That anchor is out of scope for the domain layer and is
+recorded in the technical debt register.
 """
 
 import hashlib
