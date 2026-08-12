@@ -1,0 +1,16 @@
+[importlinter]
+root_package = ugjcs
+include_external_packages = True
+
+[importlinter:contract:domain-purity]
+name = Domain layer imports no frameworks or I/O libraries
+type = forbidden
+source_modules = ugjcs.domain
+forbidden_modules =
+    fastapi
+    sqlalchemy
+    pydantic
+    boto3
+    arq
+    redis
+    httpx
