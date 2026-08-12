@@ -76,6 +76,35 @@ def test_multiple_roles_grant_the_union_of_permissions() -> None:
     assert can(dual, Action.RESUBMIT, manuscript())
 
 
+def test_editor_may_view_any_manuscript() -> None:
+    assert can(actor(Role.EDITOR), Action.VIEW, manuscript())
+
+
+def test_administrator_may_view_any_manuscript() -> None:
+    assert can(actor(Role.ADMINISTRATOR), Action.VIEW, manuscript())
+
+
+def test_author_may_view_their_own_manuscript() -> None:
+    assert can(actor(Role.AUTHOR, user_id=AUTHOR_ID), Action.VIEW, manuscript())
+
+
+def test_author_may_not_view_someone_elses_manuscript() -> None:
+    assert not can(actor(Role.AUTHOR, user_id=OTHER_ID), Action.VIEW, manuscript())
+
+
+def test_reviewer_has_no_unblinded_view() -> None:
+    """Reviewers read manuscripts through the blinded projection, never through VIEW.
+
+    If this ever returns True the double-blind guarantee is gone, because VIEW yields the
+    full aggregate including author identities.
+    """
+    assert not can(actor(Role.REVIEWER), Action.VIEW, manuscript())
+
+
+def test_view_is_denied_when_no_manuscript_is_supplied() -> None:
+    assert not can(actor(Role.EDITOR), Action.VIEW)
+
+
 def test_authorize_is_silent_when_permitted() -> None:
     authorize(actor(Role.EDITOR), Action.SCREEN, manuscript())
 
