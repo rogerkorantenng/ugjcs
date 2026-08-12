@@ -4,7 +4,9 @@ Kept apart from `models.py` because the two change for different reasons: models
 with the schema, mappers with the domain.
 """
 
-from ugjcs.domain.enums import EventType
+from ugjcs.application.ports import RefreshTokenRecord
+from ugjcs.domain.account import Account, EmailAddress
+from ugjcs.domain.enums import EventType, Role
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.events import EditorialEvent, PayloadValue
 from ugjcs.domain.hashchain import ChainedEvent
@@ -14,6 +16,9 @@ from ugjcs.infrastructure.db.models import (
     EditorialEventRow,
     ManuscriptAuthorRow,
     ManuscriptRow,
+    RefreshTokenRow,
+    UserRoleRow,
+    UserRow,
 )
 
 
@@ -91,4 +96,70 @@ def row_to_chained(row: EditorialEventRow) -> ChainedEvent:
         ),
         previous_hash=row.previous_hash,
         event_hash=row.event_hash,
+    )
+
+
+def account_to_row(account: Account) -> UserRow:
+    """Project the aggregate onto a storage row, roles included."""
+    return UserRow(
+        id=account.id,
+        email=account.email.value,
+        password_hash=account.password_hash,
+        full_name=account.full_name,
+        affiliation=account.affiliation,
+        expertise=list(account.expertise),
+        reviewer_capacity=account.reviewer_capacity,
+        is_verified=account.is_verified,
+        is_active=account.is_active,
+        verified_at=account.verified_at,
+        roles=[UserRoleRow(user_id=account.id, role=role.value) for role in account.roles],
+    )
+
+
+def row_to_account(row: UserRow) -> Account:
+    """Rebuild the aggregate, restoring roles through the private attribute.
+
+    A public `roles` setter would let any caller rewrite the role set directly, bypassing
+    `grant`/`revoke` and the invariants they enforce — the same reasoning `to_domain`
+    already applies to `Manuscript._sequence`.
+    """
+    account = Account(
+        id=UserId(row.id),
+        email=EmailAddress(row.email),
+        password_hash=row.password_hash,
+        full_name=row.full_name,
+        affiliation=row.affiliation,
+        expertise=tuple(row.expertise),
+        reviewer_capacity=row.reviewer_capacity,
+        is_verified=row.is_verified,
+        is_active=row.is_active,
+        verified_at=row.verified_at,
+    )
+    account._roles = {Role(role_row.role) for role_row in row.roles}
+    return account
+
+
+def refresh_token_to_row(record: RefreshTokenRecord) -> RefreshTokenRow:
+    return RefreshTokenRow(
+        id=record.id,
+        user_id=record.user_id,
+        family_id=record.family_id,
+        token_hash=record.token_hash,
+        issued_at=record.issued_at,
+        expires_at=record.expires_at,
+        revoked_at=record.revoked_at,
+        replaced_by=record.replaced_by,
+    )
+
+
+def row_to_refresh_token(row: RefreshTokenRow) -> RefreshTokenRecord:
+    return RefreshTokenRecord(
+        id=row.id,
+        user_id=UserId(row.user_id),
+        family_id=row.family_id,
+        token_hash=row.token_hash,
+        issued_at=row.issued_at,
+        expires_at=row.expires_at,
+        revoked_at=row.revoked_at,
+        replaced_by=row.replaced_by,
     )
