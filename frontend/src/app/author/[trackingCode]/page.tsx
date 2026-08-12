@@ -1,19 +1,22 @@
 "use client";
-import { use } from "react";
+import { use, useState } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { StatusBadge } from "@/components/ui/badge";
 import { ProblemAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
-import type { Manuscript } from "@/types/api";
+import { ManuscriptDetailSkeleton } from "@/components/skeletons";
+import type { Manuscript, ProblemDetails } from "@/types/api";
 
 const WITHDRAWABLE = new Set(["submitted", "under_screening", "under_review", "reviews_complete", "revision_requested"]);
 
 export default function ManuscriptDetailPage({ params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = use(params);
   const { data, error, isLoading, mutate } = useApi<Manuscript>(`/api/manuscripts/${trackingCode}`);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [withdrawProblem, setWithdrawProblem] = useState<ProblemDetails | null>(null);
 
-  if (isLoading) return <p>Loading…</p>;
+  if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
   if (error)
     return (
       <ProblemAlert
@@ -23,7 +26,15 @@ export default function ManuscriptDetailPage({ params }: { params: Promise<{ tra
   if (!data) return null;
 
   async function withdraw() {
-    await fetch(`/api/manuscripts/${trackingCode}/withdraw`, { method: "POST" });
+    setWithdrawing(true);
+    setWithdrawProblem(null);
+    const response = await fetch(`/api/manuscripts/${trackingCode}/withdraw`, { method: "POST" });
+    setWithdrawing(false);
+    if (!response.ok) {
+      const detail = await response.json().catch(() => null);
+      setWithdrawProblem(detail ?? { type: "about:blank", title: "Could not withdraw the submission", status: response.status });
+      return;
+    }
     mutate();
   }
 
@@ -36,8 +47,15 @@ export default function ManuscriptDetailPage({ params }: { params: Promise<{ tra
       <TrackingChip code={data.tracking_code} className="mt-1" />
       <p className="mt-4 leading-relaxed text-ink/80">{data.abstract}</p>
       <p className="mt-4 text-sm text-ink/60">{data.submitted_reviews} of {data.minimum_reviews} reviews submitted</p>
+      {withdrawProblem && (
+        <div className="mt-4">
+          <ProblemAlert problem={withdrawProblem} />
+        </div>
+      )}
       {WITHDRAWABLE.has(data.status) && (
-        <Button variant="danger" className="mt-4" onClick={withdraw}>Withdraw submission</Button>
+        <Button variant="danger" isLoading={withdrawing} className="mt-4" onClick={withdraw}>
+          {withdrawing ? "Withdrawing…" : "Withdraw submission"}
+        </Button>
       )}
       {/*
         No status history: Plan 4 exposes no event/audit log endpoint. Re-add a timeline the

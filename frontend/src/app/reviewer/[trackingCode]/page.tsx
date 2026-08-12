@@ -5,6 +5,7 @@ import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { BlindedManuscriptView } from "@/components/blinded-manuscript-view";
 import { ReviewForm } from "@/components/review-form";
+import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import type { BlindedManuscript } from "@/types/api";
 
 /**
@@ -19,7 +20,7 @@ export default function ReviewAssignmentPage({ params }: { params: Promise<{ tra
   const router = useRouter();
   const { data, error, isLoading } = useApi<BlindedManuscript[]>("/api/reviews");
 
-  if (isLoading) return <p>Loading…</p>;
+  if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
   if (error)
     return (
       <ProblemAlert
@@ -35,7 +36,10 @@ export default function ReviewAssignmentPage({ params }: { params: Promise<{ tra
   return (
     <>
       <BlindedManuscriptView manuscript={manuscript} />
-      <ReviewForm trackingCode={trackingCode} onSubmitted={() => router.push("/reviewer")} />
+      <div className="mt-6 border-t border-rule pt-6">
+        <h2 className="font-serif text-lg font-semibold text-ink">Submit your review</h2>
+        <ReviewForm trackingCode={trackingCode} onSubmitted={() => router.push("/reviewer")} />
+      </div>
     </>
   );
 }
