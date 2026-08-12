@@ -98,12 +98,53 @@ class RefreshTokenRepository(Protocol):
         ...
 
 
+@dataclass(frozen=True, slots=True)
+class ReviewAssignmentRecord:
+    """A read model, not an aggregate — there is no invariant here for a domain type to
+    protect. See Plan 4's scope decision for why."""
+
+    manuscript_id: ManuscriptId
+    reviewer_id: UserId
+    status: str
+    recommendation: str | None
+    comments: str | None
+    assigned_at: datetime
+    submitted_at: datetime | None
+
+
+class ReviewAssignmentRepository(Protocol):
+    async def assign(
+        self, manuscript_id: ManuscriptId, reviewer_id: UserId, *, occurred_at: datetime
+    ) -> None:
+        """Record that a reviewer was asked. Idempotent is not guaranteed — a second call
+        for the same pair raises, because `uq_review_assignments_pair` exists precisely
+        to make a duplicate assignment visible rather than silently accepted."""
+        ...
+
+    async def list_for_reviewer(self, reviewer_id: UserId) -> list[ReviewAssignmentRecord]: ...
+
+    async def list_for_manuscript(
+        self, manuscript_id: ManuscriptId
+    ) -> list[ReviewAssignmentRecord]: ...
+
+    async def mark_submitted(
+        self,
+        manuscript_id: ManuscriptId,
+        reviewer_id: UserId,
+        *,
+        recommendation: str,
+        comments: str,
+        occurred_at: datetime,
+    ) -> None: ...
+
+
 class UnitOfWork(Protocol):
     """A transactional boundary. Exiting without `commit` rolls back."""
 
     manuscripts: ManuscriptRepository
     accounts: AccountRepository
     refresh_tokens: RefreshTokenRepository
+    assignments: ReviewAssignmentRepository
 
     async def __aenter__(self) -> Self: ...
 
