@@ -3,9 +3,10 @@ root_package = ugjcs
 include_external_packages = True
 
 [importlinter:contract:domain-purity]
-name = Domain layer imports no frameworks or I/O libraries
+name = Domain layer imports no framework, vendor SDK, or I/O module
 type = forbidden
-source_modules = ugjcs.domain
+source_modules =
+    ugjcs.domain
 forbidden_modules =
     fastapi
     sqlalchemy
@@ -14,3 +15,17 @@ forbidden_modules =
     arq
     redis
     httpx
+    requests
+    os
+    io
+    socket
+    sqlite3
+    subprocess
+    pathlib
+    asyncio
+    threading
+    multiprocessing
+    logging
+    http
+    smtplib
+    urllib
