@@ -11,6 +11,7 @@ from typing import Protocol, Self
 from uuid import UUID
 
 from ugjcs.domain.account import Account, EmailAddress
+from ugjcs.domain.enums import ManuscriptStatus
 from ugjcs.domain.hashchain import ChainedEvent
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
@@ -49,6 +50,10 @@ class ManuscriptRepository(Protocol):
 
     async def list_by_author(self, author_id: UserId) -> list[Manuscript]:
         """Every manuscript on which this user appears as an author, newest first."""
+        ...
+
+    async def list_by_status(self, status: ManuscriptStatus) -> list[Manuscript]:
+        """Every manuscript currently in this state — the screening queue's source."""
         ...
 
 

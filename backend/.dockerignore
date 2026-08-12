@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+tests/
+.git/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.import_linter_cache/
+.coverage
+Dockerfile
+.dockerignore

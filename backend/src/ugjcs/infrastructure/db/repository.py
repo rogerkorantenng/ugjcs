@@ -54,17 +54,17 @@ class SqlAlchemyManuscriptRepository:
         )
         return [row_to_chained(row) for row in result.scalars()]
 
-    async def list_published(self) -> list[Manuscript]:
-        # Not implemented in terms of a `list_by_status` helper: that method belongs to
-        # Task 5 (the editorial queue), which is out of scope for this pass — Task 5
-        # needs an authenticated `Actor` and this worktree has no authentication yet
-        # (Plan 3, landing concurrently). Reconciling the two into one helper is left for
-        # whoever finishes Task 5.
+    async def list_by_status(self, status: S) -> list[Manuscript]:
         result = await self._session.execute(
-            select(ManuscriptRow).where(ManuscriptRow.status == S.PUBLISHED.value)
+            select(ManuscriptRow)
+            .where(ManuscriptRow.status == status.value)
+            .order_by(ManuscriptRow.id)
         )
         rows = result.scalars().all()
         return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
+
+    async def list_published(self) -> list[Manuscript]:
+        return await self.list_by_status(S.PUBLISHED)
 
     async def search_published(self, query: str) -> list[Manuscript]:
         result = await self._session.execute(

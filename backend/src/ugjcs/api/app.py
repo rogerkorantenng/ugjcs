@@ -39,11 +39,12 @@ def create_app() -> FastAPI:
             await connection.execute(text("SELECT 1"))
         return {"status": "ready"}
 
-    # Editorial and reviews routers (Plan 4 Tasks 5, 6) are wired here as each lands.
-    from ugjcs.api.routers import archive, auth, manuscripts
+    from ugjcs.api.routers import archive, auth, editorial, manuscripts, reviews
 
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
     app.include_router(manuscripts.router, prefix="/api/v1/manuscripts", tags=["manuscripts"])
+    app.include_router(editorial.router, prefix="/api/v1/editorial", tags=["editorial"])
+    app.include_router(reviews.router, prefix="/api/v1/reviews", tags=["reviews"])
     app.include_router(archive.router, prefix="/api/v1/archive", tags=["archive"])
 
     return app

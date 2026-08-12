@@ -1,9 +1,13 @@
 """Login, refresh, logout and the identity of the caller.
 
 `/login` and `/refresh` are deliberately unauthenticated — a bearer token is exactly
-what they are issuing. `/logout` and `/me` both carry `get_current_actor`/`ActorDep`
-(via `Depends`), a marked authorisation dependency, so `test_route_audit.py` needs no
-allowlist entry for either.
+what they are issuing. `/logout` is unauthenticated for the same reason `/refresh` is:
+per `docs/05-api-contract.md` §6, it revokes by the refresh token carried in the body,
+not by a bearer access token — an access token may already be expired at logout time,
+and the refresh token's hash lookup is what identifies the session to revoke. Only `/me`
+carries `get_current_actor`/`ActorDep` (via `Depends`), a marked authorisation
+dependency; `/login`, `/refresh` and `/logout` are the three entries
+`test_route_audit.py` allowlists as public for this router.
 """
 
 from typing import Annotated
