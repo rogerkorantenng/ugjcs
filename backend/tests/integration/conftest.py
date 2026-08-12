@@ -24,6 +24,12 @@ CREATE TRIGGER editorial_events_append_only
     FOR EACH ROW EXECUTE FUNCTION ugjcs_reject_event_mutation();
 """
 
+NO_TRUNCATE_TRIGGER = """
+CREATE TRIGGER editorial_events_no_truncate
+    BEFORE TRUNCATE ON editorial_events
+    FOR EACH STATEMENT EXECUTE FUNCTION ugjcs_reject_event_mutation();
+"""
+
 
 @pytest.fixture(scope="session")
 def postgres_url() -> Iterator[str]:
@@ -40,6 +46,7 @@ async def session(postgres_url: str) -> AsyncIterator[AsyncSession]:
         await connection.run_sync(Base.metadata.create_all)
         await connection.exec_driver_sql(APPEND_ONLY_FUNCTION)
         await connection.exec_driver_sql(APPEND_ONLY_TRIGGER)
+        await connection.exec_driver_sql(NO_TRUNCATE_TRIGGER)
     factory = session_factory(engine)
     async with factory() as session:
         yield session

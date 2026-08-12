@@ -30,6 +30,15 @@ CREATE TRIGGER editorial_events_append_only
     FOR EACH ROW EXECUTE FUNCTION ugjcs_reject_event_mutation();
 """
 
+# PostgreSQL never fires row-level triggers on TRUNCATE, so the row-level trigger above
+# leaves the whole log deletable by a single statement. A statement-level trigger is the
+# only thing that closes it.
+NO_TRUNCATE_TRIGGER = """
+CREATE TRIGGER editorial_events_no_truncate
+    BEFORE TRUNCATE ON editorial_events
+    FOR EACH STATEMENT EXECUTE FUNCTION ugjcs_reject_event_mutation();
+"""
+
 
 def upgrade() -> None:
     op.create_table(
@@ -97,9 +106,11 @@ def upgrade() -> None:
 
     op.execute(APPEND_ONLY_FUNCTION)
     op.execute(APPEND_ONLY_TRIGGER)
+    op.execute(NO_TRUNCATE_TRIGGER)
 
 
 def downgrade() -> None:
+    op.execute("DROP TRIGGER IF EXISTS editorial_events_no_truncate ON editorial_events")
     op.execute("DROP TRIGGER IF EXISTS editorial_events_append_only ON editorial_events")
     op.execute("DROP FUNCTION IF EXISTS ugjcs_reject_event_mutation()")
     op.drop_table("editorial_events")

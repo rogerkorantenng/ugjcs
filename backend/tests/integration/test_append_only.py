@@ -58,3 +58,14 @@ async def test_deleting_a_manuscript_with_events_is_refused(session: AsyncSessio
     manuscript = await stored_manuscript(session)
     with pytest.raises(DBAPIError):
         await session.execute(text("DELETE FROM manuscripts WHERE id = :id"), {"id": manuscript.id})
+
+
+async def test_truncating_the_event_log_is_rejected(session: AsyncSession) -> None:
+    """Row-level triggers do not fire on TRUNCATE, so this needs a statement-level one.
+
+    Without it, a single statement empties the entire audit log and the append-only
+    guarantee is worth nothing.
+    """
+    await stored_manuscript(session)
+    with pytest.raises(DBAPIError, match="append-only"):
+        await session.execute(text("TRUNCATE TABLE editorial_events"))
