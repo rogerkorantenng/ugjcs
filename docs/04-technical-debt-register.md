@@ -141,6 +141,16 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 | **Priority** | **Resolved** — `canonical_bytes()` now normalises to UTC, so the offset cannot reach the digest by construction. |
 | **Resolution** | Done. The lesson stands: a value that crosses a storage boundary may return in a different representation than it went in, and only an integration test or explicit canonicalisation catches it. |
 
+### TD-13 — TRUNCATE bypassed the append-only guarantee
+
+| | |
+|---|---|
+| **Debt** | Resolved, recorded because of how it was found. A `BEFORE UPDATE OR DELETE ... FOR EACH ROW` trigger protected the editorial event log, and it was verified firing against a live database. But PostgreSQL never fires row-level triggers on `TRUNCATE`, so a single `TRUNCATE TABLE editorial_events` erased the entire audit log with no error. |
+| **Cause** | Inadvertent. The trigger was written, reviewed, and empirically confirmed rejecting `UPDATE` and `DELETE`. Nobody asked whether the guarantee held for *every* class of statement that removes rows. |
+| **Impact** | The system claimed a tamper-evident audit trail while leaving the single most obvious way to destroy it completely unguarded. |
+| **Priority** | **Resolved** — a statement-level `BEFORE TRUNCATE ... FOR EACH STATEMENT` trigger now closes it, in both the migration and the test fixtures, with a test that fails when the trigger is removed. |
+| **Resolution** | Done. The lesson: a control verified against the cases you thought of is not a control verified against the cases that matter. The question that found this was "is this claim true for every statement class?", not "does the trigger work?" |
+
 ### TD-11 — Coverage is a weak signal, and this project has the evidence
 
 | | |
@@ -161,7 +171,7 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 | Critical | 3 | TD-01, TD-02, TD-03 |
 | Scheduled | 5 | TD-04 … TD-08 |
 | Acceptable | 3 | TD-09, TD-10, TD-11 |
-| Resolved, retained as a record | 1 | TD-12 |
+| Resolved, retained as a record | 2 | TD-12, TD-13 |
 
 **Repayment sequence.** TD-01 before any infrastructure is provisioned. TD-02, TD-03 and TD-07 are one
 piece of work — they are all consequences of reviewer assignment not existing yet — and should be repaid
