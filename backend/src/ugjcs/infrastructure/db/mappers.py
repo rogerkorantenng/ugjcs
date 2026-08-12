@@ -4,6 +4,7 @@ Kept apart from `models.py` because the two change for different reasons: models
 with the schema, mappers with the domain.
 """
 
+from ugjcs.application.ports import RefreshTokenRecord
 from ugjcs.domain.account import Account, EmailAddress
 from ugjcs.domain.enums import EventType, Role
 from ugjcs.domain.enums import ManuscriptStatus as S
@@ -15,6 +16,7 @@ from ugjcs.infrastructure.db.models import (
     EditorialEventRow,
     ManuscriptAuthorRow,
     ManuscriptRow,
+    RefreshTokenRow,
     UserRoleRow,
     UserRow,
 )
@@ -135,3 +137,29 @@ def row_to_account(row: UserRow) -> Account:
     )
     account._roles = {Role(role_row.role) for role_row in row.roles}
     return account
+
+
+def refresh_token_to_row(record: RefreshTokenRecord) -> RefreshTokenRow:
+    return RefreshTokenRow(
+        id=record.id,
+        user_id=record.user_id,
+        family_id=record.family_id,
+        token_hash=record.token_hash,
+        issued_at=record.issued_at,
+        expires_at=record.expires_at,
+        revoked_at=record.revoked_at,
+        replaced_by=record.replaced_by,
+    )
+
+
+def row_to_refresh_token(row: RefreshTokenRow) -> RefreshTokenRecord:
+    return RefreshTokenRecord(
+        id=row.id,
+        user_id=UserId(row.user_id),
+        family_id=row.family_id,
+        token_hash=row.token_hash,
+        issued_at=row.issued_at,
+        expires_at=row.expires_at,
+        revoked_at=row.revoked_at,
+        replaced_by=row.replaced_by,
+    )

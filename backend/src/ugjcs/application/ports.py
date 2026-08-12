@@ -4,7 +4,8 @@ These are protocols, not base classes. Infrastructure supplies implementations; 
 application layer never imports them, which is what the layers contract enforces.
 """
 
-from datetime import datetime
+from dataclasses import dataclass
+from datetime import datetime, timedelta
 from types import TracebackType
 from typing import Protocol, Self
 from uuid import UUID
@@ -57,11 +58,40 @@ class AccountRepository(Protocol):
         ...
 
 
+@dataclass(frozen=True, slots=True)
+class RefreshTokenRecord:
+    """A `refresh_tokens` row, as far as the application layer needs to see it."""
+
+    id: UUID
+    user_id: UserId
+    family_id: UUID
+    token_hash: str
+    issued_at: datetime
+    expires_at: datetime
+    revoked_at: datetime | None
+    replaced_by: UUID | None
+
+
+class RefreshTokenRepository(Protocol):
+    async def add(self, record: RefreshTokenRecord) -> None: ...
+
+    async def get_by_hash(self, token_hash: str) -> RefreshTokenRecord | None: ...
+
+    async def revoke(self, token_id: UUID, *, replaced_by: UUID | None = None) -> None:
+        """Mark a single token spent. `replaced_by` records the row that superseded it."""
+        ...
+
+    async def revoke_family(self, family_id: UUID) -> None:
+        """Revoke every unrevoked token sharing this family — the reuse-detection response."""
+        ...
+
+
 class UnitOfWork(Protocol):
     """A transactional boundary. Exiting without `commit` rolls back."""
 
     manuscripts: ManuscriptRepository
     accounts: AccountRepository
+    refresh_tokens: RefreshTokenRepository
 
     async def __aenter__(self) -> Self: ...
 
@@ -113,6 +143,11 @@ class TokenService(Protocol):
     def read_verification(self, token: str) -> UserId:
         """Return the subject, or raise `InvalidTokenError` if absent, expired, replayed-typed,
         or of the wrong `typ`."""
+        ...
+
+    @property
+    def refresh_ttl(self) -> timedelta:
+        """How long a freshly issued refresh token is valid, for computing its DB expiry."""
         ...
 
 

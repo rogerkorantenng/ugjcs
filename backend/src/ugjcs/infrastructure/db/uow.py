@@ -10,12 +10,14 @@ from typing import Self
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from ugjcs.infrastructure.db.account_repository import SqlAlchemyAccountRepository
+from ugjcs.infrastructure.db.refresh_token_repository import SqlAlchemyRefreshTokenRepository
 from ugjcs.infrastructure.db.repository import SqlAlchemyManuscriptRepository
 
 
 class SqlAlchemyUnitOfWork:
     manuscripts: SqlAlchemyManuscriptRepository
     accounts: SqlAlchemyAccountRepository
+    refresh_tokens: SqlAlchemyRefreshTokenRepository
 
     def __init__(self, factory: async_sessionmaker[AsyncSession]) -> None:
         self._factory = factory
@@ -25,6 +27,7 @@ class SqlAlchemyUnitOfWork:
         self._session = self._factory()
         self.manuscripts = SqlAlchemyManuscriptRepository(self._session)
         self.accounts = SqlAlchemyAccountRepository(self._session)
+        self.refresh_tokens = SqlAlchemyRefreshTokenRepository(self._session)
         return self
 
     async def __aexit__(
