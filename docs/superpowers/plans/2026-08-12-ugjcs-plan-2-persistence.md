@@ -513,7 +513,11 @@ def upgrade() -> None:
         sa.CheckConstraint("version >= 1", name="ck_manuscripts_version_positive"),
         sa.CheckConstraint("submitted_reviews >= 0", name="ck_manuscripts_reviews_non_negative"),
         sa.PrimaryKeyConstraint("id", name="pk_manuscripts"),
-        sa.UniqueConstraint("tracking_code", name="uq_manuscripts_tracking_code"),
+    )
+    # `unique=True, index=True` on the column compiles to ONE unique index, not a separate
+    # UniqueConstraint. The migration must create the same object, or Task 8's parity test fails.
+    op.create_index(
+        "ix_manuscripts_tracking_code", "manuscripts", ["tracking_code"], unique=True
     )
     op.create_index("ix_manuscripts_status", "manuscripts", ["status"])
 
