@@ -29,3 +29,15 @@ def test_tracking_code_parses_its_own_output() -> None:
 def test_tracking_code_rejects_malformed_input() -> None:
     with pytest.raises(ValueError, match="malformed tracking code"):
         TrackingCode.parse("UGJCS/2026/42")
+
+
+def test_tracking_code_rejects_a_year_that_is_not_four_digits() -> None:
+    """`mint` must not produce a value its own `parse` would reject."""
+    with pytest.raises(ValueError, match="year must be four digits"):
+        TrackingCode.mint(12345, 1)
+
+
+def test_the_constructor_rejects_a_value_parse_would_reject() -> None:
+    """Validation on `parse` alone leaves `TrackingCode("garbage")` a legal object."""
+    with pytest.raises(ValueError, match="malformed tracking code"):
+        TrackingCode("garbage")

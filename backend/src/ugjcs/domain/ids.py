@@ -23,14 +23,24 @@ class TrackingCode:
 
     value: str
 
+    def __post_init__(self) -> None:
+        """Validate in the constructor so no path can produce a code `parse` rejects."""
+        if not _TRACKING_PATTERN.match(self.value):
+            raise ValueError(f"malformed tracking code: {self.value!r}")
+
     @classmethod
     def mint(cls, year: int, sequence: int) -> Self:
+        if not 1000 <= year <= 9999:
+            raise ValueError("year must be four digits")
         if sequence <= 0:
             raise ValueError("sequence must be positive")
         return cls(f"UGJCS-{year:04d}-{sequence:04d}")
 
     @classmethod
     def parse(cls, raw: str) -> Self:
-        if not _TRACKING_PATTERN.match(raw):
-            raise ValueError(f"malformed tracking code: {raw!r}")
+        """Construct from an externally supplied string.
+
+        Validation now lives in `__post_init__`, so this is a thin wrapper; it is kept
+        for the explicit name at call sites reading untrusted input.
+        """
         return cls(raw)
