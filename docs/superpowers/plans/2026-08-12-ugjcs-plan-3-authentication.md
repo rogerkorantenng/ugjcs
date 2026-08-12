@@ -47,20 +47,32 @@ backend/
 │   ├── domain/
 │   │   └── account.py                           Task 1  Account aggregate, credential rules
 │   ├── application/
-│   │   ├── ports.py                             Task 1  (extended) hasher, tokens, clock, email
-│   │   └── identity.py                          Task 7  registration/login/refresh use cases
+│   │   ├── ports.py                             Task 1  hasher, tokens, clock, email
+│   │   │                                         (extended Task 5: AccountRepository, UnitOfWork.accounts)
+│   │   │                                         (extended Task 7: TokenService.issue/read_verification)
+│   │   │                                         (extended Task 8: RefreshTokenRecord/Repository,
+│   │   │                                          UnitOfWork.refresh_tokens, TokenService.refresh_ttl)
+│   │   └── identity.py                          Task 6  IdentityService.actor_for, AuthenticationError
+│   │                                             (extended Task 7: RegistrationService)
+│   │                                             (extended Task 8: SessionService, TokenPair)
 │   └── infrastructure/
 │       ├── security/
 │       │   ├── __init__.py                      Task 3
 │       │   ├── passwords.py                     Task 3  Argon2id adapter
 │       │   └── tokens.py                        Task 4  JWT access + rotating refresh
+│       │                                         (extended Task 7: issue_verification/read_verification)
 │       ├── email/
 │       │   ├── __init__.py                      Task 7
 │       │   └── logging_sender.py                Task 7  writes the link to the log
 │       └── db/
 │           ├── models.py                        Task 2  (extended) users, user_roles, refresh_tokens
-│           ├── mappers.py                       Task 2  (extended) account mapping
-│           └── account_repository.py            Task 5
+│           ├── mappers.py                       Task 2  event/manuscript mapping
+│           │                                     (extended Task 5: account_to_row/row_to_account)
+│           │                                     (extended Task 8: refresh token mapping)
+│           ├── uow.py                            Task 2  SqlAlchemyUnitOfWork
+│           │                                     (extended Task 5: .accounts, Task 8: .refresh_tokens)
+│           ├── account_repository.py            Task 5
+│           └── refresh_token_repository.py      Task 8
 ├── alembic/versions/0002_identity.py            Task 2
 └── tests/
     ├── unit/domain/test_account.py              Task 1
@@ -313,7 +325,7 @@ class TokenService(Protocol):
     def issue_access(self, subject: UserId) -> str: ...
 
     def read_access(self, token: str) -> UserId:
-        """Return the subject, or raise `InvalidToken` if absent, expired or tampered with."""
+        """Return the subject, or raise `InvalidTokenError` if absent, expired or tampered with."""
         ...
 
     def issue_refresh(self, subject: UserId, family_id: UUID) -> tuple[str, str]:
@@ -576,7 +588,7 @@ git commit -m "feat: add Argon2id password hashing at OWASP-recommended paramete
 - Modify: `backend/src/ugjcs/infrastructure/config.py`
 
 **Interfaces:**
-- Produces: `InvalidToken`, `JwtTokenService(secret, clock, access_ttl, refresh_ttl)`, `SystemClock`.
+- Produces: `InvalidTokenError`, `JwtTokenService(secret, clock, access_ttl, refresh_ttl)`, `SystemClock`.
 
 - [ ] **Step 1: Add the dependency and settings**
 
@@ -603,7 +615,7 @@ from uuid import uuid4
 import pytest
 
 from ugjcs.domain.ids import UserId
-from ugjcs.infrastructure.security.tokens import InvalidToken, JwtTokenService
+from ugjcs.infrastructure.security.tokens import InvalidTokenError, JwtTokenService
 
 SECRET = "test-secret-not-used-anywhere-real"
 SUBJECT = UserId(uuid4())
@@ -631,7 +643,7 @@ def test_an_expired_access_token_is_refused() -> None:
     clock = FrozenClock(datetime(2026, 8, 12, 9, 0, tzinfo=UTC))
     token = make_service(clock).issue_access(SUBJECT)
     clock.moment += timedelta(minutes=16)
-    with pytest.raises(InvalidToken, match="expired"):
+    with pytest.raises(InvalidTokenError, match="expired"):
         make_service(clock).read_access(token)
 
 
@@ -640,20 +652,20 @@ def test_a_token_signed_with_another_secret_is_refused() -> None:
     token = make_service(clock).issue_access(SUBJECT)
     other = JwtTokenService(secret="a-different-secret", clock=clock,
                             access_ttl=timedelta(minutes=15), refresh_ttl=timedelta(days=7))
-    with pytest.raises(InvalidToken):
+    with pytest.raises(InvalidTokenError):
         other.read_access(token)
 
 
 def test_a_tampered_token_is_refused() -> None:
     service = make_service(FrozenClock(datetime(2026, 8, 12, 9, 0, tzinfo=UTC)))
     token = service.issue_access(SUBJECT)
-    with pytest.raises(InvalidToken):
+    with pytest.raises(InvalidTokenError):
         service.read_access(token[:-2] + ("aa" if not token.endswith("aa") else "bb"))
 
 
 def test_rubbish_is_refused_rather_than_crashing() -> None:
     service = make_service(FrozenClock(datetime(2026, 8, 12, 9, 0, tzinfo=UTC)))
-    with pytest.raises(InvalidToken):
+    with pytest.raises(InvalidTokenError):
         service.read_access("not.a.token")
 
 
@@ -663,7 +675,7 @@ def test_an_access_token_cannot_be_used_as_a_refresh_token() -> None:
     access = service.issue_access(SUBJECT)
     refresh, _ = service.issue_refresh(SUBJECT, uuid4())
     assert access != refresh
-    with pytest.raises(InvalidToken, match="wrong token type"):
+    with pytest.raises(InvalidTokenError, match="wrong token type"):
         service.read_access(refresh)
 
 
@@ -714,7 +726,7 @@ ALGORITHM = "HS256"
 ACCESS_TYPE = "access"
 
 
-class InvalidToken(DomainError):
+class InvalidTokenError(DomainError):
     """A token that is absent, malformed, expired, of the wrong type, or not ours."""
 
 
@@ -749,15 +761,15 @@ class JwtTokenService:
         try:
             claims = jwt.decode(token, self._secret, algorithms=[ALGORITHM])
         except jwt.ExpiredSignatureError as error:
-            raise InvalidToken("token has expired") from error
+            raise InvalidTokenError("token has expired") from error
         except jwt.PyJWTError as error:
-            raise InvalidToken("token is not valid") from error
+            raise InvalidTokenError("token is not valid") from error
         if claims.get("typ") != ACCESS_TYPE:
-            raise InvalidToken("wrong token type for this endpoint")
+            raise InvalidTokenError("wrong token type for this endpoint")
         try:
             return UserId(UUID(claims["sub"]))
         except (KeyError, ValueError) as error:
-            raise InvalidToken("token subject is missing or malformed") from error
+            raise InvalidTokenError("token subject is missing or malformed") from error
 
     def issue_refresh(self, subject: UserId, family_id: UUID) -> tuple[str, str]:
         """Opaque and unguessable. The subject and family are recorded in the database row."""
@@ -787,31 +799,305 @@ git commit -m "feat: add JWT access tokens and opaque hashed refresh tokens"
 
 **Files:**
 - Create: `backend/src/ugjcs/infrastructure/db/account_repository.py`, `backend/tests/integration/test_account_repository.py`
-- Modify: `backend/src/ugjcs/infrastructure/db/mappers.py`, `backend/src/ugjcs/application/ports.py`
+- Modify: `backend/src/ugjcs/infrastructure/db/mappers.py`, `backend/src/ugjcs/application/ports.py`, `backend/src/ugjcs/infrastructure/db/uow.py`
 
 **Interfaces:**
-- Produces: `AccountRepository` protocol with `add`, `get`, `get_by_email`, `save`; `SqlAlchemyAccountRepository`; `account_to_row` and `row_to_account` mappers.
+- Produces: `AccountRepository` protocol with `add`, `get`, `get_by_email`, `save`; `SqlAlchemyAccountRepository`; `account_to_row` and `row_to_account` mappers; `UnitOfWork.accounts`.
 
 - [ ] **Step 1: Extend the ports**
 
-Add an `AccountRepository` protocol to `ports.py` with `async def add(self, account: Account) -> None`, `async def get(self, user_id: UserId) -> Account | None`, `async def get_by_email(self, email: EmailAddress) -> Account | None`, and `async def save(self, account: Account) -> None`. Add `manuscripts`' sibling `accounts: AccountRepository` to the `UnitOfWork` protocol.
+Append to `backend/src/ugjcs/application/ports.py`. Add the import `from ugjcs.domain.account import Account, EmailAddress` alongside the existing imports.
+
+```python
+class AccountRepository(Protocol):
+    """Persistence for the account aggregate and its role grants."""
+
+    async def add(self, account: Account) -> None:
+        """Persist an account that has never been stored before."""
+        ...
+
+    async def get(self, user_id: UserId) -> Account | None: ...
+
+    async def get_by_email(self, email: EmailAddress) -> Account | None:
+        """Look up by the normalised address. Case and whitespace never distinguish accounts."""
+        ...
+
+    async def save(self, account: Account) -> None:
+        """Persist scalar field changes and replace the role rows to match `account.roles`."""
+        ...
+```
+
+Add `manuscripts`' sibling to `UnitOfWork`:
+
+```python
+class UnitOfWork(Protocol):
+    manuscripts: ManuscriptRepository
+    accounts: AccountRepository
+    ...
+```
 
 - [ ] **Step 2: Write the mappers**
 
-Add `account_to_row(account) -> UserRow` and `row_to_account(row) -> Account` to `mappers.py`, following the existing style. `row_to_account` must populate `_roles` from `row.roles` — the same private-attribute assignment pattern, and for the same reason: a public setter would let any caller rewrite the role set.
+Append to `backend/src/ugjcs/infrastructure/db/mappers.py`. Extend its imports with `from ugjcs.domain.account import Account, EmailAddress`, `Role` from `ugjcs.domain.enums` (alongside the existing `EventType` and `ManuscriptStatus as S` import), and `UserRoleRow`, `UserRow` from `ugjcs.infrastructure.db.models`.
+
+```python
+def account_to_row(account: Account) -> UserRow:
+    """Project the aggregate onto a storage row, roles included."""
+    return UserRow(
+        id=account.id,
+        email=account.email.value,
+        password_hash=account.password_hash,
+        full_name=account.full_name,
+        affiliation=account.affiliation,
+        expertise=list(account.expertise),
+        reviewer_capacity=account.reviewer_capacity,
+        is_verified=account.is_verified,
+        is_active=account.is_active,
+        verified_at=account.verified_at,
+        roles=[UserRoleRow(user_id=account.id, role=role.value) for role in account.roles],
+    )
+
+
+def row_to_account(row: UserRow) -> Account:
+    """Rebuild the aggregate, restoring roles through the private attribute.
+
+    A public `roles` setter would let any caller rewrite the role set directly, bypassing
+    `grant`/`revoke` and the invariants they enforce — the same reasoning `to_domain`
+    already applies to `Manuscript._sequence`.
+    """
+    account = Account(
+        id=UserId(row.id),
+        email=EmailAddress(row.email),
+        password_hash=row.password_hash,
+        full_name=row.full_name,
+        affiliation=row.affiliation,
+        expertise=tuple(row.expertise),
+        reviewer_capacity=row.reviewer_capacity,
+        is_verified=row.is_verified,
+        is_active=row.is_active,
+        verified_at=row.verified_at,
+    )
+    account._roles = {Role(role_row.role) for role_row in row.roles}
+    return account
+```
 
 - [ ] **Step 3: Write the failing integration test**
 
-Create `backend/tests/integration/test_account_repository.py` with `pytestmark = pytest.mark.integration`, covering: a stored account reads back with its roles; lookup by email is case-insensitive (store `R.Obeng@UG.edu.gh`, fetch `r.obeng@ug.edu.gh`); a missing account returns `None`; granting a role and saving persists it; revoking a role and saving removes it; a duplicate email raises an integrity error.
+Create `backend/tests/integration/test_account_repository.py`:
+
+```python
+"""Integration tests for account persistence."""
+
+from datetime import UTC, datetime
+from uuid import uuid4
+
+import pytest
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ugjcs.domain.account import Account, EmailAddress
+from ugjcs.domain.enums import Role
+from ugjcs.domain.ids import UserId
+from ugjcs.infrastructure.db.account_repository import SqlAlchemyAccountRepository
+
+pytestmark = pytest.mark.integration
+
+NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
+
+
+def make_account(**overrides: object) -> Account:
+    defaults: dict[str, object] = {
+        "id": UserId(uuid4()),
+        "email": EmailAddress("R.Obeng@UG.edu.gh"),
+        "password_hash": "argon2-placeholder",
+        "full_name": "Roger Koranteng Obeng",
+        "affiliation": "University of Ghana",
+    }
+    return Account(**(defaults | overrides))  # type: ignore[arg-type]
+
+
+async def test_a_stored_account_reads_back_with_its_roles(session: AsyncSession) -> None:
+    repository = SqlAlchemyAccountRepository(session)
+    account = make_account()
+    account.grant(Role.REVIEWER)
+    account.grant(Role.EDITOR)
+    await repository.add(account)
+    await session.commit()
+
+    loaded = await repository.get(account.id)
+    assert loaded is not None
+    assert loaded.id == account.id
+    assert loaded.roles == frozenset({Role.REVIEWER, Role.EDITOR})
+
+
+async def test_lookup_by_email_is_case_insensitive(session: AsyncSession) -> None:
+    repository = SqlAlchemyAccountRepository(session)
+    account = make_account(email=EmailAddress("R.Obeng@UG.edu.gh"))
+    await repository.add(account)
+    await session.commit()
+
+    loaded = await repository.get_by_email(EmailAddress("r.obeng@ug.edu.gh"))
+    assert loaded is not None
+    assert loaded.id == account.id
+
+
+async def test_a_missing_account_reads_back_as_none(session: AsyncSession) -> None:
+    repository = SqlAlchemyAccountRepository(session)
+    assert await repository.get(UserId(uuid4())) is None
+    assert await repository.get_by_email(EmailAddress("nobody@ug.edu.gh")) is None
+
+
+async def test_granting_a_role_and_saving_persists_it(session: AsyncSession) -> None:
+    repository = SqlAlchemyAccountRepository(session)
+    account = make_account()
+    await repository.add(account)
+    await session.commit()
+
+    account.grant(Role.AUTHOR)
+    await repository.save(account)
+    await session.commit()
+
+    loaded = await repository.get(account.id)
+    assert loaded is not None
+    assert loaded.roles == frozenset({Role.AUTHOR})
+
+
+async def test_revoking_a_role_and_saving_removes_it(session: AsyncSession) -> None:
+    repository = SqlAlchemyAccountRepository(session)
+    account = make_account()
+    account.grant(Role.AUTHOR)
+    account.grant(Role.REVIEWER)
+    await repository.add(account)
+    await session.commit()
+
+    account.revoke(Role.AUTHOR)
+    await repository.save(account)
+    await session.commit()
+
+    loaded = await repository.get(account.id)
+    assert loaded is not None
+    assert loaded.roles == frozenset({Role.REVIEWER})
+
+
+async def test_saving_persists_scalar_field_changes_too(session: AsyncSession) -> None:
+    """Roles are not the only thing `save` must persist. An implementation that only
+    rewrites the role table and forgets scalar columns would still pass every test above."""
+    repository = SqlAlchemyAccountRepository(session)
+    account = make_account()
+    await repository.add(account)
+    await session.commit()
+
+    account.verify(occurred_at=NOW)
+    account.deactivate()
+    await repository.save(account)
+    await session.commit()
+
+    loaded = await repository.get(account.id)
+    assert loaded is not None
+    assert loaded.is_verified
+    assert loaded.verified_at == NOW
+    assert not loaded.is_active
+
+
+async def test_a_duplicate_email_raises_an_integrity_error(session: AsyncSession) -> None:
+    repository = SqlAlchemyAccountRepository(session)
+    await repository.add(make_account(email=EmailAddress("dup@ug.edu.gh")))
+    await session.commit()
+
+    with pytest.raises(IntegrityError):
+        await repository.add(make_account(id=UserId(uuid4()), email=EmailAddress("DUP@ug.edu.GH")))
+        await session.commit()
+```
+
+Run: `cd backend && uv run pytest tests/integration/test_account_repository.py -v -m integration`
+Expected: FAIL — `ModuleNotFoundError: No module named 'ugjcs.infrastructure.db.account_repository'`.
 
 - [ ] **Step 4: Write the repository**
 
-Create `backend/src/ugjcs/infrastructure/db/account_repository.py` following `SqlAlchemyManuscriptRepository`'s shape: constructor takes an `AsyncSession`; `get_by_email` queries on the normalised value; `save` re-reads the row, updates scalar fields, and replaces the role rows to match `account.roles`.
+Create `backend/src/ugjcs/infrastructure/db/account_repository.py`:
 
-- [ ] **Step 5: Run, gate, commit**
+```python
+"""PostgreSQL implementation of the account repository port."""
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ugjcs.domain.account import Account, EmailAddress
+from ugjcs.domain.enums import Role
+from ugjcs.domain.ids import UserId
+from ugjcs.infrastructure.db.mappers import account_to_row, row_to_account
+from ugjcs.infrastructure.db.models import UserRoleRow, UserRow
+
+
+class SqlAlchemyAccountRepository:
+    """Persists the account aggregate and keeps its role rows in sync."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def add(self, account: Account) -> None:
+        self._session.add(account_to_row(account))
+
+    async def get(self, user_id: UserId) -> Account | None:
+        row = await self._session.get(UserRow, user_id)
+        return row_to_account(row) if row is not None else None
+
+    async def get_by_email(self, email: EmailAddress) -> Account | None:
+        result = await self._session.execute(select(UserRow).where(UserRow.email == email.value))
+        row = result.scalar_one_or_none()
+        return row_to_account(row) if row is not None else None
+
+    async def save(self, account: Account) -> None:
+        row = await self._session.get(UserRow, account.id)
+        if row is None:
+            raise LookupError(f"account {account.id} has never been persisted")
+        row.email = account.email.value
+        row.password_hash = account.password_hash
+        row.full_name = account.full_name
+        row.affiliation = account.affiliation
+        row.expertise = list(account.expertise)
+        row.reviewer_capacity = account.reviewer_capacity
+        row.is_verified = account.is_verified
+        row.is_active = account.is_active
+        row.verified_at = account.verified_at
+        held = {existing.role for existing in row.roles}
+        wanted = {role.value for role in account.roles}
+        for existing in list(row.roles):
+            if existing.role not in wanted:
+                row.roles.remove(existing)
+        for role in wanted - held:
+            row.roles.append(UserRoleRow(user_id=account.id, role=role))
+```
+
+`row.roles.remove(existing)` relies on the relationship's `cascade="all, delete-orphan"` (Task 2) to delete the orphaned `UserRoleRow`; appending a fresh `UserRoleRow` for each newly-granted role mirrors `to_row`'s construction of `ManuscriptAuthorRow`.
+
+- [ ] **Step 5: Wire the unit of work**
+
+Modify `backend/src/ugjcs/infrastructure/db/uow.py`:
+
+```python
+class SqlAlchemyUnitOfWork:
+    manuscripts: SqlAlchemyManuscriptRepository
+    accounts: SqlAlchemyAccountRepository
+
+    ...
+
+    async def __aenter__(self) -> Self:
+        self._session = self._factory()
+        self.manuscripts = SqlAlchemyManuscriptRepository(self._session)
+        self.accounts = SqlAlchemyAccountRepository(self._session)
+        return self
+```
+
+Add the import `from ugjcs.infrastructure.db.account_repository import SqlAlchemyAccountRepository`.
+
+- [ ] **Step 6: Run the tests, gates, and commit**
+
+Run: `cd backend && uv run pytest tests/integration/test_account_repository.py tests/integration/test_unit_of_work.py -v -m integration` — expect all to pass; report the actual count.
+Run: `cd backend && make check` — both import contracts KEPT.
 
 ```bash
-git add backend/src/ugjcs/infrastructure/db/account_repository.py backend/src/ugjcs/infrastructure/db/mappers.py backend/src/ugjcs/application/ports.py backend/tests/integration/test_account_repository.py
+git add backend/src/ugjcs/infrastructure/db/account_repository.py backend/src/ugjcs/infrastructure/db/mappers.py backend/src/ugjcs/infrastructure/db/uow.py backend/src/ugjcs/application/ports.py backend/tests/integration/test_account_repository.py
 git commit -m "feat: persist accounts and their roles"
 ```
 
@@ -827,17 +1113,102 @@ git commit -m "feat: persist accounts and their roles"
 
 - [ ] **Step 1: Write the failing test**
 
-Create `backend/tests/integration/test_actor_assembly.py`, `pytestmark = pytest.mark.integration`. It must cover:
+Create `backend/tests/integration/test_actor_assembly.py`:
 
 ```python
-async def test_roles_revoked_after_a_token_was_issued_take_effect_immediately(...) -> None:
+"""Integration tests proving roles are read fresh, not carried by the token.
+
+Discharges Plan 1's Task 8 review finding: `Actor.roles` must be authentic AND current.
+"""
+
+from datetime import UTC, datetime, timedelta
+from uuid import uuid4
+
+import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ugjcs.application.identity import AuthenticationError, IdentityService
+from ugjcs.domain.account import Account, EmailAddress
+from ugjcs.domain.enums import Role
+from ugjcs.domain.ids import UserId
+from ugjcs.infrastructure.db.account_repository import SqlAlchemyAccountRepository
+from ugjcs.infrastructure.security.tokens import InvalidTokenError, JwtTokenService
+
+pytestmark = pytest.mark.integration
+
+NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
+
+
+class FrozenClock:
+    def __init__(self, moment: datetime) -> None:
+        self.moment = moment
+
+    def now(self) -> datetime:
+        return self.moment
+
+
+def make_account(**overrides: object) -> Account:
+    defaults: dict[str, object] = {
+        "id": UserId(uuid4()),
+        "email": EmailAddress(f"{uuid4()}@ug.edu.gh"),
+        "password_hash": "argon2-placeholder",
+        "full_name": "Roger Koranteng Obeng",
+        "affiliation": "University of Ghana",
+    }
+    return Account(**(defaults | overrides))  # type: ignore[arg-type]
+
+
+@pytest.fixture
+def clock() -> FrozenClock:
+    return FrozenClock(NOW)
+
+
+@pytest.fixture
+def tokens(clock: FrozenClock) -> JwtTokenService:
+    return JwtTokenService(
+        secret="test-secret-not-used-anywhere-real",
+        clock=clock,
+        access_ttl=timedelta(minutes=15),
+        refresh_ttl=timedelta(days=7),
+    )
+
+
+@pytest.fixture
+def repository(session: AsyncSession) -> SqlAlchemyAccountRepository:
+    return SqlAlchemyAccountRepository(session)
+
+
+@pytest.fixture
+def identity(repository: SqlAlchemyAccountRepository, tokens: JwtTokenService) -> IdentityService:
+    return IdentityService(repository, tokens)
+
+
+async def verified_account_with(
+    session: AsyncSession, repository: SqlAlchemyAccountRepository, *roles: Role
+) -> Account:
+    account = make_account()
+    account.verify(occurred_at=NOW)
+    for role in roles:
+        account.grant(role)
+    await repository.add(account)
+    await session.commit()
+    return account
+
+
+async def test_roles_revoked_after_a_token_was_issued_take_effect_immediately(
+    session: AsyncSession,
+    repository: SqlAlchemyAccountRepository,
+    identity: IdentityService,
+    tokens: JwtTokenService,
+) -> None:
     """The finding from Plan 1's Task 8 review, answered.
 
     A role encoded in the token would remain valid until the token expired. Reading roles
     from the database per request means an administrator's revocation binds on the very
-    next call.
+    next call. A broken implementation that reads roles from the token, or caches the
+    first lookup, would return EDITOR on the second assertion below — it must not.
     """
-    account = await verified_account_with(Role.EDITOR)
+    account = await verified_account_with(session, repository, Role.EDITOR)
     token = tokens.issue_access(account.id)
     assert Role.EDITOR in (await identity.actor_for(token)).roles
 
@@ -846,11 +1217,102 @@ async def test_roles_revoked_after_a_token_was_issued_take_effect_immediately(..
     await session.commit()
 
     assert Role.EDITOR not in (await identity.actor_for(token)).roles
+
+
+async def test_roles_granted_after_a_token_was_issued_take_effect_immediately(
+    session: AsyncSession,
+    repository: SqlAlchemyAccountRepository,
+    identity: IdentityService,
+    tokens: JwtTokenService,
+) -> None:
+    account = await verified_account_with(session, repository)
+    token = tokens.issue_access(account.id)
+    assert Role.REVIEWER not in (await identity.actor_for(token)).roles
+
+    account.grant(Role.REVIEWER)
+    await repository.save(account)
+    await session.commit()
+
+    assert Role.REVIEWER in (await identity.actor_for(token)).roles
+
+
+async def test_a_token_for_a_deleted_account_is_refused(
+    identity: IdentityService, tokens: JwtTokenService
+) -> None:
+    token = tokens.issue_access(UserId(uuid4()))
+    with pytest.raises(AuthenticationError, match="no account"):
+        await identity.actor_for(token)
+
+
+async def test_a_deactivated_account_is_refused(
+    session: AsyncSession,
+    repository: SqlAlchemyAccountRepository,
+    identity: IdentityService,
+    tokens: JwtTokenService,
+) -> None:
+    account = await verified_account_with(session, repository)
+    account.deactivate()
+    await repository.save(account)
+    await session.commit()
+
+    token = tokens.issue_access(account.id)
+    with pytest.raises(AuthenticationError):
+        await identity.actor_for(token)
+
+
+async def test_an_unverified_account_is_refused(
+    session: AsyncSession,
+    repository: SqlAlchemyAccountRepository,
+    identity: IdentityService,
+    tokens: JwtTokenService,
+) -> None:
+    account = make_account()
+    await repository.add(account)
+    await session.commit()
+
+    token = tokens.issue_access(account.id)
+    with pytest.raises(AuthenticationError):
+        await identity.actor_for(token)
+
+
+async def test_an_expired_token_is_refused(
+    session: AsyncSession,
+    repository: SqlAlchemyAccountRepository,
+    identity: IdentityService,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    """`InvalidTokenError`, not `AuthenticationError`: Step 2 makes `actor_for` let token
+    errors propagate unwrapped, precisely so the API layer can tell "bad token" apart
+    from "no such account". A test asserting `AuthenticationError` here would pass
+    against an implementation that violated that contract, so it must not be written."""
+    account = await verified_account_with(session, repository)
+    token = tokens.issue_access(account.id)
+    clock.moment += timedelta(minutes=16)
+
+    with pytest.raises(InvalidTokenError, match="expired"):
+        await identity.actor_for(token)
+
+
+async def test_the_assembled_actor_id_equals_the_account_id(
+    session: AsyncSession,
+    repository: SqlAlchemyAccountRepository,
+    identity: IdentityService,
+    tokens: JwtTokenService,
+) -> None:
+    account = await verified_account_with(session, repository, Role.AUTHOR)
+    token = tokens.issue_access(account.id)
+    actor = await identity.actor_for(token)
+    assert actor.id == account.id
 ```
 
-Also cover: a role *granted* after issuance is likewise visible immediately; a token for a deleted account raises `AuthenticationError`; a deactivated account raises `AuthenticationError`; an unverified account raises `AuthenticationError`; an expired token raises `AuthenticationError`; the assembled `Actor.id` equals the account id.
+Run: `cd backend && uv run pytest tests/integration/test_actor_assembly.py -v -m integration`
+Expected: FAIL — `ModuleNotFoundError: No module named 'ugjcs.application.identity'`.
 
-Write these out in full, with the fixtures they need — do not leave them as prose.
+**A correction to this task, made explicit rather than silently carried forward.** An
+earlier draft of this task asserted `AuthenticationError` for the expired-token case. That
+contradicts Step 2 below, which deliberately lets `InvalidTokenError` propagate unwrapped. The
+test above asserts the correct, intended behaviour: `InvalidTokenError`.
 
 - [ ] **Step 2: Write the implementation**
 
@@ -889,9 +1351,12 @@ class IdentityService:
         return Actor(id=account.id, roles=account.roles)
 ```
 
-`InvalidToken` from Task 4 is already a `DomainError`; let it propagate rather than wrapping it, so the API layer in Plan 4 can distinguish "bad token" from "no such account" when choosing a status code.
+`InvalidTokenError` from Task 4 is already a `DomainError`; let it propagate rather than wrapping it, so the API layer in Plan 4 can distinguish "bad token" from "no such account" when choosing a status code. Do not add a `try/except InvalidTokenError` here — doing so would make `test_an_expired_token_is_refused` fail on the wrong exception type, which is the point of that test.
 
 - [ ] **Step 3: Run, gate, commit**
+
+Run: `cd backend && uv run pytest tests/integration/test_actor_assembly.py -v -m integration` — expect 7 tests to pass; report the actual count.
+Run: `cd backend && make check`.
 
 ```bash
 git add backend/src/ugjcs/application/identity.py backend/tests/integration/test_actor_assembly.py
@@ -904,38 +1369,371 @@ git commit -m "feat: assemble actors with roles read fresh so revocation is imme
 
 **Files:**
 - Create: `backend/src/ugjcs/infrastructure/email/__init__.py`, `backend/src/ugjcs/infrastructure/email/logging_sender.py`, `backend/tests/unit/application/__init__.py`, `backend/tests/unit/application/test_identity.py`
-- Modify: `backend/src/ugjcs/application/identity.py`
+- Modify: `backend/src/ugjcs/application/identity.py`, `backend/src/ugjcs/application/ports.py`, `backend/src/ugjcs/infrastructure/security/tokens.py`
 
 **Interfaces:**
-- Produces: `RegistrationService.register(...)`, `.verify(token)`; `LoggingEmailSender`.
+- Produces: `RegistrationService.register(...)`, `.verify(token)`; `LoggingEmailSender`; `TokenService.issue_verification`/`.read_verification`.
 
 **Scope decision, recorded rather than assumed:** the verification *flow* is built in full behind the `EmailSender` port, but the only adapter shipped is `LoggingEmailSender`, which writes the verification link to the application log. Amazon SES in sandbox mode can only send to pre-verified addresses, which would fail for an assessor's inbox on demonstration day. Test accounts are therefore seeded pre-verified, and "replace `LoggingEmailSender` with an SES adapter and leave the sandbox" is entered in the technical debt register as **Scheduled**.
 
-- [ ] **Step 1: Write the failing tests**
+**Verification-token decision, made explicit rather than left open:** verification tokens
+reuse `TokenService`, via two new methods (`issue_verification`/`read_verification`) added
+alongside `issue_access`/`read_access`, signing a JWT with `typ="verify"` and a 48-hour
+lifetime instead of the access token's 15 minutes. A *separate* opaque-and-hashed token
+was the other option, but it would need its own storage — a row somewhere recording
+`(token_hash, user_id, expires_at)` — purely to answer "is this token still good", when
+`Account.verify()` (Task 1) already answers exactly that: it raises `AccountError` the
+second time it is called on the same account. Reusing the signed-token machinery costs one
+new pair of methods on an existing service; the opaque-token alternative costs a new table,
+a new repository, and a new port for no additional guarantee. This is also why the unit
+tests below need no fourth fake — `JwtTokenService` has no I/O and drops into a unit test
+exactly like `Argon2PasswordHasher` already does in Task 3's tests.
 
-Create `backend/tests/unit/application/test_identity.py` using in-memory fakes (a dict-backed `AccountRepository`, a `FakeEmailSender` recording sent links, a `FrozenClock`). Cover:
+- [ ] **Step 1: Extend the token service**
 
-- registering creates an unverified account and sends exactly one verification message
-- the stored password hash is not the plaintext password
-- registering an email that already exists raises, and does **not** send a second message
-- registering with an email differing only in case is treated as a duplicate
-- a valid verification token verifies the account
-- a verification token cannot be replayed once used
-- an unknown verification token raises
-- registration with a password shorter than 12 characters is refused before any hashing occurs
+Append to `backend/src/ugjcs/infrastructure/security/tokens.py`, alongside `ACCESS_TYPE`:
 
-Write them out in full with real assertions.
+```python
+VERIFY_TYPE = "verify"
+DEFAULT_VERIFICATION_TTL = timedelta(hours=48)
+```
 
-- [ ] **Step 2: Write the implementation**
+Add a keyword-only, defaulted parameter to `JwtTokenService.__init__` — existing callers
+that only pass `secret`, `clock`, `access_ttl` and `refresh_ttl` are unaffected:
 
-Add `RegistrationService` to `application/identity.py` and create `LoggingEmailSender`. Enforce a 12-character minimum password length as a named constant with a comment citing NIST SP 800-63B's guidance that length matters more than composition rules — and deliberately impose no composition requirements.
+```python
+    def __init__(
+        self,
+        *,
+        secret: str,
+        clock: Clock,
+        access_ttl: timedelta,
+        refresh_ttl: timedelta,
+        verification_ttl: timedelta = DEFAULT_VERIFICATION_TTL,
+    ) -> None:
+        self._secret = secret
+        self._clock = clock
+        self._access_ttl = access_ttl
+        self._refresh_ttl = refresh_ttl
+        self._verification_ttl = verification_ttl
+```
 
-Verification tokens reuse `TokenService.issue_access` with a distinct `typ`, or a separate opaque token stored hashed; either is acceptable, but state which you chose and why in your report.
+Add the two methods, mirroring `issue_access`/`read_access`:
 
-- [ ] **Step 3: Run, gate, commit**
+```python
+    def issue_verification(self, subject: UserId) -> str:
+        issued = self._clock.now()
+        return jwt.encode(
+            {
+                "sub": str(subject),
+                "typ": VERIFY_TYPE,
+                "iat": int(issued.timestamp()),
+                "exp": int((issued + self._verification_ttl).timestamp()),
+            },
+            self._secret,
+            algorithm=ALGORITHM,
+        )
+
+    def read_verification(self, token: str) -> UserId:
+        try:
+            claims = jwt.decode(token, self._secret, algorithms=[ALGORITHM])
+        except jwt.ExpiredSignatureError as error:
+            raise InvalidTokenError("verification link has expired") from error
+        except jwt.PyJWTError as error:
+            raise InvalidTokenError("verification link is not valid") from error
+        if claims.get("typ") != VERIFY_TYPE:
+            raise InvalidTokenError("wrong token type for verification")
+        try:
+            return UserId(UUID(claims["sub"]))
+        except (KeyError, ValueError) as error:
+            raise InvalidTokenError("token subject is missing or malformed") from error
+```
+
+- [ ] **Step 2: Extend the ports**
+
+Append two methods to the `TokenService` protocol in `ports.py`, next to `issue_access`/`read_access`:
+
+```python
+    def issue_verification(self, subject: UserId) -> str: ...
+
+    def read_verification(self, token: str) -> UserId:
+        """Return the subject, or raise `InvalidTokenError` if absent, expired, replayed-typed,
+        or of the wrong `typ`."""
+        ...
+```
+
+- [ ] **Step 3: Write the failing tests**
+
+Create `backend/tests/unit/application/__init__.py` (empty) and `backend/tests/unit/application/test_identity.py`:
+
+```python
+"""Unit tests for registration and verification, entirely in memory."""
+
+from datetime import UTC, datetime, timedelta
+from uuid import uuid4
+
+import pytest
+
+from ugjcs.domain.account import Account, AccountError, EmailAddress
+from ugjcs.domain.ids import UserId
+from ugjcs.application.identity import RegistrationService
+from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
+from ugjcs.infrastructure.security.tokens import InvalidTokenError, JwtTokenService
+
+NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
+PASSWORD = "correct horse battery staple"
+
+
+class DictAccountRepository:
+    """A dict-backed fake satisfying the `AccountRepository` protocol."""
+
+    def __init__(self) -> None:
+        self._by_id: dict[UserId, Account] = {}
+
+    async def add(self, account: Account) -> None:
+        self._by_id[account.id] = account
+
+    async def get(self, user_id: UserId) -> Account | None:
+        return self._by_id.get(user_id)
+
+    async def get_by_email(self, email: EmailAddress) -> Account | None:
+        return next((a for a in self._by_id.values() if a.email.value == email.value), None)
+
+    async def save(self, account: Account) -> None:
+        if account.id not in self._by_id:
+            raise LookupError(f"account {account.id} has never been persisted")
+        self._by_id[account.id] = account
+
+
+class FakeEmailSender:
+    def __init__(self) -> None:
+        self.sent: list[tuple[str, str]] = []
+
+    async def send_verification(self, to: str, link: str) -> None:
+        self.sent.append((to, link))
+
+
+class FrozenClock:
+    def __init__(self, moment: datetime) -> None:
+        self.moment = moment
+
+    def now(self) -> datetime:
+        return self.moment
+
+
+class CountingHasher:
+    """Spies on `hash` calls so "no hashing occurred" can be asserted directly."""
+
+    def __init__(self) -> None:
+        self._inner = Argon2PasswordHasher()
+        self.hash_calls = 0
+
+    def hash(self, password: str) -> str:
+        self.hash_calls += 1
+        return self._inner.hash(password)
+
+    def verify(self, password: str, password_hash: str) -> bool:
+        return self._inner.verify(password, password_hash)
+
+    def needs_rehash(self, password_hash: str) -> bool:
+        return self._inner.needs_rehash(password_hash)
+
+
+def make_service(
+    accounts: DictAccountRepository | None = None,
+    emails: FakeEmailSender | None = None,
+    hasher: Argon2PasswordHasher | CountingHasher | None = None,
+) -> tuple[RegistrationService, DictAccountRepository, FakeEmailSender]:
+    accounts = accounts or DictAccountRepository()
+    emails = emails or FakeEmailSender()
+    tokens = JwtTokenService(
+        secret="test-secret-not-used-anywhere-real",
+        clock=FrozenClock(NOW),
+        access_ttl=timedelta(minutes=15),
+        refresh_ttl=timedelta(days=7),
+    )
+    service = RegistrationService(accounts, tokens, hasher or Argon2PasswordHasher(), emails, FrozenClock(NOW))
+    return service, accounts, emails
+
+
+async def test_registering_creates_an_unverified_account_and_sends_one_message() -> None:
+    service, accounts, emails = make_service()
+    account = await service.register(
+        email="r.obeng@ug.edu.gh",
+        password=PASSWORD,
+        full_name="Roger Koranteng Obeng",
+        affiliation="University of Ghana",
+    )
+    assert not account.is_verified
+    assert len(emails.sent) == 1
+    assert emails.sent[0][0] == "r.obeng@ug.edu.gh"
+
+
+async def test_the_stored_password_hash_is_not_the_plaintext_password() -> None:
+    service, accounts, _ = make_service()
+    account = await service.register(
+        email="hash@ug.edu.gh", password=PASSWORD, full_name="A", affiliation="UG"
+    )
+    assert account.password_hash != PASSWORD
+
+
+async def test_registering_an_existing_email_raises_and_sends_no_second_message() -> None:
+    service, accounts, emails = make_service()
+    await service.register(
+        email="dup@ug.edu.gh", password=PASSWORD, full_name="A", affiliation="UG"
+    )
+    with pytest.raises(AccountError, match="already exists"):
+        await service.register(
+            email="dup@ug.edu.gh", password=PASSWORD, full_name="B", affiliation="UG"
+        )
+    assert len(emails.sent) == 1
+
+
+async def test_registering_an_email_differing_only_in_case_is_a_duplicate() -> None:
+    service, accounts, emails = make_service()
+    await service.register(
+        email="Case@UG.edu.gh", password=PASSWORD, full_name="A", affiliation="UG"
+    )
+    with pytest.raises(AccountError, match="already exists"):
+        await service.register(
+            email="case@ug.edu.gh", password=PASSWORD, full_name="B", affiliation="UG"
+        )
+    assert len(emails.sent) == 1
+
+
+async def test_a_valid_verification_token_verifies_the_account() -> None:
+    service, accounts, emails = make_service()
+    account = await service.register(
+        email="verify@ug.edu.gh", password=PASSWORD, full_name="A", affiliation="UG"
+    )
+    link = emails.sent[0][1]
+    token = link.rsplit("=", 1)[-1]
+
+    await service.verify(token)
+
+    stored = await accounts.get(account.id)
+    assert stored is not None
+    assert stored.is_verified
+
+
+async def test_a_verification_token_cannot_be_replayed() -> None:
+    service, accounts, emails = make_service()
+    await service.register(
+        email="replay@ug.edu.gh", password=PASSWORD, full_name="A", affiliation="UG"
+    )
+    token = emails.sent[0][1].rsplit("=", 1)[-1]
+    await service.verify(token)
+
+    with pytest.raises(AccountError, match="already verified"):
+        await service.verify(token)
+
+
+async def test_an_unknown_verification_token_raises() -> None:
+    service, _, _ = make_service()
+    with pytest.raises(InvalidTokenError):
+        await service.verify("not-a-real-token")
+
+
+async def test_a_short_password_is_refused_before_any_hashing_occurs() -> None:
+    hasher = CountingHasher()
+    service, accounts, emails = make_service(hasher=hasher)
+    with pytest.raises(AccountError, match="at least 12"):
+        await service.register(
+            email="short@ug.edu.gh", password="short", full_name="A", affiliation="UG"
+        )
+    assert hasher.hash_calls == 0
+    assert await accounts.get_by_email(EmailAddress("short@ug.edu.gh")) is None
+    assert emails.sent == []
+```
+
+Run: `cd backend && uv run pytest tests/unit/application/test_identity.py -v`
+Expected: FAIL — `ModuleNotFoundError` / `ImportError: cannot import name 'RegistrationService'`.
+
+- [ ] **Step 4: Write the implementation**
+
+Append to `backend/src/ugjcs/application/identity.py`. Extend its imports with `from uuid import uuid4`, `from ugjcs.application.ports import Clock, EmailSender, PasswordHasher` (alongside the existing `AccountRepository, TokenService`), and `from ugjcs.domain.account import Account, AccountError, EmailAddress`.
+
+```python
+MIN_PASSWORD_LENGTH = 12
+"""NIST SP 800-63B: length predicts resistance to guessing better than composition rules
+ever did. Deliberately no uppercase/digit/symbol requirement is imposed here."""
+
+VERIFICATION_LINK_BASE = "https://ugjcs.example.edu/verify?token"
+
+
+class RegistrationService:
+    def __init__(
+        self,
+        accounts: AccountRepository,
+        tokens: TokenService,
+        hasher: PasswordHasher,
+        emails: EmailSender,
+        clock: Clock,
+    ) -> None:
+        self._accounts = accounts
+        self._tokens = tokens
+        self._hasher = hasher
+        self._emails = emails
+        self._clock = clock
+
+    async def register(
+        self, *, email: str, password: str, full_name: str, affiliation: str
+    ) -> Account:
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise AccountError(f"password must be at least {MIN_PASSWORD_LENGTH} characters")
+        normalised = EmailAddress(email)
+        if await self._accounts.get_by_email(normalised) is not None:
+            raise AccountError(f"an account already exists for {normalised.value}")
+        account = Account(
+            id=UserId(uuid4()),
+            email=normalised,
+            password_hash=self._hasher.hash(password),
+            full_name=full_name,
+            affiliation=affiliation,
+        )
+        await self._accounts.add(account)
+        token = self._tokens.issue_verification(account.id)
+        await self._emails.send_verification(normalised.value, f"{VERIFICATION_LINK_BASE}={token}")
+        return account
+
+    async def verify(self, token: str) -> None:
+        subject = self._tokens.read_verification(token)
+        account = await self._accounts.get(subject)
+        if account is None:
+            raise AuthenticationError("no account for this verification link")
+        account.verify(occurred_at=self._clock.now())
+        await self._accounts.save(account)
+```
+
+Replay is refused for free: a second `verify()` call re-invokes `Account.verify()` on an
+already-verified account, which Task 1 already makes raise `AccountError`. No separate
+"has this token been used" bookkeeping is needed — this is the saving the scope decision
+above described.
+
+Create `backend/src/ugjcs/infrastructure/email/__init__.py` (empty) and `backend/src/ugjcs/infrastructure/email/logging_sender.py`:
+
+```python
+"""Stands in for a real mail transport. See Plan 3 Task 7's scope decision: SES sandbox
+mode cannot reach an unverified assessor inbox, so verification links are logged instead.
+"""
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class LoggingEmailSender:
+    async def send_verification(self, to: str, link: str) -> None:
+        logger.info("verification link for %s: %s", to, link)
+```
+
+- [ ] **Step 5: Run, gate, commit**
+
+Run: `cd backend && uv run pytest tests/unit/application/test_identity.py -v` — expect 8 tests to pass; report the actual count.
+Run: `cd backend && make check`.
 
 ```bash
-git add backend/src/ugjcs/application/identity.py backend/src/ugjcs/infrastructure/email backend/tests/unit/application
+git add backend/src/ugjcs/application/identity.py backend/src/ugjcs/application/ports.py backend/src/ugjcs/infrastructure/security/tokens.py backend/src/ugjcs/infrastructure/email backend/tests/unit/application
 git commit -m "feat: add registration with pluggable verification delivery"
 ```
 
@@ -944,36 +1742,567 @@ git commit -m "feat: add registration with pluggable verification delivery"
 ### Task 8: Login, refresh rotation and reuse detection
 
 **Files:**
-- Modify: `backend/src/ugjcs/application/identity.py`
-- Create: `backend/tests/integration/test_refresh_rotation.py`
+- Create: `backend/src/ugjcs/infrastructure/db/refresh_token_repository.py`, `backend/tests/integration/test_refresh_rotation.py`
+- Modify: `backend/src/ugjcs/application/identity.py`, `backend/src/ugjcs/application/ports.py`, `backend/src/ugjcs/infrastructure/db/mappers.py`, `backend/src/ugjcs/infrastructure/db/uow.py`
 
 **Interfaces:**
-- Produces: `SessionService.log_in(email, password) -> TokenPair`, `.refresh(token) -> TokenPair`, `.log_out(token)`.
+- Produces: `TokenPair`; `RefreshTokenRecord`; `RefreshTokenRepository` protocol with `add`, `get_by_hash`, `revoke`, `revoke_family`; `SqlAlchemyRefreshTokenRepository`; `SessionService(accounts: AccountRepository, refresh_tokens: RefreshTokenRepository, tokens: TokenService, hasher: PasswordHasher, clock: Clock)` with `.log_in(email, password) -> TokenPair`, `.refresh(token) -> TokenPair`, `.log_out(token) -> None`.
 
-- [ ] **Step 1: Write the failing tests**
+**A gap this task closes, made explicit rather than left for the next plan to guess.**
+`SessionService` needs somewhere to persist the `refresh_tokens` rows Task 2 already
+created — family, hash, issued/expiry/revoked timestamps, the rotation chain. Neither
+`AccountRepository` (Task 5) nor anything else in this plan owns that table, and
+`SessionService` lives in `application/identity.py`, which may not import
+`infrastructure` to reach `RefreshTokenRow` directly. This task therefore adds a
+`RefreshTokenRepository` port — `AccountRepository`'s sibling, same shape of protocol,
+same `UnitOfWork.refresh_tokens` pattern — and a `SqlAlchemyRefreshTokenRepository`
+adapter. `SessionService`'s constructor is **`(accounts, refresh_tokens, tokens, hasher,
+clock)`**, five positional dependencies, all ports. Downstream consumers (Plan 4) should
+wire against this signature, not a guess.
 
-Create `backend/tests/integration/test_refresh_rotation.py`, `pytestmark = pytest.mark.integration`. Cover in full:
+`TokenService` is also missing one thing `SessionService` needs: a way to know how long a
+refresh token should live when writing its `expires_at`. `JwtTokenService` already exposes
+`refresh_ttl` as a property (Task 4), but the `TokenService` *protocol* Task 1 wrote never
+declared it — an omission this task closes by adding the property to the protocol, so
+`SessionService` can depend on the port rather than the concrete class.
 
-- correct credentials return an access and a refresh token
-- an unknown email fails with the **same** error and comparable timing as a wrong password, so the endpoint cannot be used to enumerate registered users
-- an unverified account cannot log in
-- a deactivated account cannot log in
-- refreshing returns a new pair and the old refresh token stops working
-- **replaying an already-rotated refresh token revokes the entire family**, so the newest token stops working too
-- an expired refresh token is refused
-- logging out revokes the presented token's family
-- a successful login with a password whose hash uses outdated parameters transparently upgrades the stored hash
+- [ ] **Step 1: Extend the ports**
 
-- [ ] **Step 2: Write the implementation**
+Append to `backend/src/ugjcs/application/ports.py`. Extend its imports with `from dataclasses import dataclass` and `from datetime import timedelta` (alongside the existing `datetime` import).
 
-Refresh rotation with reuse detection works as follows, and the comment in the code should say so: each refresh issues a new token in the same family and marks the old row `revoked_at` with `replaced_by` pointing at the new row. If a token is presented whose row is already revoked, that is either theft or a replay — the entire family is revoked immediately, because the legitimate holder and the attacker cannot be told apart and ending both sessions is the safe failure.
+Add the missing property to `TokenService`:
 
-Constant-time behaviour on unknown email: hash the supplied password against a dummy hash before returning the failure, so a missing account and a wrong password take comparable time.
+```python
+class TokenService(Protocol):
+    ...
 
-- [ ] **Step 3: Run, gate, commit**
+    @property
+    def refresh_ttl(self) -> timedelta:
+        """How long a freshly issued refresh token is valid, for computing its DB expiry."""
+        ...
+```
+
+Add the record type and the new protocol:
+
+```python
+@dataclass(frozen=True, slots=True)
+class RefreshTokenRecord:
+    """A `refresh_tokens` row, as far as the application layer needs to see it."""
+
+    id: UUID
+    user_id: UserId
+    family_id: UUID
+    token_hash: str
+    issued_at: datetime
+    expires_at: datetime
+    revoked_at: datetime | None
+    replaced_by: UUID | None
+
+
+class RefreshTokenRepository(Protocol):
+    async def add(self, record: RefreshTokenRecord) -> None: ...
+
+    async def get_by_hash(self, token_hash: str) -> RefreshTokenRecord | None: ...
+
+    async def revoke(self, token_id: UUID, *, replaced_by: UUID | None = None) -> None:
+        """Mark a single token spent. `replaced_by` records the row that superseded it."""
+        ...
+
+    async def revoke_family(self, family_id: UUID) -> None:
+        """Revoke every unrevoked token sharing this family — the reuse-detection response."""
+        ...
+```
+
+Add `accounts`' sibling to `UnitOfWork`:
+
+```python
+class UnitOfWork(Protocol):
+    manuscripts: ManuscriptRepository
+    accounts: AccountRepository
+    refresh_tokens: RefreshTokenRepository
+    ...
+```
+
+- [ ] **Step 2: Write the mappers and the repository**
+
+Append to `backend/src/ugjcs/infrastructure/db/mappers.py`. Extend its imports with `RefreshTokenRow` from `ugjcs.infrastructure.db.models` and `RefreshTokenRecord` from `ugjcs.application.ports`.
+
+```python
+def refresh_token_to_row(record: RefreshTokenRecord) -> RefreshTokenRow:
+    return RefreshTokenRow(
+        id=record.id,
+        user_id=record.user_id,
+        family_id=record.family_id,
+        token_hash=record.token_hash,
+        issued_at=record.issued_at,
+        expires_at=record.expires_at,
+        revoked_at=record.revoked_at,
+        replaced_by=record.replaced_by,
+    )
+
+
+def row_to_refresh_token(row: RefreshTokenRow) -> RefreshTokenRecord:
+    return RefreshTokenRecord(
+        id=row.id,
+        user_id=UserId(row.user_id),
+        family_id=row.family_id,
+        token_hash=row.token_hash,
+        issued_at=row.issued_at,
+        expires_at=row.expires_at,
+        revoked_at=row.revoked_at,
+        replaced_by=row.replaced_by,
+    )
+```
+
+Create `backend/src/ugjcs/infrastructure/db/refresh_token_repository.py`:
+
+```python
+"""PostgreSQL implementation of the refresh token repository port."""
+
+from datetime import UTC, datetime
+from uuid import UUID
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ugjcs.application.ports import RefreshTokenRecord
+from ugjcs.infrastructure.db.mappers import refresh_token_to_row, row_to_refresh_token
+from ugjcs.infrastructure.db.models import RefreshTokenRow
+
+
+class SqlAlchemyRefreshTokenRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def add(self, record: RefreshTokenRecord) -> None:
+        self._session.add(refresh_token_to_row(record))
+
+    async def get_by_hash(self, token_hash: str) -> RefreshTokenRecord | None:
+        result = await self._session.execute(
+            select(RefreshTokenRow).where(RefreshTokenRow.token_hash == token_hash)
+        )
+        row = result.scalar_one_or_none()
+        return row_to_refresh_token(row) if row is not None else None
+
+    async def revoke(self, token_id: UUID, *, replaced_by: UUID | None = None) -> None:
+        row = await self._session.get(RefreshTokenRow, token_id)
+        if row is None:
+            raise LookupError(f"refresh token {token_id} has never been persisted")
+        row.revoked_at = datetime.now(UTC)
+        row.replaced_by = replaced_by
+
+    async def revoke_family(self, family_id: UUID) -> None:
+        result = await self._session.execute(
+            select(RefreshTokenRow).where(
+                RefreshTokenRow.family_id == family_id, RefreshTokenRow.revoked_at.is_(None)
+            )
+        )
+        now = datetime.now(UTC)
+        for row in result.scalars():
+            row.revoked_at = now
+```
+
+Modify `backend/src/ugjcs/infrastructure/db/uow.py` the same way Task 5 wired `accounts`:
+
+```python
+class SqlAlchemyUnitOfWork:
+    manuscripts: SqlAlchemyManuscriptRepository
+    accounts: SqlAlchemyAccountRepository
+    refresh_tokens: SqlAlchemyRefreshTokenRepository
+
+    async def __aenter__(self) -> Self:
+        self._session = self._factory()
+        self.manuscripts = SqlAlchemyManuscriptRepository(self._session)
+        self.accounts = SqlAlchemyAccountRepository(self._session)
+        self.refresh_tokens = SqlAlchemyRefreshTokenRepository(self._session)
+        return self
+```
+
+- [ ] **Step 3: Write the failing tests**
+
+Create `backend/tests/integration/test_refresh_rotation.py`:
+
+```python
+"""Integration tests for login, refresh rotation and reuse detection."""
+
+from datetime import UTC, datetime, timedelta
+from uuid import uuid4
+
+import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ugjcs.application.identity import AuthenticationError, SessionService
+from ugjcs.domain.account import Account, EmailAddress
+from ugjcs.domain.ids import UserId
+from ugjcs.infrastructure.db.account_repository import SqlAlchemyAccountRepository
+from ugjcs.infrastructure.db.refresh_token_repository import SqlAlchemyRefreshTokenRepository
+from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
+from ugjcs.infrastructure.security.tokens import JwtTokenService
+
+pytestmark = pytest.mark.integration
+
+NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
+PASSWORD = "correct horse battery staple"
+
+
+class FrozenClock:
+    def __init__(self, moment: datetime) -> None:
+        self.moment = moment
+
+    def now(self) -> datetime:
+        return self.moment
+
+
+class CountingHasher:
+    """Spies on `verify` calls. A wall-clock timing assertion would be flaky under CI
+    load; this proves the same code path — a real Argon2 verify — runs for both a wrong
+    password and an unregistered email, which is what makes the timing comparable."""
+
+    def __init__(self) -> None:
+        self._inner = Argon2PasswordHasher()
+        self.verify_calls = 0
+
+    def hash(self, password: str) -> str:
+        return self._inner.hash(password)
+
+    def verify(self, password: str, password_hash: str) -> bool:
+        self.verify_calls += 1
+        return self._inner.verify(password, password_hash)
+
+    def needs_rehash(self, password_hash: str) -> bool:
+        return self._inner.needs_rehash(password_hash)
+
+
+@pytest.fixture
+def clock() -> FrozenClock:
+    return FrozenClock(NOW)
+
+
+@pytest.fixture
+def tokens(clock: FrozenClock) -> JwtTokenService:
+    return JwtTokenService(
+        secret="test-secret-not-used-anywhere-real",
+        clock=clock,
+        access_ttl=timedelta(minutes=15),
+        refresh_ttl=timedelta(days=7),
+    )
+
+
+@pytest.fixture
+def accounts(session: AsyncSession) -> SqlAlchemyAccountRepository:
+    return SqlAlchemyAccountRepository(session)
+
+
+@pytest.fixture
+def refresh_tokens(session: AsyncSession) -> SqlAlchemyRefreshTokenRepository:
+    return SqlAlchemyRefreshTokenRepository(session)
+
+
+async def register_account(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    *,
+    email: str = "r.obeng@ug.edu.gh",
+    password: str = PASSWORD,
+    verified: bool = True,
+    active: bool = True,
+    hasher: Argon2PasswordHasher | None = None,
+) -> Account:
+    account = Account(
+        id=UserId(uuid4()),
+        email=EmailAddress(email),
+        password_hash=(hasher or Argon2PasswordHasher()).hash(password),
+        full_name="Roger Koranteng Obeng",
+        affiliation="University of Ghana",
+    )
+    if verified:
+        account.verify(occurred_at=NOW)
+    if not active:
+        account.deactivate()
+    await accounts.add(account)
+    await session.commit()
+    return account
+
+
+def make_service(
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+    hasher: Argon2PasswordHasher | CountingHasher | None = None,
+) -> SessionService:
+    return SessionService(accounts, refresh_tokens, tokens, hasher or Argon2PasswordHasher(), clock)
+
+
+async def test_correct_credentials_return_an_access_and_a_refresh_token(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    account = await register_account(session, accounts)
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+
+    pair = await service.log_in(account.email.value, PASSWORD)
+
+    assert pair.access_token
+    assert pair.refresh_token
+    assert tokens.read_access(pair.access_token) == account.id
+
+
+async def test_an_unknown_email_fails_like_a_wrong_password(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    await register_account(session, accounts)
+    hasher = CountingHasher()
+    service = make_service(accounts, refresh_tokens, tokens, clock, hasher)
+
+    with pytest.raises(AuthenticationError) as unknown_error:
+        await service.log_in("nobody@ug.edu.gh", "whatever-password")
+    assert hasher.verify_calls == 1
+
+    with pytest.raises(AuthenticationError) as wrong_error:
+        await service.log_in("r.obeng@ug.edu.gh", "not the right password")
+    assert hasher.verify_calls == 2
+
+    assert str(unknown_error.value) == str(wrong_error.value)
+
+
+async def test_an_unverified_account_cannot_log_in(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    await register_account(session, accounts, email="unverified@ug.edu.gh", verified=False)
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+
+    with pytest.raises(AuthenticationError):
+        await service.log_in("unverified@ug.edu.gh", PASSWORD)
+
+
+async def test_a_deactivated_account_cannot_log_in(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    await register_account(session, accounts, email="deactivated@ug.edu.gh", active=False)
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+
+    with pytest.raises(AuthenticationError):
+        await service.log_in("deactivated@ug.edu.gh", PASSWORD)
+
+
+async def test_refreshing_returns_a_new_pair_and_the_old_token_stops_working(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    account = await register_account(session, accounts, email="rotate@ug.edu.gh")
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+    first = await service.log_in("rotate@ug.edu.gh", PASSWORD)
+
+    second = await service.refresh(first.refresh_token)
+
+    assert second.refresh_token != first.refresh_token
+    assert tokens.read_access(second.access_token) == account.id
+    with pytest.raises(AuthenticationError):
+        await service.refresh(first.refresh_token)
+
+
+async def test_replaying_a_rotated_refresh_token_revokes_the_entire_family(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    await register_account(session, accounts, email="reuse@ug.edu.gh")
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+    first = await service.log_in("reuse@ug.edu.gh", PASSWORD)
+    second = await service.refresh(first.refresh_token)
+
+    # Replaying the spent token is theft-or-replay; the whole family dies, including the
+    # newest, legitimately rotated token. An implementation that revoked only the
+    # presented token would leave `second` usable — this is what that would miss.
+    with pytest.raises(AuthenticationError):
+        await service.refresh(first.refresh_token)
+
+    with pytest.raises(AuthenticationError):
+        await service.refresh(second.refresh_token)
+
+
+async def test_an_expired_refresh_token_is_refused(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    await register_account(session, accounts, email="expiring@ug.edu.gh")
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+    pair = await service.log_in("expiring@ug.edu.gh", PASSWORD)
+
+    clock.moment += timedelta(days=8)
+
+    with pytest.raises(AuthenticationError, match="expired"):
+        await service.refresh(pair.refresh_token)
+
+
+async def test_logging_out_revokes_the_presented_tokens_family(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    await register_account(session, accounts, email="logout@ug.edu.gh")
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+    pair = await service.log_in("logout@ug.edu.gh", PASSWORD)
+
+    await service.log_out(pair.refresh_token)
+
+    with pytest.raises(AuthenticationError):
+        await service.refresh(pair.refresh_token)
+
+
+async def test_a_successful_login_upgrades_an_outdated_password_hash(
+    session: AsyncSession,
+    accounts: SqlAlchemyAccountRepository,
+    refresh_tokens: SqlAlchemyRefreshTokenRepository,
+    tokens: JwtTokenService,
+    clock: FrozenClock,
+) -> None:
+    weak_hasher = Argon2PasswordHasher(memory_cost=8, time_cost=1, parallelism=1)
+    account = await register_account(session, accounts, email="weak@ug.edu.gh", hasher=weak_hasher)
+    stored_before = account.password_hash
+    service = make_service(accounts, refresh_tokens, tokens, clock)
+
+    await service.log_in("weak@ug.edu.gh", PASSWORD)
+
+    reloaded = await accounts.get(account.id)
+    assert reloaded is not None
+    assert reloaded.password_hash != stored_before
+    assert Argon2PasswordHasher().verify(PASSWORD, reloaded.password_hash)
+    assert not Argon2PasswordHasher().needs_rehash(reloaded.password_hash)
+```
+
+Run: `cd backend && uv run pytest tests/integration/test_refresh_rotation.py -v -m integration`
+Expected: FAIL — `ImportError: cannot import name 'SessionService'`.
+
+- [ ] **Step 4: Write the implementation**
+
+Append to `backend/src/ugjcs/application/identity.py`. Extend its imports with `import secrets`, `from dataclasses import dataclass`, `from uuid import UUID`, and `from ugjcs.application.ports import RefreshTokenRecord, RefreshTokenRepository` (alongside the existing port imports).
+
+```python
+@dataclass(frozen=True, slots=True)
+class TokenPair:
+    access_token: str
+    refresh_token: str
+
+
+class SessionService:
+    """Login and refresh-token lifecycle: issue, rotate, and detect reuse.
+
+    Refresh rotation with reuse detection: each successful `refresh` issues a new token in
+    the same family and marks the presented row `revoked_at` with `replaced_by` pointing at
+    the new row's id. If a *revoked* row is presented again, that is either the legitimate
+    holder retrying a request whose response was lost, or an attacker replaying a token they
+    stole — the two cannot be told apart from here, so the entire family is revoked. Ending
+    both sessions is the safe failure; leaving either one open is not.
+    """
+
+    def __init__(
+        self,
+        accounts: AccountRepository,
+        refresh_tokens: RefreshTokenRepository,
+        tokens: TokenService,
+        hasher: PasswordHasher,
+        clock: Clock,
+    ) -> None:
+        self._accounts = accounts
+        self._refresh_tokens = refresh_tokens
+        self._tokens = tokens
+        self._hasher = hasher
+        self._clock = clock
+        # Hashed once per service instance, not per call, so an unregistered email still
+        # pays the full Argon2 cost on every login attempt — the wall-clock gap between
+        # "no such account" and "wrong password" is exactly what would let a caller
+        # enumerate registered addresses.
+        self._dummy_hash = hasher.hash(secrets.token_urlsafe(32))
+
+    async def log_in(self, email: str, password: str) -> TokenPair:
+        account = await self._accounts.get_by_email(EmailAddress(email))
+        if account is None:
+            self._hasher.verify(password, self._dummy_hash)
+            raise AuthenticationError("email or password is incorrect")
+        if not self._hasher.verify(password, account.password_hash):
+            raise AuthenticationError("email or password is incorrect")
+        if not account.may_authenticate():
+            raise AuthenticationError("account is not permitted to authenticate")
+        if self._hasher.needs_rehash(account.password_hash):
+            account.password_hash = self._hasher.hash(password)
+            await self._accounts.save(account)
+        pair, _ = await self._issue_pair(account.id, family_id=uuid4())
+        return pair
+
+    async def refresh(self, refresh_token: str) -> TokenPair:
+        token_hash = self._tokens.hash_refresh(refresh_token)
+        record = await self._refresh_tokens.get_by_hash(token_hash)
+        if record is None:
+            raise AuthenticationError("refresh token is not recognised")
+        if record.revoked_at is not None:
+            await self._refresh_tokens.revoke_family(record.family_id)
+            raise AuthenticationError("refresh token has already been used")
+        if record.expires_at <= self._clock.now():
+            raise AuthenticationError("refresh token has expired")
+        pair, new_id = await self._issue_pair(record.user_id, family_id=record.family_id)
+        await self._refresh_tokens.revoke(record.id, replaced_by=new_id)
+        return pair
+
+    async def log_out(self, refresh_token: str) -> None:
+        token_hash = self._tokens.hash_refresh(refresh_token)
+        record = await self._refresh_tokens.get_by_hash(token_hash)
+        if record is not None:
+            await self._refresh_tokens.revoke_family(record.family_id)
+
+    async def _issue_pair(self, user_id: UserId, *, family_id: UUID) -> tuple[TokenPair, UUID]:
+        access = self._tokens.issue_access(user_id)
+        refresh, refresh_hash = self._tokens.issue_refresh(user_id, family_id)
+        issued = self._clock.now()
+        record_id = uuid4()
+        await self._refresh_tokens.add(
+            RefreshTokenRecord(
+                id=record_id,
+                user_id=user_id,
+                family_id=family_id,
+                token_hash=refresh_hash,
+                issued_at=issued,
+                expires_at=issued + self._tokens.refresh_ttl,
+                revoked_at=None,
+                replaced_by=None,
+            )
+        )
+        return TokenPair(access_token=access, refresh_token=refresh), record_id
+```
+
+- [ ] **Step 5: Run, gate, commit**
+
+Run: `cd backend && uv run pytest tests/integration/test_refresh_rotation.py -v -m integration` — expect 9 tests to pass; report the actual count.
+Run: `cd backend && make check` and `cd backend && make integration`.
 
 ```bash
-git add backend/src/ugjcs/application/identity.py backend/tests/integration/test_refresh_rotation.py
+git add backend/src/ugjcs/application/identity.py backend/src/ugjcs/application/ports.py backend/src/ugjcs/infrastructure/db/mappers.py backend/src/ugjcs/infrastructure/db/refresh_token_repository.py backend/src/ugjcs/infrastructure/db/uow.py backend/tests/integration/test_refresh_rotation.py
 git commit -m "feat: add login and refresh rotation with reuse detection"
 ```
 
