@@ -52,3 +52,15 @@ def test_canonical_bytes_change_when_payload_changes() -> None:
     a = make_event(payload={"alpha": 1})
     b = make_event(payload={"alpha": 2})
     assert a.canonical_bytes() != b.canonical_bytes()
+
+
+def test_canonical_bytes_refuses_a_value_it_cannot_serialise_stably() -> None:
+    """A set's str() follows iteration order, which varies with the process hash seed.
+
+    Serialising it would produce different bytes for the same event in a different
+    process, so the chain would report tampering that never happened. Refusing loudly
+    is the only safe behaviour.
+    """
+    event = make_event(payload={"tags": {"a", "b"}})
+    with pytest.raises(TypeError):
+        event.canonical_bytes()
