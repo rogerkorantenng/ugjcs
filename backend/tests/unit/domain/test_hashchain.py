@@ -81,6 +81,20 @@ def test_verify_detects_a_removed_event() -> None:
         verify(chain)
 
 
+def test_verify_detects_a_spliced_chain() -> None:
+    """Two internally consistent chains joined together must not verify.
+
+    Every link here reconciles with its own recorded predecessor hash, so the payload
+    and sequence checks both pass. Only the link-to-predecessor check catches it. This
+    is the splice attack: take a real prefix, graft a different history onto it.
+    """
+    original = build_chain(2)
+    forged = build_chain(2)
+    spliced = [original[0], forged[1]]
+    with pytest.raises(ChainBrokenError, match="broken link at sequence 2"):
+        verify(spliced)
+
+
 def test_append_rejects_a_non_consecutive_sequence() -> None:
     chain = build_chain(1)
     with pytest.raises(ChainBrokenError, match="expected sequence 2"):
