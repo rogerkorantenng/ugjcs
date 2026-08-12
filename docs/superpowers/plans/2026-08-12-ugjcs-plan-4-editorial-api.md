@@ -2457,11 +2457,13 @@ git commit -m "feat: add the reviewer's queue and review submission, blinded by 
 ### Task 7: Archive router (public)
 
 **Files:**
-- Modify: `backend/src/ugjcs/application/ports.py`, `backend/src/ugjcs/infrastructure/db/repository.py`, `backend/src/ugjcs/api/app.py`
+- Modify: `backend/src/ugjcs/application/ports.py`, `backend/src/ugjcs/infrastructure/db/repository.py`, `backend/src/ugjcs/api/schemas.py`, `backend/src/ugjcs/api/app.py`, `backend/tests/unit/api/fakes.py`
 - Create: `backend/src/ugjcs/api/routers/archive.py`, `backend/tests/unit/api/test_archive_router.py`, `backend/tests/integration/test_archive_queries.py`
 
 **Interfaces:**
-- Produces: `ManuscriptRepository.list_published`, `.search_published`; `GET /api/v1/archive`, `GET /api/v1/archive/{tracking_code}`, `GET /api/v1/archive/search`.
+- Produces: `ManuscriptRepository.list_published`, `.search_published`; `ArchivePaperOut`; `GET /api/v1/archive`, `GET /api/v1/archive/{tracking_code}`, `GET /api/v1/archive/search`.
+
+**Reconciliation correction (against Plan 5, 2026-08-12):** the version of this task originally drafted returned `ManuscriptOut` — the authenticated, author-facing shape, carrying `author_ids`/`corresponding_author_id` as raw UUIDs — from the three public archive routes. That is wrong for a public, anonymous-caller endpoint for two independent reasons: it leaks internal account identifiers to the internet for no reason, and a UUID is useless to Plan 5's public pages, which need a byline a human or Google Scholar can read (`citation_author`, the JSON-LD `author` list, `PaperCard`'s "A. Mensah et al."). This is exactly the case where the API plan was the one that needed fixing rather than the frontend: `ArchivePaperOut` below resolves each author id to `Account.full_name` via `AccountRepository` (already an inherited interface, `uow.accounts`) and returns names, not ids. Volume/issue/DOI/PDF fields are deliberately still absent — that part of Plan 5's original assumption was checked against this plan's own "Deliberately not in this plan" list (issue composition, citation export) and Plan 5 was corrected to match instead.
 
 - [ ] **Step 1: Extend the port**
 
@@ -2575,6 +2577,46 @@ Add to `SqlAlchemyManuscriptRepository`:
 Run: `cd backend && uv run pytest tests/integration/test_archive_queries.py -m integration -v`
 Expected: PASS, 2 tests.
 
+- [ ] **Step 3b: Add `ArchivePaperOut` — resolved author names, not raw ids**
+
+Append to `backend/src/ugjcs/api/schemas.py`:
+
+```python
+from ugjcs.application.ports import AccountRepository
+
+
+class ArchivePaperOut(BaseModel):
+    """The public shape: a byline a human (or Google Scholar) can read, never a UUID."""
+
+    tracking_code: str
+    title: str
+    abstract: str
+    keywords: tuple[str, ...]
+    author_names: list[str]
+    status: str
+    version: int
+
+    @classmethod
+    async def from_domain(
+        cls, manuscript: Manuscript, accounts: AccountRepository
+    ) -> "ArchivePaperOut":
+        names: list[str] = []
+        for author_id in manuscript.author_ids:
+            account = await accounts.get(author_id)
+            names.append(account.full_name if account is not None else "Unknown author")
+        return cls(
+            tracking_code=manuscript.tracking_code.value,
+            title=manuscript.title,
+            abstract=manuscript.abstract,
+            keywords=manuscript.keywords,
+            author_names=names,
+            status=manuscript.status.value,
+            version=manuscript.version,
+        )
+```
+
+Add `from ugjcs.domain.manuscript import Manuscript` to `schemas.py`'s imports if not already present (Task 3's `ManuscriptOut.from_domain` already imports it).
+
 - [ ] **Step 4: Write the failing router test**
 
 Create `backend/tests/unit/api/test_archive_router.py`:
@@ -2589,7 +2631,7 @@ from ugjcs.api.wiring import get_uow
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
-from tests.unit.api.fakes import FakeUnitOfWork
+from tests.unit.api.fakes import FakeAccount, FakeUnitOfWork
 
 AUTHOR = UserId(uuid4())
 
@@ -2612,6 +2654,9 @@ def make_client(*manuscripts: Manuscript) -> TestClient:
     uow = FakeUnitOfWork()
     for manuscript in manuscripts:
         uow.manuscripts.store[manuscript.id] = manuscript
+    uow.accounts = {  # type: ignore[attr-defined]
+        AUTHOR: FakeAccount(id=AUTHOR, email="a@ug.edu.gh", roles=frozenset())
+    }
 
     async def _uow():
         yield uow
@@ -2627,8 +2672,17 @@ def test_the_archive_requires_no_authentication() -> None:
     assert len(response.json()) == 1
 
 
+def test_the_archive_never_exposes_a_raw_author_id() -> None:
+    client = make_client(published("Fair Scheduling", 112))
+    response = client.get("/api/v1/archive")
+    body = response.json()[0]
+    assert "author_ids" not in body
+    assert "corresponding_author_id" not in body
+    assert "author_names" in body
+
+
 def test_retrieving_a_published_paper_by_tracking_code() -> None:
-    paper = published("Fair Scheduling", 112)
+    paper = published("Fair Scheduling", 113)
     client = make_client(paper)
     response = client.get(f"/api/v1/archive/{paper.tracking_code.value}")
     assert response.status_code == 200
@@ -2636,17 +2690,19 @@ def test_retrieving_a_published_paper_by_tracking_code() -> None:
 
 
 def test_search_finds_a_matching_paper() -> None:
-    client = make_client(published("Fair Scheduling for GPUs", 113))
+    client = make_client(published("Fair Scheduling for GPUs", 114))
     response = client.get("/api/v1/archive/search", params={"q": "scheduling"})
     assert response.status_code == 200
     assert len(response.json()) == 1
 
 
 def test_search_with_no_match_returns_an_empty_list() -> None:
-    client = make_client(published("Fair Scheduling for GPUs", 114))
+    client = make_client(published("Fair Scheduling for GPUs", 115))
     response = client.get("/api/v1/archive/search", params={"q": "quantum"})
     assert response.json() == []
 ```
+
+`FakeUnitOfWork.accounts` does not exist yet in Task 1's fake — add `accounts: dict[UserId, FakeAccount] = field(default_factory=dict)` to `FakeUnitOfWork` in `backend/tests/unit/api/fakes.py` as part of this task, and give `FakeAccount` a trivial `async def get(self, ...)`-compatible lookup by wrapping the dict in a tiny adapter, e.g. add a `FakeAccountRepository` dataclass (`accounts: dict[UserId, FakeAccount]`, `async def get(self, user_id): return self.accounts.get(user_id)`) and change `FakeUnitOfWork.accounts`'s default to `field(default_factory=lambda: FakeAccountRepository({}))`, then have `make_client` above assign `uow.accounts = FakeAccountRepository({AUTHOR: FakeAccount(...)})` instead of a bare dict — report which shape you chose, the test only depends on `await uow.accounts.get(id)` returning a `FakeAccount | None`.
 
 - [ ] **Step 5: Run to verify it fails**
 
@@ -2662,7 +2718,7 @@ Create `backend/src/ugjcs/api/routers/archive.py`:
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from ugjcs.api.schemas import ManuscriptOut
+from ugjcs.api.schemas import ArchivePaperOut
 from ugjcs.api.wiring import get_uow
 from ugjcs.application.ports import UnitOfWork
 from ugjcs.domain.ids import TrackingCode
@@ -2670,24 +2726,24 @@ from ugjcs.domain.ids import TrackingCode
 router = APIRouter()
 
 
-@router.get("", response_model=list[ManuscriptOut])
-async def list_published(uow: UnitOfWork = Depends(get_uow)) -> list[ManuscriptOut]:
+@router.get("", response_model=list[ArchivePaperOut])
+async def list_published(uow: UnitOfWork = Depends(get_uow)) -> list[ArchivePaperOut]:
     manuscripts = await uow.manuscripts.list_published()
-    return [ManuscriptOut.from_domain(m) for m in manuscripts]
+    return [await ArchivePaperOut.from_domain(m, uow.accounts) for m in manuscripts]
 
 
-@router.get("/search", response_model=list[ManuscriptOut])
+@router.get("/search", response_model=list[ArchivePaperOut])
 async def search(
     q: str = Query(..., min_length=1), uow: UnitOfWork = Depends(get_uow)
-) -> list[ManuscriptOut]:
+) -> list[ArchivePaperOut]:
     manuscripts = await uow.manuscripts.search_published(q)
-    return [ManuscriptOut.from_domain(m) for m in manuscripts]
+    return [await ArchivePaperOut.from_domain(m, uow.accounts) for m in manuscripts]
 
 
-@router.get("/{tracking_code}", response_model=ManuscriptOut)
+@router.get("/{tracking_code}", response_model=ArchivePaperOut)
 async def retrieve_published(
     tracking_code: str, uow: UnitOfWork = Depends(get_uow)
-) -> ManuscriptOut:
+) -> ArchivePaperOut:
     try:
         code = TrackingCode.parse(tracking_code)
     except ValueError as error:
@@ -2695,12 +2751,12 @@ async def retrieve_published(
     manuscript = await uow.manuscripts.get_by_tracking_code(code)
     if manuscript is None or manuscript.status.value != "published":
         raise HTTPException(status_code=404, detail="paper not found")
-    return ManuscriptOut.from_domain(manuscript)
+    return await ArchivePaperOut.from_domain(manuscript, uow.accounts)
 ```
 
 `/search` is registered before `/{tracking_code}` — FastAPI matches routes in registration order, and a literal path must be declared ahead of a path parameter that would otherwise swallow it (`GET /archive/search` would match `/{tracking_code}` with `tracking_code="search"` if the order were reversed).
 
-`ManuscriptOut` is reused here rather than `BlindedManuscriptOut` — publication is post-decision and authorship is public record for a published paper, which is exactly why `retrieve_published` also checks `status == "published"` explicitly rather than trusting `get_by_tracking_code` alone: an unpublished manuscript must 404 here even though the same tracking code returns real data on the authenticated `/manuscripts/{tracking_code}` route.
+`ArchivePaperOut`, not `ManuscriptOut` or `BlindedManuscriptOut`, is the response type here — publication is post-decision and authorship is public record for a published paper (so, unlike `BlindedManuscriptOut`, author information belongs in the response), but "public record" means a name, not the internal account UUID `ManuscriptOut` carries for the authenticated author-facing routes. `retrieve_published` still checks `status == "published"` explicitly rather than trusting `get_by_tracking_code` alone: an unpublished manuscript must 404 here even though the same tracking code returns real data on the authenticated `/manuscripts/{tracking_code}` route.
 
 - [ ] **Step 7: Wire the router**
 
@@ -2718,7 +2774,7 @@ Run: `cd backend && uv run pytest tests/unit/api/test_archive_router.py -v` and 
 Run: `cd backend && make check`.
 
 ```bash
-git add backend/src/ugjcs/application/ports.py backend/src/ugjcs/infrastructure/db/repository.py backend/src/ugjcs/api/routers/archive.py backend/src/ugjcs/api/app.py backend/tests/unit/api/test_archive_router.py backend/tests/integration/test_archive_queries.py
+git add backend/src/ugjcs/application/ports.py backend/src/ugjcs/infrastructure/db/repository.py backend/src/ugjcs/api/schemas.py backend/src/ugjcs/api/routers/archive.py backend/src/ugjcs/api/app.py backend/tests/unit/api/fakes.py backend/tests/unit/api/test_archive_router.py backend/tests/integration/test_archive_queries.py
 git commit -m "feat: add the public archive: list, retrieve and search published papers"
 ```
 

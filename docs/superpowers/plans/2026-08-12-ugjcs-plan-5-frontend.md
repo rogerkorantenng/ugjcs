@@ -6,7 +6,7 @@
 
 **Architecture:** Two traffic classes, never mixed.
 
-1. **Public archive** (`/`, `/issues`, `/papers/[trackingCode]`, `/search`) is rendered by React Server Components with Incremental Static Regeneration, calling the backend directly over plain `fetch`. No cookie, no bearer token, nothing an anonymous reader's browser holds is privileged. This is what keeps these pages fast, cacheable at the edge and crawlable.
+1. **Public archive** (`/`, `/papers/[trackingCode]`, `/search`) is rendered by React Server Components with Incremental Static Regeneration, calling the backend directly over plain `fetch`. No cookie, no bearer token, nothing an anonymous reader's browser holds is privileged. This is what keeps these pages fast, cacheable at the edge and crawlable. (There is no `/issues` route: Plan 4 exposes a flat published-manuscript list with no issue/volume grouping — see "Backend contract" above.)
 2. **Everything behind a role** (`/login`, `/author/*`, `/reviewer/*`, `/editor/*`) is a Client Component tree that talks only to same-origin `/api/*` Next.js Route Handlers, never to the backend directly. The browser holds one httpOnly, Secure, SameSite=Lax cookie scoped to the Vercel origin, sealed with `iron-session`. Each Route Handler unseals it, attaches `Authorization: Bearer <access_token>` to the upstream call, transparently refreshes an expired access token using the refresh token also inside the sealed cookie, and reseals the cookie with rotated tokens before responding.
 
 **Why the split, stated once so no later task re-litigates it:** a cookie set by `ugjcs.vercel.app` is first-party to Vercel and third-party to the AWS backend origin. Safari and Brave block third-party cookies by default, so a design that sets the session cookie on the API origin, or that ships the access token to the browser at all, works on Chrome and fails silently on the assessor's machine. Routing every authenticated call through a same-origin Route Handler is what makes the cookie first-party everywhere, and it keeps the bearer token out of reach of any XSS in the page — Client Components never see it.
@@ -15,39 +15,44 @@
 
 **Tech Stack:** Next.js 15 (App Router), React 19, TypeScript (strict), Tailwind CSS v4, `iron-session` (cookie sealing), `zod` (input validation), `swr` (client-side data fetching against the BFF), Vitest + Testing Library (unit/component), Playwright (end-to-end) + `@axe-core/playwright` (accessibility scan).
 
-## Assumed backend contract
+## Backend contract (reconciled against Plan 4, 2026-08-12)
 
-`docs/superpowers/plans/2026-08-12-ugjcs-plan-4-editorial-api.md` does not exist yet at the time of writing. This plan assumes, and every Route Handler below is written against, the following shape under `/api/v1` (consistent with §9 of the design spec and with the domain vocabulary fixed in Plans 1–3):
+`docs/superpowers/plans/2026-08-12-ugjcs-plan-4-editorial-api.md` did not exist when this plan was first drafted, so every Route Handler below was originally written against an assumed shape. Plan 4 has since landed and is authoritative on wire format — it was written directly against the executed domain/persistence/auth code, this plan was not. The assumed contract has been reconciled against it; the full diff and rationale for each change live in `docs/05-api-contract.md`. The corrected shape, under `/api/v1` unless noted:
 
-- `POST /auth/login {email, password} -> {access_token, refresh_token, expires_in, user: {id, email, name, roles}}`
-- `POST /auth/refresh {refresh_token} -> {access_token, refresh_token, expires_in}`
+- `POST /auth/login {email, password} -> {access_token, refresh_token, token_type}` — no `expires_in`, no `user` object. The BFF derives the session's `user` itself (Task 3): it keeps the `email` from the request it already validated, then calls `GET /auth/me` with the fresh access token for `{id, roles}`.
+- `POST /auth/refresh {refresh_token} -> {access_token, refresh_token, token_type}`
 - `POST /auth/logout {refresh_token} -> 204`
-- `GET /auth/me -> {id, email, name, roles}` (Bearer)
-- `POST /manuscripts` (multipart: `title, abstract, keywords[], author_ids[], confirmed_anonymised, file`) `-> ManuscriptDetail` (Bearer, role `author`)
-- `GET /manuscripts/mine -> ManuscriptSummary[]` (Bearer, role `author`)
-- `GET /manuscripts/{id} -> ManuscriptDetail` (Bearer; visibility enforced server-side by the `can()` policy)
-- `POST /manuscripts/{id}/withdraw -> ManuscriptDetail` (Bearer, corresponding author only)
-- `GET /editorial/queue?status= -> ManuscriptSummary[]` (Bearer, role `editor`|`editor_in_chief`)
-- `POST /editorial/{id}/screen {decision: "advance"|"desk_reject", rationale} -> ManuscriptDetail`
-- `GET /editorial/reviewer-candidates?manuscript_id= -> ReviewerCandidate[]` (score + exclusion reason, per §10.1)
-- `POST /editorial/{id}/assign {reviewer_id, due_date} -> ManuscriptDetail`
-- `POST /editorial/{id}/decide {decision, rationale} -> ManuscriptDetail`
-- `GET /reviews/mine -> ReviewAssignmentSummary[]` (Bearer, role `reviewer`)
-- `GET /reviews/{assignmentId} -> BlindedManuscript` (Bearer; **response type carries no author field at all**, per §6.4)
-- `POST /reviews/{assignmentId} {scores: {originality, rigour, clarity, significance}, recommendation, comments_to_author, confidential_comments_to_editor} -> 201`
-- `GET /archive/issues -> IssueSummary[]`
-- `GET /archive/issues/{volume}/{number} -> IssueDetail`
-- `GET /archive/papers/{trackingCode} -> ArchivePaperDetail`
-- `GET /archive/search?q=&page= -> {results: ArchivePaperSummary[], total: number}`
+- `GET /auth/me -> {id, roles}` (Bearer) — no `email`, no `name`. `Actor` (the type this endpoint serialises) carries only an id and a role set; Plan 3's `Account` has a `full_name`, but nothing on the auth path currently threads it through to HTTP. Entered in the technical debt register below.
+- `POST /manuscripts {title, abstract, keywords, co_author_ids} -> ManuscriptOut` (Bearer, role `author`, **JSON, not multipart** — see "File upload" below)
+- `GET /manuscripts/mine -> ManuscriptOut[]` (Bearer, role `author`)
+- `GET /manuscripts/{trackingCode} -> ManuscriptOut` (Bearer; visibility enforced server-side by the `can()` policy)
+- `POST /manuscripts/{trackingCode}/withdraw -> ManuscriptOut` (Bearer, corresponding author only)
+- `GET /editorial/queue -> ManuscriptOut[]` (Bearer, role `editor`|`editor_in_chief`; no `?status=` filter — the queue is hardcoded to `submitted`)
+- `POST /editorial/{trackingCode}/screen` (Bearer, editor, **no request body**) `-> ManuscriptOut` — moves `submitted` to `under_screening`
+- `POST /editorial/{trackingCode}/decision {decision: DecisionType, rationale} -> ManuscriptOut` — **path is `/decision`, not `/decide`**; a desk rejection is `decision: "desk_reject"` on this same endpoint, there is no separate "screen with a rejecting decision" call
+- `POST /editorial/{trackingCode}/reviewers {reviewer_id} -> 204` — **path is `/reviewers`, not `/assign`; no `due_date`; no response body.** There is no `GET /editorial/reviewer-candidates` endpoint at all — Plan 4's scope decision is that reviewer assignment is a persistence-only record with no scoring, no exclusion check, no candidate list (see its "Scope decision" section)
+- `GET /reviews/mine -> BlindedManuscript[]` (Bearer, role `reviewer`) — **returns the blinded manuscripts directly, not an assignment-summary wrapper.** There is no `manuscript_title`, `due_date`, assignment `id`, or assignment `status` anywhere in the response; the only handle on an assignment is the manuscript's own `tracking_code`
+- `POST /reviews/{trackingCode}/submit {recommendation, comments} -> 204` — **not `POST /reviews/{assignmentId}`.** No per-criterion `scores` object, no `comments_to_author`/`confidential_comments_to_editor` split — one free-text `recommendation` string and one free-text `comments` string. There is also no `GET /reviews/{trackingCode}` detail route; the list from `/reviews/mine` is the only read
+- `GET /archive -> ArchivePaperOut[]` — not `/archive/papers`; flat list, no pagination
+- `GET /archive/{trackingCode} -> ArchivePaperOut`
+- `GET /archive/search?q= -> ArchivePaperOut[]` — a flat array, **not** `{results, total}`; no `page` parameter
 - `GET /health -> 200`
 
-Errors are RFC 9457 problem details: `{type, title, status, detail?, instance?}`, `type` stable and machine-readable. Every Route Handler below relays that shape verbatim to the browser rather than inventing its own error format, so a future Plan 4 that matches this contract needs zero frontend changes; a Plan 4 that differs needs changes isolated to `src/lib/backend.ts`, `src/lib/auth-fetch.ts` and `src/types/api.ts` only.
+`ArchivePaperOut` is `{tracking_code, title, abstract, keywords, author_names, status, version}` — resolved author names, never a raw account id, but also no `published_at`, `doi`, `pdf_url`, `volume` or `number`. There is no `/archive/issues` endpoint of any kind: Plan 4 states issue composition and any table of contents beyond a flat archive listing is deliberately out of its scope, and no PDF storage or DOI minting exists anywhere in the domain built by Plans 1–4. This plan's issue-browsing pages (`/issues`, `/issues/[volume]/[number]`) and citation `pdf_url`/`doi` fields have been removed rather than left pointing at endpoints that do not exist; re-adding them is future work tracked in the technical debt register, not something this plan can build against today.
 
-Role and status vocabularies are copied verbatim from `ugjcs.domain.enums` (Plan 1) because the frontend must never invent its own spelling of a value the backend will send:
+**No response anywhere in Plan 4 carries a timestamp.** `ManuscriptOut` has no `submitted_at`/`updated_at`, there is no exposed event/audit log endpoint, and `ArchivePaperOut` has no `published_at`. The status timeline UI and every `formatDate(...)` call this plan originally wrote against manuscript or archive data have been removed for the same reason as the issue pages — there is nothing on the wire to render. `formatDate` itself is kept (harmless, generic) but is no longer called from a page that assumes a date field exists.
+
+**Error responses:** RFC 9457 problem details, `{type, title, status, detail?, instance?}` — matches the original assumption exactly, no change needed. In practice Plan 4's `type` is always the literal string `"about:blank"` (it does not mint per-error-class URIs); `title` is the raising exception's class name (e.g. `"IllegalTransitionError"`), and that is what `ProblemAlert` actually renders as its headline. No frontend code change was needed here since `ProblemDetails.type`/`title` were always typed as plain `string`, not a literal union — this plan never assumed anything narrower.
+
+**Pagination:** none, anywhere. Plan 4's "Deliberately not in this plan" section states this explicitly for a 48-hour demonstration corpus. Every list response is a flat, unbounded JSON array.
+
+Every Route Handler below relays the problem-details shape verbatim to the browser rather than inventing its own error format, isolating any *future* contract drift to `src/lib/backend.ts`, `src/lib/auth-fetch.ts` and `src/types/api.ts`.
+
+Role, status, decision and recommendation vocabularies are copied verbatim from `ugjcs.domain.enums` (Plan 1) because the frontend must never invent its own spelling of a value the backend will send. Both sides use `snake_case` for every field and enum value on the wire — Pydantic's default, and what Plan 4 actually emits — so `src/types/api.ts` mirrors it as-is; there is no camelCase translation layer anywhere in this plan, deliberately (see `docs/05-api-contract.md` for the naming-convention decision):
 
 - `Role`: `author`, `reviewer`, `editor`, `editor_in_chief`, `administrator`
 - `ManuscriptStatus`: `draft`, `submitted`, `under_screening`, `desk_rejected`, `under_review`, `reviews_complete`, `revision_requested`, `resubmitted`, `accepted`, `rejected`, `scheduled`, `published`, `withdrawn`
-- `Recommendation`: `accept`, `minor_revision`, `major_revision`, `reject`
+- `Recommendation`: `accept`, `minor_revision`, `major_revision`, `reject` (used only as UI `<select>` option values in the review form — Plan 4's `SubmitReviewRequest.recommendation` is an unvalidated `str`, not this enum, so a value outside this list is a UI bug, not a 422 from the server)
 - `DecisionType`: `desk_reject`, `send_to_review`, `request_revision`, `accept`, `reject`
 
 ## Global Constraints
@@ -67,10 +72,12 @@ Role and status vocabularies are copied verbatim from `ugjcs.domain.enums` (Plan
 
 Implementers must not redefine these values; the TypeScript literal unions in `src/types/api.ts` (Task 1) are the frontend's copy of them, and must stay byte-for-byte identical to the `StrEnum` values above.
 
-- `TokenPair`-shaped login/refresh response: `access_token`, `refresh_token`, `expires_in` (seconds), and on login only, `user: {id, email, name, roles}}` (Plan 3 `SessionService.log_in`/`.refresh`).
-- RFC 9457 problem details on every error response (design spec §9, §11).
-- `BlindedManuscript` — the reviewer-facing projection has no author field in its type, not merely a filtered value (design spec §6.4). The frontend's `BlindedManuscript` TypeScript type mirrors that omission structurally; Task 5 proves the UI cannot render what the type cannot hold even if a malformed payload smuggles the field in.
+- Login/refresh response as Plan 4's `TokenPairOut` actually serialises it: `access_token`, `refresh_token`, `token_type` — **no `expires_in` and no `user` object**, corrected from this plan's original assumption. `src/lib/session.ts`'s `accessTokenExpiresAt` therefore cannot be computed from a server-supplied TTL; Task 3 uses `IdentityService`/`JwtTokenService`'s configured access-token lifetime instead (`access_token_minutes` from `Settings`, the same figure Plan 3 puts in the JWT's own `exp` claim) rather than trusting a value the response never carries.
+- RFC 9457 problem details on every error response (design spec §9, §11) — confirmed, `type` is always `"about:blank"` in Plan 4's current implementation.
+- `BlindedManuscript` — the reviewer-facing projection has no author field in its type, not merely a filtered value (design spec §6.4), and now also has no `id` and no `document_url`: it mirrors `ugjcs.domain.blinding.BlindedManuscript` field-for-field (`tracking_code, title, abstract, keywords, version, status`), which is what Plan 4's `BlindedManuscriptOut` actually serialises. The frontend's `BlindedManuscript` TypeScript type mirrors that omission structurally; Task 5 proves the UI cannot render what the type cannot hold even if a malformed payload smuggles the field in.
 - The manuscript lifecycle in design spec §6.2, used to drive which actions each screen offers (e.g. desk rejection is offered only from `under_screening`; resubmission only from `revision_requested`). The frontend enforces none of these as security — the backend's guards are authoritative — but the UI hides actions the backend would reject, to avoid presenting a false affordance.
+
+**One assumption this plan cannot resolve on its own:** Plan 4 wires `SessionService(accounts, tokens, hasher, clock)` and says so explicitly, but flags that Plan 3's own write-up never specifies `SessionService`'s constructor — Plan 4 inferred the shape by mirroring `IdentityService`'s already-confirmed one. This plan's Route Handlers only ever call `SessionService` indirectly, through Plan 4's HTTP endpoints, so nothing here depends on the constructor directly — noted here only so whoever reconciles Plan 3 knows this plan is not a second source of assumptions about it.
 
 ---
 
@@ -107,14 +114,11 @@ frontend/
 │   │   │   ├── alert.tsx                                    Task 1  renders a ProblemDetails
 │   │   │   ├── badge.tsx                                    Task 1  status pill
 │   │   │   ├── select.tsx                                   Task 6
-│   │   │   ├── textarea.tsx                                 Task 5
-│   │   │   └── pagination.tsx                                Task 2
+│   │   │   └── textarea.tsx                                 Task 5
 │   │   ├── layout/
 │   │   │   ├── site-header.tsx                               Task 2  public nav
 │   │   │   └── app-nav.tsx                                   Task 3  role-aware authenticated nav
 │   │   ├── manuscript-card.tsx                                Task 2
-│   │   ├── status-timeline.tsx                                Task 4
-│   │   ├── file-upload.tsx                                    Task 4
 │   │   ├── blinded-manuscript-view.tsx                        Task 5
 │   │   ├── review-form.tsx                                    Task 5
 │   │   ├── reviewer-assign-form.tsx                           Task 6
@@ -124,8 +128,6 @@ frontend/
 │       ├── globals.css                                       Task 1  (Tailwind v4 `@import`)
 │       ├── (public)/
 │       │   ├── page.tsx                                      Task 2  home
-│       │   ├── issues/page.tsx                                Task 2  browse issues
-│       │   ├── issues/[volume]/[number]/page.tsx              Task 2  issue detail
 │       │   ├── papers/[trackingCode]/page.tsx                 Task 2  paper detail (+ JSON-LD)
 │       │   └── search/page.tsx                                Task 2
 │       ├── sitemap.ts                                        Task 2
@@ -134,30 +136,29 @@ frontend/
 │       │   ├── layout.tsx                                     Task 3  session-presence read for nav
 │       │   ├── page.tsx                                       Task 4  dashboard
 │       │   ├── submit/page.tsx                                 Task 4  submission form
-│       │   └── [id]/page.tsx                                   Task 4  detail + timeline
+│       │   └── [trackingCode]/page.tsx                         Task 4  detail
 │       ├── reviewer/
 │       │   ├── layout.tsx                                     Task 3
-│       │   ├── page.tsx                                       Task 5  assignment list
-│       │   └── [id]/page.tsx                                   Task 5  blinded read + review form
+│       │   ├── page.tsx                                       Task 5  blinded assignment list
+│       │   └── [trackingCode]/page.tsx                         Task 5  blinded read + review form
 │       ├── editor/
 │       │   ├── layout.tsx                                     Task 3
 │       │   ├── page.tsx                                       Task 6  screening queue
-│       │   └── [id]/page.tsx                                   Task 6  screen / assign / decide
+│       │   └── [trackingCode]/page.tsx                         Task 6  screen / assign / decide
 │       └── api/
 │           ├── auth/login/route.ts                            Task 3
 │           ├── auth/logout/route.ts                            Task 3
 │           ├── auth/me/route.ts                                Task 3
 │           ├── manuscripts/route.ts                            Task 4  GET mine, POST create
-│           ├── manuscripts/[id]/route.ts                       Task 4  GET one
-│           ├── manuscripts/[id]/withdraw/route.ts               Task 4
-│           ├── reviews/route.ts                                Task 5  GET mine
-│           ├── reviews/[id]/route.ts                           Task 5  GET blinded, POST submit
+│           ├── manuscripts/[trackingCode]/route.ts              Task 4  GET one (reused by Task 6's editor detail page)
+│           ├── manuscripts/[trackingCode]/withdraw/route.ts     Task 4
+│           ├── reviews/route.ts                                Task 5  GET mine (blinded list)
+│           ├── reviews/[trackingCode]/route.ts                 Task 5  POST submit only — no GET, Plan 4 has no per-assignment read
 │           └── editorial/
 │               ├── queue/route.ts                              Task 6
-│               ├── [id]/screen/route.ts                        Task 6
-│               ├── [id]/candidates/route.ts                    Task 6
-│               ├── [id]/assign/route.ts                        Task 6
-│               └── [id]/decide/route.ts                        Task 6
+│               ├── [trackingCode]/screen/route.ts               Task 6  no body
+│               ├── [trackingCode]/decision/route.ts             Task 6  {decision, rationale}
+│               └── [trackingCode]/reviewers/route.ts            Task 6  {reviewer_id}, 204 — no candidates endpoint exists
 └── tests/
     └── e2e/
         ├── mock-backend.ts                                   Task 7  hand-rolled contract double
@@ -232,6 +233,10 @@ The `server-only` import makes it a build error for any Client Component to impo
 Create `frontend/src/types/api.ts`:
 
 ```ts
+// Every type in this file mirrors Plan 4's Pydantic response models field-for-field,
+// snake_case included — see docs/05-api-contract.md for the naming-convention decision
+// and the full endpoint-by-endpoint diff this file was reconciled against.
+
 export const MANUSCRIPT_STATUSES = [
   "draft", "submitted", "under_screening", "desk_rejected", "under_review",
   "reviews_complete", "revision_requested", "resubmitted", "accepted",
@@ -239,6 +244,9 @@ export const MANUSCRIPT_STATUSES = [
 ] as const;
 export type ManuscriptStatus = (typeof MANUSCRIPT_STATUSES)[number];
 
+// Plan 4's `SubmitReviewRequest.recommendation` is an unvalidated `str`, not this domain
+// enum — this list is used only to populate the review form's `<select>`, so a value
+// outside it is a UI bug, not something the server would ever reject with a 422.
 export const RECOMMENDATIONS = ["accept", "minor_revision", "major_revision", "reject"] as const;
 export type Recommendation = (typeof RECOMMENDATIONS)[number];
 
@@ -257,88 +265,72 @@ export interface ProblemDetails {
   instance?: string;
 }
 
+/**
+ * No `name` field: `GET /auth/me` (`ActorOut`) serialises only `{id, roles}` — `Actor`
+ * carries nothing else. `email` is not part of that response either; the session's `email`
+ * is the value the BFF already validated out of the login request body, not anything the
+ * backend echoes back. See "Backend contract" above and the technical debt register.
+ */
 export interface SessionUser {
   id: string;
   email: string;
-  name: string;
   roles: Role[];
 }
 
-export interface ManuscriptSummary {
-  id: string;
+/**
+ * Mirrors `ManuscriptOut` exactly — the one shape Plan 4 returns from every manuscript
+ * route (`POST /manuscripts`, `GET /manuscripts/mine`, `GET /manuscripts/{trackingCode}`,
+ * `POST /manuscripts/{trackingCode}/withdraw`, `GET /editorial/queue`). There is no
+ * separate "summary" and "detail" shape on the backend, so there is only one type here.
+ *
+ * Deliberately absent, because Plan 4 does not serialise them anywhere: `id` (the
+ * `tracking_code` string is the only identifier the wire ever carries — use it as the
+ * React key and the route param), `submitted_at`/`updated_at` (no response carries a
+ * timestamp), and `events`/an audit trail (no endpoint exposes one).
+ */
+export interface Manuscript {
   tracking_code: string;
   title: string;
-  status: ManuscriptStatus;
-  submitted_at: string | null;
-  updated_at: string;
-}
-
-export interface EditorialEventDTO {
-  sequence: number;
-  event_type: string;
-  occurred_at: string;
-  payload: Record<string, unknown>;
-}
-
-export interface ManuscriptDetail extends ManuscriptSummary {
   abstract: string;
   keywords: string[];
-  author_names: string[];
+  author_ids: string[];
   corresponding_author_id: string;
-  events: EditorialEventDTO[];
+  status: ManuscriptStatus;
+  version: number;
+  minimum_reviews: number;
+  submitted_reviews: number;
 }
 
 /**
- * The reviewer-facing projection. There is deliberately no `author_names` or
- * `corresponding_author_id` field on this type — see design spec §6.4 and Task 5's test.
+ * The reviewer-facing projection — mirrors `ugjcs.domain.blinding.BlindedManuscript`
+ * field-for-field. There is deliberately no `author_ids`/`corresponding_author_id` field
+ * on this type (design spec §6.4, Task 5's test), and no `id` or `document_url` either:
+ * Plan 4 stores no document of any kind, so there is nothing to link to (see "File upload"
+ * in docs/05-api-contract.md). `tracking_code` is this type's only identifier.
  */
 export interface BlindedManuscript {
-  id: string;
   tracking_code: string;
   title: string;
   abstract: string;
   keywords: string[];
-  document_url: string;
+  version: number;
   status: ManuscriptStatus;
 }
 
-export interface ReviewAssignmentSummary {
-  id: string;
-  manuscript_tracking_code: string;
-  manuscript_title: string;
-  due_date: string;
-  status: "invited" | "accepted" | "declined" | "submitted" | "expired";
-}
-
-export interface ReviewerCandidate {
-  reviewer_id: string;
-  name: string;
-  score: number | null;
-  excluded_reason: string | null;
-}
-
-export interface IssueSummary {
-  volume: number;
-  number: number;
-  year: number;
-  title: string;
-  published_at: string;
-}
-
-export interface ArchivePaperSummary {
+/**
+ * Mirrors `ArchivePaperOut` — Plan 4's public archive shape. `author_names` are resolved
+ * server-side (never a raw account id, on a route anyone on the internet can call).
+ * Deliberately absent: `published_at`, `doi`, `pdf_url`, `volume`, `number` — none of
+ * these exist anywhere in the domain built by Plans 1–4. See "Backend contract" above.
+ */
+export interface ArchivePaperOut {
   tracking_code: string;
   title: string;
-  author_names: string[];
-  published_at: string;
-}
-
-export interface ArchivePaperDetail extends ArchivePaperSummary {
   abstract: string;
   keywords: string[];
-  volume: number;
-  number: number;
-  pdf_url: string;
-  doi: string;
+  author_names: string[];
+  status: ManuscriptStatus;
+  version: number;
 }
 ```
 
@@ -675,59 +667,54 @@ git commit -m "feat: scaffold Next.js frontend with env validation and UI atoms"
 
 ### Task 2: Public archive (SSG/ISR, no credentials)
 
-**Files:** `frontend/src/lib/format.ts`, `frontend/src/components/manuscript-card.tsx`, `frontend/src/components/ui/pagination.tsx`, `frontend/src/components/layout/site-header.tsx`, everything under `app/(public)/`, `app/sitemap.ts`.
+**Files:** `frontend/src/lib/format.ts`, `frontend/src/components/manuscript-card.tsx`, `frontend/src/components/layout/site-header.tsx`, everything under `app/(public)/`, `app/sitemap.ts`.
 
 **Interfaces:**
 - Consumes: `backendFetch` (Task 1).
-- Produces: `getIssues()`, `getIssue()`, `getPaper()`, `searchArchive()`.
+- Produces: `getPublishedPapers()`, `getPaper()`, `searchArchive()`.
+
+**Reconciled against `docs/05-api-contract.md`:** Plan 4 exposes a flat archive (`GET /archive`, `GET /archive/{trackingCode}`, `GET /archive/search?q=`) with no issue/volume grouping, no pagination, and no `published_at` on any paper — so the issue-browsing pages, `Pagination`, and every `formatDate(paper.published_at)` call this task originally wrote have been removed. `frontend/src/components/ui/pagination.tsx` is consequently dropped from this task's file list; nothing in this plan wires it up, and it should not be created speculatively for an endpoint that does not paginate.
 
 - [ ] **Step 1: Archive data access**
 
 Create `frontend/src/lib/format.ts`:
 
 ```ts
-export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" });
-}
-
 export function formatAuthors(names: string[]): string {
+  if (names.length === 0) return "Unattributed";
   if (names.length <= 2) return names.join(" & ");
   return `${names[0]} et al.`;
 }
 ```
 
+`formatDate` has been removed: no response in Plan 4's contract carries a timestamp (no `submitted_at`/`updated_at` on `ManuscriptOut`, no `published_at` on `ArchivePaperOut`), so there is nothing for it to format. Re-add it in the task that adds a date field to the wire contract, not before.
+
 Create `frontend/src/lib/archive.ts`:
 
 ```ts
 import { backendFetch } from "@/lib/backend";
-import type { ArchivePaperDetail, ArchivePaperSummary, IssueSummary } from "@/types/api";
+import type { ArchivePaperOut } from "@/types/api";
 
 const REVALIDATE_SECONDS = 300;
 
-export function getIssues() {
-  return backendFetch<IssueSummary[]>("/archive/issues", { next: { revalidate: REVALIDATE_SECONDS } });
-}
-
-export function getIssue(volume: number, number: number) {
-  return backendFetch<IssueSummary & { papers: ArchivePaperSummary[] }>(
-    `/archive/issues/${volume}/${number}`,
-    { next: { revalidate: REVALIDATE_SECONDS } },
-  );
+export function getPublishedPapers() {
+  return backendFetch<ArchivePaperOut[]>("/archive", { next: { revalidate: REVALIDATE_SECONDS } });
 }
 
 export function getPaper(trackingCode: string) {
-  return backendFetch<ArchivePaperDetail>(`/archive/papers/${trackingCode}`, {
+  return backendFetch<ArchivePaperOut>(`/archive/${trackingCode}`, {
     next: { revalidate: REVALIDATE_SECONDS },
   });
 }
 
-export function searchArchive(query: string, page: number) {
-  return backendFetch<{ results: ArchivePaperSummary[]; total: number }>(
-    `/archive/search?q=${encodeURIComponent(query)}&page=${page}`,
-    { next: { revalidate: 60 } },
-  );
+export function searchArchive(query: string) {
+  return backendFetch<ArchivePaperOut[]>(`/archive/search?q=${encodeURIComponent(query)}`, {
+    next: { revalidate: 60 },
+  });
 }
 ```
+
+`searchArchive` takes no `page` argument and returns a flat array, not `{results, total}` — Plan 4's `/archive/search` is unpaginated (see "Backend contract" above).
 
 - [ ] **Step 2: `manuscript-card` and its test**
 
@@ -735,19 +722,17 @@ Create `frontend/src/components/manuscript-card.tsx`:
 
 ```tsx
 import Link from "next/link";
-import { formatAuthors, formatDate } from "@/lib/format";
-import type { ArchivePaperSummary } from "@/types/api";
+import { formatAuthors } from "@/lib/format";
+import type { ArchivePaperOut } from "@/types/api";
 
-export function PaperCard({ paper }: { paper: ArchivePaperSummary }) {
+export function PaperCard({ paper }: { paper: ArchivePaperOut }) {
   return (
     <Link
       href={`/papers/${paper.tracking_code}`}
       className="block rounded-lg border border-gray-200 bg-white p-4 hover:border-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
     >
       <h3 className="text-base font-semibold text-gray-900">{paper.title}</h3>
-      <p className="mt-1 text-sm text-gray-600">
-        {formatAuthors(paper.author_names)} · {formatDate(paper.published_at)}
-      </p>
+      <p className="mt-1 text-sm text-gray-600">{formatAuthors(paper.author_names)}</p>
     </Link>
   );
 }
@@ -763,8 +748,11 @@ import { PaperCard } from "./manuscript-card";
 const PAPER = {
   tracking_code: "UGJCS-2026-0012",
   title: "Sparse Retrieval for Low-Resource Languages",
+  abstract: "An abstract.",
+  keywords: ["ir"],
   author_names: ["A. Mensah", "B. Owusu", "C. Boateng"],
-  published_at: "2026-06-01T00:00:00Z",
+  status: "published" as const,
+  version: 1,
 };
 
 describe("PaperCard", () => {
@@ -780,20 +768,22 @@ describe("PaperCard", () => {
 });
 ```
 
-- [ ] **Step 3: Home, issues, issue detail**
+- [ ] **Step 3: Home page**
+
+There is no issue/volume grouping in Plan 4's contract (see "Backend contract" above), so the home page lists the most recently published papers directly rather than pointing at a "latest issue" — and there are no `/issues` or `/issues/[volume]/[number]` pages in this plan at all.
 
 Create `frontend/src/app/(public)/page.tsx`:
 
 ```tsx
 import Link from "next/link";
-import { getIssues } from "@/lib/archive";
+import { getPublishedPapers } from "@/lib/archive";
 import { PaperCard } from "@/components/manuscript-card";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const issues = await getIssues();
-  const latest = issues[0];
+  const papers = await getPublishedPapers();
+  const recent = papers.slice(0, 5);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -802,79 +792,16 @@ export default async function HomePage() {
       <Link href="/search" className="mt-6 inline-block text-blue-700 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
         Search the archive
       </Link>
-      {latest && (
+      {recent.length > 0 && (
         <section className="mt-10">
-          <h2 className="text-xl font-semibold">
-            Latest issue — Vol. {latest.volume}, No. {latest.number} ({latest.year})
-          </h2>
-          <Link href={`/issues/${latest.volume}/${latest.number}`} className="mt-2 inline-block text-blue-700 underline">
-            View issue
-          </Link>
+          <h2 className="text-xl font-semibold">Recently published</h2>
+          <div className="mt-4 grid gap-4">
+            {recent.map((paper) => (
+              <PaperCard key={paper.tracking_code} paper={paper} />
+            ))}
+          </div>
         </section>
       )}
-    </main>
-  );
-}
-```
-
-Create `frontend/src/app/(public)/issues/page.tsx`:
-
-```tsx
-import Link from "next/link";
-import { getIssues } from "@/lib/archive";
-
-export const revalidate = 300;
-export const metadata = { title: "Browse issues" };
-
-export default async function IssuesPage() {
-  const issues = await getIssues();
-  return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-2xl font-bold">Issues</h1>
-      <ul className="mt-6 space-y-3">
-        {issues.map((issue) => (
-          <li key={`${issue.volume}-${issue.number}`}>
-            <Link href={`/issues/${issue.volume}/${issue.number}`} className="text-blue-700 underline">
-              Vol. {issue.volume}, No. {issue.number} ({issue.year}) — {issue.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
-  );
-}
-```
-
-Create `frontend/src/app/(public)/issues/[volume]/[number]/page.tsx`:
-
-```tsx
-import type { Metadata } from "next";
-import { getIssue } from "@/lib/archive";
-import { PaperCard } from "@/components/manuscript-card";
-
-interface Params { volume: string; number: string }
-
-export const revalidate = 300;
-
-export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const { volume, number } = await params;
-  const issue = await getIssue(Number(volume), Number(number));
-  return { title: `Vol. ${issue.volume}, No. ${issue.number}` };
-}
-
-export default async function IssuePage({ params }: { params: Promise<Params> }) {
-  const { volume, number } = await params;
-  const issue = await getIssue(Number(volume), Number(number));
-  return (
-    <main className="mx-auto max-w-4xl px-4 py-10">
-      <h1 className="text-2xl font-bold">
-        Vol. {issue.volume}, No. {issue.number} — {issue.title}
-      </h1>
-      <div className="mt-6 grid gap-4">
-        {issue.papers.map((paper) => (
-          <PaperCard key={paper.tracking_code} paper={paper} />
-        ))}
-      </div>
     </main>
   );
 }
@@ -887,7 +814,7 @@ Create `frontend/src/app/(public)/papers/[trackingCode]/page.tsx`:
 ```tsx
 import type { Metadata } from "next";
 import { getPaper } from "@/lib/archive";
-import { formatAuthors, formatDate } from "@/lib/format";
+import { formatAuthors } from "@/lib/format";
 
 interface Params { trackingCode: string }
 
@@ -907,13 +834,14 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
   const { trackingCode } = await params;
   const paper = await getPaper(trackingCode);
 
+  // No `datePublished`/`identifier` (DOI): Plan 4 mints no DOI and exposes no publication
+  // timestamp anywhere on the wire. Both are entered in the technical debt register rather
+  // than filled with a placeholder value a search engine would index as real.
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ScholarlyArticle",
     headline: paper.title,
     author: paper.author_names.map((name) => ({ "@type": "Person", name })),
-    datePublished: paper.published_at,
-    identifier: paper.doi,
   };
 
   return (
@@ -923,22 +851,17 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
       {paper.author_names.map((name) => (
         <meta key={name} name="citation_author" content={name} />
       ))}
-      <meta name="citation_publication_date" content={paper.published_at} />
-      <meta name="citation_doi" content={paper.doi} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <p className="text-sm text-gray-500">{paper.tracking_code}</p>
       <h1 className="mt-1 text-2xl font-bold">{paper.title}</h1>
-      <p className="mt-2 text-gray-600">
-        {formatAuthors(paper.author_names)} · {formatDate(paper.published_at)}
-      </p>
+      <p className="mt-2 text-gray-600">{formatAuthors(paper.author_names)}</p>
       <p className="mt-6 leading-relaxed text-gray-800">{paper.abstract}</p>
-      <a
-        href={paper.pdf_url}
-        className="mt-6 inline-block rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-      >
-        Download PDF
-      </a>
+      {/*
+        No "Download PDF" link: Plan 4 stores no document of any kind (no `pdf_url` field,
+        no file storage anywhere in the domain built by Plans 1–4 — see "File upload" in
+        docs/05-api-contract.md). Re-add this once a document-storage capability exists.
+      */}
     </main>
   );
 }
@@ -946,38 +869,19 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
 
 - [ ] **Step 5: Search page and sitemap**
 
-Create `frontend/src/components/ui/pagination.tsx`:
-
-```tsx
-import Link from "next/link";
-
-export function Pagination({ page, hasNext, hrefFor }: { page: number; hasNext: boolean; hrefFor: (p: number) => string }) {
-  return (
-    <nav aria-label="Search results pages" className="mt-6 flex justify-between">
-      {page > 1 ? (
-        <Link href={hrefFor(page - 1)} className="text-blue-700 underline">Previous</Link>
-      ) : <span />}
-      {hasNext && <Link href={hrefFor(page + 1)} className="text-blue-700 underline">Next</Link>}
-    </nav>
-  );
-}
-```
-
 Create `frontend/src/app/(public)/search/page.tsx`:
 
 ```tsx
 import { searchArchive } from "@/lib/archive";
 import { PaperCard } from "@/components/manuscript-card";
-import { Pagination } from "@/components/ui/pagination";
 
 export const metadata = { title: "Search" };
 
-interface SearchParams { q?: string; page?: string }
+interface SearchParams { q?: string }
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const { q = "", page: pageParam = "1" } = await searchParams;
-  const page = Number(pageParam) || 1;
-  const results = q ? await searchArchive(q, page) : { results: [], total: 0 };
+  const { q = "" } = await searchParams;
+  const results = q ? await searchArchive(q) : [];
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
@@ -993,17 +897,16 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         />
       </form>
       <div className="mt-6 grid gap-4">
-        {results.results.map((paper) => (
+        {results.map((paper) => (
           <PaperCard key={paper.tracking_code} paper={paper} />
         ))}
       </div>
-      {q && (
-        <Pagination
-          page={page}
-          hasNext={page * 20 < results.total}
-          hrefFor={(p) => `/search?q=${encodeURIComponent(q)}&page=${p}`}
-        />
-      )}
+      {/*
+        No pagination control: `/archive/search` returns a flat, unbounded array (Plan 4's
+        "Deliberately not in this plan" section). A `limit`/`offset` UI can be added the day
+        the backend adds the query parameters — not before, since there is nothing to page
+        through today beyond client-side slicing that would misrepresent the result count.
+      */}
     </main>
   );
 }
@@ -1013,14 +916,14 @@ Create `frontend/src/app/sitemap.ts`:
 
 ```ts
 import type { MetadataRoute } from "next";
-import { getIssues } from "@/lib/archive";
+import { getPublishedPapers } from "@/lib/archive";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const issues = await getIssues();
+  const papers = await getPublishedPapers();
   return [
     { url: "https://ugjcs.example/" },
-    { url: "https://ugjcs.example/issues" },
-    ...issues.map((issue) => ({ url: `https://ugjcs.example/issues/${issue.volume}/${issue.number}` })),
+    { url: "https://ugjcs.example/search" },
+    ...papers.map((paper) => ({ url: `https://ugjcs.example/papers/${paper.tracking_code}` })),
   ];
 }
 ```
@@ -1036,7 +939,7 @@ Expected: 6 unit tests pass (the 4 from Task 1 plus the 2 `PaperCard` tests); ty
 
 ```bash
 git add frontend/src/lib/format.ts frontend/src/lib/archive.ts frontend/src/components/manuscript-card.tsx \
-  frontend/src/components/manuscript-card.test.tsx frontend/src/components/ui/pagination.tsx \
+  frontend/src/components/manuscript-card.test.tsx \
   "frontend/src/app/(public)" frontend/src/app/sitemap.ts
 git commit -m "feat: add statically rendered public archive with scholarly metadata"
 ```
@@ -1499,13 +1402,15 @@ git commit -m "feat: add sealed-cookie session, BFF auth routes and role-gated m
 
 ---
 
-### Task 4: Author — dashboard, submission, status timeline
+### Task 4: Author — dashboard, submission, detail
 
-**Files:** `frontend/src/lib/use-api.ts`, `frontend/src/components/status-timeline.tsx`, `frontend/src/components/file-upload.tsx`, `frontend/src/app/api/manuscripts/**`, `frontend/src/app/author/{page,submit/page,[id]/page}.tsx`.
+**Files:** `frontend/src/lib/use-api.ts`, `frontend/src/app/api/manuscripts/**`, `frontend/src/app/author/{page,submit/page,[trackingCode]/page}.tsx`.
 
 **Interfaces:**
 - Consumes: `authedFetch` (Task 3).
-- Produces: `GET/POST /api/manuscripts`, `GET /api/manuscripts/[id]`, `POST /api/manuscripts/[id]/withdraw`, `useApi()`.
+- Produces: `GET/POST /api/manuscripts`, `GET /api/manuscripts/[trackingCode]`, `POST /api/manuscripts/[trackingCode]/withdraw`, `useApi()`.
+
+**Reconciled against `docs/05-api-contract.md`:** this task originally had a "status timeline" step and a `FileUpload` component; both are removed. Plan 4 has no file storage anywhere in the domain (`POST /manuscripts` takes a JSON body, not multipart — see "File upload" in the contract doc) and no endpoint exposes the editorial event log, so there is neither a file to upload nor a timeline to render. `Manuscript`'s only identifier is `tracking_code` (there is no `id` field), so the dynamic route segment is `[trackingCode]`, not `[id]`, and every link/key below uses `manuscript.tracking_code`.
 
 - [ ] **Step 1: `useApi` — the client-side counterpart to `authedFetch`**
 
@@ -1539,198 +1444,89 @@ Create `frontend/src/app/api/manuscripts/route.ts`:
 
 ```ts
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { authedFetch } from "@/lib/auth-fetch";
 import { ProblemDetailsError } from "@/lib/backend";
-import { env } from "@/lib/env";
-import { getSession } from "@/lib/session";
-import type { ManuscriptDetail, ManuscriptSummary } from "@/types/api";
+import type { Manuscript } from "@/types/api";
+
+const SubmitInput = z.object({
+  title: z.string().min(5),
+  abstract: z.string().min(100),
+  keywords: z.array(z.string()),
+  co_author_ids: z.array(z.string().uuid()).default([]),
+});
 
 export async function GET() {
   try {
-    const manuscripts = await authedFetch<ManuscriptSummary[]>("/manuscripts/mine");
-    return NextResponse.json(manuscripts);
+    return NextResponse.json(await authedFetch<Manuscript[]>("/manuscripts/mine"));
   } catch (error) {
     if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });
     throw error;
   }
 }
 
-/** Forwards the browser's multipart form (including the uploaded file) upstream unchanged. */
+/** JSON only — Plan 4 has no file storage anywhere, so there is no attachment to forward. */
 export async function POST(request: Request) {
-  const session = await getSession();
-  if (!session.accessToken) {
-    return NextResponse.json({ type: "about:blank", title: "Not signed in", status: 401 }, { status: 401 });
-  }
-
-  const incoming = await request.formData();
-  const upstream = await fetch(`${env.API_BASE_URL}/manuscripts`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${session.accessToken}` },
-    body: incoming, // fetch sets the multipart boundary itself from the FormData instance
-  });
-
-  const body = (await upstream.json()) as ManuscriptDetail;
-  return NextResponse.json(body, { status: upstream.status });
-}
-```
-
-Create `frontend/src/app/api/manuscripts/[id]/route.ts`:
-
-```ts
-import { NextResponse } from "next/server";
-import { authedFetch } from "@/lib/auth-fetch";
-import { ProblemDetailsError } from "@/lib/backend";
-import type { ManuscriptDetail } from "@/types/api";
-
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  try {
-    return NextResponse.json(await authedFetch<ManuscriptDetail>(`/manuscripts/${id}`));
-  } catch (error) {
-    if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });
-    throw error;
-  }
-}
-```
-
-Create `frontend/src/app/api/manuscripts/[id]/withdraw/route.ts`:
-
-```ts
-import { NextResponse } from "next/server";
-import { authedFetch } from "@/lib/auth-fetch";
-import { ProblemDetailsError } from "@/lib/backend";
-import type { ManuscriptDetail } from "@/types/api";
-
-export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  try {
-    return NextResponse.json(await authedFetch<ManuscriptDetail>(`/manuscripts/${id}/withdraw`, { method: "POST" }));
-  } catch (error) {
-    if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });
-    throw error;
-  }
-}
-```
-
-- [ ] **Step 3: Status timeline, with a test asserting event order**
-
-Create `frontend/src/components/status-timeline.tsx`:
-
-```tsx
-import { formatDate } from "@/lib/format";
-import type { EditorialEventDTO } from "@/types/api";
-
-const LABELS: Record<string, string> = {
-  manuscript_submitted: "Submitted",
-  screening_started: "Screening started",
-  reviewer_assigned: "Reviewer assigned",
-  invitation_answered: "Reviewer responded",
-  review_submitted: "A review was submitted",
-  review_round_closed: "Review round closed",
-  decision_recorded: "Decision recorded",
-  revision_submitted: "Revision submitted",
-  manuscript_withdrawn: "Withdrawn",
-  scheduled_for_issue: "Scheduled for an issue",
-  manuscript_published: "Published",
-};
-
-export function StatusTimeline({ events }: { events: EditorialEventDTO[] }) {
-  const ordered = [...events].sort((a, b) => a.sequence - b.sequence);
-  return (
-    <ol className="border-l-2 border-gray-200 pl-4">
-      {ordered.map((event) => (
-        <li key={event.sequence} className="mb-4">
-          <p className="text-sm font-medium text-gray-900">{LABELS[event.event_type] ?? event.event_type}</p>
-          <time dateTime={event.occurred_at} className="text-xs text-gray-500">{formatDate(event.occurred_at)}</time>
-        </li>
-      ))}
-    </ol>
-  );
-}
-```
-
-Create `frontend/src/components/status-timeline.test.tsx`:
-
-```tsx
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
-import { StatusTimeline } from "./status-timeline";
-
-describe("StatusTimeline", () => {
-  it("orders entries by sequence even when the API returns them out of order", () => {
-    render(
-      <StatusTimeline
-        events={[
-          { sequence: 2, event_type: "screening_started", occurred_at: "2026-08-02T00:00:00Z", payload: {} },
-          { sequence: 1, event_type: "manuscript_submitted", occurred_at: "2026-08-01T00:00:00Z", payload: {} },
-        ]}
-      />,
+  const parsed = SubmitInput.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { type: "https://ugjcs.example/problems/invalid-input", title: "Invalid input", status: 422, detail: parsed.error.issues[0]?.message },
+      { status: 422 },
     );
-    const items = screen.getAllByRole("listitem");
-    expect(items[0]).toHaveTextContent("Submitted");
-    expect(items[1]).toHaveTextContent("Screening started");
-  });
-
-  it("falls back to the raw event type for one this component does not yet label", () => {
-    render(<StatusTimeline events={[{ sequence: 1, event_type: "some_future_event", occurred_at: "2026-08-01T00:00:00Z", payload: {} }]} />);
-    expect(screen.getByText("some_future_event")).toBeInTheDocument();
-  });
-});
-```
-
-- [ ] **Step 4: File upload control**
-
-Create `frontend/src/components/file-upload.tsx`:
-
-```tsx
-"use client";
-import { useState, type ChangeEvent } from "react";
-
-const MAX_BYTES = 25 * 1024 * 1024; // UX guardrail only; the backend's magic-byte check is authoritative
-
-export function FileUpload({ name, label }: { name: string; label: string }) {
-  const [error, setError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
-
-  function onChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (file.type !== "application/pdf") {
-      setError("Only PDF files are accepted");
-      event.target.value = "";
-      return;
-    }
-    if (file.size > MAX_BYTES) {
-      setError("File must be under 25MB");
-      event.target.value = "";
-      return;
-    }
-    setError(null);
-    setFileName(file.name);
   }
-
-  const inputId = `${name}-file`;
-  return (
-    <div>
-      <label htmlFor={inputId} className="mb-1 block text-sm font-medium text-gray-900">{label}</label>
-      <input
-        id={inputId}
-        name={name}
-        type="file"
-        accept="application/pdf"
-        required
-        onChange={onChange}
-        aria-describedby={error ? `${inputId}-error` : undefined}
-        className="block w-full text-sm text-gray-700 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-blue-700 hover:file:bg-blue-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-      />
-      {fileName && !error && <p className="mt-1 text-sm text-gray-600">Selected: {fileName}</p>}
-      {error && <p id={`${inputId}-error`} className="mt-1 text-sm text-red-700">{error}</p>}
-    </div>
-  );
+  try {
+    const manuscript = await authedFetch<Manuscript>("/manuscripts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
+    });
+    return NextResponse.json(manuscript, { status: 201 });
+  } catch (error) {
+    if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });
+    throw error;
+  }
 }
 ```
 
-- [ ] **Step 5: Dashboard, submission form, detail page**
+Create `frontend/src/app/api/manuscripts/[trackingCode]/route.ts`:
+
+```ts
+import { NextResponse } from "next/server";
+import { authedFetch } from "@/lib/auth-fetch";
+import { ProblemDetailsError } from "@/lib/backend";
+import type { Manuscript } from "@/types/api";
+
+export async function GET(_request: Request, { params }: { params: Promise<{ trackingCode: string }> }) {
+  const { trackingCode } = await params;
+  try {
+    return NextResponse.json(await authedFetch<Manuscript>(`/manuscripts/${trackingCode}`));
+  } catch (error) {
+    if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });
+    throw error;
+  }
+}
+```
+
+Create `frontend/src/app/api/manuscripts/[trackingCode]/withdraw/route.ts`:
+
+```ts
+import { NextResponse } from "next/server";
+import { authedFetch } from "@/lib/auth-fetch";
+import { ProblemDetailsError } from "@/lib/backend";
+import type { Manuscript } from "@/types/api";
+
+export async function POST(_request: Request, { params }: { params: Promise<{ trackingCode: string }> }) {
+  const { trackingCode } = await params;
+  try {
+    return NextResponse.json(await authedFetch<Manuscript>(`/manuscripts/${trackingCode}/withdraw`, { method: "POST" }));
+  } catch (error) {
+    if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });
+    throw error;
+  }
+}
+```
+
+- [ ] **Step 3: Dashboard, submission form, detail page**
 
 Create `frontend/src/app/author/page.tsx`:
 
@@ -1740,12 +1536,11 @@ import Link from "next/link";
 import { useApi } from "@/lib/use-api";
 import { StatusBadge } from "@/components/ui/badge";
 import { ProblemAlert } from "@/components/ui/alert";
-import { formatDate } from "@/lib/format";
-import type { ManuscriptSummary } from "@/types/api";
+import type { Manuscript } from "@/types/api";
 import { ClientApiError } from "@/lib/use-api";
 
 export default function AuthorDashboard() {
-  const { data, error, isLoading } = useApi<ManuscriptSummary[]>("/api/manuscripts");
+  const { data, error, isLoading } = useApi<Manuscript[]>("/api/manuscripts");
 
   if (isLoading) return <p>Loading your submissions…</p>;
   if (error) return <ProblemAlert problem={error instanceof ClientApiError ? error.problem : { type: "about:blank", title: "Something went wrong", status: 500 }} />;
@@ -1756,11 +1551,11 @@ export default function AuthorDashboard() {
       {data && data.length === 0 && <p className="mt-4 text-gray-600">You have not submitted a manuscript yet.</p>}
       <ul className="mt-4 space-y-3">
         {data?.map((manuscript) => (
-          <li key={manuscript.id}>
-            <Link href={`/author/${manuscript.id}`} className="flex items-center justify-between rounded-md border border-gray-200 bg-white p-4 hover:border-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+          <li key={manuscript.tracking_code}>
+            <Link href={`/author/${manuscript.tracking_code}`} className="flex items-center justify-between rounded-md border border-gray-200 bg-white p-4 hover:border-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
               <div>
                 <p className="font-medium">{manuscript.title}</p>
-                <p className="text-sm text-gray-500">{manuscript.tracking_code} · updated {formatDate(manuscript.updated_at)}</p>
+                <p className="text-sm text-gray-500">{manuscript.tracking_code}</p>
               </div>
               <StatusBadge status={manuscript.status} />
             </Link>
@@ -1781,8 +1576,7 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProblemAlert } from "@/components/ui/alert";
-import { FileUpload } from "@/components/file-upload";
-import type { ManuscriptDetail, ProblemDetails } from "@/types/api";
+import type { Manuscript, ProblemDetails } from "@/types/api";
 
 export default function SubmitPage() {
   const router = useRouter();
@@ -1791,26 +1585,40 @@ export default function SubmitPage() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    if (!(form.elements.namedItem("confirmed_anonymised") as HTMLInputElement).checked) {
-      setProblem({ type: "about:blank", title: "Confirmation required", status: 422, detail: "Confirm the manuscript file has been anonymised before submitting." });
-      return;
-    }
+    const form = new FormData(event.currentTarget);
+    const keywords = String(form.get("keywords") ?? "").split(",").map((k) => k.trim()).filter(Boolean);
+    const coAuthorIds = String(form.get("co_author_ids") ?? "").split(",").map((id) => id.trim()).filter(Boolean);
     setSubmitting(true);
     setProblem(null);
-    const response = await fetch("/api/manuscripts", { method: "POST", body: new FormData(form) });
+    const response = await fetch("/api/manuscripts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: form.get("title"),
+        abstract: form.get("abstract"),
+        keywords,
+        co_author_ids: coAuthorIds,
+      }),
+    });
     setSubmitting(false);
     if (!response.ok) {
       setProblem((await response.json()) as ProblemDetails);
       return;
     }
-    const manuscript = (await response.json()) as ManuscriptDetail;
-    router.push(`/author/${manuscript.id}`);
+    const manuscript = (await response.json()) as Manuscript;
+    router.push(`/author/${manuscript.tracking_code}`);
   }
 
   return (
     <>
       <h1 className="text-2xl font-bold">Submit a manuscript</h1>
+      {/*
+        No file field: Plan 4's `POST /manuscripts` takes a JSON body — `title`, `abstract`,
+        `keywords`, `co_author_ids` — and nothing else. There is no manuscript file storage
+        anywhere in the domain built by Plans 1–4; see "File upload" in docs/05-api-contract.md.
+        The original anonymisation-confirmation checkbox is removed for the same reason: it
+        confirmed a file upload that no longer exists in this form.
+      */}
       {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
         <Input label="Title" name="title" required minLength={5} />
@@ -1819,13 +1627,7 @@ export default function SubmitPage() {
           <textarea id="abstract" name="abstract" required minLength={100} rows={6} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600" />
         </div>
         <Input label="Keywords (comma-separated)" name="keywords" required />
-        <FileUpload name="file" label="Manuscript PDF (anonymised)" />
-        <div className="flex items-start gap-2">
-          <input id="confirmed_anonymised" name="confirmed_anonymised" type="checkbox" className="mt-1" />
-          <label htmlFor="confirmed_anonymised" className="text-sm text-gray-700">
-            I confirm this file has had author-identifying information removed, in line with the journal&apos;s double-blind policy.
-          </label>
-        </div>
+        <Input label="Co-author account ids (comma-separated, optional)" name="co_author_ids" />
         <Button type="submit" disabled={submitting}>{submitting ? "Submitting…" : "Submit manuscript"}</Button>
       </form>
     </>
@@ -1833,30 +1635,29 @@ export default function SubmitPage() {
 }
 ```
 
-Create `frontend/src/app/author/[id]/page.tsx`:
+Create `frontend/src/app/author/[trackingCode]/page.tsx`:
 
 ```tsx
 "use client";
 import { use } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { StatusBadge } from "@/components/ui/badge";
-import { StatusTimeline } from "@/components/status-timeline";
 import { ProblemAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import type { ManuscriptDetail } from "@/types/api";
+import type { Manuscript } from "@/types/api";
 
 const WITHDRAWABLE = new Set(["submitted", "under_screening", "under_review", "reviews_complete", "revision_requested"]);
 
-export default function ManuscriptDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
-  const { data, error, isLoading, mutate } = useApi<ManuscriptDetail>(`/api/manuscripts/${id}`);
+export default function ManuscriptDetailPage({ params }: { params: Promise<{ trackingCode: string }> }) {
+  const { trackingCode } = use(params);
+  const { data, error, isLoading, mutate } = useApi<Manuscript>(`/api/manuscripts/${trackingCode}`);
 
   if (isLoading) return <p>Loading…</p>;
   if (error) return <ProblemAlert problem={error instanceof ClientApiError ? error.problem : { type: "about:blank", title: "Something went wrong", status: 500 }} />;
   if (!data) return null;
 
   async function withdraw() {
-    await fetch(`/api/manuscripts/${id}/withdraw`, { method: "POST" });
+    await fetch(`/api/manuscripts/${trackingCode}/withdraw`, { method: "POST" });
     mutate();
   }
 
@@ -1868,17 +1669,21 @@ export default function ManuscriptDetailPage({ params }: { params: Promise<{ id:
       </div>
       <p className="mt-1 text-sm text-gray-500">{data.tracking_code}</p>
       <p className="mt-4 text-gray-800">{data.abstract}</p>
+      <p className="mt-4 text-sm text-gray-600">{data.submitted_reviews} of {data.minimum_reviews} reviews submitted</p>
       {WITHDRAWABLE.has(data.status) && (
         <Button variant="danger" className="mt-4" onClick={withdraw}>Withdraw submission</Button>
       )}
-      <h2 className="mt-8 text-lg font-semibold">Status history</h2>
-      <div className="mt-2"><StatusTimeline events={data.events} /></div>
+      {/*
+        No status history: Plan 4 exposes no event/audit log endpoint (see "No response
+        anywhere in Plan 4 carries a timestamp" in the "Backend contract" section above).
+        Re-add a timeline the day a `GET .../events` route exists to back it.
+      */}
     </>
   );
 }
 ```
 
-- [ ] **Step 6: A route-handler-level test proving multipart forwarding**
+- [ ] **Step 4: A route-handler-level test proving the JSON body reaches upstream**
 
 Create `frontend/src/app/api/manuscripts/route.test.ts`:
 
@@ -1886,47 +1691,65 @@ Create `frontend/src/app/api/manuscripts/route.test.ts`:
 import { describe, expect, it, vi, afterEach } from "vitest";
 
 vi.mock("@/lib/session", () => ({
-  getSession: vi.fn().mockResolvedValue({ accessToken: "token-123", user: { id: "u1", roles: ["author"] } }),
+  getSession: vi.fn().mockResolvedValue({ accessToken: "token-123", user: { id: "u1", email: "a@ug.edu.gh", roles: ["author"] } }),
 }));
 
 afterEach(() => vi.restoreAllMocks());
 
 describe("POST /api/manuscripts", () => {
-  it("forwards the multipart body upstream with a bearer header, unmodified", async () => {
+  it("forwards a validated JSON body upstream with a bearer header", async () => {
     const fetchSpy = vi.fn().mockResolvedValue({
       status: 201,
-      json: async () => ({ id: "m1", tracking_code: "UGJCS-2026-0099", status: "submitted" }),
+      ok: true,
+      json: async () => ({ tracking_code: "UGJCS-2026-0099", status: "submitted" }),
     });
     vi.stubGlobal("fetch", fetchSpy);
 
     const { POST } = await import("./route");
-    const form = new FormData();
-    form.set("title", "A Paper");
-    const request = new Request("http://localhost/api/manuscripts", { method: "POST", body: form });
+    const request = new Request("http://localhost/api/manuscripts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "A Paper Title", abstract: "x".repeat(100), keywords: ["ir"] }),
+    });
 
     const response = await POST(request);
 
     expect(response.status).toBe(201);
     const [, init] = fetchSpy.mock.calls[0] as [string, RequestInit];
     expect((init.headers as Record<string, string>).Authorization).toBe("Bearer token-123");
-    expect(init.body).toBeInstanceOf(FormData);
+    expect(JSON.parse(init.body as string)).toMatchObject({ title: "A Paper Title", co_author_ids: [] });
+  });
+
+  it("rejects a body that fails validation before ever calling upstream", async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+
+    const { POST } = await import("./route");
+    const request = new Request("http://localhost/api/manuscripts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "short", abstract: "too short", keywords: [] }),
+    });
+
+    const response = await POST(request);
+
+    expect(response.status).toBe(422);
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
 ```
 
-Run: `cd frontend && npx vitest run src/app/api/manuscripts src/components/status-timeline.test.tsx`
-Expected: 3 tests pass.
+Run: `cd frontend && npx vitest run src/app/api/manuscripts`
+Expected: 2 tests pass.
 
-- [ ] **Step 7: Run and commit**
+- [ ] **Step 5: Run and commit**
 
 Run: `cd frontend && make check`
-Expected: all gates pass; 13 unit tests total.
+Expected: all gates pass; 10 unit tests total.
 
 ```bash
-git add frontend/src/lib/use-api.ts frontend/src/components/status-timeline.tsx \
-  frontend/src/components/status-timeline.test.tsx frontend/src/components/file-upload.tsx \
-  frontend/src/app/api/manuscripts frontend/src/app/author
-git commit -m "feat: add author dashboard, submission form and status timeline"
+git add frontend/src/lib/use-api.ts frontend/src/app/api/manuscripts frontend/src/app/author
+git commit -m "feat: add author dashboard, submission form and manuscript detail page"
 ```
 
 ---
@@ -2999,7 +2822,7 @@ git commit -m "test: add end-to-end submit-screen-review-decide flow and fronten
 
 - `cd frontend && make check` passes: ESLint at zero warnings, `tsc --noEmit` clean, 20 Vitest unit/component tests green.
 - `cd frontend && make e2e` passes: the full submit → screen → review → decide flow across three roles, plus an Axe scan on the login page with zero violations.
-- The public archive (`/`, `/issues`, `/issues/[v]/[n]`, `/papers/[trackingCode]`, `/search`) renders via SSR/ISR with no session import anywhere in that route tree, correct `<title>`/OpenGraph/JSON-LD, and a generated `sitemap.xml`.
+- The public archive (`/`, `/papers/[trackingCode]`, `/search`) renders via SSR/ISR with no session import anywhere in that route tree, correct `<title>`/OpenGraph/JSON-LD, and a generated `sitemap.xml`.
 - No access token or refresh token is ever observable in a Client Component, `localStorage`, `sessionStorage`, or a URL. The only place a token exists is the sealed `ugjcs_session` cookie (httpOnly, Secure in production, SameSite=Lax).
 - `BlindedManuscriptView` renders `BlindedManuscript` and nothing wider; `blinded-manuscript-view.test.tsx` proves no author sentinel reaches the DOM even from a contaminated payload, and a `@ts-expect-error` line fails the typecheck gate the day the type itself grows an author field.
 - Every screen is reachable and completable by keyboard alone (proved for the login form; the same focus-visible/label pattern is used on every other form in the app).
