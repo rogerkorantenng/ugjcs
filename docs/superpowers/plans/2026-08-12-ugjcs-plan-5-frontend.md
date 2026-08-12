@@ -77,7 +77,7 @@ Implementers must not redefine these values; the TypeScript literal unions in `s
 - `BlindedManuscript` — the reviewer-facing projection has no author field in its type, not merely a filtered value (design spec §6.4), and now also has no `id` and no `document_url`: it mirrors `ugjcs.domain.blinding.BlindedManuscript` field-for-field (`tracking_code, title, abstract, keywords, version, status`), which is what Plan 4's `BlindedManuscriptOut` actually serialises. The frontend's `BlindedManuscript` TypeScript type mirrors that omission structurally; Task 5 proves the UI cannot render what the type cannot hold even if a malformed payload smuggles the field in.
 - The manuscript lifecycle in design spec §6.2, used to drive which actions each screen offers (e.g. desk rejection is offered only from `under_screening`; resubmission only from `revision_requested`). The frontend enforces none of these as security — the backend's guards are authoritative — but the UI hides actions the backend would reject, to avoid presenting a false affordance.
 
-**One assumption this plan cannot resolve on its own:** Plan 4 wires `SessionService(accounts, tokens, hasher, clock)` and says so explicitly, but flags that Plan 3's own write-up never specifies `SessionService`'s constructor — Plan 4 inferred the shape by mirroring `IdentityService`'s already-confirmed one. This plan's Route Handlers only ever call `SessionService` indirectly, through Plan 4's HTTP endpoints, so nothing here depends on the constructor directly — noted here only so whoever reconciles Plan 3 knows this plan is not a second source of assumptions about it.
+**`SessionService`'s constructor, now settled:** Plan 3 Task 8 specifies it as `SessionService(accounts, refresh_tokens, tokens, hasher, clock)`; Plan 4's wiring has been corrected to match. This plan's Route Handlers only ever call `SessionService` indirectly, through Plan 4's HTTP endpoints, so nothing here depended on the constructor directly — noted here only for completeness.
 
 ---
 
@@ -952,7 +952,7 @@ git commit -m "feat: add statically rendered public archive with scholarly metad
 
 **Interfaces:**
 - Produces: `getSession()`, `authedFetch()`, `middleware()`.
-- Consumes: `backendFetch` (Task 1), assumed `/auth/*` endpoints.
+- Consumes: `backendFetch` (Task 1), the reconciled `/auth/*` endpoints ("Backend contract" above).
 
 - [ ] **Step 1: Sealed session**
 
@@ -1010,6 +1010,25 @@ async function toProblem(response: Response): Promise<ProblemDetails> {
   }
 }
 
+interface TokenPairResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+}
+
+/**
+ * Reads the `exp` claim (seconds since epoch) out of the access token's JWT payload,
+ * without verifying the signature — this process never holds the signing secret, and the
+ * backend re-verifies every call anyway. Plan 4's `TokenPairOut` carries no `expires_in`,
+ * so the JWT's own `exp` claim (Plan 3, `JwtTokenService`) is the only source of truth for
+ * when to schedule a proactive refresh.
+ */
+export function decodeAccessTokenExpiry(token: string): number {
+  const payload = token.split(".")[1];
+  const claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as { exp: number };
+  return claims.exp * 1000;
+}
+
 async function refresh(session: IronSession<SessionData>): Promise<void> {
   const response = await fetch(`${env.API_BASE_URL}/auth/refresh`, {
     method: "POST",
@@ -1023,10 +1042,10 @@ async function refresh(session: IronSession<SessionData>): Promise<void> {
       401,
     );
   }
-  const data = (await response.json()) as { access_token: string; refresh_token: string; expires_in: number };
+  const data = (await response.json()) as TokenPairResponse;
   session.accessToken = data.access_token;
   session.refreshToken = data.refresh_token;
-  session.accessTokenExpiresAt = Date.now() + data.expires_in * 1000;
+  session.accessTokenExpiresAt = decodeAccessTokenExpiry(data.access_token);
   await session.save();
 }
 
@@ -1078,7 +1097,7 @@ const PASSWORD = "a".repeat(32);
 describe("session sealing", () => {
   it("round-trips user identity and tokens through the sealed cookie payload", async () => {
     const original: SessionData = {
-      user: { id: "u1", email: "a@ug.edu.gh", name: "A. Mensah", roles: ["author"] },
+      user: { id: "u1", email: "a@ug.edu.gh", roles: ["author"] },
       accessToken: "access-abc",
       refreshToken: "refresh-xyz",
       accessTokenExpiresAt: Date.now() + 900_000,
@@ -1089,7 +1108,7 @@ describe("session sealing", () => {
   });
 
   it("fails to unseal with the wrong password, rather than silently returning garbage", async () => {
-    const sealed = await sealData({ user: { id: "u1", email: "a@ug.edu.gh", name: "A", roles: ["author"] } }, { password: PASSWORD });
+    const sealed = await sealData({ user: { id: "u1", email: "a@ug.edu.gh", roles: ["author"] } }, { password: PASSWORD });
     await expect(unsealData(sealed, { password: "b".repeat(32) })).rejects.toThrow();
   });
 });
@@ -1107,15 +1126,20 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getSession } from "@/lib/session";
 import { backendFetch, ProblemDetailsError } from "@/lib/backend";
+import { decodeAccessTokenExpiry } from "@/lib/auth-fetch";
 import type { SessionUser } from "@/types/api";
 
 const LoginInput = z.object({ email: z.string().email(), password: z.string().min(1) });
 
-interface LoginResponse {
+interface TokenPairResponse {
   access_token: string;
   refresh_token: string;
-  expires_in: number;
-  user: SessionUser;
+  token_type: string;
+}
+
+interface MeResponse {
+  id: string;
+  roles: SessionUser["roles"];
 }
 
 export async function POST(request: Request) {
@@ -1128,14 +1152,25 @@ export async function POST(request: Request) {
   }
 
   try {
-    const data = await backendFetch<LoginResponse>("/auth/login", { method: "POST", body: JSON.stringify(parsed.data) });
+    // Plan 4's `TokenPairOut` carries no `user` object — the BFF derives the session's
+    // user itself: `email` from the request it already validated, `id`/`roles` from a
+    // follow-up call to `GET /auth/me` with the token just issued.
+    const pair = await backendFetch<TokenPairResponse>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(parsed.data),
+    });
+    const me = await backendFetch<MeResponse>("/auth/me", {
+      headers: { Authorization: `Bearer ${pair.access_token}` },
+    });
+    const user: SessionUser = { id: me.id, email: parsed.data.email, roles: me.roles };
+
     const session = await getSession();
-    session.user = data.user;
-    session.accessToken = data.access_token;
-    session.refreshToken = data.refresh_token;
-    session.accessTokenExpiresAt = Date.now() + data.expires_in * 1000;
+    session.user = user;
+    session.accessToken = pair.access_token;
+    session.refreshToken = pair.refresh_token;
+    session.accessTokenExpiresAt = decodeAccessTokenExpiry(pair.access_token);
     await session.save();
-    return NextResponse.json({ user: data.user });
+    return NextResponse.json({ user });
   } catch (error) {
     if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });
     throw error;
@@ -1319,7 +1354,9 @@ export function AppNav({ user }: { user: SessionUser }) {
         ))}
       </div>
       <div className="flex items-center gap-3 text-sm text-gray-600">
-        <span>{user.name}</span>
+        {/* `SessionUser` has no `name` — `GET /auth/me` (`ActorOut`) serialises only
+            `{id, roles}`; `email` is the one human-readable field the session carries. */}
+        <span>{user.email}</span>
         <button onClick={signOut} className="font-medium text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
           Sign out
         </button>
@@ -2509,6 +2546,15 @@ function bearerUser(req: import("node:http").IncomingMessage) {
   return email ? USERS[email] : null;
 }
 
+/** JWT-shaped (not signed) so `decodeAccessTokenExpiry` — real code, exercised as-is by
+ * this mock — can read an `exp` claim the same way it reads a genuine Plan 3 token. */
+function mockAccessToken(email: string): string {
+  const payload = Buffer.from(
+    JSON.stringify({ sub: email, exp: Math.floor(Date.now() / 1000) + 900, jti: randomUUID() }),
+  ).toString("base64url");
+  return `mock.${payload}.unsigned`;
+}
+
 export function startMockBackend(port: number) {
   const server = createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://localhost:${port}`);
@@ -2520,16 +2566,28 @@ export function startMockBackend(port: number) {
     if (url.pathname === "/api/v1/auth/login" && req.method === "POST") {
       const user = USERS[body.email];
       if (!user || body.password !== "password123") return json(res, 401, { type: "about:blank", title: "Invalid email or password", status: 401 });
-      const token = `access-${randomUUID()}`;
+      const token = mockAccessToken(user.email);
       tokensByUser.set(token, user.email);
-      return json(res, 200, { access_token: token, refresh_token: `refresh-${randomUUID()}`, expires_in: 900, user });
+      return json(res, 200, { access_token: token, refresh_token: `refresh-${randomUUID()}`, token_type: "bearer" });
     }
 
     if (url.pathname === "/api/v1/auth/refresh" && req.method === "POST") {
-      return json(res, 200, { access_token: `access-${randomUUID()}`, refresh_token: `refresh-${randomUUID()}`, expires_in: 900 });
+      return json(res, 200, {
+        access_token: mockAccessToken("author@ug.edu.gh"),
+        refresh_token: `refresh-${randomUUID()}`,
+        token_type: "bearer",
+      });
     }
 
     if (url.pathname === "/api/v1/auth/logout") return json(res, 204, {});
+
+    if (url.pathname === "/api/v1/auth/me" && req.method === "GET") {
+      // Task 3's login Route Handler now calls this immediately after `/auth/login` to
+      // derive `SessionUser`, mirroring `ActorOut`'s real shape — the mock must serve it.
+      const meUser = bearerUser(req);
+      if (!meUser) return json(res, 401, { type: "about:blank", title: "Not signed in", status: 401 });
+      return json(res, 200, { id: meUser.id, roles: meUser.roles });
+    }
 
     const user = bearerUser(req);
     if (!user) return json(res, 401, { type: "about:blank", title: "Not signed in", status: 401 });

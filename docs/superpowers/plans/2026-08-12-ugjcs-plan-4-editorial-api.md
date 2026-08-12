@@ -9,11 +9,11 @@
 - `ugjcs.application.identity.IdentityService.actor_for(access_token: str) -> Actor` (raises `AuthenticationError`)
 - `ugjcs.application.identity.SessionService.log_in(email, password) -> TokenPair`, `.refresh(token) -> TokenPair`, `.log_out(token) -> None`
 - `ugjcs.application.ports.AccountRepository`
-- `ugjcs.infrastructure.security.tokens.JwtTokenService`, `InvalidToken`
+- `ugjcs.infrastructure.security.tokens.JwtTokenService`, `InvalidTokenError`
 - `ugjcs.infrastructure.security.passwords.Argon2PasswordHasher`
 - `ugjcs.infrastructure.db.uow.SqlAlchemyUnitOfWork`
 
-**One assumption flagged rather than silently made:** Plan 3's Task 8 write-up specifies `SessionService`'s three methods but never writes out its constructor. This plan wires it as `SessionService(accounts, tokens, hasher, clock)`, mirroring `IdentityService(accounts, tokens)`'s already-confirmed shape. If Plan 3 lands with a different constructor, `backend/src/ugjcs/api/wiring.py`'s `_session_service` is the only place to fix — the three method names are the real contract.
+**`SessionService`'s constructor, confirmed by Plan 3 Task 8:** `SessionService(accounts: AccountRepository, refresh_tokens: RefreshTokenRepository, tokens: TokenService, hasher: PasswordHasher, clock: Clock)`. `refresh_tokens` is `UnitOfWork.refresh_tokens`, the `RefreshTokenRepository` Plan 3 adds alongside `accounts`; `backend/src/ugjcs/api/wiring.py`'s `get_session_service` wires it from there.
 
 **Architecture:** All HTTP concerns — FastAPI app, routers, request/response schemas, dependency wiring, error translation — live in a new top-level package `ugjcs.api`, a sibling of `domain`, `application` and `infrastructure`, never imported by any of them. `ugjcs.api` depends inward on all three; nothing depends on it. Route handlers do three things and nothing else: authenticate and authorise, call one method on a repository or aggregate obtained through `UnitOfWork`, and serialise the result — business logic stays in `ugjcs.domain`. Every non-public route carries an authorisation dependency built from `ugjcs.domain.policies`, enforced mechanically by a test that walks the route table.
 
@@ -463,7 +463,7 @@ def _status_for(error: DomainError) -> int:
     for error_type, code in _STATUS_BY_ERROR.items():
         if isinstance(error, error_type):
             return code
-    if type(error).__name__ in {"AuthenticationError", "InvalidToken"}:
+    if type(error).__name__ in {"AuthenticationError", "InvalidTokenError"}:
         return status.HTTP_401_UNAUTHORIZED
     if type(error).__name__ == "AccountError":
         return status.HTTP_400_BAD_REQUEST
@@ -511,7 +511,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 ```
 
-`AuthenticationError`, `InvalidToken` and `AccountError` are matched by class name rather than imported, deliberately: importing `ugjcs.application.identity` here would be fine under the layers contract (`api` may import `application`), but importing `ugjcs.infrastructure.security.tokens` for `InvalidToken` alongside it would mean this module reaches into two different layers for what is conceptually one job — mapping domain-shaped errors to status codes. Name matching keeps `errors.py` dependent on `ugjcs.domain` alone. If this feels too clever when you are implementing it, the alternative — importing both exception classes directly — is also acceptable; report which you chose.
+`AuthenticationError`, `InvalidTokenError` and `AccountError` are matched by class name rather than imported, deliberately: importing `ugjcs.application.identity` here would be fine under the layers contract (`api` may import `application`), but importing `ugjcs.infrastructure.security.tokens` for `InvalidTokenError` alongside it would mean this module reaches into two different layers for what is conceptually one job — mapping domain-shaped errors to status codes. Name matching keeps `errors.py` dependent on `ugjcs.domain` alone. If this feels too clever when you are implementing it, the alternative — importing both exception classes directly — is also acceptable; report which you chose.
 
 - [ ] **Step 7: Write the DI wiring and auth dependency**
 
@@ -583,7 +583,9 @@ async def get_identity_service(uow: UnitOfWork = Depends(get_uow)) -> IdentitySe
 
 
 async def get_session_service(uow: UnitOfWork = Depends(get_uow)) -> SessionService:
-    return SessionService(uow.accounts, _tokens(), Argon2PasswordHasher(), SystemClock())
+    return SessionService(
+        uow.accounts, uow.refresh_tokens, _tokens(), Argon2PasswordHasher(), SystemClock()
+    )
 ```
 
 and delete the two `NotImplementedError` placeholders and the `# placeholder` comments. (This two-step description exists only because the plan is read top-to-bottom before being typed; write the final file directly with `Depends` imported at the top and the placeholders never created.)
