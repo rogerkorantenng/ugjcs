@@ -96,6 +96,36 @@ class EditorialEventRow(Base):
     )
 
 
+class ReviewAssignmentRow(Base):
+    """A record that an editor asked a reviewer to review a manuscript, and what came back.
+
+    Deliberately not a domain aggregate: see Plan 4's scope decision. There is no
+    invitation/accept/decline lifecycle, no conflict-of-interest check, and no capacity
+    limit enforced anywhere in this table's existence — an editor's assignment is final
+    the moment it is recorded. `status` only ever takes the values `"assigned"` and
+    `"submitted"`, a deliberate subset of `ugjcs.domain.enums.AssignmentStatus` that
+    skips `INVITED`/`ACCEPTED`/`DECLINED`/`EXPIRED` because nothing here offers a
+    reviewer the choice those states represent.
+    """
+
+    __tablename__ = "review_assignments"
+
+    id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
+    manuscript_id: Mapped[UUID] = mapped_column(
+        postgresql.UUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="CASCADE"), index=True
+    )
+    reviewer_id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), index=True)
+    status: Mapped[str] = mapped_column(String(16), default="assigned")
+    recommendation: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    comments: Mapped[str | None] = mapped_column(Text, nullable=True)
+    assigned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (
+        UniqueConstraint("manuscript_id", "reviewer_id", name="uq_review_assignments_pair"),
+    )
+
+
 class UserRow(Base):
     __tablename__ = "users"
 

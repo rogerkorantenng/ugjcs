@@ -2,27 +2,23 @@
 
 Kept apart from `deps.py` so authorisation logic stays readable without scrolling past
 engine and session-factory construction.
-
-TODO(Plan 3): `get_identity_service` and `get_session_service` — wiring
-`ugjcs.application.identity.IdentityService`/`SessionService` from the unit of work and
-`JwtTokenService` — are deliberately not implemented here. Authentication (Plan 3) is
-being written concurrently in another worktree: `SessionService` and the
-`UnitOfWork.refresh_tokens` port it depends on do not exist in this one yet. Add them
-here, alongside a `_tokens()` helper building `JwtTokenService`, once Plan 3 lands and
-`deps.py`'s stubs are wired for real.
 """
 
 from collections.abc import AsyncIterator
+from datetime import timedelta
 from functools import lru_cache
 from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
+from ugjcs.application.identity import IdentityService, SessionService
 from ugjcs.application.ports import UnitOfWork
 from ugjcs.infrastructure.config import get_settings
 from ugjcs.infrastructure.db.engine import create_engine, session_factory
 from ugjcs.infrastructure.db.uow import SqlAlchemyUnitOfWork
+from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
+from ugjcs.infrastructure.security.tokens import JwtTokenService, SystemClock
 
 
 @lru_cache
@@ -58,3 +54,24 @@ async def get_uow() -> AsyncIterator[SqlAlchemyUnitOfWork]:
 # default to flag, since the call now lives in a module-level assignment instead of a
 # function signature.
 UowDep = Annotated[UnitOfWork, Depends(get_uow)]
+
+
+@lru_cache
+def _tokens() -> JwtTokenService:
+    settings = get_settings()
+    return JwtTokenService(
+        secret=settings.jwt_secret,
+        clock=SystemClock(),
+        access_ttl=timedelta(minutes=settings.access_token_minutes),
+        refresh_ttl=timedelta(days=settings.refresh_token_days),
+    )
+
+
+async def get_identity_service(uow: UowDep) -> IdentityService:
+    return IdentityService(uow.accounts, _tokens())
+
+
+async def get_session_service(uow: UowDep) -> SessionService:
+    return SessionService(
+        uow.accounts, uow.refresh_tokens, _tokens(), Argon2PasswordHasher(), SystemClock()
+    )

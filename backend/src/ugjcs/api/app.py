@@ -39,13 +39,11 @@ def create_app() -> FastAPI:
             await connection.execute(text("SELECT 1"))
         return {"status": "ready"}
 
-    # Auth, manuscripts, editorial and reviews routers (Plan 4 Tasks 2, 3, 5, 6) all
-    # require an authenticated `Actor`, which needs `ugjcs.application.identity` (Plan
-    # 3) — not available in this worktree. They are deliberately not wired here; see
-    # `ugjcs.api.deps` for the stubbed `get_current_actor`/`require()` this leaves
-    # behind for that work to finish against.
-    from ugjcs.api.routers import archive
+    # Editorial and reviews routers (Plan 4 Tasks 5, 6) are wired here as each lands.
+    from ugjcs.api.routers import archive, auth, manuscripts
 
+    app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+    app.include_router(manuscripts.router, prefix="/api/v1/manuscripts", tags=["manuscripts"])
     app.include_router(archive.router, prefix="/api/v1/archive", tags=["archive"])
 
     return app

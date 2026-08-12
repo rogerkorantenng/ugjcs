@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.hashchain import ChainedEvent, append
-from ugjcs.domain.ids import ManuscriptId, TrackingCode
+from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.infrastructure.db.mappers import (
     event_to_row,
@@ -13,7 +13,7 @@ from ugjcs.infrastructure.db.mappers import (
     to_domain,
     to_row,
 )
-from ugjcs.infrastructure.db.models import EditorialEventRow, ManuscriptRow
+from ugjcs.infrastructure.db.models import EditorialEventRow, ManuscriptAuthorRow, ManuscriptRow
 
 
 class SqlAlchemyManuscriptRepository:
@@ -75,6 +75,16 @@ class SqlAlchemyManuscriptRepository:
             )
         )
         rows = result.scalars().all()
+        return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
+
+    async def list_by_author(self, author_id: UserId) -> list[Manuscript]:
+        result = await self._session.execute(
+            select(ManuscriptRow)
+            .join(ManuscriptRow.authors)
+            .where(ManuscriptAuthorRow.author_id == author_id)
+            .order_by(ManuscriptRow.id)
+        )
+        rows = result.scalars().unique().all()
         return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
 
     async def _rehydrate(self, row: ManuscriptRow | None) -> Manuscript | None:

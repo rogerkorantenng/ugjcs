@@ -1,9 +1,52 @@
 """Wire shapes. The domain must never import pydantic — these live here, not there."""
 
+from uuid import UUID
+
 from pydantic import BaseModel
 
 from ugjcs.application.ports import AccountRepository
 from ugjcs.domain.manuscript import Manuscript
+
+
+class ManuscriptOut(BaseModel):
+    """The one shape every manuscript route returns; no separate summary/detail variant.
+
+    Deliberately absent, per `docs/05-api-contract.md` §7: `id` (`tracking_code` is the
+    only identifier on the wire), any timestamp, and any event/audit trail.
+    """
+
+    tracking_code: str
+    title: str
+    abstract: str
+    keywords: tuple[str, ...]
+    author_ids: tuple[UUID, ...]
+    corresponding_author_id: UUID
+    status: str
+    version: int
+    minimum_reviews: int
+    submitted_reviews: int
+
+    @classmethod
+    def from_domain(cls, manuscript: Manuscript) -> "ManuscriptOut":
+        return cls(
+            tracking_code=manuscript.tracking_code.value,
+            title=manuscript.title,
+            abstract=manuscript.abstract,
+            keywords=manuscript.keywords,
+            author_ids=tuple(UUID(str(a)) for a in manuscript.author_ids),
+            corresponding_author_id=UUID(str(manuscript.corresponding_author_id)),
+            status=manuscript.status.value,
+            version=manuscript.version,
+            minimum_reviews=manuscript.minimum_reviews,
+            submitted_reviews=manuscript.submitted_reviews,
+        )
+
+
+class SubmitManuscriptRequest(BaseModel):
+    title: str
+    abstract: str
+    keywords: tuple[str, ...]
+    co_author_ids: tuple[UUID, ...] = ()
 
 
 class ArchivePaperOut(BaseModel):
