@@ -43,6 +43,15 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
       <TrackingChip code={paper.tracking_code} />
       <h1 className="mt-3 font-serif text-2xl font-semibold leading-tight text-ink">{paper.title}</h1>
       <p className="mt-2 text-sm text-ink/60">{formatAuthors(paper.author_names)}</p>
+      {paper.keywords.length > 0 && (
+        <ul className="mt-4 flex flex-wrap gap-2">
+          {paper.keywords.map((keyword) => (
+            <li key={keyword} className="rounded-full border border-rule px-2.5 py-0.5 text-xs text-ink/70">
+              {keyword}
+            </li>
+          ))}
+        </ul>
+      )}
       <p className="mt-8 border-t border-rule pt-8 leading-relaxed text-ink/80">{paper.abstract}</p>
       {/*
         No "Download PDF" link: Plan 4 stores no document of any kind (no `pdf_url` field,
