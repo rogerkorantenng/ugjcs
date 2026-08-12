@@ -68,12 +68,36 @@ def test_editor_may_not_manage_users() -> None:
 
 def test_unknown_role_combination_is_denied_by_default() -> None:
     assert not can(actor(), Action.DECIDE, manuscript())
+    assert not can(actor(), Action.WITHDRAW, manuscript())
 
 
 def test_multiple_roles_grant_the_union_of_permissions() -> None:
     dual = actor(Role.AUTHOR, Role.EDITOR, user_id=AUTHOR_ID)
     assert can(dual, Action.SCREEN, manuscript())
     assert can(dual, Action.RESUBMIT, manuscript())
+
+
+def test_corresponding_author_may_withdraw_own_manuscript() -> None:
+    assert can(actor(Role.AUTHOR, user_id=AUTHOR_ID), Action.WITHDRAW, manuscript())
+
+
+def test_another_author_may_not_withdraw_someone_elses_manuscript() -> None:
+    assert not can(actor(Role.AUTHOR, user_id=OTHER_ID), Action.WITHDRAW, manuscript())
+
+
+def test_a_listed_co_author_who_is_not_corresponding_may_not_withdraw() -> None:
+    """`_OWNERSHIP_ACTIONS` checks `corresponding_author_id` specifically, not mere
+    membership in `author_ids` — a listed co-author is still denied."""
+    co_authored = Manuscript(
+        id=ManuscriptId(uuid4()),
+        tracking_code=TrackingCode.mint(2026, 4),
+        title="A Jointly Authored Paper",
+        abstract="An abstract with two authors.",
+        keywords=("networking",),
+        author_ids=(AUTHOR_ID, OTHER_ID),
+        corresponding_author_id=AUTHOR_ID,
+    )
+    assert not can(actor(Role.AUTHOR, user_id=OTHER_ID), Action.WITHDRAW, co_authored)
 
 
 def test_editor_may_view_any_manuscript() -> None:

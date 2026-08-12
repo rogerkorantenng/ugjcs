@@ -47,6 +47,10 @@ class ManuscriptRepository(Protocol):
         """Published manuscripts whose title or abstract contains `query`, case-insensitively."""
         ...
 
+    async def list_by_author(self, author_id: UserId) -> list[Manuscript]:
+        """Every manuscript on which this user appears as an author, newest first."""
+        ...
+
 
 class AccountRepository(Protocol):
     """Persistence for the account aggregate and its role grants."""

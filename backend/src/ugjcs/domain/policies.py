@@ -31,6 +31,7 @@ class Action(StrEnum):
     REVIEW = "review"
     DECIDE = "decide"
     RESUBMIT = "resubmit"
+    WITHDRAW = "withdraw"
     PUBLISH = "publish"
     MANAGE_USERS = "manage_users"
     VIEW_AUDIT = "view_audit"
@@ -53,7 +54,7 @@ _ROLE_GRANTS: Mapping[Action, frozenset[Role]] = {
     Action.VIEW_AUDIT: frozenset({Role.EDITOR, Role.EDITOR_IN_CHIEF}),
 }
 
-_OWNERSHIP_ACTIONS = frozenset({Action.RESUBMIT})
+_OWNERSHIP_ACTIONS = frozenset({Action.RESUBMIT, Action.WITHDRAW})
 
 
 def can(actor: Actor, action: Action, manuscript: Manuscript | None = None) -> bool:
