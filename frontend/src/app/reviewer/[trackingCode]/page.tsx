@@ -36,6 +36,18 @@ export default function ReviewAssignmentPage({ params }: { params: Promise<{ tra
   return (
     <>
       <BlindedManuscriptView manuscript={manuscript} />
+      {/*
+        The anonymised copy only, ever — `/api/reviews/{trackingCode}/document` is the one
+        document route a reviewer-facing page may link to. It has no `variant` parameter
+        on the backend at all, so there is no way to point this link at the author's
+        original even by mistake; see `frontend/src/app/api/reviews/[trackingCode]/document/route.ts`.
+      */}
+      <a
+        href={`/api/reviews/${trackingCode}/document`}
+        className="mt-4 inline-block text-sm font-medium text-teal-dark underline underline-offset-2"
+      >
+        Download anonymised manuscript
+      </a>
       <div className="mt-6 border-t border-rule pt-6">
         <h2 className="font-serif text-lg font-semibold text-ink">Submit your review</h2>
         <ReviewForm trackingCode={trackingCode} onSubmitted={() => router.push("/reviewer")} />
