@@ -329,7 +329,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import ARRAY, UUID as PgUUID
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ugjcs.infrastructure.db.base import Base
@@ -338,17 +338,17 @@ from ugjcs.infrastructure.db.base import Base
 class ManuscriptRow(Base):
     __tablename__ = "manuscripts"
 
-    id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True)
+    id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
     tracking_code: Mapped[str] = mapped_column(String(32), unique=True, index=True)
     title: Mapped[str] = mapped_column(Text)
     abstract: Mapped[str] = mapped_column(Text)
-    keywords: Mapped[list[str]] = mapped_column(ARRAY(Text), default=list)
-    corresponding_author_id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True))
+    keywords: Mapped[list[str]] = mapped_column(postgresql.ARRAY(Text), default=list)
+    corresponding_author_id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True))
     status: Mapped[str] = mapped_column(String(32), index=True)
     version: Mapped[int] = mapped_column(Integer, default=1)
     minimum_reviews: Mapped[int] = mapped_column(Integer, default=2)
     submitted_reviews: Mapped[int] = mapped_column(Integer, default=0)
-    issue_id: Mapped[UUID | None] = mapped_column(PgUUID(as_uuid=True), nullable=True)
+    issue_id: Mapped[UUID | None] = mapped_column(postgresql.UUID(as_uuid=True), nullable=True)
 
     authors: Mapped[list["ManuscriptAuthorRow"]] = relationship(
         back_populates="manuscript",
@@ -367,9 +367,9 @@ class ManuscriptAuthorRow(Base):
     __tablename__ = "manuscript_authors"
 
     manuscript_id: Mapped[UUID] = mapped_column(
-        PgUUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="CASCADE"), primary_key=True
+        postgresql.UUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="CASCADE"), primary_key=True
     )
-    author_id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True)
+    author_id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
     position: Mapped[int] = mapped_column(Integer)
 
     manuscript: Mapped[ManuscriptRow] = relationship(back_populates="authors")
@@ -381,12 +381,12 @@ class EditorialEventRow(Base):
     __tablename__ = "editorial_events"
 
     manuscript_id: Mapped[UUID] = mapped_column(
-        PgUUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="RESTRICT"), primary_key=True
+        postgresql.UUID(as_uuid=True), ForeignKey("manuscripts.id", ondelete="RESTRICT"), primary_key=True
     )
     sequence: Mapped[int] = mapped_column(Integer, primary_key=True)
     event_type: Mapped[str] = mapped_column(String(48))
     payload: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
-    actor_id: Mapped[UUID | None] = mapped_column(PgUUID(as_uuid=True), nullable=True)
+    actor_id: Mapped[UUID | None] = mapped_column(postgresql.UUID(as_uuid=True), nullable=True)
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     previous_hash: Mapped[str] = mapped_column(String(64))
     event_hash: Mapped[str] = mapped_column(String(64))
