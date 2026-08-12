@@ -35,11 +35,12 @@ function LoginForm() {
     <div className="w-full max-w-sm border border-amber/30 bg-paper p-8">
       <p className="font-mono text-xs uppercase tracking-[0.2em] text-teal-dark">UGJCS</p>
       <h1 className="mt-2 font-serif text-2xl font-semibold text-ink">Sign in</h1>
+      <p className="mt-1 text-sm text-ink/60">Enter your account credentials to continue.</p>
       {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
-      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
+      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate aria-busy={submitting}>
         <Input label="Email" name="email" type="email" required autoComplete="email" />
         <Input label="Password" name="password" type="password" required autoComplete="current-password" />
-        <Button type="submit" disabled={submitting} className="w-full">
+        <Button type="submit" isLoading={submitting} className="w-full">
           {submitting ? "Signing in…" : "Sign in"}
         </Button>
       </form>

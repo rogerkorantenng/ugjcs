@@ -2,6 +2,7 @@
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ProblemAlert } from "@/components/ui/alert";
 import type { Manuscript, ProblemDetails } from "@/types/api";
@@ -46,22 +47,12 @@ export default function SubmitPage() {
         anywhere in the domain built by Plans 1–4.
       */}
       {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
-      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
+      <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate aria-busy={submitting}>
         <Input label="Title" name="title" required minLength={5} />
-        <div>
-          <label htmlFor="abstract" className="mb-1.5 block text-sm font-medium text-ink">Abstract</label>
-          <textarea
-            id="abstract"
-            name="abstract"
-            required
-            minLength={100}
-            rows={6}
-            className="w-full rounded-[3px] border border-rule bg-white px-3 py-2 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
-          />
-        </div>
+        <Textarea label="Abstract" name="abstract" required minLength={100} rows={6} />
         <Input label="Keywords (comma-separated)" name="keywords" required />
         <Input label="Co-author account ids (comma-separated, optional)" name="co_author_ids" />
-        <Button type="submit" disabled={submitting}>{submitting ? "Submitting…" : "Submit manuscript"}</Button>
+        <Button type="submit" isLoading={submitting}>{submitting ? "Submitting…" : "Submit manuscript"}</Button>
       </form>
     </>
   );

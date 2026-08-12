@@ -3,7 +3,8 @@ import { useState, type FormEvent } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import type { DecisionType, ManuscriptStatus } from "@/types/api";
+import { ProblemAlert } from "@/components/ui/alert";
+import type { DecisionType, ManuscriptStatus, ProblemDetails } from "@/types/api";
 
 // A UX hint mirroring the manuscript lifecycle guards (design spec §6.2), not a security
 // control — the backend re-validates every transition regardless of what this component
@@ -18,6 +19,7 @@ const AVAILABLE_BY_STATUS: Record<ManuscriptStatus, DecisionType[]> = {
 
 export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode: string; status: ManuscriptStatus; onDecided: () => void }) {
   const [submitting, setSubmitting] = useState(false);
+  const [problem, setProblem] = useState<ProblemDetails | null>(null);
   const available = AVAILABLE_BY_STATUS[status];
   if (available.length === 0) return null;
 
@@ -25,24 +27,31 @@ export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     setSubmitting(true);
-    await fetch(`/api/editorial/${trackingCode}/decision`, {
+    setProblem(null);
+    const response = await fetch(`/api/editorial/${trackingCode}/decision`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ decision: form.get("decision"), rationale: form.get("rationale") }),
     });
     setSubmitting(false);
+    if (!response.ok) {
+      const detail = await response.json().catch(() => null);
+      setProblem(detail ?? { type: "about:blank", title: "Could not record the decision", status: response.status });
+      return;
+    }
     onDecided();
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-4 space-y-4" aria-label="Record decision">
+    <form onSubmit={onSubmit} className="mt-4 space-y-4" aria-label="Record decision" aria-busy={submitting}>
+      {problem && <ProblemAlert problem={problem} />}
       <Select label="Decision" name="decision" required>
         {available.map((decision) => (
           <option key={decision} value={decision}>{decision.replace("_", " ")}</option>
         ))}
       </Select>
       <Textarea label="Rationale" name="rationale" required minLength={20} />
-      <Button type="submit" disabled={submitting}>{submitting ? "Recording…" : "Record decision"}</Button>
+      <Button type="submit" isLoading={submitting}>{submitting ? "Recording…" : "Record decision"}</Button>
     </form>
   );
 }

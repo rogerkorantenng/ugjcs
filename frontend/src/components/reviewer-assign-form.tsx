@@ -2,6 +2,8 @@
 import { useState, type FormEvent } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ProblemAlert } from "@/components/ui/alert";
+import type { ProblemDetails } from "@/types/api";
 
 /**
  * A raw reviewer-id input, not a `<select>` of candidates: Plan 4 has no
@@ -12,14 +14,14 @@ import { Button } from "@/components/ui/button";
  */
 export function ReviewerAssignForm({ trackingCode, onAssigned }: { trackingCode: string; onAssigned: () => void }) {
   const [submitting, setSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [problem, setProblem] = useState<ProblemDetails | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     setSubmitting(true);
-    setErrorMessage(null);
+    setProblem(null);
     const response = await fetch(`/api/editorial/${trackingCode}/reviewers`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -27,7 +29,15 @@ export function ReviewerAssignForm({ trackingCode, onAssigned }: { trackingCode:
     });
     setSubmitting(false);
     if (!response.ok) {
-      setErrorMessage("Could not assign that reviewer. Check the account id and try again.");
+      const detail = await response.json().catch(() => null);
+      setProblem(
+        detail ?? {
+          type: "about:blank",
+          title: "Could not assign that reviewer",
+          status: response.status,
+          detail: "Check the account id and try again.",
+        },
+      );
       return;
     }
     formElement.reset();
@@ -35,12 +45,16 @@ export function ReviewerAssignForm({ trackingCode, onAssigned }: { trackingCode:
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-4 flex flex-wrap items-end gap-3" aria-label="Assign reviewer">
-      {errorMessage && <p role="alert" className="w-full text-sm text-brick">{errorMessage}</p>}
+    <form onSubmit={onSubmit} className="mt-4 flex flex-wrap items-end gap-3" aria-label="Assign reviewer" aria-busy={submitting}>
+      {problem && (
+        <div className="w-full">
+          <ProblemAlert problem={problem} />
+        </div>
+      )}
       <div className="min-w-64 flex-1">
         <Input label="Reviewer account id" name="reviewer_id" required />
       </div>
-      <Button type="submit" disabled={submitting}>{submitting ? "Assigning…" : "Assign"}</Button>
+      <Button type="submit" isLoading={submitting}>{submitting ? "Assigning…" : "Assign"}</Button>
     </form>
   );
 }

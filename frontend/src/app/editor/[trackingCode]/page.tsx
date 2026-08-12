@@ -1,18 +1,22 @@
 "use client";
-import { use } from "react";
+import { use, useState } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { StatusBadge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
+import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerAssignForm } from "@/components/reviewer-assign-form";
 import { DecisionForm } from "@/components/decision-form";
-import type { Manuscript } from "@/types/api";
+import type { Manuscript, ProblemDetails } from "@/types/api";
 
 export default function EditorialManuscriptPage({ params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = use(params);
   const { data, error, isLoading, mutate } = useApi<Manuscript>(`/api/manuscripts/${trackingCode}`);
+  const [screening, setScreening] = useState(false);
+  const [screenProblem, setScreenProblem] = useState<ProblemDetails | null>(null);
 
-  if (isLoading) return <p>Loading…</p>;
+  if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
   if (error)
     return (
       <ProblemAlert
@@ -22,7 +26,15 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
   if (!data) return null;
 
   async function screen() {
-    await fetch(`/api/editorial/${trackingCode}/screen`, { method: "POST" });
+    setScreening(true);
+    setScreenProblem(null);
+    const response = await fetch(`/api/editorial/${trackingCode}/screen`, { method: "POST" });
+    setScreening(false);
+    if (!response.ok) {
+      const detail = await response.json().catch(() => null);
+      setScreenProblem(detail ?? { type: "about:blank", title: "Could not begin screening", status: response.status });
+      return;
+    }
     mutate();
   }
 
@@ -38,12 +50,12 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
 
       {data.status === "submitted" && (
         <div className="mt-6 border-t border-rule pt-6">
-          <button
-            onClick={screen}
-            className="rounded-[3px] bg-teal px-4 py-2 text-sm font-medium text-paper hover:bg-teal-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
-          >
-            Begin screening
-          </button>
+          {screenProblem && (
+            <div className="mb-4">
+              <ProblemAlert problem={screenProblem} />
+            </div>
+          )}
+          <Button isLoading={screening} onClick={screen}>{screening ? "Starting…" : "Begin screening"}</Button>
         </div>
       )}
 
