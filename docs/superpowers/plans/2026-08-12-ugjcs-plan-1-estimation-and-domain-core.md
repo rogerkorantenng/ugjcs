@@ -1888,15 +1888,31 @@ def manuscript() -> Manuscript:
     )
 
 
-def test_blinded_view_preserves_reviewable_content() -> None:
+def test_blinded_view_preserves_every_reviewable_field() -> None:
     blinded = blind(manuscript())
+    assert blinded.tracking_code == "UGJCS-2026-0009"
     assert blinded.title == "Low-Bandwidth Telemedicine Protocols"
+    assert blinded.abstract == "A protocol for clinical consultation over intermittent links."
     assert blinded.keywords == ("telemedicine", "protocols")
+    assert blinded.version == 1
+    assert blinded.status == "draft"
 
 
-def test_blinded_view_has_no_author_fields_in_its_type() -> None:
-    field_names = {field.name for field in dataclasses.fields(BlindedManuscript)}
-    assert not any("author" in name for name in field_names)
+def test_blinded_view_exposes_exactly_the_permitted_fields() -> None:
+    """Any field added to BlindedManuscript must be a deliberate decision.
+
+    A substring check for "author" would not catch `affiliation`, `submitter_id` or
+    `corresponding_email`. Pinning the exact set makes this test fail whenever the type
+    grows, so an addition has to be justified rather than merely compile.
+    """
+    assert {field.name for field in dataclasses.fields(BlindedManuscript)} == {
+        "tracking_code",
+        "title",
+        "abstract",
+        "keywords",
+        "version",
+        "status",
+    }
 
 
 def test_blinded_view_never_serialises_an_author_identifier() -> None:
@@ -1929,6 +1945,13 @@ Create `backend/src/ugjcs/domain/blinding.py`:
 Blinding is structural: `BlindedManuscript` has no author attributes, so there is no
 field a future change could accidentally populate. Filtering a full object would leave
 that possibility open; omitting the fields from the type does not.
+
+What this does NOT do: `title`, `abstract` and `keywords` are copied verbatim. If an
+author writes their name into the title, or the abstract says "extending our earlier work
+in [Obeng 2025]", that text reaches the reviewer unchanged. Scrubbing identifying text
+from the manuscript body is out of scope here and is recorded in the technical debt
+register. Submission guidance asks authors to anonymise their own manuscript, and
+screening surfaces detected name matches to the editor.
 """
 
 from dataclasses import dataclass

@@ -3,6 +3,13 @@
 Blinding is structural: `BlindedManuscript` has no author attributes, so there is no
 field a future change could accidentally populate. Filtering a full object would leave
 that possibility open; omitting the fields from the type does not.
+
+What this does NOT do: `title`, `abstract` and `keywords` are copied verbatim. If an
+author writes their name into the title, or the abstract says "extending our earlier work
+in [Obeng 2025]", that text reaches the reviewer unchanged. Scrubbing identifying text
+from the manuscript body is out of scope here and is recorded in the technical debt
+register. Submission guidance asks authors to anonymise their own manuscript, and
+screening surfaces detected name matches to the editor.
 """
 
 from dataclasses import dataclass
