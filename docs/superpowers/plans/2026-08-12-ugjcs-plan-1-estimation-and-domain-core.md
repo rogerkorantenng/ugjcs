@@ -744,13 +744,20 @@ from ugjcs.domain.events import EditorialEvent
 from ugjcs.domain.ids import ManuscriptId, UserId
 
 
+# Identity is pinned at module level: canonical_bytes() covers the identity fields as
+# well as the payload, so a fixture that minted fresh UUIDs per call would make every
+# event differ regardless of payload key order, and the determinism test would be vacuous.
+MANUSCRIPT = ManuscriptId(uuid4())
+ACTOR = UserId(uuid4())
+
+
 def make_event(**overrides: object) -> EditorialEvent:
     defaults: dict[str, object] = {
-        "manuscript_id": ManuscriptId(uuid4()),
+        "manuscript_id": MANUSCRIPT,
         "sequence": 1,
         "event_type": EventType.MANUSCRIPT_SUBMITTED,
         "payload": {"title": "On Kente Pattern Recognition"},
-        "actor_id": UserId(uuid4()),
+        "actor_id": ACTOR,
         "occurred_at": datetime(2026, 8, 12, 9, 30, tzinfo=UTC),
     }
     return EditorialEvent(**(defaults | overrides))  # type: ignore[arg-type]
