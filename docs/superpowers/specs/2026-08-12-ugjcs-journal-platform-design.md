@@ -181,7 +181,7 @@ DRAFT ──submit──▶ SUBMITTED ──begin screening──▶ UNDER_SCREE
                                                       │                  │
                                               reviews complete       author resubmits
                                                       ▼                  ▼
-                                              REVIEWS_COMPLETE ◀── RESUBMITTED
+                                              REVIEWS_COMPLETE      RESUBMITTED
                                                       │
                           ┌───────────────────────────┼───────────────────┐
                           ▼                           ▼                   ▼
@@ -191,6 +191,12 @@ DRAFT ──submit──▶ SUBMITTED ──begin screening──▶ UNDER_SCREE
                                                       ▼
                                                  SCHEDULED ──issue published──▶ PUBLISHED
 ```
+
+A resubmission does **not** close the review round on its own. `RESUBMITTED` returns to
+`UNDER_REVIEW`, or to `UNDER_SCREENING` if the editor wants to screen the revision before
+sending it out again; the round closes only when the review quorum is met. An earlier draft
+of this diagram showed `RESUBMITTED` reaching `REVIEWS_COMPLETE` directly, which the
+transition table has never permitted.
 
 `WITHDRAWN` is reachable from `SUBMITTED`, `UNDER_SCREENING`, `UNDER_REVIEW`,
 `REVIEWS_COMPLETE` and `REVISION_REQUESTED`. `DESK_REJECTED`, `REJECTED`, `PUBLISHED`
