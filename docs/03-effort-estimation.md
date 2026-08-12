@@ -188,6 +188,9 @@ UCP  = 188 × 1.105 × 0.605 = 125.7
 Effort = 125.7 × 20 = 2,514 person-hours
 ```
 
+Arithmetic: `188 × 1.105 = 207.74`; `207.74 × 0.605 = 125.68` → 125.7 UCP.
+`125.7 × 20 = 2,514` person-hours.
+
 TCF and ECF are unchanged: they rate the *system* being built, not the subset
 of it in scope for a given milestone, so the same 1.105 and 0.605 apply to both
 calculations.
@@ -230,11 +233,11 @@ which this project has a great deal relative to its use-case count. Each
 method under-weights what the other over-weights. They do not converge on a
 single number, and are not expected to; what they do is **bound the answer
 from the same side**: both estimates exceed the 48-hour window by roughly two
-orders of magnitude, and **the full system is a one-to-four person-year
-effort** by either reckoning (1.8 person-years from UCP on the full scope, up
-to 47.2 ÷ 12 ≈ 3.9 person-years from COCOMO II). That agreement — on the
-scale of the problem, not its exact magnitude — is what governs the scope
-decision in §8.
+orders of magnitude, and **the full system is a roughly two-to-four
+person-year effort** by either reckoning (1.8 person-years from UCP on the
+full scope, up to 47.2 ÷ 12 ≈ 3.9 person-years from COCOMO II). That
+agreement — on the scale of the problem, not its exact magnitude — is what
+governs the scope decision in §8.
 
 ---
 
@@ -243,8 +246,8 @@ decision in §8.
 48 hours is 1.5% of the lower (UCP, full-scope) estimate of 3,262 hours
 (`48 ÷ 3,262 = 0.0147`). Even against the Must-have subset alone (2,514 hours),
 48 hours is 1.9% of the estimate. Under either reading, the available time is
-two orders of magnitude short of what classical estimation predicts the full
-system requires. The estimate therefore governs scope in two ways: it forces a
+nearly two orders of magnitude short of what classical estimation predicts the
+full system requires. The estimate therefore governs scope in two ways: it forces a
 MoSCoW cut (below), and it forces an explicit reckoning with the fact that the
 build method itself — not just the schedule — has to absorb that gap (§9).
 
@@ -370,12 +373,11 @@ present for the build.
    commit — which still represents real drafting, review and verification
    time not evidenced by a second commit — is not credited as zero.
 3. Tag each commit to a phase (Plan 1–6, and within Plan 1 to a task) using
-   its Conventional Commit type and message, which this project's plans
-   specify verbatim (for example, this document's own commit message,
-   recorded in §12, tags it to Plan 1 Task 1). Where a session spans commits
-   from more than one phase, apportion that session's duration across the
-   phases in proportion to the commit count each phase contributes to the
-   session.
+   its Conventional Commit type and message, which this project's
+   implementation plans specify verbatim, task by task. Where a session
+   spans commits from more than one phase, apportion that session's
+   duration across the phases in proportion to the commit count each phase
+   contributes to the session.
 4. Sum apportioned session-hours by phase to give actual hours per phase, and
    sum all phases to give total actual hours.
 
@@ -383,8 +385,8 @@ present for the build.
 scope actually delivered at project close` — UCP taken from §6's Must-have
 figure (125.7) if only Must-have use cases ship, or recomputed by the same
 method as §3 over whichever Should-have use cases from §8.1 are also
-delivered, if any are. This is the single figure referred to in §9 as "the
-locally realised PF."
+delivered, if any are. This is the single figure §9 describes as "a local
+calibration, not a general claim."
 
 **Variance percentage.** `Variance % = (actual hours − estimated hours) ÷
 estimated hours × 100`, computed against the Must-have UCP estimate (2,514

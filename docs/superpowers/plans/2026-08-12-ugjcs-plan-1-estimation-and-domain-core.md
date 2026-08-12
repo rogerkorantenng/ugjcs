@@ -2270,7 +2270,7 @@ git commit -m "ci: run lint, types, architecture contract and coverage gate on t
 
 - `docs/03-effort-estimation.md` contains the full UCP derivation, the COCOMO II cross-check, the reconciliation of the two, the MoSCoW cut that governs Plans 2–6, and the method for the closing variance analysis.
 - `cd backend && make check` passes from a clean checkout: ruff, ruff format, mypy strict, import-linter, and pytest at or above 85% coverage.
-- The domain package imports no framework, verified mechanically rather than by inspection.
+- The domain package imports no framework, vendor SDK, or I/O module from a named denylist, verified mechanically by an import-linter contract rather than by inspection.
 - The manuscript lifecycle, hash chain, authorisation policy and blinded projection are each covered by example-based tests and, where the claim is universal, by property-based tests.
 
 ## What Plans 2–6 cover
