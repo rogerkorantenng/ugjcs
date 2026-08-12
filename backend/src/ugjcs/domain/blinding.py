@@ -1,0 +1,43 @@
+"""The reviewer-facing projection of a manuscript.
+
+Blinding is structural: `BlindedManuscript` has no author attributes, so there is no
+field a future change could accidentally populate. Filtering a full object would leave
+that possibility open; omitting the fields from the type does not. That structural
+guarantee covers the aggregate only: the editorial event log carries `actor_id` and an
+editor's free-text `rationale`, there is no `BlindedEvent` projection, and the log is
+kept from reviewers by authorisation policy (`Action.VIEW_AUDIT`) rather than by
+construction.
+
+What this does NOT do: `title`, `abstract` and `keywords` are copied verbatim. If an
+author writes their name into the title, or the abstract says "extending our earlier work
+in [Obeng 2025]", that text reaches the reviewer unchanged. Scrubbing identifying text
+from the manuscript body is out of scope here and is recorded in the technical debt
+register. Submission guidance asks authors to anonymise their own manuscript, and
+screening surfaces detected name matches to the editor.
+"""
+
+from dataclasses import dataclass
+
+from ugjcs.domain.manuscript import Manuscript
+
+
+@dataclass(frozen=True, slots=True)
+class BlindedManuscript:
+    tracking_code: str
+    title: str
+    abstract: str
+    keywords: tuple[str, ...]
+    version: int
+    status: str
+
+
+def blind(manuscript: Manuscript) -> BlindedManuscript:
+    """Project a manuscript into the form a reviewer is permitted to see."""
+    return BlindedManuscript(
+        tracking_code=manuscript.tracking_code.value,
+        title=manuscript.title,
+        abstract=manuscript.abstract,
+        keywords=manuscript.keywords,
+        version=manuscript.version,
+        status=manuscript.status.value,
+    )

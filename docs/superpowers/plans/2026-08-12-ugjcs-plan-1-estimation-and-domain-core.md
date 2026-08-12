@@ -342,7 +342,7 @@ git commit -m "chore: scaffold backend with ruff, mypy strict, import-linter and
 
 **Interfaces:**
 - Produces:
-  - `DomainError`, `IllegalTransition`, `GuardViolation`, `AuthorizationDenied` (all in `errors.py`)
+  - `DomainError`, `IllegalTransitionError`, `GuardViolationError`, `AuthorizationDeniedError` (all in `errors.py`)
   - `Role`, `ManuscriptStatus`, `Recommendation`, `DecisionType`, `AssignmentStatus`, `EventType` (all `StrEnum`, in `enums.py`)
   - `UserId`, `ManuscriptId`, `ReviewId`, `IssueId` (`NewType` over `UUID`); `TrackingCode` with `TrackingCode.mint(year: int, sequence: int) -> TrackingCode` and `.value: str`
 
@@ -402,15 +402,15 @@ class DomainError(Exception):
     """Base class for every domain rule violation."""
 
 
-class IllegalTransition(DomainError):
+class IllegalTransitionError(DomainError):
     """A manuscript state transition that the lifecycle does not permit."""
 
 
-class GuardViolation(DomainError):
+class GuardViolationError(DomainError):
     """A transition is structurally legal but its precondition is unmet."""
 
 
-class AuthorizationDenied(DomainError):
+class AuthorizationDeniedError(DomainError):
     """The actor may not perform this action on this resource."""
 ```
 
@@ -475,6 +475,7 @@ class EventType(StrEnum):
     REVIEWER_ASSIGNED = "reviewer_assigned"
     INVITATION_ANSWERED = "invitation_answered"
     REVIEW_SUBMITTED = "review_submitted"
+    REVIEW_ROUND_CLOSED = "review_round_closed"
     DECISION_RECORDED = "decision_recorded"
     REVISION_SUBMITTED = "revision_submitted"
     MANUSCRIPT_WITHDRAWN = "manuscript_withdrawn"
@@ -549,12 +550,12 @@ git commit -m "feat: add domain primitives — errors, enums and typed identifie
 - Test: `backend/tests/unit/domain/test_transitions.py`
 
 **Interfaces:**
-- Consumes: `ManuscriptStatus` from `enums.py`; `IllegalTransition` from `errors.py`.
+- Consumes: `ManuscriptStatus` from `enums.py`; `IllegalTransitionError` from `errors.py`.
 - Produces:
   - `TERMINAL_STATES: frozenset[ManuscriptStatus]`
   - `LEGAL_TRANSITIONS: Mapping[ManuscriptStatus, frozenset[ManuscriptStatus]]`
   - `is_legal(source: ManuscriptStatus, target: ManuscriptStatus) -> bool`
-  - `assert_legal(source: ManuscriptStatus, target: ManuscriptStatus) -> None` raising `IllegalTransition`
+  - `assert_legal(source: ManuscriptStatus, target: ManuscriptStatus) -> None` raising `IllegalTransitionError`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -564,7 +565,7 @@ Create `backend/tests/unit/domain/test_transitions.py`:
 import pytest
 
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.errors import IllegalTransition
+from ugjcs.domain.errors import IllegalTransitionError
 from ugjcs.domain.transitions import (
     LEGAL_TRANSITIONS,
     TERMINAL_STATES,
@@ -627,7 +628,7 @@ def test_assert_legal_is_silent_for_a_legal_transition() -> None:
 
 
 def test_assert_legal_raises_naming_both_states() -> None:
-    with pytest.raises(IllegalTransition, match="draft.*published"):
+    with pytest.raises(IllegalTransitionError, match=r"draft.*published"):
         assert_legal(S.DRAFT, S.PUBLISHED)
 ```
 
@@ -650,7 +651,7 @@ without touching aggregate behaviour, and the table can be exhaustively tested.
 from collections.abc import Mapping
 
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.errors import IllegalTransition
+from ugjcs.domain.errors import IllegalTransitionError
 
 TERMINAL_STATES: frozenset[S] = frozenset(
     {S.DESK_REJECTED, S.REJECTED, S.PUBLISHED, S.WITHDRAWN}
@@ -691,9 +692,9 @@ def is_legal(source: S, target: S) -> bool:
 
 
 def assert_legal(source: S, target: S) -> None:
-    """Raise `IllegalTransition` unless the move is permitted."""
+    """Raise `IllegalTransitionError` unless the move is permitted."""
     if not is_legal(source, target):
-        raise IllegalTransition(
+        raise IllegalTransitionError(
             f"cannot move manuscript from {source.value} to {target.value}"
         )
 ```
@@ -727,7 +728,7 @@ git commit -m "feat: add guarded manuscript lifecycle state machine"
 
 **Interfaces:**
 - Consumes: `EventType` from `enums.py`; `ManuscriptId`, `UserId` from `ids.py`.
-- Produces: `EditorialEvent` frozen dataclass with fields `manuscript_id: ManuscriptId`, `sequence: int`, `event_type: EventType`, `payload: Mapping[str, object]`, `actor_id: UserId | None`, `occurred_at: datetime`, and method `canonical_bytes() -> bytes`.
+- Produces: `EditorialEvent` frozen dataclass with fields `manuscript_id: ManuscriptId`, `sequence: int`, `event_type: EventType`, `payload: Mapping[str, PayloadValue]`, `actor_id: UserId | None`, `occurred_at: datetime`, and method `canonical_bytes() -> bytes`. Also exports `type PayloadValue = str | int | float | bool | None`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -744,13 +745,20 @@ from ugjcs.domain.events import EditorialEvent
 from ugjcs.domain.ids import ManuscriptId, UserId
 
 
+# Identity is pinned at module level: canonical_bytes() covers the identity fields as
+# well as the payload, so a fixture that minted fresh UUIDs per call would make every
+# event differ regardless of payload key order, and the determinism test would be vacuous.
+MANUSCRIPT = ManuscriptId(uuid4())
+ACTOR = UserId(uuid4())
+
+
 def make_event(**overrides: object) -> EditorialEvent:
     defaults: dict[str, object] = {
-        "manuscript_id": ManuscriptId(uuid4()),
+        "manuscript_id": MANUSCRIPT,
         "sequence": 1,
         "event_type": EventType.MANUSCRIPT_SUBMITTED,
         "payload": {"title": "On Kente Pattern Recognition"},
-        "actor_id": UserId(uuid4()),
+        "actor_id": ACTOR,
         "occurred_at": datetime(2026, 8, 12, 9, 30, tzinfo=UTC),
     }
     return EditorialEvent(**(defaults | overrides))  # type: ignore[arg-type]
@@ -782,6 +790,18 @@ def test_canonical_bytes_change_when_payload_changes() -> None:
     a = make_event(payload={"alpha": 1})
     b = make_event(payload={"alpha": 2})
     assert a.canonical_bytes() != b.canonical_bytes()
+
+
+def test_canonical_bytes_refuses_a_value_it_cannot_serialise_stably() -> None:
+    """A set's str() follows iteration order, which varies with the process hash seed.
+
+    Serialising it would produce different bytes for the same event in a different
+    process, so the chain would report tampering that never happened. Refusing loudly
+    is the only safe behaviour.
+    """
+    event = make_event(payload={"tags": {"a", "b"}})
+    with pytest.raises(TypeError):
+        event.canonical_bytes()
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -808,13 +828,24 @@ from datetime import datetime
 from ugjcs.domain.enums import EventType
 from ugjcs.domain.ids import ManuscriptId, UserId
 
+type PayloadValue = str | int | float | bool | None
+"""Payload values are restricted to JSON-native scalars.
+
+The hash chain in `hashchain.py` is only tamper-evident if equal events always
+serialise to equal bytes. A `set` would serialise through its iteration order, which
+varies with Python's per-process hash seed; an arbitrary object would fall back to a
+`repr` containing a memory address. Either would make an untampered event fail
+verification in a different process, which is a false tamper alert — worse than no
+check at all. Restricting the type makes that unrepresentable.
+"""
+
 
 @dataclass(frozen=True, slots=True)
 class EditorialEvent:
     manuscript_id: ManuscriptId
     sequence: int
     event_type: EventType
-    payload: Mapping[str, object]
+    payload: Mapping[str, PayloadValue]
     actor_id: UserId | None
     occurred_at: datetime
 
@@ -834,13 +865,11 @@ class EditorialEvent:
             "manuscript_id": str(self.manuscript_id),
             "sequence": self.sequence,
             "event_type": self.event_type.value,
-            "payload": self.payload,
-            "actor_id": str(self.actor_id) if self.actor_id else None,
+            "payload": dict(self.payload),
+            "actor_id": str(self.actor_id) if self.actor_id is not None else None,
             "occurred_at": self.occurred_at.isoformat(),
         }
-        return json.dumps(
-            document, sort_keys=True, separators=(",", ":"), default=str
-        ).encode("utf-8")
+        return json.dumps(document, sort_keys=True, separators=(",", ":")).encode("utf-8")
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
@@ -875,7 +904,7 @@ git commit -m "feat: add editorial event with canonical serialisation"
   - `chain_hash(event: EditorialEvent, previous_hash: str) -> str`
   - `ChainedEvent` frozen dataclass wrapping `event: EditorialEvent`, `previous_hash: str`, `event_hash: str`
   - `append(chain: Sequence[ChainedEvent], event: EditorialEvent) -> ChainedEvent`
-  - `verify(chain: Sequence[ChainedEvent]) -> None` raising `ChainBroken` (a `DomainError` subclass defined in this module)
+  - `verify(chain: Sequence[ChainedEvent]) -> None` raising `ChainBrokenError` (a `DomainError` subclass defined in this module)
 
 - [ ] **Step 1: Write the failing test**
 
@@ -889,10 +918,10 @@ from uuid import uuid4
 import pytest
 
 from ugjcs.domain.enums import EventType
-from ugjcs.domain.events import EditorialEvent
+from ugjcs.domain.events import EditorialEvent, PayloadValue
 from ugjcs.domain.hashchain import (
     GENESIS_HASH,
-    ChainBroken,
+    ChainBrokenError,
     ChainedEvent,
     append,
     chain_hash,
@@ -903,7 +932,7 @@ from ugjcs.domain.ids import ManuscriptId, UserId
 MANUSCRIPT = ManuscriptId(uuid4())
 
 
-def event(sequence: int, **payload: object) -> EditorialEvent:
+def event(sequence: int, **payload: PayloadValue) -> EditorialEvent:
     return EditorialEvent(
         manuscript_id=MANUSCRIPT,
         sequence=sequence,
@@ -954,20 +983,34 @@ def test_verify_accepts_an_empty_chain() -> None:
 def test_verify_detects_a_modified_payload() -> None:
     chain = build_chain(3)
     chain[1] = replace(chain[1], event=event(2, note="tampered"))
-    with pytest.raises(ChainBroken, match="sequence 2"):
+    with pytest.raises(ChainBrokenError, match="sequence 2"):
         verify(chain)
 
 
 def test_verify_detects_a_removed_event() -> None:
     chain = build_chain(3)
     del chain[1]
-    with pytest.raises(ChainBroken):
+    with pytest.raises(ChainBrokenError):
         verify(chain)
+
+
+def test_verify_detects_a_spliced_chain() -> None:
+    """Two internally consistent chains joined together must not verify.
+
+    Every link here reconciles with its own recorded predecessor hash, so the payload
+    and sequence checks both pass. Only the link-to-predecessor check catches it. This
+    is the splice attack: take a real prefix, graft a different history onto it.
+    """
+    original = build_chain(2)
+    forged = build_chain(2)
+    spliced = [original[0], forged[1]]
+    with pytest.raises(ChainBrokenError, match="broken link at sequence 2"):
+        verify(spliced)
 
 
 def test_append_rejects_a_non_consecutive_sequence() -> None:
     chain = build_chain(1)
-    with pytest.raises(ChainBroken, match="expected sequence 2"):
+    with pytest.raises(ChainBrokenError, match="expected sequence 2"):
         append(chain, event(5))
 ```
 
@@ -983,9 +1026,22 @@ Create `backend/src/ugjcs/domain/hashchain.py`:
 ```python
 """Tamper-evident chaining over the editorial event log.
 
-Each event's hash covers its predecessor's hash, so altering, reordering or removing
-any event invalidates every hash after it. This detects tampering; it does not prevent
-it, which is why the database also denies UPDATE and DELETE on the event table.
+Each event's hash covers its predecessor's hash, so altering, reordering or removing an
+event in the interior of the chain invalidates every hash after it. This detects
+tampering; it does not prevent it, which is why the database also denies UPDATE and
+DELETE on the event table.
+
+What this construction cannot detect on its own, stated plainly so no caller assumes
+more than it provides:
+
+- Truncation of the tail. Any prefix of a valid chain is itself a valid chain.
+- A forged event appended through `append`, which is indistinguishable from a genuine one.
+- A wholly fabricated history rebuilt from the genesis hash using these same functions.
+
+All three need an external anchor the forger cannot reproduce: a periodically published
+or signed checkpoint of the latest `event_hash`, plus an expected event count asserted at
+the persistence boundary. That anchor is out of scope for the domain layer and is
+recorded in the technical debt register.
 """
 
 import hashlib
@@ -998,7 +1054,7 @@ from ugjcs.domain.events import EditorialEvent
 GENESIS_HASH = "0" * 64
 
 
-class ChainBroken(DomainError):
+class ChainBrokenError(DomainError):
     """The event chain does not verify against its recorded hashes."""
 
 
@@ -1021,7 +1077,7 @@ def append(chain: Sequence[ChainedEvent], event: EditorialEvent) -> ChainedEvent
     """Link `event` onto the end of `chain`, enforcing consecutive sequencing."""
     expected_sequence = len(chain) + 1
     if event.sequence != expected_sequence:
-        raise ChainBroken(
+        raise ChainBrokenError(
             f"expected sequence {expected_sequence}, received {event.sequence}"
         )
     previous_hash = chain[-1].event_hash if chain else GENESIS_HASH
@@ -1033,17 +1089,17 @@ def append(chain: Sequence[ChainedEvent], event: EditorialEvent) -> ChainedEvent
 
 
 def verify(chain: Sequence[ChainedEvent]) -> None:
-    """Raise `ChainBroken` at the first link that does not reconcile."""
+    """Raise `ChainBrokenError` at the first link that does not reconcile."""
     previous_hash = GENESIS_HASH
     for position, link in enumerate(chain, start=1):
         if link.event.sequence != position:
-            raise ChainBroken(
+            raise ChainBrokenError(
                 f"expected sequence {position}, found {link.event.sequence}"
             )
         if link.previous_hash != previous_hash:
-            raise ChainBroken(f"broken link at sequence {link.event.sequence}")
+            raise ChainBrokenError(f"broken link at sequence {link.event.sequence}")
         if chain_hash(link.event, previous_hash) != link.event_hash:
-            raise ChainBroken(f"hash mismatch at sequence {link.event.sequence}")
+            raise ChainBrokenError(f"hash mismatch at sequence {link.event.sequence}")
         previous_hash = link.event_hash
 ```
 
@@ -1087,13 +1143,24 @@ from uuid import uuid4
 import pytest
 
 from ugjcs.domain.enums import DecisionType, EventType, ManuscriptStatus as S
-from ugjcs.domain.errors import GuardViolation, IllegalTransition
-from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
+from ugjcs.domain.errors import GuardViolationError, IllegalTransitionError
+from ugjcs.domain.ids import IssueId, ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 
 AUTHOR = UserId(uuid4())
 EDITOR = UserId(uuid4())
 NOW = datetime(2026, 8, 12, 11, 0, tzinfo=UTC)
+
+
+def status_of(manuscript: Manuscript) -> S:
+    """Read status through a call so mypy cannot narrow the attribute in place.
+
+    Asserting `manuscript.status is S.X` inline narrows the attribute to that literal for
+    the rest of the function. mypy cannot see that a later method call mutates it, so a
+    second assertion against a different status is rejected as a non-overlapping identity
+    check. Reading through a call yields a fresh `S` each time.
+    """
+    return manuscript.status
 
 
 def draft() -> Manuscript:
@@ -1150,7 +1217,7 @@ def test_pull_events_drains_the_buffer() -> None:
 
 def test_cannot_submit_twice() -> None:
     manuscript = submitted()
-    with pytest.raises(IllegalTransition):
+    with pytest.raises(IllegalTransitionError):
         manuscript.submit(actor_id=AUTHOR, occurred_at=NOW)
 
 
@@ -1166,7 +1233,7 @@ def test_desk_rejection_requires_no_reviews() -> None:
 
 def test_desk_rejection_is_illegal_once_under_review() -> None:
     manuscript = under_review()
-    with pytest.raises(IllegalTransition):
+    with pytest.raises(IllegalTransitionError):
         manuscript.record_decision(
             decision=DecisionType.DESK_REJECT, actor_id=EDITOR,
             rationale="Too late", occurred_at=NOW,
@@ -1176,7 +1243,7 @@ def test_desk_rejection_is_illegal_once_under_review() -> None:
 def test_acceptance_requires_the_minimum_review_count() -> None:
     manuscript = under_review()
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    with pytest.raises(GuardViolation, match="requires 2 reviews, has 1"):
+    with pytest.raises(GuardViolationError, match="requires 2 reviews, has 1"):
         manuscript.record_decision(
             decision=DecisionType.ACCEPT, actor_id=EDITOR,
             rationale="Strong", occurred_at=NOW,
@@ -1186,9 +1253,9 @@ def test_acceptance_requires_the_minimum_review_count() -> None:
 def test_review_quorum_closes_the_review_round() -> None:
     manuscript = under_review()
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    assert manuscript.status is S.UNDER_REVIEW
+    assert status_of(manuscript) is S.UNDER_REVIEW
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    assert manuscript.status is S.REVIEWS_COMPLETE
+    assert status_of(manuscript) is S.REVIEWS_COMPLETE
 
 
 def test_acceptance_succeeds_once_the_minimum_is_met() -> None:
@@ -1210,7 +1277,7 @@ def test_only_the_corresponding_author_may_resubmit() -> None:
         decision=DecisionType.REQUEST_REVISION, actor_id=EDITOR,
         rationale="Clarify method", occurred_at=NOW,
     )
-    with pytest.raises(GuardViolation, match="corresponding author"):
+    with pytest.raises(GuardViolationError, match="corresponding author"):
         manuscript.resubmit(actor_id=UserId(uuid4()), occurred_at=NOW)
 
 
@@ -1235,7 +1302,7 @@ def test_publication_requires_an_issue() -> None:
         decision=DecisionType.ACCEPT, actor_id=EDITOR,
         rationale="Strong", occurred_at=NOW,
     )
-    with pytest.raises(IllegalTransition):
+    with pytest.raises(IllegalTransitionError):
         manuscript.publish(actor_id=EDITOR, occurred_at=NOW)
 
 
@@ -1243,6 +1310,81 @@ def test_withdrawal_is_permitted_before_a_decision() -> None:
     manuscript = under_review()
     manuscript.withdraw(actor_id=AUTHOR, occurred_at=NOW)
     assert manuscript.status is S.WITHDRAWN
+
+
+def accepted() -> Manuscript:
+    manuscript = under_review()
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.ACCEPT, actor_id=EDITOR,
+        rationale="Strong contribution", occurred_at=NOW,
+    )
+    return manuscript
+
+
+def test_accepted_manuscript_can_be_scheduled_then_published() -> None:
+    """The terminal path. Everything else is preparation for this happening."""
+    manuscript = accepted()
+    issue_id = IssueId(uuid4())
+    scheduled = manuscript.schedule(issue_id=issue_id, actor_id=EDITOR, occurred_at=NOW)
+    assert status_of(manuscript) is S.SCHEDULED
+    assert manuscript.issue_id == issue_id
+    assert scheduled.event_type is EventType.SCHEDULED_FOR_ISSUE
+    published = manuscript.publish(actor_id=EDITOR, occurred_at=NOW)
+    assert status_of(manuscript) is S.PUBLISHED
+    assert published.event_type is EventType.MANUSCRIPT_PUBLISHED
+
+
+def test_reviews_are_refused_outside_the_review_stage() -> None:
+    manuscript = submitted()
+    with pytest.raises(GuardViolationError, match="only while under review"):
+        manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+
+
+def test_revision_may_be_requested_at_screening_without_any_reviews() -> None:
+    """FR-07: an editor may return a manuscript for pre-review changes."""
+    manuscript = submitted()
+    manuscript.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    manuscript.record_decision(
+        decision=DecisionType.REQUEST_REVISION, actor_id=EDITOR,
+        rationale="Anonymise the manuscript before review", occurred_at=NOW,
+    )
+    assert manuscript.status is S.REVISION_REQUESTED
+
+
+def test_closing_the_review_round_emits_a_distinct_event_type() -> None:
+    """Counting REVIEW_SUBMITTED must not include the event that closes the round."""
+    manuscript = under_review()
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
+    submitted_count = sum(
+        1 for event in manuscript.pending_events
+        if event.event_type is EventType.REVIEW_SUBMITTED
+    )
+    assert submitted_count == 2
+    assert manuscript.pending_events[-1].event_type is EventType.REVIEW_ROUND_CLOSED
+
+
+def test_sequence_numbers_continue_after_the_buffer_is_drained() -> None:
+    """hashchain.append demands consecutive sequences across the manuscript's whole life.
+
+    Draining the buffer is how a repository persists events, so numbering that restarts
+    at 1 after a drain would collide with an event already in the chain.
+    """
+    manuscript = submitted()
+    manuscript.pull_events()
+    event = manuscript.begin_screening(actor_id=EDITOR, occurred_at=NOW)
+    assert event.sequence == 2
+
+
+def test_decision_payload_carries_the_decision_and_rationale() -> None:
+    """Payload keys are hashed into the audit chain, so their names are part of the contract."""
+    manuscript = accepted()
+    decision = manuscript.pending_events[-1]
+    assert decision.payload["decision"] == "accept"
+    assert decision.payload["rationale"] == "Strong contribution"
+    assert decision.payload["status"] == "accepted"
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1267,8 +1409,8 @@ from datetime import datetime
 
 from ugjcs.domain.enums import DecisionType, EventType
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.errors import GuardViolation
-from ugjcs.domain.events import EditorialEvent
+from ugjcs.domain.errors import GuardViolationError
+from ugjcs.domain.events import EditorialEvent, PayloadValue
 from ugjcs.domain.ids import IssueId, ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.transitions import assert_legal
 
@@ -1280,9 +1422,11 @@ _DECISION_TARGETS: dict[DecisionType, S] = {
     DecisionType.REJECT: S.REJECTED,
 }
 
-_DECISIONS_REQUIRING_REVIEWS = frozenset(
-    {DecisionType.ACCEPT, DecisionType.REJECT, DecisionType.REQUEST_REVISION}
-)
+# Only these need a quorum. REQUEST_REVISION is deliberately absent: FR-07 lets an editor
+# return a manuscript for pre-review changes during screening, when no reviews exist yet.
+# Post-review revision is already gated by the table, which reaches REVISION_REQUESTED from
+# REVIEWS_COMPLETE and nowhere else after review begins.
+_DECISIONS_REQUIRING_REVIEWS = frozenset({DecisionType.ACCEPT, DecisionType.REJECT})
 
 
 @dataclass(slots=True)
@@ -1299,6 +1443,7 @@ class Manuscript:
     minimum_reviews: int = 2
     submitted_reviews: int = 0
     issue_id: IssueId | None = None
+    _sequence: int = 0
     _events: list[EditorialEvent] = field(default_factory=list, repr=False)
 
     @property
@@ -1306,7 +1451,14 @@ class Manuscript:
         return tuple(self._events)
 
     def pull_events(self) -> tuple[EditorialEvent, ...]:
-        """Return buffered events and clear the buffer, for the caller to persist."""
+        """Return buffered events and clear the buffer, for the caller to persist.
+
+        `_sequence` is deliberately NOT reset. Sequence numbers must stay monotonic across
+        the whole lifetime of the manuscript, not just the current buffer, because
+        `hashchain.append` requires each event to follow its predecessor consecutively.
+        A repository rehydrating this aggregate must seed `_sequence` from the last
+        persisted event, otherwise the next event collides with one already in the chain.
+        """
         drained = tuple(self._events)
         self._events.clear()
         return drained
@@ -1334,7 +1486,7 @@ class Manuscript:
         editor cannot decide while reviews are still outstanding.
         """
         if self.status is not S.UNDER_REVIEW:
-            raise GuardViolation(
+            raise GuardViolationError(
                 f"reviews accepted only while under review, not in {self.status.value}"
             )
         self.submitted_reviews += 1
@@ -1344,7 +1496,7 @@ class Manuscript:
         )
         if self.submitted_reviews >= self.minimum_reviews:
             self._transition(
-                S.REVIEWS_COMPLETE, EventType.REVIEW_SUBMITTED, reviewer_id,
+                S.REVIEWS_COMPLETE, EventType.REVIEW_ROUND_CLOSED, reviewer_id,
                 occurred_at, {"reviews_complete": True},
             )
         return event
@@ -1361,7 +1513,7 @@ class Manuscript:
             decision in _DECISIONS_REQUIRING_REVIEWS
             and self.submitted_reviews < self.minimum_reviews
         ):
-            raise GuardViolation(
+            raise GuardViolationError(
                 f"{decision.value} requires {self.minimum_reviews} reviews, "
                 f"has {self.submitted_reviews}"
             )
@@ -1372,7 +1524,7 @@ class Manuscript:
 
     def resubmit(self, *, actor_id: UserId, occurred_at: datetime) -> EditorialEvent:
         if actor_id != self.corresponding_author_id:
-            raise GuardViolation("only the corresponding author may resubmit")
+            raise GuardViolationError("only the corresponding author may resubmit")
         event = self._transition(
             S.RESUBMITTED, EventType.REVISION_SUBMITTED, actor_id, occurred_at,
             {"version": self.version + 1},
@@ -1407,7 +1559,7 @@ class Manuscript:
         event_type: EventType,
         actor_id: UserId,
         occurred_at: datetime,
-        payload: dict[str, object],
+        payload: dict[str, PayloadValue],
     ) -> EditorialEvent:
         assert_legal(self.status, target)
         self.status = target
@@ -1418,11 +1570,12 @@ class Manuscript:
         event_type: EventType,
         actor_id: UserId,
         occurred_at: datetime,
-        payload: dict[str, object],
+        payload: dict[str, PayloadValue],
     ) -> EditorialEvent:
+        self._sequence += 1
         event = EditorialEvent(
             manuscript_id=self.id,
-            sequence=len(self._events) + 1,
+            sequence=self._sequence,
             event_type=event_type,
             payload=payload,
             actor_id=actor_id,
@@ -1460,12 +1613,12 @@ git commit -m "feat: add manuscript aggregate with guarded transitions and event
 - Test: `backend/tests/unit/domain/test_policies.py`
 
 **Interfaces:**
-- Consumes: `Role` from `enums.py`; `AuthorizationDenied` from `errors.py`; `Manuscript` from `manuscript.py`; `UserId` from `ids.py`.
+- Consumes: `Role` from `enums.py`; `AuthorizationDeniedError` from `errors.py`; `Manuscript` from `manuscript.py`; `UserId` from `ids.py`.
 - Produces:
   - `Action` (`StrEnum`): `VIEW`, `SUBMIT`, `SCREEN`, `ASSIGN_REVIEWER`, `REVIEW`, `DECIDE`, `RESUBMIT`, `PUBLISH`, `MANAGE_USERS`, `VIEW_AUDIT`
   - `Actor` frozen dataclass: `id: UserId`, `roles: frozenset[Role]`
   - `can(actor: Actor, action: Action, manuscript: Manuscript | None = None) -> bool`
-  - `authorize(actor: Actor, action: Action, manuscript: Manuscript | None = None) -> None` raising `AuthorizationDenied`
+  - `authorize(actor: Actor, action: Action, manuscript: Manuscript | None = None) -> None` raising `AuthorizationDeniedError`
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1478,7 +1631,7 @@ from uuid import uuid4
 import pytest
 
 from ugjcs.domain.enums import Role
-from ugjcs.domain.errors import AuthorizationDenied
+from ugjcs.domain.errors import AuthorizationDeniedError
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Action, Actor, authorize, can
@@ -1550,12 +1703,41 @@ def test_multiple_roles_grant_the_union_of_permissions() -> None:
     assert can(dual, Action.RESUBMIT, manuscript())
 
 
+def test_editor_may_view_any_manuscript() -> None:
+    assert can(actor(Role.EDITOR), Action.VIEW, manuscript())
+
+
+def test_administrator_may_view_any_manuscript() -> None:
+    assert can(actor(Role.ADMINISTRATOR), Action.VIEW, manuscript())
+
+
+def test_author_may_view_their_own_manuscript() -> None:
+    assert can(actor(Role.AUTHOR, user_id=AUTHOR_ID), Action.VIEW, manuscript())
+
+
+def test_author_may_not_view_someone_elses_manuscript() -> None:
+    assert not can(actor(Role.AUTHOR, user_id=OTHER_ID), Action.VIEW, manuscript())
+
+
+def test_reviewer_has_no_unblinded_view() -> None:
+    """Reviewers read manuscripts through the blinded projection, never through VIEW.
+
+    If this ever returns True the double-blind guarantee is gone, because VIEW yields the
+    full aggregate including author identities.
+    """
+    assert not can(actor(Role.REVIEWER), Action.VIEW, manuscript())
+
+
+def test_view_is_denied_when_no_manuscript_is_supplied() -> None:
+    assert not can(actor(Role.EDITOR), Action.VIEW)
+
+
 def test_authorize_is_silent_when_permitted() -> None:
     authorize(actor(Role.EDITOR), Action.SCREEN, manuscript())
 
 
 def test_authorize_raises_when_denied() -> None:
-    with pytest.raises(AuthorizationDenied, match="screen"):
+    with pytest.raises(AuthorizationDeniedError, match="screen"):
         authorize(actor(Role.AUTHOR), Action.SCREEN, manuscript())
 ```
 
@@ -1581,7 +1763,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from ugjcs.domain.enums import Role
-from ugjcs.domain.errors import AuthorizationDenied
+from ugjcs.domain.errors import AuthorizationDeniedError
 from ugjcs.domain.ids import UserId
 from ugjcs.domain.manuscript import Manuscript
 
@@ -1645,9 +1827,9 @@ def _can_view(actor: Actor, manuscript: Manuscript | None) -> bool:
 def authorize(
     actor: Actor, action: Action, manuscript: Manuscript | None = None
 ) -> None:
-    """Raise `AuthorizationDenied` unless the action is permitted."""
+    """Raise `AuthorizationDeniedError` unless the action is permitted."""
     if not can(actor, action, manuscript):
-        raise AuthorizationDenied(f"actor {actor.id} may not {action.value}")
+        raise AuthorizationDeniedError(f"actor {actor.id} may not {action.value}")
 ```
 
 - [ ] **Step 4: Run tests to verify they pass**
@@ -1706,15 +1888,31 @@ def manuscript() -> Manuscript:
     )
 
 
-def test_blinded_view_preserves_reviewable_content() -> None:
+def test_blinded_view_preserves_every_reviewable_field() -> None:
     blinded = blind(manuscript())
+    assert blinded.tracking_code == "UGJCS-2026-0009"
     assert blinded.title == "Low-Bandwidth Telemedicine Protocols"
+    assert blinded.abstract == "A protocol for clinical consultation over intermittent links."
     assert blinded.keywords == ("telemedicine", "protocols")
+    assert blinded.version == 1
+    assert blinded.status == "draft"
 
 
-def test_blinded_view_has_no_author_fields_in_its_type() -> None:
-    field_names = {field.name for field in dataclasses.fields(BlindedManuscript)}
-    assert not any("author" in name for name in field_names)
+def test_blinded_view_exposes_exactly_the_permitted_fields() -> None:
+    """Any field added to BlindedManuscript must be a deliberate decision.
+
+    A substring check for "author" would not catch `affiliation`, `submitter_id` or
+    `corresponding_email`. Pinning the exact set makes this test fail whenever the type
+    grows, so an addition has to be justified rather than merely compile.
+    """
+    assert {field.name for field in dataclasses.fields(BlindedManuscript)} == {
+        "tracking_code",
+        "title",
+        "abstract",
+        "keywords",
+        "version",
+        "status",
+    }
 
 
 def test_blinded_view_never_serialises_an_author_identifier() -> None:
@@ -1747,6 +1945,13 @@ Create `backend/src/ugjcs/domain/blinding.py`:
 Blinding is structural: `BlindedManuscript` has no author attributes, so there is no
 field a future change could accidentally populate. Filtering a full object would leave
 that possibility open; omitting the fields from the type does not.
+
+What this does NOT do: `title`, `abstract` and `keywords` are copied verbatim. If an
+author writes their name into the title, or the abstract says "extending our earlier work
+in [Obeng 2025]", that text reaches the reviewer unchanged. Scrubbing identifying text
+from the manuscript body is out of scope here and is recorded in the technical debt
+register. Submission guidance asks authors to anonymise their own manuscript, and
+screening surfaces detected name matches to the editor.
 """
 
 from dataclasses import dataclass
@@ -1811,17 +2016,20 @@ Create `backend/tests/unit/domain/test_invariants.py`:
 ```python
 """Universal invariants, asserted over generated inputs rather than chosen examples."""
 
+import dataclasses
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
+from ugjcs.domain.blinding import blind
 from ugjcs.domain.enums import EventType
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.events import EditorialEvent
-from ugjcs.domain.hashchain import ChainBroken, append, verify
-from ugjcs.domain.ids import ManuscriptId, UserId
+from ugjcs.domain.events import EditorialEvent, PayloadValue
+from ugjcs.domain.hashchain import ChainBrokenError, ChainedEvent, append, verify
+from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
+from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.transitions import LEGAL_TRANSITIONS, TERMINAL_STATES, is_legal
 
 BASE_TIME = datetime(2026, 8, 12, tzinfo=UTC)
@@ -1831,6 +2039,28 @@ payloads = st.dictionaries(
     st.one_of(st.integers(), st.text(max_size=20), st.booleans()),
     max_size=5,
 )
+
+
+def build_chain(payload_list: list[dict[str, PayloadValue]]) -> list[ChainedEvent]:
+    """Link a run of events into a chain, one per supplied payload."""
+    manuscript_id = ManuscriptId(uuid4())
+    actor_id = UserId(uuid4())
+    chain: list[ChainedEvent] = []
+    for index, payload in enumerate(payload_list, start=1):
+        chain.append(
+            append(
+                chain,
+                EditorialEvent(
+                    manuscript_id=manuscript_id,
+                    sequence=index,
+                    event_type=EventType.DECISION_RECORDED,
+                    payload=payload,
+                    actor_id=actor_id,
+                    occurred_at=BASE_TIME + timedelta(minutes=index),
+                ),
+            )
+        )
+    return chain
 
 
 @given(source=st.sampled_from(list(S)), target=st.sampled_from(list(S)))
@@ -1846,6 +2076,17 @@ def test_published_is_reachable_only_from_scheduled(source: S) -> None:
 
 
 @given(source=st.sampled_from(list(S)))
+def test_scheduling_is_reachable_only_from_accepted(source: S) -> None:
+    """With the previous property, this makes acceptance a precondition of publication.
+
+    Publication is reachable only from SCHEDULED, and SCHEDULED only from ACCEPTED, so no
+    path through the lifetime of a manuscript reaches PUBLISHED without an acceptance.
+    """
+    if is_legal(source, S.SCHEDULED):
+        assert source is S.ACCEPTED
+
+
+@given(source=st.sampled_from(list(S)))
 def test_accepted_is_reachable_only_from_reviews_complete(source: S) -> None:
     if is_legal(source, S.ACCEPTED):
         assert source is S.REVIEWS_COMPLETE
@@ -1855,8 +2096,8 @@ def test_withdrawal_is_reachable_from_every_non_terminal_state_except_draft() ->
     expected = {
         state
         for state in S
-        if state not in TERMINAL_STATES and state not in {S.DRAFT, S.RESUBMITTED,
-                                                          S.ACCEPTED, S.SCHEDULED}
+        if state not in TERMINAL_STATES
+        and state not in {S.DRAFT, S.RESUBMITTED, S.ACCEPTED, S.SCHEDULED}
     }
     actual = {state for state in S if S.WITHDRAWN in LEGAL_TRANSITIONS[state]}
     assert actual == expected
@@ -1865,26 +2106,9 @@ def test_withdrawal_is_reachable_from_every_non_terminal_state_except_draft() ->
 @settings(max_examples=100)
 @given(payload_list=st.lists(payloads, min_size=1, max_size=12))
 def test_a_chain_built_by_append_always_verifies(
-    payload_list: list[dict[str, object]],
+    payload_list: list[dict[str, PayloadValue]],
 ) -> None:
-    manuscript_id = ManuscriptId(uuid4())
-    actor_id = UserId(uuid4())
-    chain: list = []
-    for index, payload in enumerate(payload_list, start=1):
-        chain.append(
-            append(
-                chain,
-                EditorialEvent(
-                    manuscript_id=manuscript_id,
-                    sequence=index,
-                    event_type=EventType.DECISION_RECORDED,
-                    payload=payload,
-                    actor_id=actor_id,
-                    occurred_at=BASE_TIME + timedelta(minutes=index),
-                ),
-            )
-        )
-    verify(chain)
+    verify(build_chain(payload_list))
 
 
 @settings(max_examples=50)
@@ -1892,38 +2116,67 @@ def test_a_chain_built_by_append_always_verifies(
     payload_list=st.lists(payloads, min_size=2, max_size=8),
     victim=st.integers(min_value=0),
 )
-def test_removing_any_event_breaks_the_chain(
-    payload_list: list[dict[str, object]], victim: int
+def test_removing_any_event_except_the_last_breaks_the_chain(
+    payload_list: list[dict[str, PayloadValue]], victim: int
 ) -> None:
-    manuscript_id = ManuscriptId(uuid4())
-    actor_id = UserId(uuid4())
-    chain: list = []
-    for index, payload in enumerate(payload_list, start=1):
-        chain.append(
-            append(
-                chain,
-                EditorialEvent(
-                    manuscript_id=manuscript_id,
-                    sequence=index,
-                    event_type=EventType.DECISION_RECORDED,
-                    payload=payload,
-                    actor_id=actor_id,
-                    occurred_at=BASE_TIME + timedelta(minutes=index),
-                ),
-            )
-        )
-    del chain[victim % len(chain)]
+    """The tail is deliberately excluded, because truncation is undetectable by design.
+
+    Any prefix of a valid chain is itself a valid chain, so removing the last event leaves
+    nothing inconsistent to find. That limitation is stated in `hashchain`'s module
+    docstring and recorded in the technical debt register; closing it needs an external
+    anchor. Every other removal must break verification.
+    """
+    chain = build_chain(payload_list)
+    del chain[victim % (len(chain) - 1)]
     try:
         verify(chain)
-    except ChainBroken:
+    except ChainBrokenError:
         return
-    raise AssertionError("removing an event should always break verification")
+    raise AssertionError("removing a non-terminal event should always break verification")
+
+
+@settings(max_examples=100)
+@given(payload_list=st.lists(payloads, min_size=1, max_size=6))
+def test_truncating_the_tail_is_not_detected(
+    payload_list: list[dict[str, PayloadValue]],
+) -> None:
+    """Pins the known limitation so it cannot change silently.
+
+    If a future change makes truncation detectable, this test fails and forces the
+    docstring, the specification and the debt register to be updated together.
+    """
+    verify(build_chain(payload_list)[:-1])
+
+
+@given(
+    title=st.text(max_size=40),
+    abstract=st.text(max_size=80),
+    keywords=st.lists(st.text(min_size=1, max_size=15), max_size=4),
+)
+def test_the_blinded_projection_never_carries_author_identity(
+    title: str, abstract: str, keywords: list[str]
+) -> None:
+    """No manuscript content, however chosen, causes the author id to reach a reviewer."""
+    author = UserId(uuid4())
+    manuscript = Manuscript(
+        id=ManuscriptId(uuid4()),
+        tracking_code=TrackingCode.mint(2026, 1),
+        title=title,
+        abstract=abstract,
+        keywords=tuple(keywords),
+        author_ids=(author,),
+        corresponding_author_id=author,
+    )
+    serialised = repr(dataclasses.asdict(blind(manuscript)))
+    assert str(author) not in serialised
 ```
 
 - [ ] **Step 2: Run the property tests**
 
 Run: `cd backend && uv run pytest tests/unit/domain/test_invariants.py -v`
-Expected: PASS. If `test_withdrawal_is_reachable_from_every_non_terminal_state_except_draft` fails, the transition table and the spec's withdrawal policy disagree — fix the table in `transitions.py`, not the test, because the spec is authoritative.
+Expected: PASS, 9 tests. If `test_withdrawal_is_reachable_from_every_non_terminal_state_except_draft` fails, the transition table and the spec's withdrawal policy disagree — fix the table in `transitions.py`, not the test, because the spec is authoritative.
+
+Note that `test_removing_any_event_except_the_last_breaks_the_chain` deliberately excludes the tail. Truncation is undetectable by hash chaining alone, and `test_truncating_the_tail_is_not_detected` pins that limitation so it cannot change without the docstring, the specification and the debt register being updated together.
 
 - [ ] **Step 3: Run the full gate**
 
@@ -2017,7 +2270,7 @@ git commit -m "ci: run lint, types, architecture contract and coverage gate on t
 
 - `docs/03-effort-estimation.md` contains the full UCP derivation, the COCOMO II cross-check, the reconciliation of the two, the MoSCoW cut that governs Plans 2–6, and the method for the closing variance analysis.
 - `cd backend && make check` passes from a clean checkout: ruff, ruff format, mypy strict, import-linter, and pytest at or above 85% coverage.
-- The domain package imports no framework, verified mechanically rather than by inspection.
+- The domain package imports no framework, vendor SDK, or I/O module from a named denylist, verified mechanically by an import-linter contract rather than by inspection.
 - The manuscript lifecycle, hash chain, authorisation policy and blinded projection are each covered by example-based tests and, where the claim is universal, by property-based tests.
 
 ## What Plans 2–6 cover
