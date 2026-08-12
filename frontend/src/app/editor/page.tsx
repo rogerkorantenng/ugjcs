@@ -33,33 +33,35 @@ export default function EditorialQueue() {
       )}
 
       {data && data.length > 0 && (
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[36rem] text-left text-sm">
-            <caption className="sr-only">Manuscripts awaiting editorial action</caption>
-            <thead>
-              <tr className="border-b border-rule text-ink/60">
-                <th scope="col" className="py-2 pr-4 font-medium">Tracking code</th>
-                <th scope="col" className="pr-4 font-medium">Title</th>
-                <th scope="col" className="font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((manuscript) => (
-                <tr key={manuscript.tracking_code} className="border-b border-rule transition-colors hover:bg-teal/5">
-                  <td className="py-2.5 pr-4">
-                    <Link
-                      href={`/editor/${manuscript.tracking_code}`}
-                      className="rounded-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
-                    >
-                      <TrackingChip code={manuscript.tracking_code} />
-                    </Link>
-                  </td>
-                  <td className="pr-4 text-ink">{manuscript.title}</td>
-                  <td><StatusBadge status={manuscript.status} /></td>
+        <div className="mt-4 overflow-hidden rounded-[3px] border border-rule bg-white/70 shadow-[0_1px_2px_rgba(18,32,58,0.06)]">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[36rem] text-left text-sm">
+              <caption className="sr-only">Manuscripts awaiting editorial action</caption>
+              <thead>
+                <tr className="border-b border-rule bg-ink/[0.03] text-ink/60">
+                  <th scope="col" className="py-2.5 pl-4 pr-4 font-medium">Tracking code</th>
+                  <th scope="col" className="pr-4 font-medium">Title</th>
+                  <th scope="col" className="pr-4 font-medium">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {data.map((manuscript) => (
+                  <tr key={manuscript.tracking_code} className="border-b border-rule last:border-b-0 transition-colors hover:bg-teal/5">
+                    <td className="py-2.5 pl-4 pr-4">
+                      <Link
+                        href={`/editor/${manuscript.tracking_code}`}
+                        className="rounded-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+                      >
+                        <TrackingChip code={manuscript.tracking_code} />
+                      </Link>
+                    </td>
+                    <td className="pr-4 text-ink">{manuscript.title}</td>
+                    <td className="pr-4"><StatusBadge status={manuscript.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </>

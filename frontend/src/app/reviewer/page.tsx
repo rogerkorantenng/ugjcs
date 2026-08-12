@@ -4,6 +4,7 @@ import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { EmptyState } from "@/components/ui/empty-state";
+import { cardLinkClasses } from "@/components/ui/card";
 import { ManuscriptListSkeleton } from "@/components/skeletons";
 import type { BlindedManuscript } from "@/types/api";
 
@@ -35,10 +36,7 @@ export default function ReviewerAssignments() {
         <ul className="mt-4 space-y-3">
           {data.map((manuscript) => (
             <li key={manuscript.tracking_code}>
-              <Link
-                href={`/reviewer/${manuscript.tracking_code}`}
-                className="block rounded-[3px] border border-rule bg-white/70 p-4 transition-colors hover:border-teal/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
-              >
+              <Link href={`/reviewer/${manuscript.tracking_code}`} className={cardLinkClasses()}>
                 <p className="font-medium text-ink">{manuscript.title}</p>
                 <TrackingChip code={manuscript.tracking_code} className="mt-1" />
               </Link>

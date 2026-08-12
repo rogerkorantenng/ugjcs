@@ -3,7 +3,7 @@
 export function TrackingChip({ code, className = "" }: { code: string; className?: string }) {
   return (
     <span
-      className={`inline-block rounded-[3px] border border-rule px-1.5 py-0.5 font-mono text-xs
+      className={`inline-block rounded-[3px] border border-rule bg-ink/[0.03] px-1.5 py-0.5 font-mono text-xs
         tracking-wider text-ink/70 ${className}`}
     >
       {code}

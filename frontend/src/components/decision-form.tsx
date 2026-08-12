@@ -17,6 +17,14 @@ const AVAILABLE_BY_STATUS: Record<ManuscriptStatus, DecisionType[]> = {
   revision_requested: [], resubmitted: [], accepted: [], rejected: [], scheduled: [], published: [], withdrawn: [],
 };
 
+/** Whether `DecisionForm` would render anything for this status — the caller
+ * (`editor/[trackingCode]/page.tsx`) uses this to decide whether to render the "Decision"
+ * section heading at all, so a terminal-state manuscript doesn't show an empty heading
+ * over nothing. */
+export function hasAvailableDecision(status: ManuscriptStatus): boolean {
+  return AVAILABLE_BY_STATUS[status].length > 0;
+}
+
 export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode: string; status: ManuscriptStatus; onDecided: () => void }) {
   const [submitting, setSubmitting] = useState(false);
   const [problem, setProblem] = useState<ProblemDetails | null>(null);

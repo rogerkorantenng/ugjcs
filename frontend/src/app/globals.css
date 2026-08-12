@@ -28,4 +28,44 @@
     background-color: color-mix(in srgb, var(--color-amber) 35%, transparent);
     color: var(--color-ink);
   }
+
+  /* A faint printer's dot-screen on the page ground — the one texture cue that the
+     "paper" token name is not just a colour but a material. Cheap (no image asset),
+     and quiet enough to disappear under any content sitting on top of it. */
+  body {
+    background-image: radial-gradient(
+      color-mix(in srgb, var(--color-ink) 5%, transparent) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* A page-load entrance for hero-level content only — used sparingly (the homepage
+     nameplate and lede), never on repeating list items, so it reads as one orchestrated
+     moment rather than scattered motion. */
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-rise-in {
+    animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
