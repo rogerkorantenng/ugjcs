@@ -1017,6 +1017,11 @@ async def session(postgres_url: str) -> AsyncIterator[AsyncSession]:
     await engine.dispose()
 ```
 
+**`get_settings()` is `@lru_cache`d, so never let a test depend on it.** The fixture passes both
+`postgres_url` and `echo` explicitly, which is what keeps `create_engine` from reading settings at
+all. Anything that does call `get_settings()` in a test must call `get_settings.cache_clear()` first,
+or it silently receives configuration captured by an earlier test in the same process.
+
 The trigger is created here as well as in the migration because these tests build the schema from metadata rather than by running Alembic. Task 8 adds a separate check that the migration itself produces the same trigger, so the duplication cannot drift unnoticed.
 
 The `noqa: F401` is authorised for the same registration-side-effect reason as Alembic's.
