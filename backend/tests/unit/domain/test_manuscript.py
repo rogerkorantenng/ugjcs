@@ -14,6 +14,17 @@ EDITOR = UserId(uuid4())
 NOW = datetime(2026, 8, 12, 11, 0, tzinfo=UTC)
 
 
+def status_of(manuscript: Manuscript) -> S:
+    """Read status through a call so mypy cannot narrow the attribute in place.
+
+    Asserting `manuscript.status is S.X` inline narrows the attribute to that literal for
+    the rest of the function. mypy cannot see that a later method call mutates it, so a
+    second assertion against a different status is rejected as a non-overlapping identity
+    check. Reading through a call yields a fresh `S` each time.
+    """
+    return manuscript.status
+
+
 def draft() -> Manuscript:
     return Manuscript(
         id=ManuscriptId(uuid4()),
@@ -110,17 +121,11 @@ def test_acceptance_requires_the_minimum_review_count() -> None:
 
 
 def test_review_quorum_closes_the_review_round() -> None:
-    # The statuses are captured into annotated locals before either is asserted. Asserting
-    # `manuscript.status is S.UNDER_REVIEW` inline would narrow the attribute's type to that
-    # literal for the rest of the function, and mypy cannot see that record_review mutates it,
-    # so the second assertion would be rejected as a non-overlapping identity check.
     manuscript = under_review()
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    after_first: S = manuscript.status
+    assert status_of(manuscript) is S.UNDER_REVIEW
     manuscript.record_review(reviewer_id=UserId(uuid4()), occurred_at=NOW)
-    after_second: S = manuscript.status
-    assert after_first is S.UNDER_REVIEW
-    assert after_second is S.REVIEWS_COMPLETE
+    assert status_of(manuscript) is S.REVIEWS_COMPLETE
 
 
 def test_acceptance_succeeds_once_the_minimum_is_met() -> None:
@@ -203,11 +208,11 @@ def test_accepted_manuscript_can_be_scheduled_then_published() -> None:
     manuscript = accepted()
     issue_id = IssueId(uuid4())
     scheduled = manuscript.schedule(issue_id=issue_id, actor_id=EDITOR, occurred_at=NOW)
-    assert manuscript.status is S.SCHEDULED
+    assert status_of(manuscript) is S.SCHEDULED
     assert manuscript.issue_id == issue_id
     assert scheduled.event_type is EventType.SCHEDULED_FOR_ISSUE
     published = manuscript.publish(actor_id=EDITOR, occurred_at=NOW)
-    assert manuscript.status is S.PUBLISHED
+    assert status_of(manuscript) is S.PUBLISHED
     assert published.event_type is EventType.MANUSCRIPT_PUBLISHED
 
 
