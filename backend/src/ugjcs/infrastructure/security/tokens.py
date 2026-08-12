@@ -22,6 +22,8 @@ from ugjcs.domain.ids import UserId
 
 ALGORITHM = "HS256"
 ACCESS_TYPE = "access"
+VERIFY_TYPE = "verify"
+DEFAULT_VERIFICATION_TTL = timedelta(hours=48)
 
 
 class InvalidTokenError(DomainError):
@@ -35,12 +37,19 @@ class SystemClock:
 
 class JwtTokenService:
     def __init__(
-        self, *, secret: str, clock: Clock, access_ttl: timedelta, refresh_ttl: timedelta
+        self,
+        *,
+        secret: str,
+        clock: Clock,
+        access_ttl: timedelta,
+        refresh_ttl: timedelta,
+        verification_ttl: timedelta = DEFAULT_VERIFICATION_TTL,
     ) -> None:
         self._secret = secret
         self._clock = clock
         self._access_ttl = access_ttl
         self._refresh_ttl = refresh_ttl
+        self._verification_ttl = verification_ttl
 
     def issue_access(self, subject: UserId) -> str:
         issued = self._clock.now()
@@ -78,6 +87,33 @@ class JwtTokenService:
 
     def hash_refresh(self, token: str) -> str:
         return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+    def issue_verification(self, subject: UserId) -> str:
+        issued = self._clock.now()
+        return jwt.encode(
+            {
+                "sub": str(subject),
+                "typ": VERIFY_TYPE,
+                "iat": int(issued.timestamp()),
+                "exp": int((issued + self._verification_ttl).timestamp()),
+            },
+            self._secret,
+            algorithm=ALGORITHM,
+        )
+
+    def read_verification(self, token: str) -> UserId:
+        try:
+            claims = jwt.decode(token, self._secret, algorithms=[ALGORITHM])
+        except jwt.ExpiredSignatureError as error:
+            raise InvalidTokenError("verification link has expired") from error
+        except jwt.PyJWTError as error:
+            raise InvalidTokenError("verification link is not valid") from error
+        if claims.get("typ") != VERIFY_TYPE:
+            raise InvalidTokenError("wrong token type for verification")
+        try:
+            return UserId(UUID(claims["sub"]))
+        except (KeyError, ValueError) as error:
+            raise InvalidTokenError("token subject is missing or malformed") from error
 
     @property
     def refresh_ttl(self) -> timedelta:

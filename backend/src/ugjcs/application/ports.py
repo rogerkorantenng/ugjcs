@@ -108,6 +108,13 @@ class TokenService(Protocol):
 
     def hash_refresh(self, token: str) -> str: ...
 
+    def issue_verification(self, subject: UserId) -> str: ...
+
+    def read_verification(self, token: str) -> UserId:
+        """Return the subject, or raise `InvalidTokenError` if absent, expired, replayed-typed,
+        or of the wrong `typ`."""
+        ...
+
 
 class EmailSender(Protocol):
     async def send_verification(self, to: str, link: str) -> None: ...
