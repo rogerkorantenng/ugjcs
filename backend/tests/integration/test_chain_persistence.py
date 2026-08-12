@@ -1,6 +1,6 @@
 """The chain must verify after a round trip, and keep verifying as events accumulate."""
 
-from datetime import UTC, datetime
+from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 import pytest
@@ -16,7 +16,11 @@ pytestmark = pytest.mark.integration
 
 AUTHOR = UserId(uuid4())
 EDITOR = UserId(uuid4())
-NOW = datetime(2026, 8, 12, 12, 0, tzinfo=UTC)
+# Deliberately NOT UTC. PostgreSQL normalises timestamptz to UTC on storage, so an event
+# recorded at a different offset only hashes reproducibly because canonical_bytes()
+# normalises too. With a UTC fixture the round trip is a no-op and proves nothing.
+KAMPALA = timezone(timedelta(hours=3))
+NOW = datetime(2026, 8, 12, 15, 0, tzinfo=KAMPALA)
 
 
 def make_manuscript() -> Manuscript:
