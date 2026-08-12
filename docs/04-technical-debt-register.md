@@ -31,7 +31,8 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 | **Cause** | Deliberate. The account was configured before the project began, and replacing root credentials was not on the critical path to a working domain core. |
 | **Impact** | Root credentials cannot be scoped, cannot be rotated per-service, and cannot be revoked without disrupting every other use of the account. Their compromise is unrecoverable within the account. |
 | **Priority** | **Critical** — must be resolved before any infrastructure is provisioned, not merely before real users. |
-| **Resolution** | Create an IAM deploy user restricted to ECR, ECS, RDS, S3 and CloudFront actions on this project's resources; store its credentials in GitHub Actions secrets; enable MFA on root and stop using it. |
+| **Resolution** | Create an IAM deploy user restricted to App Runner, ECR, RDS, S3, Secrets Manager and CloudWatch actions on this project's resources, and store its credentials as GitHub Actions secrets so nothing runs as root. |
+| **Partially accepted** | Enabling MFA on the root account was considered and **deliberately declined by the owner** for this assessment period. Scoping day-to-day access to the IAM user removes root from the operational path, which addresses the larger share of the exposure; MFA would additionally protect root itself against credential compromise. This is a conscious, recorded acceptance rather than an oversight, and it is the entry to close first if this system were ever to carry real submissions. |
 
 ### TD-02 — A reviewer may be authorised to review their own manuscript
 
