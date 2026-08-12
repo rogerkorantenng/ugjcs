@@ -21,6 +21,39 @@
 
 ## Global Constraints
 
+### Write dependencies as `Annotated` aliases, not default arguments — this is not optional
+
+Ruff's bugbear rules (`B008`) reject `Depends(...)` and `Query(...)` used as default argument
+values, which is the style this plan's router snippets were originally written in. The standard
+escape is `extend-immutable-calls` in `pyproject.toml`, but editing that file is forbidden here,
+and `# noqa` is forbidden everywhere. Use the alias pattern instead — it satisfies the linter with
+no suppression and reads better:
+
+```python
+# in api/wiring.py or the router module
+UowDep = Annotated[UnitOfWork, Depends(get_uow)]
+ActorDep = Annotated[Actor, Depends(get_current_actor)]
+
+# in the route
+async def submit(payload: SubmissionIn, uow: UowDep, actor: ActorDep) -> ManuscriptOut:
+    ...
+```
+
+not
+
+```python
+async def submit(payload: SubmissionIn, uow: UnitOfWork = Depends(get_uow)) -> ManuscriptOut:
+    ...
+```
+
+Task 1 already established `UowDep` this way. Follow it in every router.
+
+**A second trap, also already hit:** `get_uow()` cannot be annotated as returning the `UnitOfWork`
+Protocol. The protocol declares `manuscripts` and `accounts` as mutable attributes, which mypy
+checks invariantly, so the concrete `SqlAlchemyUnitOfWork` does not satisfy it as a return type.
+Annotate the provider with the concrete class and expose the protocol through the `UowDep` alias.
+
+
 - Python **3.13**, all tooling via `uv run` from `backend/`.
 - The layered import contract holds and gains one layer: `ugjcs.api` → `ugjcs.infrastructure` → `ugjcs.application` → `ugjcs.domain`, inward only. `ugjcs.api` is added as Task 1's first step.
 - Timestamps are timezone-aware UTC.
