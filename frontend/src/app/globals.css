@@ -1,42 +1,48 @@
 @import "tailwindcss";
 
 /*
- * UGJCS's palette is built from two artefacts of the real editorial process, not from a
- * generic "scholarly" mood board: the violet registry stamp a received manuscript is
- * marked with (`stamp`), and the physical act of redaction at the heart of double-blind
- * review (rendered by `RedactionBar`, the app's one signature device). `seal` and
- * `verified` are the two outcomes a manuscript's story can end on — rejected in red ink,
- * settled in green — and `ink`/`paper`/`rule` are the cool, laid-paper neutrals everything
- * else sits on. No warm cream, no hairline-on-hairline default: this is a specific print
- * object, not a template.
+ * Palette: a registry, not a brief. `paper`/`ink` are cool and near-neutral — the ground a
+ * violet accession stamp and a red wax seal would actually sit on, not a warm scholarly
+ * cream. `stamp` is the violet ink a received manuscript is marked with: accession codes,
+ * links, primary actions. `seal` is reserved for what cannot be undone — rejection,
+ * retraction, withdrawal. `verified` marks what has settled — accepted, published. There is
+ * no fourth accent: a "pending" status explains itself in words (see src/lib/status.ts)
+ * rather than reaching for a new hue.
  */
 @theme {
   --color-paper: #f6f7f5;
+  --color-surface: #ffffff;
   --color-ink: #12151a;
   --color-stamp: #4b3f9e;
-  --color-stamp-dark: color-mix(in srgb, var(--color-stamp) 80%, black);
+  --color-stamp-dark: #3a317b;
   --color-seal: #8c2f2f;
-  --color-seal-dark: color-mix(in srgb, var(--color-seal) 80%, black);
   --color-verified: #2f6b4f;
-  --color-verified-dark: color-mix(in srgb, var(--color-verified) 80%, black);
   --color-rule: #d8dcd6;
 
-  /* `font-serif` carries Fraunces everywhere a heading or display moment needs it — kept
-     under Tailwind's existing `font-serif` key so every call site written against the old
-     warm-serif direction still resolves, just to a different, deliberately chosen face. */
-  --font-serif: var(--font-fraunces), "Iowan Old Style", Georgia, serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
   --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
-  /* A deliberate scale, not the default one Tailwind ships: display sizes get tighter
-     line-height and negative tracking (a print masthead's numerals sit close), body copy
-     stays roomy. */
-  --text-display: 3rem;
-  --text-display--line-height: 1.05;
-  --text-display--letter-spacing: -0.01em;
-  --text-headline: 2rem;
-  --text-headline--line-height: 1.1;
-  --text-headline--letter-spacing: -0.01em;
+  /* A deliberate scale (~1.22 ratio), each size paired with its own line-height rather than
+     inheriting Tailwind's defaults — a journal's type sits on a considered grid. */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.55;
+  --text-base: 1rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.4;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: 1.15;
+  --text-4xl: 2.875rem;
+  --text-4xl--line-height: 1.08;
+  --text-5xl: 3.75rem;
+  --text-5xl--line-height: 1.02;
 }
 
 @layer base {
@@ -46,28 +52,30 @@
 
   h1, h2, h3 {
     text-wrap: balance;
-    font-optical-sizing: auto;
+    font-family: var(--font-display);
   }
 
   ::selection {
     background-color: color-mix(in srgb, var(--color-stamp) 30%, transparent);
-    color: var(--color-paper);
+    color: var(--color-ink);
   }
 
-  /* A faint printer's dot-screen on the page ground — the one texture cue that "paper" is a
-     material, not just a colour name. Cheap (no image asset), quiet enough to vanish under
-     any content sitting on top of it. */
+  /* A faint laid-paper chain-line texture — vertical hairlines, the way handmade/laid paper
+     is held up to the light, rather than the previous dot-screen (a print-halftone cue that
+     belonged to the warm-cream direction this replaces). Cheap, and quiet under content. */
   body {
-    background-color: var(--color-paper);
-    background-image: radial-gradient(
-      color-mix(in srgb, var(--color-ink) 5%, transparent) 1px,
-      transparent 1px
+    background-image: repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 0px,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 1px,
+      transparent 1px,
+      transparent 24px
     );
-    background-size: 20px 20px;
   }
 
   :focus-visible {
-    outline: none;
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -81,16 +89,25 @@
 }
 
 @layer utilities {
-  /* The Fraunces "wonk" axis (its inkier, more characterful alternate letterforms) applied
-     only to the masthead nameplate — the single place the display face is allowed to show
-     personality. Restraint elsewhere keeps it a working display face, not a gimmick. */
-  .font-display-wonk {
-    font-variation-settings: "WONK" 1;
+  /* The display face, used with restraint: a moderate optical size and a touch of ink-trap
+     "wonk" for character at heading sizes — never applied at body text sizes, and the wonk
+     axis never pushed further than this on any element. */
+  .font-display-heading {
+    font-family: var(--font-display);
+    font-variation-settings: "opsz" 28, "SOFT" 0, "WONK" 1;
   }
 
-  /* A page-load entrance for one arrival moment only — the masthead/issue-cover on first
-     paint and the sign-in card — never on repeating list items, so it reads as one
-     orchestrated moment rather than scattered motion. */
+  /* The one place the display face is allowed to lean further into its personality — the
+     issue cover's masthead title. Not reused elsewhere, so it reads as one deliberate voice
+     rather than a texture applied everywhere. */
+  .font-display-cover {
+    font-family: var(--font-display);
+    font-variation-settings: "opsz" 72, "SOFT" 0, "WONK" 1;
+  }
+
+  /* A page-load entrance for hero-level content only — used sparingly (the issue cover's
+     masthead), never on repeating list items, so it reads as one orchestrated moment rather
+     than scattered motion. */
   @keyframes rise-in {
     from {
       opacity: 0;
@@ -106,15 +123,18 @@
     animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  /* The redaction bar's ink block gets a faint diagonal hatch — the one texture that reads
-     as "physically blacked out" rather than "just a dark rectangle" at a glance. */
-  .redaction-hatch {
+  /* The redaction bar's texture: a tight diagonal hazard-stripe, the visual grammar of a
+     marker drawn over a line of text. Used only by RedactionBar — see
+     src/components/ui/redaction-bar.tsx — so it stays this app's one deliberate "blocked
+     out" cue rather than a general-purpose pattern. */
+  .bg-redaction {
+    background-color: var(--color-ink);
     background-image: repeating-linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--color-paper) 6%, transparent) 0,
-      color-mix(in srgb, var(--color-paper) 6%, transparent) 1px,
-      transparent 1px,
-      transparent 6px
+      -45deg,
+      color-mix(in srgb, var(--color-paper) 8%, transparent) 0px,
+      color-mix(in srgb, var(--color-paper) 8%, transparent) 2px,
+      transparent 2px,
+      transparent 10px
     );
   }
 }

@@ -141,3 +141,29 @@ export interface DocumentUrlOut {
   url: string;
   expires_in_seconds: number;
 }
+
+/**
+ * `GET /people/lookup?email=` — exact-match only, any authenticated user. Backs the
+ * submission form's add-by-email co-author picker: a typed email resolves to a name to
+ * confirm before it becomes a chip, rather than asking a submitter for a raw account id.
+ */
+export interface PersonLookup {
+  id: string;
+  full_name: string;
+  affiliation: string;
+}
+
+/**
+ * `GET /editorial/{trackingCode}/reviewer-candidates` — editor/EiC only. `excluded_reason`
+ * is null when eligible; when it is not null, the picker shows the candidate greyed out
+ * with the reason visible rather than hiding them — an editor seeing *why* someone can't
+ * review is the conflict-of-interest feature surfacing where the decision is made.
+ */
+export interface ReviewerCandidate {
+  id: string;
+  full_name: string;
+  affiliation: string;
+  active_assignments: number;
+  reviewer_capacity: number;
+  excluded_reason: string | null;
+}

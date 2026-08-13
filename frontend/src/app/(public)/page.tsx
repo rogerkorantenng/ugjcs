@@ -1,54 +1,48 @@
 import Link from "next/link";
 import { getPublishedPapers } from "@/lib/archive";
-import { PaperCard } from "@/components/manuscript-card";
+import { formatAuthors } from "@/lib/format";
+import { TrackingChip } from "@/components/ui/tracking-chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { buttonClasses } from "@/components/ui/button";
 
 export const revalidate = 300;
 
-/** Real, derived facts only — never a placeholder number. `/archive` carries no
- * `published_at`/volume/DOI (docs/05-api-contract.md §7): there is no true "Vol. N No. N"
- * to print on the cover, so the cover states what the data actually supports — how many
- * papers are in the current issue and how many distinct bylines stand behind them —
- * instead of inventing a volume/issue number nothing on the wire backs up. */
-function issueFacts(papers: { author_names: string[] }[]) {
+/** Counts real, derived facts only — never a placeholder number. `/archive` carries no
+ * `published_at`/volume/DOI (docs/05-api-contract.md §7), so the strip states what the
+ * data actually supports: how many papers, and how many distinct bylines behind them. */
+function journalStats(papers: { author_names: string[] }[]) {
   const authors = new Set(papers.flatMap((paper) => paper.author_names));
-  return { count: papers.length, authors: authors.size };
+  return [
+    { label: "Published papers", value: papers.length },
+    { label: "Contributing authors", value: authors.size },
+    { label: "Reviewers per manuscript", value: 2 },
+  ];
 }
 
 export default async function HomePage() {
   const papers = await getPublishedPapers();
-  const facts = issueFacts(papers);
+  const stats = journalStats(papers);
 
   return (
     <main>
-      {/* The issue cover. A rule under the masthead, then the current-issue line standing
-          in for the volume/number a print cover would carry — honestly, since no volume or
-          issue number exists anywhere on the wire; see `issueFacts`. Contents follow as a
-          numbered list below, not a grid of equal cards: papers in an issue genuinely have
-          an order, the way entries in a table of contents do. */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-5xl px-4 pb-10 pt-14 sm:pt-20">
-          <div className="animate-rise-in">
-            <div aria-hidden="true" className="h-px w-16 bg-stamp" />
-            <p className="mt-4 font-mono text-xs uppercase tracking-[0.22em] text-stamp">Current issue</p>
-            <h1 className="font-display-wonk mt-3 max-w-3xl font-serif text-display font-semibold text-ink sm:text-5xl">
-              Rigorously reviewed computing research, from Legon and beyond.
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-ink/65 sm:text-lg">
-              Every manuscript is screened, reviewed twice under strict double-blind conditions,
-              and decided on by an editor before it reaches this archive
-              {facts.count > 0 ? (
-                <>
-                  {" — "}
-                  {facts.count} {facts.count === 1 ? "paper" : "papers"} so far, from {facts.authors}{" "}
-                  {facts.authors === 1 ? "author" : "authors"}.
-                </>
-              ) : (
-                "."
-              )}
+      {/* The issue cover: a masthead moment, not a hero banner — the one place the display
+          face is allowed its full character (`.font-display-cover`), and the one entrance
+          animation in the app. Everything past this section is deliberately quiet. */}
+      <section className="border-b border-rule bg-surface/40">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
+          <div className="animate-rise-in max-w-2xl">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-stamp">
+              A double-blind peer-reviewed journal
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-5">
+            <h1 className="font-display-cover mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:text-5xl">
+              University of Ghana Journal of Computing Science
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/70">
+              Original research in computing and information systems, from Legon and beyond. Every manuscript is
+              screened, reviewed twice under strict double-blind conditions, and decided on by an editor before it
+              reaches this archive.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link href="/search" className={buttonClasses("primary")}>
                 Search the archive
               </Link>
@@ -60,27 +54,59 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
+          <dl className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-[3px] border border-rule bg-rule sm:grid-cols-3">
+            {stats.map((stat) => (
+              <div key={stat.label} className="bg-paper px-6 py-5">
+                <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/50">{stat.label}</dt>
+                <dd className="font-display-heading mt-1 text-3xl font-semibold text-ink">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-12 sm:py-14">
-        <div className="flex items-baseline justify-between gap-4 border-b border-rule pb-3">
-          <h2 className="font-serif text-lg font-semibold text-ink">Contents</h2>
+      {/* The contents page: a numbered list, the way a print issue's table of contents
+          orders its articles — not a card grid. Numbering is legitimate here: these papers
+          have a real order (most recently published first), not a decorative one. */}
+      <section className="mx-auto max-w-5xl px-4 py-14">
+        <div className="flex items-baseline justify-between border-b-2 border-stamp pb-3">
+          <h2 className="font-display-heading text-lg font-semibold text-ink">Contents</h2>
           <Link href="/search" className="text-sm font-medium text-stamp hover:text-stamp-dark">
             Browse all →
           </Link>
         </div>
         {papers.length > 0 ? (
-          <div>
-            {papers.slice(0, 8).map((paper, i) => (
-              <PaperCard key={paper.tracking_code} paper={paper} index={i + 1} />
+          <ol className="divide-y divide-rule">
+            {papers.map((paper, index) => (
+              <li key={paper.tracking_code} className="group grid grid-cols-[3rem_1fr] gap-4 py-6 sm:grid-cols-[4rem_1fr]">
+                <span
+                  aria-hidden="true"
+                  className="font-mono text-2xl font-light leading-none text-stamp/50 tabular-nums sm:text-3xl"
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0">
+                  <Link href={`/papers/${paper.tracking_code}`} className="rounded-[2px] focus-visible:outline-2 focus-visible:outline-offset-2">
+                    <h3 className="font-display-heading text-lg font-semibold text-ink group-hover:text-stamp sm:text-xl">
+                      {paper.title}
+                    </h3>
+                  </Link>
+                  <p className="mt-1 text-sm text-ink/60">{formatAuthors(paper.author_names)}</p>
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink/70">{paper.abstract}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <TrackingChip code={paper.tracking_code} />
+                    {paper.keywords.slice(0, 3).map((keyword) => (
+                      <span key={keyword} className="rounded-full border border-rule px-2 py-0.5 text-[11px] uppercase tracking-wide text-ink/50">
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         ) : (
-          <EmptyState
-            title="No papers have been published yet"
-            hint="Check back soon — new issues appear here as they clear review."
-          />
+          <EmptyState title="No papers have been published yet" hint="Check back soon — new issues appear here as they clear review." />
         )}
       </section>
     </main>

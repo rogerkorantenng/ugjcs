@@ -67,8 +67,8 @@ export function PdfDropzone({ label, file, onSelect, disabled = false }: PdfDrop
           if (!disabled) handleFiles(event.dataTransfer.files);
         }}
         className={`flex flex-col items-center justify-center gap-1 rounded-[3px] border border-dashed px-4 py-6 text-center text-sm transition-colors
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stamp
-          ${dragging ? "border-stamp bg-stamp/5" : "border-rule bg-white"}
+          focus-visible:outline-2 focus-visible:outline-offset-2
+          ${dragging ? "border-stamp bg-stamp/5" : "border-rule bg-surface"}
           ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:border-stamp/60"}`}
       >
         <span className="text-ink/70">{file ? file.name : "Drag a PDF here, or click to browse"}</span>

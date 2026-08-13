@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Public_Sans } from "next/font/google";
 import "./globals.css";
 
-// Fraunces: the display face. Variable, loaded with its optical-size axis (so a 14px
-// tracking chip and a 48px masthead numeral aren't the same letterforms stretched) and its
-// "wonk" axis available for the one place — the masthead nameplate — that uses it.
+// Display face: registry-stamp headings lean on Fraunces' optical-size and "wonk" axes
+// (see .font-display-heading / .font-display-cover in globals.css) rather than a second
+// typeface, so the whole heading system stays one variable font.
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
-  axes: ["opsz", "WONK"],
+  axes: ["opsz", "SOFT", "WONK"],
 });
 const publicSans = Public_Sans({
   subsets: ["latin"],
@@ -18,7 +18,7 @@ const publicSans = Public_Sans({
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   variable: "--font-plex-mono",
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {

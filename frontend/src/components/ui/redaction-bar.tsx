@@ -1,41 +1,39 @@
-import { formatAuthors } from "@/lib/format";
-
 /**
- * The app's one signature device, built from the physical act at the heart of double-blind
- * review. Reviewer-facing screens render this with no `names` — a solid `ink` block, hatched
- * like something physically blacked out, labelled "Author withheld". The public archive
- * renders the exact same shape with `names` supplied, so the block opens into a plain byline
- * instead. A reader who has seen both instantly understands the mechanic the whole system is
- * built on — that is deliberate, and it is why this component is shared rather than two
- * unrelated pieces of markup that happen to sit in the same place.
+ * This app's one signature device. Where an author's name would sit, a reviewer sees a
+ * solid ink block labelled "Author withheld" — the double-blind mechanic made visible, not
+ * just enforced silently by a type with no author field. The public archive renders the
+ * *same slot*, same label position, same border geometry, with the actual byline in place
+ * of the block (`revealed` below) — seeing both teaches the mechanic at a glance, the way a
+ * censored and an uncensored document rhyme.
  *
- * `BlindedManuscript` (the type this renders against on every reviewer-facing screen) has no
- * author field at all — this component is never handed real identity to hide, it only ever
- * renders the redacted variant. The revealing variant is reachable exclusively from
- * `ArchivePaperOut.author_names`, a field that exists only on the public, post-publication
- * archive shape.
+ * Deliberately not reused for anything else in the app: one memorable device, kept rare.
  */
-export function RedactionBar({ names, compact = false }: { names?: string[]; compact?: boolean }) {
-  const size = compact ? "px-2 py-0.5 text-[11px]" : "px-2.5 py-1 text-xs";
 
-  if (!names) {
-    return (
-      <p
-        className={`redaction-hatch inline-flex items-center gap-1.5 rounded-[2px] bg-ink font-mono uppercase tracking-[0.14em] text-paper ${size}`}
-      >
-        <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-stamp" />
-        Author withheld
-        <span className="sr-only"> — identity blinded for double-blind review</span>
-      </p>
-    );
-  }
+const SLOT_BASE = "flex items-center gap-3 rounded-[2px] border border-rule px-3 py-2.5";
 
+export function RedactedAuthorSlot({ className = "" }: { className?: string }) {
   return (
-    <p
-      className={`inline-flex items-center gap-1.5 rounded-[2px] border border-stamp/25 bg-stamp/[0.05] font-mono uppercase tracking-[0.14em] text-stamp ${size}`}
-    >
-      <span aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rounded-full bg-stamp" />
-      {formatAuthors(names)}
-    </p>
+    <div className={`${SLOT_BASE} border-ink/15 bg-ink/[0.02] ${className}`}>
+      <span
+        aria-hidden="true"
+        className="bg-redaction h-4 w-32 shrink-0 rounded-[1px]"
+      />
+      <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ink/50">
+        Author withheld — double-blind review
+      </span>
+    </div>
+  );
+}
+
+export function RevealedAuthorSlot({ names, className = "" }: { names: string[]; className?: string }) {
+  return (
+    <div className={`${SLOT_BASE} border-stamp/25 bg-stamp/[0.04] ${className}`}>
+      <span className="font-sans text-sm font-medium text-ink" data-testid="revealed-author-names">
+        {names.length > 0 ? names.join(", ") : "Unattributed"}
+      </span>
+      <span className="ml-auto shrink-0 font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-stamp/70">
+        Author of record
+      </span>
+    </div>
   );
 }

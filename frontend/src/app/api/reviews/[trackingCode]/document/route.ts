@@ -11,11 +11,22 @@ import type { DocumentUrlOut } from "@/types/api";
  * at `/api/manuscripts/{trackingCode}/document` instead — that route can serve the
  * original, and doing so would defeat the double-blind guarantee this whole route exists
  * to enforce.
+ *
+ * `?format=json` returns the `DocumentUrlOut` body directly (`Cache-Control: no-store`)
+ * instead of redirecting, for the inline `<PdfViewer>` — see the sibling manuscripts route
+ * for the full rationale. The reviewer's viewer chrome renders a `RedactedAuthorSlot`
+ * alongside this document; the anonymised PDF itself carrying no `/Title`/`/Author` is what
+ * keeps the browser's own PDF toolbar from re-leaking identity — see
+ * `src/lib/pdf-metadata.test.ts`.
  */
-export async function GET(_request: Request, { params }: { params: Promise<{ trackingCode: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = await params;
+  const asJson = new URL(request.url).searchParams.get("format") === "json";
   try {
     const document = await authedFetch<DocumentUrlOut>(`/reviews/${trackingCode}/document`);
+    if (asJson) {
+      return NextResponse.json(document, { headers: { "Cache-Control": "no-store" } });
+    }
     return NextResponse.redirect(document.url);
   } catch (error) {
     if (error instanceof ProblemDetailsError) return NextResponse.json(error.problem, { status: error.status });

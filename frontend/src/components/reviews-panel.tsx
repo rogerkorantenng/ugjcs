@@ -37,25 +37,18 @@ export function ReviewsPanel({ trackingCode }: { trackingCode: string }) {
   return (
     <ul className="mt-3 space-y-4">
       {submitted.map((review) => (
-        <li key={review.reviewer_id} className="rounded-[3px] border border-rule bg-white/70 p-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <span className="font-serif text-base font-semibold text-ink">
-              Recommendation: {review.recommendation?.replaceAll("_", " ")}
-            </span>
-          </div>
-          <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-ink/70 sm:grid-cols-4">
+        <li key={review.reviewer_id} className="rounded-[3px] border border-rule bg-surface/70 p-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            <span className="font-medium text-ink">Recommendation: {review.recommendation?.replaceAll("_", " ")}</span>
             {CRITERIA.map(({ key, label }) => (
-              <div key={key} className="flex items-baseline justify-between gap-2 sm:block">
-                <dt className="text-ink/50">{label}</dt>
-                <dd className="font-mono tabular-nums text-ink">{String(review[key] ?? "—")}/5</dd>
-              </div>
+              <span key={key} className="text-ink/70">{label}: {String(review[key] ?? "—")}/5</span>
             ))}
-          </dl>
-          <p className="mt-3 text-sm leading-relaxed text-ink/80">{review.comments_to_author}</p>
-          <div className="mt-3 border-l-2 border-stamp/40 bg-ink/[0.025] py-2 pl-3 text-sm leading-relaxed text-ink/80">
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-stamp">Confidential to editors</p>
-            <p className="mt-1">{review.confidential_comments_to_editor}</p>
           </div>
+          <p className="mt-2 text-sm text-ink/80">{review.comments_to_author}</p>
+          <p className="mt-2 rounded-[3px] border-l-2 border-stamp bg-stamp/[0.06] p-2 text-sm text-ink/80">
+            <span className="font-medium text-ink">Confidential to editors: </span>
+            {review.confidential_comments_to_editor}
+          </p>
         </li>
       ))}
     </ul>

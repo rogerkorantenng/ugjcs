@@ -28,7 +28,7 @@ export function ManuscriptListSkeleton({
     <StatusRegion label={label}>
       <ul className="mt-4 space-y-3">
         {Array.from({ length: count }).map((_, i) => (
-          <li key={i} className="flex items-center justify-between rounded-[3px] border border-rule bg-white/70 p-4">
+          <li key={i} className="flex items-center justify-between rounded-[3px] border border-rule bg-surface/70 p-4">
             <div className="flex-1 space-y-2">
               <Skeleton className="h-4 w-2/3 max-w-sm" />
               <Skeleton className="h-3 w-28" />
@@ -96,7 +96,7 @@ export function ArchiveListSkeleton({ count = 5, label = "Loading papers…" }: 
     <StatusRegion label={label}>
       <div className="mt-6 grid gap-4">
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="rounded-[3px] border border-rule bg-white/70 p-5">
+          <div key={i} className="rounded-[3px] border border-rule bg-surface/70 p-5">
             <Skeleton className="h-4 w-28" />
             <Skeleton className="mt-3 h-5 w-3/4" />
             <Skeleton className="mt-2 h-3.5 w-1/3" />

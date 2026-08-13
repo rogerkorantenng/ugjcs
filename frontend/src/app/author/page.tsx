@@ -15,7 +15,7 @@ export default function AuthorDashboard() {
 
   return (
     <>
-      <h1 className="font-serif text-2xl font-semibold text-ink">My submissions</h1>
+      <h1 className="font-display-heading text-2xl font-semibold text-ink">My submissions</h1>
 
       {isLoading && <ManuscriptListSkeleton label="Loading your submissions…" />}
 

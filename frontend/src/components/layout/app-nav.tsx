@@ -20,9 +20,9 @@ const ROLE_LABELS: Record<string, string> = {
   administrator: "Administrator",
 };
 
-/** The dashboard's masthead. Same `paper` ground and closing double rule as `SiteHeader`,
- * so a reader moving from the public archive into a signed-in workspace never loses the
- * sense they are still inside the same journal — just past its front cover. */
+/** The dashboard's masthead. Same `ink` chrome and closing double rule as `SiteHeader`, so
+ * a reader moving from the public archive into a signed-in workspace never loses the sense
+ * they are still inside the same journal — just past its front cover. */
 export function AppNav({ user }: { user: SessionUser }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -43,12 +43,12 @@ export function AppNav({ user }: { user: SessionUser }) {
   }
 
   return (
-    <header className="bg-paper text-ink">
+    <header className="bg-ink text-paper">
       <nav aria-label="Account navigation" className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <div className="flex items-center gap-7">
           <Link
             href="/"
-            className="font-serif text-sm font-semibold tracking-tight text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stamp"
+            className="font-display-heading text-sm font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             UGJCS
           </Link>
@@ -59,8 +59,8 @@ export function AppNav({ user }: { user: SessionUser }) {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "page" : undefined}
-                className={`group relative py-1 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stamp ${
-                  active ? "text-stamp" : "text-ink/65 hover:text-ink"
+                className={`group relative py-1 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  active ? "text-stamp" : "text-paper/75 hover:text-paper"
                 }`}
               >
                 {link.label}
@@ -74,20 +74,20 @@ export function AppNav({ user }: { user: SessionUser }) {
             );
           })}
         </div>
-        <div className="flex items-center gap-4 text-sm text-ink/65">
+        <div className="flex items-center gap-4 text-sm text-paper/75">
           <span className="hidden items-center gap-2 sm:flex">
             {primaryRole && (
-              <span className="rounded-full border border-stamp/35 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-stamp">
+              <span className="rounded-full border border-stamp/50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-stamp">
                 {ROLE_LABELS[primaryRole] ?? primaryRole}
               </span>
             )}
-            <span className="font-mono text-xs text-ink/55">{user.email}</span>
+            <span className="font-mono text-xs">{user.email}</span>
           </span>
           <button
             onClick={signOut}
             disabled={signingOut}
             aria-busy={signingOut}
-            className="inline-flex items-center gap-1.5 font-medium text-stamp transition-colors hover:text-stamp-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stamp disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 font-medium text-paper/85 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {signingOut && <Spinner className="h-3.5 w-3.5" />}
             {signingOut ? "Signing out…" : "Sign out"}
@@ -95,7 +95,7 @@ export function AppNav({ user }: { user: SessionUser }) {
         </div>
       </nav>
       <div aria-hidden="true" className="h-[3px] bg-stamp" />
-      <div aria-hidden="true" className="h-px bg-rule" />
+      <div aria-hidden="true" className="h-px bg-paper/20" />
     </header>
   );
 }

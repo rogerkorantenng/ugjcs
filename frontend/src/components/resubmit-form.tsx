@@ -73,7 +73,7 @@ export function ResubmitForm({ trackingCode, onResubmitted }: { trackingCode: st
         name="response_to_reviewers"
         required
         minLength={20}
-        hint="At least 20 characters — explain what changed since the last version."
+        hint="At least 20 characters — describe how the revision addresses the reviewers' comments."
       />
       <Button type="submit" isLoading={submitting}>
         {submitting ? `Uploading… ${progress}%` : "Resubmit manuscript"}

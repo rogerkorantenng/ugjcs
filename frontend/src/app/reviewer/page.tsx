@@ -1,24 +1,39 @@
 "use client";
+import { Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cardLinkClasses } from "@/components/ui/card";
 import { ManuscriptListSkeleton } from "@/components/skeletons";
-import { RedactionBar } from "@/components/ui/redaction-bar";
 import type { BlindedManuscript } from "@/types/api";
+
+/** See the author dashboard's `SubmittedBanner` for why this is isolated behind its own
+ * Suspense boundary rather than calling `useSearchParams()` directly in the page body. */
+function SubmittedBanner() {
+  if (useSearchParams().get("submitted") !== "1") return null;
+  return (
+    <div className="mb-6 rounded-[3px] border-l-2 border-stamp bg-stamp/[0.06] px-4 py-3">
+      <p className="font-medium text-ink">Review submitted.</p>
+      <p className="mt-1 text-sm text-ink/70">
+        The handling editor can now see your scores and comments. Your identity stays withheld from the author
+        throughout — nothing further is required from you unless a revision is later sent back for another round.
+      </p>
+    </div>
+  );
+}
 
 export default function ReviewerAssignments() {
   const { data, error, isLoading } = useApi<BlindedManuscript[]>("/api/reviews");
 
   return (
     <>
-      <h1 className="font-serif text-2xl font-semibold text-ink">My review assignments</h1>
-      <p className="mt-1.5 text-sm text-ink/60">
-        Every manuscript below is shown to you under double-blind conditions — the author&rsquo;s
-        identity is withheld, not merely hidden by this screen.
-      </p>
+      <Suspense fallback={null}>
+        <SubmittedBanner />
+      </Suspense>
+      <h1 className="font-display-heading text-2xl font-semibold text-ink">My review assignments</h1>
 
       {isLoading && <ManuscriptListSkeleton withBadge={false} label="Loading your assignments…" />}
 
@@ -43,10 +58,7 @@ export default function ReviewerAssignments() {
             <li key={manuscript.tracking_code}>
               <Link href={`/reviewer/${manuscript.tracking_code}`} className={cardLinkClasses()}>
                 <p className="font-medium text-ink">{manuscript.title}</p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  <TrackingChip code={manuscript.tracking_code} />
-                  <RedactionBar compact />
-                </div>
+                <TrackingChip code={manuscript.tracking_code} className="mt-1" />
               </Link>
             </li>
           ))}

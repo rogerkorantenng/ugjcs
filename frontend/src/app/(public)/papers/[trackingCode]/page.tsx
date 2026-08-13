@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { getPaper } from "@/lib/archive";
 import { TrackingChip } from "@/components/ui/tracking-chip";
-import { RedactionBar } from "@/components/ui/redaction-bar";
-import { buttonClasses } from "@/components/ui/button";
+import { RevealedAuthorSlot } from "@/components/ui/redaction-bar";
+import { PdfViewer } from "@/components/ui/pdf-viewer";
 
 interface Params { trackingCode: string }
 
@@ -42,10 +42,10 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <TrackingChip code={paper.tracking_code} />
-      <h1 className="mt-3 font-serif text-2xl font-semibold leading-tight text-ink">{paper.title}</h1>
-      <div className="mt-3">
-        <RedactionBar names={paper.author_names} />
-      </div>
+      <h1 className="font-display-heading mt-3 text-2xl font-semibold leading-tight text-ink">{paper.title}</h1>
+      {/* The public half of the redaction/reveal rhyme: the same slot shape a reviewer sees
+          rendered as a solid ink block (`RedactedAuthorSlot`) shows the real byline here. */}
+      <RevealedAuthorSlot names={paper.author_names} className="mt-3" />
       {paper.keywords.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2">
           {paper.keywords.map((keyword) => (
@@ -57,12 +57,13 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
       )}
       <p className="mt-8 border-t border-rule pt-8 leading-relaxed text-ink/80">{paper.abstract}</p>
       {paper.has_document && (
-        <a
-          href={`/api/archive/${paper.tracking_code}/document`}
-          className={buttonClasses("primary", "mt-8")}
-        >
-          Download PDF
-        </a>
+        <PdfViewer
+          trackingCode={paper.tracking_code}
+          documentEndpoint={`/api/archive/${paper.tracking_code}/document`}
+          title={paper.title}
+          variant="original"
+          className="mt-8"
+        />
       )}
     </main>
   );
