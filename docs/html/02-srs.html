@@ -1,0 +1,2235 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>02 · Software Requirements Specification</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+  <style>
+  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+  h3 { font-size:1.12rem; margin-top:1.8rem; }
+  a { color:#4b3f9e; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+  pre code { background:none; color:inherit; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+  th { background:#eceee9; font-weight:600; }
+  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+  figure.diagram svg { max-width:100%; height:auto; }
+  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="title">02 · Software Requirements Specification</div>
+</header>
+<main>
+<nav class="docnav"><a href="index.html">← All documents</a></nav>
+<header id="title-block-header">
+<h1 class="title">02 · Software Requirements Specification</h1>
+</header>
+<h1 id="software-requirements-specification">Software Requirements
+Specification</h1>
+<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
+Computing Science <strong>Document:</strong> 02 — Software Requirements
+Specification <strong>Author:</strong> Roger Koranteng Obeng, student ID
+22424140 <strong>Assessor:</strong> Prof. Solomon Mensah
+<strong>Date:</strong> 2026-08-12 <strong>Conformance:</strong> Adapted
+from IEEE 830-1998 and ISO/IEC/IEEE 29148:2018 <strong>Status:</strong>
+Authoritative. Where this document and the implementation disagree, the
+implementation governs and the disagreement is recorded (§4.1, §7).</p>
+<p><strong>Revision note (2026-08-12, post-implementation).</strong>
+This document was originally authored before the API and frontend
+existed, when only the domain layer and the database persistence adapter
+were built. §2.1, §2.4, §4.3, §5 and §7 have since been revised against
+the finished, deployed system — the live API
+(<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>, confirmed
+against its own <code>/openapi.json</code>), the live frontend
+(<code>https://ugjcs-frontend.vercel.app</code>), the backend source
+under <code>backend/src/ugjcs/api/</code> and
+<code>frontend/src/app/</code>, the test suites under
+<code>backend/tests/</code>, and <code>docs/06-testing-report.md</code>.
+The revision moved twelve requirements from planned to
+implemented-and-tested, refined six from "planned" to "partially
+implemented" with a named gap, and left eleven genuinely not implemented
+— stated as such rather than glossed over. Requirement identifiers,
+MoSCoW priorities and the sections not touched by this revision are
+unchanged from the original.</p>
+<hr />
+<h2 id="1-introduction">1. Introduction</h2>
+<h3 id="11-purpose">1.1 Purpose</h3>
+<p>This document specifies the functional and non-functional
+requirements of UGJCS, a double-blind peer-reviewed journal management
+platform for the Department of Computer Science, University of Ghana. It
+is written for three audiences: the assessor judging
+requirements-engineering competence against this capstone's rubric, a
+future maintainer who needs to know what the system is contracted to do,
+and the author's own implementation, which this document constrains.
+Requirements are stated so that each is individually testable; no
+requirement is expressed as an unmeasurable quality goal.</p>
+<h3 id="12-scope">1.2 Scope</h3>
+<p>UGJCS manages the complete scholarly publishing lifecycle: account
+registration and role-based access; manuscript submission with file
+upload; automated post-upload processing; editorial screening; assisted
+reviewer assignment; structured double-blind review; editorial decisions
+and revision rounds; issue composition and publication; a public archive
+with search, citation export and metadata harvesting; and a
+tamper-evident editorial audit trail. Payment processing,
+copy-editing/typesetting, multi-journal tenancy, ORCID federation, real
+DOI registration, and plagiarism screening against external corpora are
+explicitly out of scope (design specification §4.2). The full functional
+boundary is enumerated in §5 of that specification and restated as
+testable requirements in §3 of this document.</p>
+<h3 id="13-definitions-acronyms-and-abbreviations">1.3 Definitions,
+acronyms and abbreviations</h3>
+<table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UGJCS</td>
+<td>University of Ghana Journal of Computing Science — the platform and
+the journal it hosts</td>
+</tr>
+<tr>
+<td>Double-blind</td>
+<td>Neither author nor reviewer identity is disclosed to the other party
+during review</td>
+</tr>
+<tr>
+<td>MoSCoW</td>
+<td>Must/Should/Could/Won't — requirement prioritisation scheme</td>
+</tr>
+<tr>
+<td>UCP</td>
+<td>Use Case Points — the effort-estimation technique that produced the
+MoSCoW cut</td>
+</tr>
+<tr>
+<td>FR / NFR</td>
+<td>Functional requirement / non-functional requirement</td>
+</tr>
+<tr>
+<td>UC</td>
+<td>Use case, as enumerated in the effort-estimation document</td>
+</tr>
+<tr>
+<td>RBAC</td>
+<td>Role-based access control</td>
+</tr>
+<tr>
+<td>COI</td>
+<td>Conflict of interest</td>
+</tr>
+<tr>
+<td>EiC</td>
+<td>Editor-in-Chief</td>
+</tr>
+<tr>
+<td>HoD</td>
+<td>Head of Department</td>
+</tr>
+<tr>
+<td>BFF</td>
+<td>Backend-for-Frontend — the Next.js server-side proxy pattern used
+for authenticated traffic</td>
+</tr>
+<tr>
+<td>OAI-PMH</td>
+<td>Open Archives Initiative Protocol for Metadata Harvesting</td>
+</tr>
+<tr>
+<td>DOI</td>
+<td>Digital Object Identifier (UGJCS issues DOI-<em>shaped</em> but
+unregistered identifiers — §4.2)</td>
+</tr>
+<tr>
+<td>TF-IDF</td>
+<td>Term frequency–inverse document frequency, used for
+reviewer–manuscript matching</td>
+</tr>
+<tr>
+<td>LSH</td>
+<td>Locality-sensitive hashing, used for near-duplicate similarity
+screening</td>
+</tr>
+<tr>
+<td>WCAG</td>
+<td>Web Content Accessibility Guidelines</td>
+</tr>
+<tr>
+<td>RFC 9457</td>
+<td>Problem Details for HTTP APIs — the platform's error-response
+format</td>
+</tr>
+<tr>
+<td>Hash chain</td>
+<td>The append-only audit mechanism: each event hashes over its
+predecessor's hash and its own payload</td>
+</tr>
+</tbody>
+</table>
+<h3 id="14-references">1.4 References</h3>
+<ul>
+<li>Design specification —
+<code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code></li>
+<li>Effort estimation — <code>docs/03-effort-estimation.md</code></li>
+<li>Technical debt register —
+<code>docs/04-technical-debt-register.md</code></li>
+<li>Domain implementation —
+<code>backend/src/ugjcs/domain/{transitions,enums,policies,blinding,manuscript,hashchain,events}.py</code></li>
+<li>IEEE Std 830-1998, <em>Recommended Practice for Software
+Requirements Specifications</em></li>
+<li>ISO/IEC/IEEE 29148:2018, <em>Systems and software engineering — Life
+cycle processes — Requirements engineering</em></li>
+</ul>
+<h3 id="15-overview">1.5 Overview</h3>
+<p>§2 describes the product, its user classes and its operating
+constraints. §3 states each functional and non-functional requirement in
+testable form. §4 gives the manuscript lifecycle as implemented, the
+actor/use-case mapping and the authorisation matrix. §5 is the
+requirements traceability matrix, stated honestly for what is built
+versus planned. §6 explains the MoSCoW prioritisation and how the effort
+estimate drove it. §7 states the system's limitations plainly,
+cross-referenced to the technical debt register.</p>
+<hr />
+<h2 id="2-overall-description">2. Overall description</h2>
+<h3 id="21-product-perspective">2.1 Product perspective</h3>
+<p>UGJCS is a new, self-contained system; it replaces an ad hoc process
+of email and shared spreadsheets rather than integrating with an
+existing departmental system. It is a three-tier web application: a
+Next.js frontend (public archive, search, paper detail, and
+author/reviewer/editor/Editor-in-Chief screens, with all authenticated
+traffic proxied server-side as a Backend-For-Frontend), a FastAPI
+backend built as a hexagonal architecture with a framework-free domain
+core, and PostgreSQL and S3 as its persistence and document-storage
+infrastructure.</p>
+<p><strong>This is no longer a forward-looking description.</strong> The
+domain layer, the database persistence adapter, the application use-case
+layer, the FastAPI API layer (<code>/auth</code>,
+<code>/manuscripts</code>, <code>/editorial</code>,
+<code>/reviews</code>, <code>/archive</code>, <code>/health</code>,
+<code>/ready</code>) and the Next.js frontend are all built, tested and
+deployed: API at
+<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>, frontend at
+<code>https://ugjcs-frontend.vercel.app</code>. §5's traceability matrix
+states, requirement by requirement, which of these are implemented and
+tested, which are partially built with a named gap, and which — reviewer
+expertise-matching, asynchronous post-upload processing, OAI-PMH,
+citation export, notifications, and analytics — are not built at all.
+Redis and an ARQ worker were designed for asynchronous processing
+(design specification §7) but are not present in the delivered codebase;
+nothing in the current system depends on them, and FR-20 (similarity
+screening) is the requirement that would have used them, and remains
+unimplemented. Terraform-managed ECS/ALB/CloudFront was the original
+deployment design; the actual deployment target differs (§2.4,
+TD-14).</p>
+<h3 id="22-product-functions--summary">2.2 Product functions —
+summary</h3>
+<ul>
+<li>Register, authenticate and authorise users under five roles, several
+of which one account may hold concurrently.</li>
+<li>Accept manuscript submissions, validate and process them
+asynchronously, and produce an anonymised derivative for reviewers.</li>
+<li>Screen submissions and route them to review, revision, or desk
+rejection.</li>
+<li>Recommend reviewers by expertise match, exclude conflicts, balance
+workload, and let the editor accept, reject or override every
+recommendation.</li>
+<li>Collect structured, double-blind reviews and aggregate them into an
+editorial decision once a quorum is met.</li>
+<li>Support revision rounds between author and editor.</li>
+<li>Compose issues from accepted manuscripts and publish them to a
+public archive.</li>
+<li>Serve the archive to anonymous readers with full-text search,
+citation export and OAI-PMH harvesting.</li>
+<li>Record every editorial event in a tamper-evident, append-only
+log.</li>
+</ul>
+<p><em>This list states intended product scope, unchanged from the
+original design; it is not a claim that every bullet is built. §5's
+traceability matrix is the authoritative, requirement-by-requirement
+account of what is implemented today — notably, expertise- ranked
+reviewer recommendation (FR-08), asynchronous processing (§2.1),
+citation export and OAI-PMH harvesting (FR-21, FR-22) are not yet
+built.</em></p>
+<h3 id="23-user-classes-and-characteristics">2.3 User classes and
+characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>User class</th>
+<th>Description</th>
+<th>Frequency of use</th>
+<th>Technical proficiency required</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Author</td>
+<td>Submits and tracks manuscripts, responds to review</td>
+<td>Occasional, bursty around submission and revision</td>
+<td>Low — web form and file upload only</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Evaluates blinded manuscripts against structured criteria</td>
+<td>Occasional, invitation-driven</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Editor</td>
+<td>Screens submissions, assigns reviewers, records decisions</td>
+<td>Regular, throughout each submission's lifecycle</td>
+<td>Moderate — must interpret matching output and audit trail</td>
+</tr>
+<tr>
+<td>Editor-in-Chief</td>
+<td>All Editor capability plus issue composition, publication and policy
+configuration</td>
+<td>Regular; final authority</td>
+<td>Moderate</td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td>Manages accounts, roles and reviewer capacity</td>
+<td>Infrequent</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Reader</td>
+<td>Anonymous; discovers, reads, cites and downloads published work</td>
+<td>Frequent, unauthenticated</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Head of Department (secondary)</td>
+<td>Consumes editorial throughput analytics</td>
+<td>Infrequent</td>
+<td>Low</td>
+</tr>
+<tr>
+<td>Indexing service (external system)</td>
+<td>Harvests metadata via a defined API</td>
+<td>Automated, scheduled</td>
+<td>N/A — machine actor</td>
+</tr>
+</tbody>
+</table>
+<p>A single account may hold multiple roles simultaneously (design
+specification §3); this is a deliberate design choice with a direct
+security consequence recorded in §4.3 and §7 (an Author–Reviewer
+dual-role holder is not currently prevented from reviewing their own
+manuscript).</p>
+<h3 id="24-operating-environment">2.4 Operating environment</h3>
+<p><strong>As deployed</strong> (superseding the design specification's
+ECS/ALB/CloudFront topology — see TD-14 for why, and for why no
+functional capability was lost by the substitution): Backend: Python
+3.13, FastAPI, PostgreSQL 16, deployed as a container on AWS App Runner,
+reachable at <code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>
+with a trusted TLS certificate on App Runner's own
+<code>*.awsapprunner.com</code> hostname (no registered domain is
+available, which is what the CloudFront design was originally solving;
+App Runner supplies the same guarantee directly). Frontend: Next.js 15 /
+TypeScript / Tailwind, deployed on Vercel at
+<code>https://ugjcs-frontend.vercel.app</code>. Storage: private S3
+buckets, documents reachable only via short-lived pre-signed URLs.
+Client environment: any evergreen browser at 360 px width or above;
+readers require no account. Redis and an ARQ worker, specified for
+asynchronous post-upload processing, are not present in the delivered
+infrastructure — nothing currently deployed depends on them (§2.1).</p>
+<h3 id="25-design-and-implementation-constraints">2.5 Design and
+implementation constraints</h3>
+<ul>
+<li>A 48-hour solo development window (effort estimation §8), which
+forced the MoSCoW cut in §6 of this document.</li>
+<li>No registered domain — the CloudFront TLS strategy is not optional
+but architecturally necessary (design specification §7.3).</li>
+<li>AWS and Vercel free/low-cost tiers; operating cost is targeted at
+USD 35–55/month.</li>
+<li>Domain layer must import no framework code, enforced by an
+import-linter contract in CI (NFR-13). <strong>As delivered</strong>,
+two contracts are enforced (<code>backend/.importlinter</code>):
+<code>domain-purity</code> (the constraint above) and
+<code>layers</code>
+(<code>api → infrastructure → application → domain</code>, dependencies
+point inward only) — both gate <code>make check</code> and therefore CI
+on every push and pull request.</li>
+<li>The domain layer is framework-free by construction; this is a
+testable constraint, not an aspiration.</li>
+<li>Synthetic seed data only — no real departmental submissions or
+reviewer data are used.</li>
+</ul>
+<h3 id="26-assumptions-and-dependencies">2.6 Assumptions and
+dependencies</h3>
+<p>Assumptions: a single journal instance suffices; reviewers
+participate without incentive mechanisms; corpus scale is hundreds, not
+millions, of papers, justifying Postgres full-text search over a
+dedicated search engine; authors submit PDFs; a single transactional
+email provider is available. Dependencies: AWS managed services (ECS,
+RDS, S3, CloudFront), Vercel, and a transactional email provider must
+remain available and within free/low-cost tier limits for the system to
+operate as specified.</p>
+<hr />
+<h2 id="3-specific-requirements">3. Specific requirements</h2>
+<p>Each functional requirement is stated as "the system shall …", is
+atomic (one testable behaviour per identifier), and carries the
+preconditions that must hold before it may fire, the postconditions
+guaranteed on success, and the acceptance criterion by which it is
+verified. Identifiers are preserved unchanged from the design
+specification; no requirement is renumbered. One requirement,
+<strong>FR-25a</strong>, is added beyond the original set and is marked
+<strong>NEW</strong> — it was surfaced by comparing the implemented
+lifecycle guard (<code>transitions.py</code>, which permits
+<code>WITHDRAWN</code> as a target state) against the implemented
+authorisation layer (<code>policies.py</code>, which has no action
+gating who may invoke that transition), a gap the original requirement
+(FR-25, which named the feature but not its authorisation mechanism) did
+not anticipate.</p>
+<h3 id="31-functional-requirements">3.1 Functional requirements</h3>
+<h4 id="group-a--identity-and-access">Group A — Identity and access</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-01</td>
+<td>The system shall let a person register an account and shall verify
+their email address before the account is usable.</td>
+<td>Author, Reviewer</td>
+<td>M</td>
+<td>Email address not already registered</td>
+<td>Account exists in an unverified state until the verification link is
+followed</td>
+<td>Registration with a duplicate email is rejected; login is refused
+until verified</td>
+</tr>
+<tr>
+<td>FR-02</td>
+<td>The system shall authenticate a registered user and maintain a
+session that expires and can be explicitly revoked.</td>
+<td>All authenticated</td>
+<td>M</td>
+<td>Account verified</td>
+<td>A valid session token is issued; revoked or expired tokens are
+rejected on every subsequent call</td>
+<td>A revoked refresh token fails all further use; an expired access
+token is rejected without a valid session</td>
+</tr>
+<tr>
+<td>FR-03</td>
+<td>The system shall let an Administrator assign and revoke roles, and a
+user may hold several roles concurrently.</td>
+<td>Administrator</td>
+<td>M</td>
+<td>Target account exists</td>
+<td>The account's role set reflects the change immediately</td>
+<td>Assigning a second role does not remove the first; policy checks
+re-evaluate against the updated set on the next request</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-b--submission-intake-and-processing">Group B — Submission
+intake and processing</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-04</td>
+<td>The system shall let an Author create a submission comprising title,
+abstract, keywords, co-authors and a PDF file.</td>
+<td>Author</td>
+<td>M</td>
+<td>Author is authenticated</td>
+<td>Manuscript exists in <code>DRAFT</code>, then transitions to
+<code>SUBMITTED</code></td>
+<td>A manuscript with all required fields and a valid PDF reaches
+<code>SUBMITTED</code>; the transition is illegal from any other
+state</td>
+</tr>
+<tr>
+<td>FR-05</td>
+<td>The system shall reject an uploaded file that fails type, size or
+integrity validation, and shall return a clear reason.</td>
+<td>System</td>
+<td>M</td>
+<td>A file has been uploaded</td>
+<td>Rejected files never reach persistent storage or a manuscript
+version</td>
+<td>A renamed non-PDF file (validated by magic bytes, not extension) is
+rejected with a specific reason code</td>
+</tr>
+<tr>
+<td>FR-06</td>
+<td>The system shall generate an anonymised copy of every submitted
+document, distinct from the original.</td>
+<td>System</td>
+<td>M</td>
+<td>A manuscript version has been uploaded and validated</td>
+<td>Two document references exist per version: original and
+anonymised</td>
+<td>The anonymised derivative has XMP and DocInfo metadata stripped;
+reviewers are never issued the original</td>
+</tr>
+<tr>
+<td>FR-20</td>
+<td>The system shall screen a submission for similarity against the
+internal corpus of previously submitted manuscripts.</td>
+<td>System</td>
+<td>S</td>
+<td>Text has been extracted from the submission</td>
+<td>A similarity report is persisted against the manuscript version</td>
+<td>A near-duplicate submitted twice produces a report flagging the
+match; unrelated submissions produce no false positive on the seeded
+corpus</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-c--screening-and-reviewer-assignment">Group C — Screening
+and reviewer assignment</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-07</td>
+<td>The system shall let an Editor or Editor-in-Chief screen a
+submission by sending it to review, requesting pre-review changes, or
+desk-rejecting it.</td>
+<td>Editor</td>
+<td>M</td>
+<td>Manuscript is in <code>UNDER_SCREENING</code></td>
+<td>Manuscript moves to <code>UNDER_REVIEW</code>,
+<code>REVISION_REQUESTED</code> or <code>DESK_REJECTED</code>
+respectively</td>
+<td>Any of the three legal targets is reachable only from
+<code>UNDER_SCREENING</code>; no other actor role can invoke it</td>
+</tr>
+<tr>
+<td>FR-08</td>
+<td>The system shall recommend reviewers ranked by expertise match,
+excluding conflicts of interest and respecting reviewer capacity.</td>
+<td>System</td>
+<td>M</td>
+<td>Manuscript is in <code>UNDER_SCREENING</code> or
+<code>UNDER_REVIEW</code></td>
+<td>A ranked candidate list is produced with a score and, for excluded
+reviewers, a stated reason</td>
+<td>A reviewer sharing an author's affiliation, or already at capacity,
+never appears as a positive recommendation</td>
+</tr>
+<tr>
+<td>FR-09</td>
+<td>The system shall let an Editor invite reviewers, and may override
+any system recommendation.</td>
+<td>Editor</td>
+<td>M</td>
+<td>Manuscript is in <code>UNDER_SCREENING</code> or
+<code>UNDER_REVIEW</code></td>
+<td>A review assignment is created in the <code>INVITED</code>
+state</td>
+<td>An editor-chosen reviewer outside the recommended list can still be
+invited</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-d--review-and-revision">Group D — Review and revision</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-10</td>
+<td>The system shall let an invited reviewer accept or decline the
+invitation, optionally with a reason.</td>
+<td>Reviewer</td>
+<td>M</td>
+<td>Assignment is in <code>INVITED</code></td>
+<td>Assignment moves to <code>ACCEPTED</code> or
+<code>DECLINED</code></td>
+<td>A declined invitation frees the reviewer's capacity and is visible
+to the editor with its reason</td>
+</tr>
+<tr>
+<td>FR-11</td>
+<td>The system shall let a reviewer with an accepted assignment submit a
+structured review: criterion scores, an overall recommendation, comments
+to the author, and confidential comments to the editor.</td>
+<td>Reviewer</td>
+<td>M</td>
+<td>Assignment is <code>ACCEPTED</code>; manuscript is
+<code>UNDER_REVIEW</code></td>
+<td>A <code>Review</code> record is stored against the assignment;
+assignment moves to <code>SUBMITTED</code></td>
+<td>Confidential comments never appear in any author-facing view; a
+review cannot be submitted twice by the same reviewer for the same
+manuscript</td>
+</tr>
+<tr>
+<td>FR-13</td>
+<td>The system shall let the corresponding author submit a revised
+version together with a response-to-reviewers letter.</td>
+<td>Author</td>
+<td>M</td>
+<td>Manuscript is in <code>REVISION_REQUESTED</code>; actor is the
+corresponding author</td>
+<td>Manuscript moves to <code>RESUBMITTED</code>, then to
+<code>UNDER_REVIEW</code> or <code>UNDER_SCREENING</code> at editorial
+discretion</td>
+<td>A non-corresponding co-author's attempt to resubmit is denied; the
+letter is attached to the new version</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-e--editorial-decision-and-withdrawal">Group E — Editorial
+decision and withdrawal</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-12</td>
+<td>The system shall let an Editor or Editor-in-Chief record an
+editorial decision once the configured minimum number of reviews has
+been submitted.</td>
+<td>Editor</td>
+<td>M</td>
+<td>Manuscript is <code>REVIEWS_COMPLETE</code> (or
+<code>UNDER_SCREENING</code> for desk rejection, which requires no
+reviews)</td>
+<td>Manuscript moves to <code>ACCEPTED</code>, <code>REJECTED</code> or
+<code>REVISION_REQUESTED</code></td>
+<td>A decision attempted below quorum is refused with the current review
+count; desk rejection is legal only from
+<code>UNDER_SCREENING</code></td>
+</tr>
+<tr>
+<td>FR-25</td>
+<td>The system shall let the corresponding author withdraw a submission
+before a decision is recorded.</td>
+<td>Author</td>
+<td>S</td>
+<td>Manuscript is in <code>SUBMITTED</code>,
+<code>UNDER_SCREENING</code>, <code>UNDER_REVIEW</code>,
+<code>REVIEWS_COMPLETE</code> or <code>REVISION_REQUESTED</code></td>
+<td>Manuscript moves to <code>WITHDRAWN</code>, a terminal state</td>
+<td>A withdrawal attempted from <code>ACCEPTED</code> or any other
+non-listed state is refused</td>
+</tr>
+<tr>
+<td><strong>FR-25a</strong> <em>(NEW)</em></td>
+<td>The system shall authorise withdrawal only for the corresponding
+author of the manuscript being withdrawn, via a dedicated
+ownership-checked action equivalent to how <code>RESUBMIT</code> is
+checked.</td>
+<td>Author</td>
+<td>M <em>(elevated — closes a live authorisation gap)</em></td>
+<td><code>Action.WITHDRAW</code> exists in the policy layer with the
+same ownership predicate as <code>Action.RESUBMIT</code></td>
+<td>An actor who is not the corresponding author, including a co-author,
+cannot invoke the transition regardless of role</td>
+<td>A non-corresponding-author holder of the <code>AUTHOR</code> role
+attempting withdrawal is denied</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-f--publication-and-public-archive">Group F — Publication
+and public archive</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-15</td>
+<td>The system shall let the Editor-in-Chief compose an issue from
+accepted manuscripts and publish it.</td>
+<td>Editor-in-Chief</td>
+<td>M</td>
+<td>Manuscripts are <code>ACCEPTED</code>; actor holds
+<code>EDITOR_IN_CHIEF</code></td>
+<td>Manuscripts move <code>ACCEPTED → SCHEDULED → PUBLISHED</code>; the
+issue becomes publicly visible</td>
+<td>An Editor without EiC role cannot publish; a manuscript not in
+<code>ACCEPTED</code> cannot be added to an issue</td>
+</tr>
+<tr>
+<td>FR-16</td>
+<td>The system shall let an unauthenticated reader browse issues and
+read published papers.</td>
+<td>Reader</td>
+<td>M</td>
+<td>Issue is <code>PUBLISHED</code></td>
+<td>Paper content and metadata are served without requiring login</td>
+<td>Anonymous request to a published paper's page succeeds; request to
+an unpublished manuscript is refused</td>
+</tr>
+<tr>
+<td>FR-17</td>
+<td>The system shall provide full-text search across published papers
+with filters.</td>
+<td>Reader</td>
+<td>M</td>
+<td>At least one paper is published</td>
+<td>Search returns ranked results within the performance bound of
+NFR-09</td>
+<td>A query on a distinctive term present only in one seeded paper
+returns that paper first</td>
+</tr>
+<tr>
+<td>FR-18</td>
+<td>The system shall let a reader download a published paper's PDF.</td>
+<td>Reader</td>
+<td>M</td>
+<td>Paper is published</td>
+<td>The original (non-anonymised) PDF is served via the archive
+path</td>
+<td>Download succeeds without authentication for any published
+paper</td>
+</tr>
+<tr>
+<td>FR-21</td>
+<td>The system shall let a reader export a paper's citation as BibTeX
+and RIS.</td>
+<td>Reader</td>
+<td>S</td>
+<td>Paper is published</td>
+<td>A correctly formatted citation file is returned in the requested
+format</td>
+<td>The exported BibTeX parses under a standard BibTeX parser without
+error</td>
+</tr>
+<tr>
+<td>FR-22</td>
+<td>The system shall expose an OAI-PMH endpoint serving Dublin Core
+metadata for all published papers.</td>
+<td>External system</td>
+<td>S</td>
+<td>At least one paper is published</td>
+<td><code>Identify</code>, <code>ListMetadataFormats</code>,
+<code>ListIdentifiers</code>, <code>ListRecords</code> and
+<code>GetRecord</code> all respond per OAI-PMH 2.0</td>
+<td>A harvest run against the seeded archive completes with resumption
+tokens honoured correctly</td>
+</tr>
+<tr>
+<td>FR-27</td>
+<td>The system shall resolve a persistent identifier to its paper.</td>
+<td>Reader</td>
+<td>C</td>
+<td>Identifier is DOI-shaped and assigned</td>
+<td>Resolving the identifier returns (or redirects to) the paper</td>
+<td>A well-formed but unassigned identifier returns a 404, not a server
+error</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-g--transparency-and-communication">Group G — Transparency
+and communication</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-14</td>
+<td>The system shall let an author view their own submissions and each
+one's status timeline.</td>
+<td>Author</td>
+<td>M</td>
+<td>Actor is authenticated</td>
+<td>Only manuscripts the actor authored are listed</td>
+<td>An author cannot see another author's manuscript in this view, even
+by guessing its identifier</td>
+</tr>
+<tr>
+<td>FR-19</td>
+<td>The system shall let an Editor or Editor-in-Chief view the complete
+audit trail for a manuscript.</td>
+<td>Editor, EiC</td>
+<td>M</td>
+<td>Actor holds <code>EDITOR</code> or <code>EDITOR_IN_CHIEF</code></td>
+<td>The full, sequence-ordered event chain for the manuscript is
+returned</td>
+<td>A Reviewer or Author role attempting this view is denied; the
+chain's hash verification passes</td>
+</tr>
+<tr>
+<td>FR-23</td>
+<td>The system shall notify actors, in-app and by email where
+configured, of events affecting them.</td>
+<td>System</td>
+<td>S</td>
+<td>An event affecting a specific actor has occurred</td>
+<td>A notification record exists and, where email is configured, a
+message is queued for delivery</td>
+<td>An editorial decision produces a notification visible to the
+affected author within the same request cycle</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-h--administration-configuration-and-analytics">Group H —
+Administration, configuration and analytics</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-24</td>
+<td>The system shall provide editorial analytics: throughput, decision
+mix, reviewer load and time-to-decision.</td>
+<td>EiC, HoD</td>
+<td>S</td>
+<td>At least one full editorial cycle has completed</td>
+<td>Aggregate figures are computed over the current dataset</td>
+<td>Time-to-decision reported for a manuscript matches the difference
+between its submission and decision timestamps</td>
+</tr>
+<tr>
+<td>FR-26</td>
+<td>The system shall let the Editor-in-Chief configure journal policy:
+minimum reviews, review window and blinding model.</td>
+<td>EiC</td>
+<td>C</td>
+<td>Actor holds <code>EDITOR_IN_CHIEF</code></td>
+<td>Subsequent decisions and assignments respect the updated
+configuration</td>
+<td>Lowering the minimum-review threshold takes effect for manuscripts
+not yet at decision, not retroactively</td>
+</tr>
+<tr>
+<td>FR-28</td>
+<td>The system shall provide reviewer performance history and
+reliability indicators.</td>
+<td>EiC</td>
+<td>C</td>
+<td>Reviewer has at least one completed or declined assignment</td>
+<td>A per-reviewer summary (acceptance rate, on-time rate, average score
+deviation) is available</td>
+<td>A reviewer who declines every invitation shows a 0% acceptance rate,
+not a null or error</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-non-functional-requirements">3.2 Non-functional
+requirements</h3>
+<p>Each non-functional requirement carries a stated <strong>verification
+method</strong> so that "non-functional" does not collapse into
+"unverifiable."</p>
+<h4 id="security">Security</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-01</td>
+<td>Passwords are hashed with Argon2id; no credential is ever written to
+a log.</td>
+<td>Code review; unit test asserting the hashing algorithm and asserting
+no credential-shaped value appears in captured log output</td>
+</tr>
+<tr>
+<td>NFR-02</td>
+<td>Every endpoint is authorised by an explicit policy; access is denied
+by default.</td>
+<td>Integration test that walks the full route table and fails if any
+route lacks a policy check (design specification §11)</td>
+</tr>
+<tr>
+<td>NFR-03</td>
+<td>Reviewer-facing payloads contain no author-identifying data.</td>
+<td>Automated leak test enumerating every reviewer-facing endpoint,
+serialising against a fixture with sentinel author names, asserting no
+sentinel appears in output</td>
+</tr>
+<tr>
+<td>NFR-04</td>
+<td>Documents are served only via short-lived pre-signed URLs; storage
+buckets are private.</td>
+<td>Integration test confirming direct bucket access is refused; manual
+verification of URL expiry</td>
+</tr>
+<tr>
+<td>NFR-05</td>
+<td>Authentication and submission endpoints are rate-limited.</td>
+<td>Integration test exceeding the configured limit and asserting a 429
+response</td>
+</tr>
+<tr>
+<td>NFR-06</td>
+<td>Dependencies are scanned; no known high-severity vulnerability is
+present at release.</td>
+<td><code>pip-audit</code> and <code>npm audit</code> as CI gates</td>
+</tr>
+</tbody>
+</table>
+<h4 id="integrity">Integrity</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-07</td>
+<td>Audit events are append-only and hash-chained; any retrospective
+edit is detectable.</td>
+<td>Property test over random legal event sequences confirming the chain
+always verifies; a tamper-detection test that mutates a stored event and
+confirms verification fails. <strong>Demonstrated in the current
+build</strong> by
+<code>backend/tests/unit/domain/test_hashchain.py</code> and the
+integration tests <code>test_append_only.py</code> and
+<code>test_chain_persistence.py</code>, including a PostgreSQL trigger
+rejecting <code>UPDATE</code>/<code>DELETE</code>/<code>TRUNCATE</code>
+on the event table (technical debt register TD-13)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="performance">Performance</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-08</td>
+<td>Public archive pages respond within 500 ms at p95 under nominal
+load.</td>
+<td>k6 smoke test against a deployed environment</td>
+</tr>
+<tr>
+<td>NFR-09</td>
+<td>Search returns within 800 ms at p95 over the seeded corpus.</td>
+<td>k6 smoke test</td>
+</tr>
+</tbody>
+</table>
+<h4 id="reliability">Reliability</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-10</td>
+<td>Upload processing is idempotent and retried with exponential backoff
+on failure.</td>
+<td>Unit test on the retry policy; integration test replaying the same
+content checksum and asserting no duplicate side effect</td>
+</tr>
+</tbody>
+</table>
+<h4 id="availability">Availability</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-11</td>
+<td>The service exposes liveness and readiness probes; unhealthy tasks
+are replaced automatically.</td>
+<td>Deployment verification against the ECS service's health-check
+configuration</td>
+</tr>
+</tbody>
+</table>
+<h4 id="usability">Usability</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-12</td>
+<td>The interface is responsive from 360 px width, keyboard-navigable,
+and meets WCAG 2.1 AA contrast.</td>
+<td>Manual audit; automated <code>axe</code> accessibility check in
+CI</td>
+</tr>
+</tbody>
+</table>
+<h4 id="maintainability">Maintainability</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-13</td>
+<td>The domain layer imports no framework code.</td>
+<td>Import-linter contract enforced as a CI gate</td>
+</tr>
+<tr>
+<td>NFR-14</td>
+<td>The domain and application layers hold at least 85% line
+coverage.</td>
+<td>CI coverage gate. <strong>The delivered domain and application
+layers report 88.24%</strong> against the 85% gate, confirmed directly
+(<code>pytest -m "not integration" --cov=src/ugjcs/domain --cov=src/ugjcs/application</code>,
+run against this commit): 275 unit tests pass, and a separate run
+collects 60 integration tests against a real PostgreSQL container.
+Technical debt register TD-10 records the 85% figure as a floor, not a
+target, and TD-11 records that coverage alone is a weak signal — four
+mutations survived a 100%-covered suite until closed by targeted
+tests</td>
+</tr>
+</tbody>
+</table>
+<h4 id="observability">Observability</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-15</td>
+<td>Structured JSON logs carry correlation IDs; traces are
+exported.</td>
+<td>Manual verification against a deployed environment</td>
+</tr>
+</tbody>
+</table>
+<h4 id="portability">Portability</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-16</td>
+<td>The entire infrastructure is reproducible from code.</td>
+<td><code>terraform apply</code> from a clean state, followed by
+<code>terraform destroy</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="compliance">Compliance</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Requirement</th>
+<th>Verification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NFR-17</td>
+<td>Personal data is minimised; the audit log retains identity only
+where required.</td>
+<td>Design review against the data model (design specification §8)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-system-models">4. System models</h2>
+<h3 id="41-manuscript-lifecycle">4.1 Manuscript lifecycle</h3>
+<p>The lifecycle below is transcribed directly from
+<code>backend/src/ugjcs/domain/transitions.py</code> — the
+<code>LEGAL_TRANSITIONS</code> mapping is the executable, tested source
+of truth, not the narrative description in the design specification.</p>
+<h4 id="411-state-table">4.1.1 State table</h4>
+<table>
+<thead>
+<tr>
+<th>Source state</th>
+<th>Legal target states</th>
+<th>Terminal?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DRAFT</code></td>
+<td><code>SUBMITTED</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>SUBMITTED</code></td>
+<td><code>UNDER_SCREENING</code>, <code>WITHDRAWN</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>UNDER_SCREENING</code></td>
+<td><code>DESK_REJECTED</code>, <code>UNDER_REVIEW</code>,
+<code>REVISION_REQUESTED</code>, <code>WITHDRAWN</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>UNDER_REVIEW</code></td>
+<td><code>REVIEWS_COMPLETE</code>, <code>WITHDRAWN</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>REVIEWS_COMPLETE</code></td>
+<td><code>ACCEPTED</code>, <code>REJECTED</code>,
+<code>REVISION_REQUESTED</code>, <code>WITHDRAWN</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>REVISION_REQUESTED</code></td>
+<td><code>RESUBMITTED</code>, <code>WITHDRAWN</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>RESUBMITTED</code></td>
+<td><code>UNDER_REVIEW</code>, <code>UNDER_SCREENING</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>ACCEPTED</code></td>
+<td><code>SCHEDULED</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>SCHEDULED</code></td>
+<td><code>PUBLISHED</code></td>
+<td>No</td>
+</tr>
+<tr>
+<td><code>DESK_REJECTED</code></td>
+<td><em>(none)</em></td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>REJECTED</code></td>
+<td><em>(none)</em></td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>PUBLISHED</code></td>
+<td><em>(none)</em></td>
+<td><strong>Yes</strong></td>
+</tr>
+<tr>
+<td><code>WITHDRAWN</code></td>
+<td><em>(none)</em></td>
+<td><strong>Yes</strong></td>
+</tr>
+</tbody>
+</table>
+<p>No transition is legal out of a terminal state; this is asserted
+directly by <code>assert_legal</code>, which raises
+<code>IllegalTransitionError</code> for any pair not present in
+<code>LEGAL_TRANSITIONS</code>. <code>ACCEPTED</code> and
+<code>SCHEDULED</code> are deliberately excluded from the withdrawable
+set: once a manuscript is accepted, undoing that is editorial retraction
+— a different action, with its own notice obligations — and is not
+modelled as withdrawal.</p>
+<h4 id="412-state-diagram">4.1.2 State diagram</h4>
+<figure class="diagram"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="statediagram" style="max-width: 1539.88px; background-color: transparent;" viewBox="0 0 1539.87890625 982" role="graphics-document document" aria-roledescription="stateDiagram"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg defs [id$="-barbEnd"]{fill:#333333;stroke:#333333;}#my-svg g.stateGroup text{fill:#9370DB;stroke:none;font-size:10px;}#my-svg g.stateGroup text{fill:#333;stroke:none;font-size:10px;}#my-svg g.stateGroup .state-title{font-weight:bolder;fill:#131300;}#my-svg g.stateGroup rect{fill:#ECECFF;stroke:#9370DB;}#my-svg g.stateGroup line{stroke:#333333;stroke-width:1;}#my-svg .transition{stroke:#333333;stroke-width:1;fill:none;}#my-svg .stateGroup .composit{fill:white;border-bottom:1px;}#my-svg .stateGroup .alt-composit{fill:#e0e0e0;border-bottom:1px;}#my-svg .state-note{stroke:#aaaa33;fill:#fff5ad;}#my-svg .state-note text{fill:black;stroke:none;font-size:10px;}#my-svg .stateLabel .box{stroke:none;stroke-width:0;fill:#ECECFF;opacity:0.5;}#my-svg .edgeLabel .label rect{fill:#ECECFF;opacity:0.5;}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .edgeLabel .label text{fill:#333;}#my-svg .label div .edgeLabel{color:#333;}#my-svg .stateLabel text{fill:#131300;font-size:10px;font-weight:bold;}#my-svg .node circle.state-start{fill:#333333;stroke:#333333;}#my-svg .node .fork-join{fill:#333333;stroke:#333333;}#my-svg .node circle.state-end{fill:#9370DB;stroke:white;stroke-width:1.5;}#my-svg .end-state-inner{fill:white;stroke-width:1.5;}#my-svg .node rect{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .node polygon{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg [id$="-barbEnd"]{fill:#333333;}#my-svg .statediagram-cluster rect{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .cluster-label,#my-svg .nodeLabel{color:#131300;}#my-svg .statediagram-cluster rect.outer{rx:5px;ry:5px;}#my-svg .statediagram-state .divider{stroke:#9370DB;}#my-svg .statediagram-state .title-state{rx:5px;ry:5px;}#my-svg .statediagram-cluster.statediagram-cluster .inner{fill:white;}#my-svg .statediagram-cluster.statediagram-cluster-alt .inner{fill:#f0f0f0;}#my-svg .statediagram-cluster .inner{rx:0;ry:0;}#my-svg .statediagram-state rect.basic{rx:5px;ry:5px;}#my-svg .statediagram-state rect.divider{stroke-dasharray:10,10;fill:#f0f0f0;}#my-svg .note-edge{stroke-dasharray:5;}#my-svg .statediagram-note rect{fill:#fff5ad;stroke:#aaaa33;stroke-width:1px;rx:0;ry:0;}#my-svg .statediagram-note rect{fill:#fff5ad;stroke:#aaaa33;stroke-width:1px;rx:0;ry:0;}#my-svg .statediagram-note text{fill:black;}#my-svg .statediagram-note .nodeLabel{color:black;}#my-svg .statediagram .edgeLabel{color:red;}#my-svg [id$="-dependencyStart"],#my-svg [id$="-dependencyEnd"]{fill:#333333;stroke:#333333;stroke-width:1;}#my-svg .statediagramTitleText{text-anchor:middle;font-size:18px;fill:#333;}#my-svg [data-look="neo"].statediagram-cluster rect{fill:#ECECFF;stroke:#9370DB;stroke-width:1;}#my-svg [data-look="neo"].statediagram-cluster rect.outer{rx:5px;ry:5px;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><defs><marker id="my-svg_stateDiagram-barbEnd" refX="19" refY="7" markerWidth="20" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto"><path d="M 19,7 L9,13 L14,7 L9,1 Z"/></marker></defs><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M1229.344,22L1229.344,26.167C1229.344,30.333,1229.344,38.667,1229.344,47C1229.344,55.333,1229.344,63.667,1229.344,67.833L1229.344,72" id="my-svg-edge0" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge0" data-points="W3sieCI6MTIyOS4zNDM3NSwieSI6MjJ9LHsieCI6MTIyOS4zNDM3NSwieSI6NDd9LHsieCI6MTIyOS4zNDM3NSwieSI6NzJ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1229.344,112L1229.344,118.167C1229.344,124.333,1229.344,136.667,1229.344,149C1229.344,161.333,1229.344,173.667,1229.344,179.833L1229.344,186" id="my-svg-edge1" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge1" data-points="W3sieCI6MTIyOS4zNDM3NSwieSI6MTEyfSx7IngiOjEyMjkuMzQzNzUsInkiOjE0OX0seyJ4IjoxMjI5LjM0Mzc1LCJ5IjoxODZ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1181.398,220.431L1157.826,227.526C1134.254,234.621,1087.109,248.81,1063.537,262.072C1039.965,275.333,1039.965,287.667,1039.965,293.833L1039.965,300" id="my-svg-edge2" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge2" data-points="W3sieCI6MTE4MS4zOTg0Mzc1LCJ5IjoyMjAuNDMwNzY2NjkyMTA2MTh9LHsieCI6MTAzOS45NjQ4NDM3NSwieSI6MjYzfSx7IngiOjEwMzkuOTY0ODQzNzUsInkiOjMwMH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1277.289,216.158L1314.137,223.965C1350.986,231.772,1424.682,247.386,1461.531,264.693C1498.379,282,1498.379,301,1498.379,320C1498.379,339,1498.379,358,1498.379,377C1498.379,396,1498.379,415,1498.379,434C1498.379,453,1498.379,472,1498.379,491C1498.379,510,1498.379,529,1498.379,548C1498.379,567,1498.379,586,1498.379,605C1498.379,624,1498.379,643,1498.379,662C1498.379,681,1498.379,700,1399.078,718.232C1299.777,736.463,1101.176,753.927,1001.875,762.659L902.574,771.39" id="my-svg-edge3" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge3" data-points="W3sieCI6MTI3Ny4yODkwNjI1LCJ5IjoyMTYuMTU4MDg4MDc1MTUyODJ9LHsieCI6MTQ5OC4zNzg5MDYyNSwieSI6MjYzfSx7IngiOjE0OTguMzc4OTA2MjUsInkiOjMyMH0seyJ4IjoxNDk4LjM3ODkwNjI1LCJ5IjozNzd9LHsieCI6MTQ5OC4zNzg5MDYyNSwieSI6NDM0fSx7IngiOjE0OTguMzc4OTA2MjUsInkiOjQ5MX0seyJ4IjoxNDk4LjM3ODkwNjI1LCJ5Ijo1NDh9LHsieCI6MTQ5OC4zNzg5MDYyNSwieSI6NjA1fSx7IngiOjE0OTguMzc4OTA2MjUsInkiOjY2Mn0seyJ4IjoxNDk4LjM3ODkwNjI1LCJ5Ijo3MTl9LHsieCI6OTAyLjU3NDIxODc1LCJ5Ijo3NzEuMzkwNDI4MjExNTg2OX1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M963.918,324.485L815.515,333.238C667.112,341.99,370.306,359.495,221.903,377.748C73.5,396,73.5,415,73.5,434C73.5,453,73.5,472,73.5,491C73.5,510,73.5,529,73.5,548C73.5,567,73.5,586,73.5,605C73.5,624,73.5,643,73.5,662C73.5,681,73.5,700,73.5,719C73.5,738,73.5,757,73.5,776C73.5,795,73.5,814,73.5,829.667C73.5,845.333,73.5,857.667,73.5,863.833L73.5,870" id="my-svg-edge4" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge4" data-points="W3sieCI6OTYzLjkxNzk2ODc1LCJ5IjozMjQuNDg1MDc5NzI0MzQ5NzZ9LHsieCI6NzMuNSwieSI6Mzc3fSx7IngiOjczLjUsInkiOjQzNH0seyJ4Ijo3My41LCJ5Ijo0OTF9LHsieCI6NzMuNSwieSI6NTQ4fSx7IngiOjczLjUsInkiOjYwNX0seyJ4Ijo3My41LCJ5Ijo2NjJ9LHsieCI6NzMuNSwieSI6NzE5fSx7IngiOjczLjUsInkiOjc3Nn0seyJ4Ijo3My41LCJ5Ijo4MzN9LHsieCI6NzMuNSwieSI6ODcwfV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M963.918,336.954L933.979,343.628C904.04,350.302,844.163,363.651,814.224,376.492C784.285,389.333,784.285,401.667,784.285,407.833L784.285,414" id="my-svg-edge5" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge5" data-points="W3sieCI6OTYzLjkxNzk2ODc1LCJ5IjozMzYuOTUzNTI0NjEyNzA1MX0seyJ4Ijo3ODQuMjg1MTU2MjUsInkiOjM3N30seyJ4Ijo3ODQuMjg1MTU2MjUsInkiOjQxNH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1067.914,340L1076.532,346.167C1085.15,352.333,1102.386,364.667,1111.003,380.333C1119.621,396,1119.621,415,1119.621,434C1119.621,453,1119.621,472,1119.621,491C1119.621,510,1119.621,529,1119.621,548C1119.621,567,1119.621,586,1063.008,603.078C1006.395,620.156,893.168,635.313,836.555,642.891L779.941,650.469" id="my-svg-edge6" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge6" data-points="W3sieCI6MTA2Ny45MTQ0MDUxNTM1MDg4LCJ5IjozNDB9LHsieCI6MTExOS42MjEwOTM3NSwieSI6Mzc3fSx7IngiOjExMTkuNjIxMDkzNzUsInkiOjQzNH0seyJ4IjoxMTE5LjYyMTA5Mzc1LCJ5Ijo0OTF9LHsieCI6MTExOS42MjEwOTM3NSwieSI6NTQ4fSx7IngiOjExMTkuNjIxMDkzNzUsInkiOjYwNX0seyJ4Ijo3NzkuOTQxNDA2MjUsInkiOjY1MC40NjkyNzgwNDc4ODU1fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1109.765,340L1131.286,346.167C1152.808,352.333,1195.851,364.667,1217.373,380.333C1238.895,396,1238.895,415,1238.895,434C1238.895,453,1238.895,472,1238.895,491C1238.895,510,1238.895,529,1238.895,548C1238.895,567,1238.895,586,1238.895,605C1238.895,624,1238.895,643,1238.895,662C1238.895,681,1238.895,700,1182.841,717.719C1126.788,735.438,1014.681,751.876,958.628,760.095L902.574,768.314" id="my-svg-edge7" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge7" data-points="W3sieCI6MTEwOS43NjQ3MzQxMDA4NzcxLCJ5IjozNDB9LHsieCI6MTIzOC44OTQ1MzEyNSwieSI6Mzc3fSx7IngiOjEyMzguODk0NTMxMjUsInkiOjQzNH0seyJ4IjoxMjM4Ljg5NDUzMTI1LCJ5Ijo0OTF9LHsieCI6MTIzOC44OTQ1MzEyNSwieSI6NTQ4fSx7IngiOjEyMzguODk0NTMxMjUsInkiOjYwNX0seyJ4IjoxMjM4Ljg5NDUzMTI1LCJ5Ijo2NjJ9LHsieCI6MTIzOC44OTQ1MzEyNSwieSI6NzE5fSx7IngiOjkwMi41NzQyMTg3NSwieSI6NzY4LjMxMzU1MTMxNzM0OTZ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M720.98,442.244L658.581,450.37C596.182,458.496,471.384,474.748,408.985,489.041C346.586,503.333,346.586,515.667,346.586,521.833L346.586,528" id="my-svg-edge8" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge8" data-points="W3sieCI6NzIwLjk4MDQ2ODc1LCJ5Ijo0NDIuMjQzOTQyNDkwNDczMX0seyJ4IjozNDYuNTg1OTM3NSwieSI6NDkxfSx7IngiOjM0Ni41ODU5Mzc1LCJ5Ijo1Mjh9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M807.396,454L814.522,460.167C821.648,466.333,835.9,478.667,843.026,494.333C850.152,510,850.152,529,850.152,548C850.152,567,850.152,586,850.152,605C850.152,624,850.152,643,850.152,662C850.152,681,850.152,700,850.152,715.667C850.152,731.333,850.152,743.667,850.152,749.833L850.152,756" id="my-svg-edge9" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge9" data-points="W3sieCI6ODA3LjM5NjQ1MDEwOTY0OTEsInkiOjQ1NH0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjQ5MX0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjU0OH0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjYwNX0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjY2Mn0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjcxOX0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjc1Nn1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M307.688,568L295.694,574.167C283.701,580.333,259.714,592.667,247.72,605C235.727,617.333,235.727,629.667,235.727,635.833L235.727,642" id="my-svg-edge10" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge10" data-points="W3sieCI6MzA3LjY4NzkxMTE4NDIxMDUsInkiOjU2OH0seyJ4IjoyMzUuNzI2NTYyNSwieSI6NjA1fSx7IngiOjIzNS43MjY1NjI1LCJ5Ijo2NDJ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M356.948,568L360.143,574.167C363.338,580.333,369.727,592.667,372.922,608.333C376.117,624,376.117,643,376.117,662C376.117,681,376.117,700,376.117,719C376.117,738,376.117,757,376.117,776C376.117,795,376.117,814,376.117,829.667C376.117,845.333,376.117,857.667,376.117,863.833L376.117,870" id="my-svg-edge11" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge11" data-points="W3sieCI6MzU2Ljk0Nzc3OTYwNTI2MzIsInkiOjU2OH0seyJ4IjozNzYuMTE3MTg3NSwieSI6NjA1fSx7IngiOjM3Ni4xMTcxODc1LCJ5Ijo2NjJ9LHsieCI6Mzc2LjExNzE4NzUsInkiOjcxOX0seyJ4IjozNzYuMTE3MTg3NSwieSI6Nzc2fSx7IngiOjM3Ni4xMTcxODc1LCJ5Ijo4MzN9LHsieCI6Mzc2LjExNzE4NzUsInkiOjg3MH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M384.086,568L395.648,574.167C407.211,580.333,430.336,592.667,467.9,605C505.464,617.333,557.468,629.667,583.469,635.833L609.471,642" id="my-svg-edge12" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge12" data-points="W3sieCI6Mzg0LjA4NTkzNzUsInkiOjU2OH0seyJ4Ijo0NTMuNDYwOTM3NSwieSI6NjA1fSx7IngiOjYwOS40NzEwMTE1MTMxNTc5LCJ5Ijo2NDJ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M411.224,568L431.154,574.167C451.084,580.333,490.944,592.667,510.875,608.333C530.805,624,530.805,643,530.805,662C530.805,681,530.805,700,575.292,717.441C619.78,734.881,708.755,750.762,753.243,758.703L797.73,766.643" id="my-svg-edge13" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge13" data-points="W3sieCI6NDExLjIyNDA5NTM5NDczNjgsInkiOjU2OH0seyJ4Ijo1MzAuODA0Njg3NSwieSI6NjA1fSx7IngiOjUzMC44MDQ2ODc1LCJ5Ijo2NjJ9LHsieCI6NTMwLjgwNDY4NzUsInkiOjcxOX0seyJ4Ijo3OTcuNzMwNDY4NzUsInkiOjc2Ni42NDMyNzkxNDU3MTk1fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M677.915,682L673.017,688.167C668.119,694.333,658.323,706.667,704.1,720.836C749.876,735.005,851.225,751.01,901.9,759.013L952.574,767.016" id="my-svg-edge14" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge14" data-points="W3sieCI6Njc3LjkxNTM2NDU4MzMzMzQsInkiOjY4Mn0seyJ4Ijo2NDguNTI3MzQzNzUsInkiOjcxOX0seyJ4Ijo5NTIuNTc0MjE4NzUsInkiOjc2Ny4wMTU3MTQyODU3MTQyfV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M718.022,682L725.491,688.167C732.959,694.333,747.895,706.667,764.811,719C781.726,731.333,800.62,743.667,810.067,749.833L819.514,756" id="my-svg-edge15" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge15" data-points="W3sieCI6NzE4LjAyMjI3MjQ3ODA3MDEsInkiOjY4Mn0seyJ4Ijo3NjIuODMyMDMxMjUsInkiOjcxOX0seyJ4Ijo4MTkuNTEzNjM3NjA5NjQ5MSwieSI6NzU2fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1006.266,756L1005.279,749.833C1004.293,743.667,1002.32,731.333,1001.334,715.667C1000.348,700,1000.348,681,1000.348,662C1000.348,643,1000.348,624,1000.348,605C1000.348,586,1000.348,567,1000.348,548C1000.348,529,1000.348,510,974.888,493.783C949.428,477.567,898.509,464.134,873.049,457.417L847.59,450.701" id="my-svg-edge16" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge16" data-points="W3sieCI6MTAwNi4yNjU4MzA1OTIxMDUzLCJ5Ijo3NTZ9LHsieCI6MTAwMC4zNDc2NTYyNSwieSI6NzE5fSx7IngiOjEwMDAuMzQ3NjU2MjUsInkiOjY2Mn0seyJ4IjoxMDAwLjM0NzY1NjI1LCJ5Ijo2MDV9LHsieCI6MTAwMC4zNDc2NTYyNSwieSI6NTQ4fSx7IngiOjEwMDAuMzQ3NjU2MjUsInkiOjQ5MX0seyJ4Ijo4NDcuNTg5ODQzNzUsInkiOjQ1MC43MDA1NzEzMDQ1OTkzNX1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1066.355,767.374L1119.527,759.312C1172.699,751.249,1279.043,735.125,1332.215,717.562C1385.387,700,1385.387,681,1385.387,662C1385.387,643,1385.387,624,1385.387,605C1385.387,586,1385.387,567,1385.387,548C1385.387,529,1385.387,510,1385.387,491C1385.387,472,1385.387,453,1385.387,434C1385.387,415,1385.387,396,1340.491,379.091C1295.595,362.183,1205.803,347.366,1160.908,339.957L1116.012,332.549" id="my-svg-edge17" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge17" data-points="W3sieCI6MTA2Ni4zNTU0Njg3NSwieSI6NzY3LjM3MzgzMDk5ODc5NDZ9LHsieCI6MTM4NS4zODY3MTg3NSwieSI6NzE5fSx7IngiOjEzODUuMzg2NzE4NzUsInkiOjY2Mn0seyJ4IjoxMzg1LjM4NjcxODc1LCJ5Ijo2MDV9LHsieCI6MTM4NS4zODY3MTg3NSwieSI6NTQ4fSx7IngiOjEzODUuMzg2NzE4NzUsInkiOjQ5MX0seyJ4IjoxMzg1LjM4NjcxODc1LCJ5Ijo0MzR9LHsieCI6MTM4NS4zODY3MTg3NSwieSI6Mzc3fSx7IngiOjExMTYuMDExNzE4NzUsInkiOjMzMi41NDg5MjExNTYxOTQ4N31d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M235.727,682L235.727,688.167C235.727,694.333,235.727,706.667,235.727,719C235.727,731.333,235.727,743.667,235.727,749.833L235.727,756" id="my-svg-edge18" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge18" data-points="W3sieCI6MjM1LjcyNjU2MjUsInkiOjY4Mn0seyJ4IjoyMzUuNzI2NTYyNSwieSI6NzE5fSx7IngiOjIzNS43MjY1NjI1LCJ5Ijo3NTZ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M235.727,796L235.727,802.167C235.727,808.333,235.727,820.667,235.727,833C235.727,845.333,235.727,857.667,235.727,863.833L235.727,870" id="my-svg-edge19" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge19" data-points="W3sieCI6MjM1LjcyNjU2MjUsInkiOjc5Nn0seyJ4IjoyMzUuNzI2NTYyNSwieSI6ODMzfSx7IngiOjIzNS43MjY1NjI1LCJ5Ijo4NzB9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M73.5,910L73.5,914.167C73.5,918.333,73.5,926.667,111.08,936.007C148.66,945.348,223.82,955.696,261.401,960.87L298.981,966.044" id="my-svg-edge20" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge20" data-points="W3sieCI6NzMuNSwieSI6OTEwfSx7IngiOjczLjUsInkiOjkzNX0seyJ4IjoyOTguOTgwNzA3Nzg3MjgwMjcsInkiOjk2Ni4wNDQzMzU0MzE4MjE5fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M376.117,910L376.117,914.167C376.117,918.333,376.117,926.667,365.481,935.682C354.844,944.698,333.571,954.396,322.934,959.245L312.297,964.094" id="my-svg-edge21" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge21" data-points="W3sieCI6Mzc2LjExNzE4NzUsInkiOjkxMH0seyJ4IjozNzYuMTE3MTg3NSwieSI6OTM1fSx7IngiOjMxMi4yOTczMDQwNTM0NjI4LCJ5Ijo5NjQuMDkzNjI3NDQ1NDEwOH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M235.727,910L235.727,914.167C235.727,918.333,235.727,926.667,246.363,935.682C257,944.698,278.273,954.396,288.91,959.245L299.546,964.094" id="my-svg-edge22" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge22" data-points="W3sieCI6MjM1LjcyNjU2MjUsInkiOjkxMH0seyJ4IjoyMzUuNzI2NTYyNSwieSI6OTM1fSx7IngiOjI5OS41NDY0NDU5NDY1MzcyLCJ5Ijo5NjQuMDkzNjI3NDQ1NDEwOH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M850.152,796L850.152,802.167C850.152,808.333,850.152,820.667,850.152,836.333C850.152,852,850.152,871,850.152,888C850.152,905,850.152,920,760.613,932.765C671.074,945.53,491.995,956.059,402.456,961.324L312.916,966.589" id="my-svg-edge23" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge23" data-points="W3sieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo3OTZ9LHsieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo4MzN9LHsieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo4OTB9LHsieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo5MzV9LHsieCI6MzEyLjkxNjQ0MDk4NzUxODEsInkiOjk2Ni41ODg3MjkxNzkxNzU0fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="edge0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1229.34375, 149)"><g class="label" data-id="edge1" transform="translate(-24.1640625, -12)"><foreignObject width="48.328125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>submit</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1039.96484375, 263)"><g class="label" data-id="edge2" transform="translate(-55.9765625, -12)"><foreignObject width="111.953125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>begin screening</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1498.37890625, 491)"><g class="label" data-id="edge3" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(73.5, 605)"><g class="label" data-id="edge4" transform="translate(-40.40625, -12)"><foreignObject width="80.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>desk reject</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(784.28515625, 377)"><g class="label" data-id="edge5" transform="translate(-52.703125, -12)"><foreignObject width="105.40625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>send to review</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1119.62109375, 491)"><g class="label" data-id="edge6" transform="translate(-99.2734375, -12)"><foreignObject width="198.546875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>request pre-review changes</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1238.89453125, 548)"><g class="label" data-id="edge7" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(346.5859375, 491)"><g class="label" data-id="edge8" transform="translate(-58.484375, -12)"><foreignObject width="116.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>quorum reached</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(850.15234375, 605)"><g class="label" data-id="edge9" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(235.7265625, 605)"><g class="label" data-id="edge10" transform="translate(-24.1171875, -12)"><foreignObject width="48.234375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>accept</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(376.1171875, 719)"><g class="label" data-id="edge11" transform="translate(-21.90625, -12)"><foreignObject width="43.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>reject</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(453.4609375, 605)"><g class="label" data-id="edge12" transform="translate(-57.34375, -12)"><foreignObject width="114.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>request revision</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(530.8046875, 662)"><g class="label" data-id="edge13" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(777.21449, 739.32254)"><g class="label" data-id="edge14" transform="translate(-60.8046875, -12)"><foreignObject width="121.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>author resubmits</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(762.83203125, 719)"><g class="label" data-id="edge15" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1000.34765625, 605)"><g class="label" data-id="edge16" transform="translate(-82.90625, -12)"><foreignObject width="165.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>editor routes to review</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1385.38671875, 548)"><g class="label" data-id="edge17" transform="translate(-92.9921875, -12)"><foreignObject width="185.984375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>editor routes to screening</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(235.7265625, 719)"><g class="label" data-id="edge18" transform="translate(-51.125, -12)"><foreignObject width="102.25" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>assign to issue</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(235.7265625, 833)"><g class="label" data-id="edge19" transform="translate(-54.2578125, -12)"><foreignObject width="108.515625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>issue published</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge20" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge21" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge22" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge23" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-state-root_start-0" data-look="classic" transform="translate(1229.34375, 15)"><circle class="state-start" r="7" width="14" height="14"/></g><g class="node  statediagram-state" id="my-svg-state-DRAFT-1" data-look="classic" transform="translate(1229.34375, 92)"><rect class="basic label-container" style="" rx="5" ry="5" x="-31.125" y="-20" width="62.25" height="40"/><g class="label" style="" transform="translate(-23.125, -12)"><rect/><foreignObject width="46.25" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>DRAFT</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-SUBMITTED-3" data-look="classic" transform="translate(1229.34375, 206)"><rect class="basic label-container" style="" rx="5" ry="5" x="-47.9453125" y="-20" width="95.890625" height="40"/><g class="label" style="" transform="translate(-39.9453125, -12)"><rect/><foreignObject width="79.890625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>SUBMITTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-UNDER_SCREENING-17" data-look="classic" transform="translate(1039.96484375, 320)"><rect class="basic label-container" style="" rx="5" ry="5" x="-76.046875" y="-20" width="152.09375" height="40"/><g class="label" style="" transform="translate(-68.046875, -12)"><rect/><foreignObject width="136.09375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>UNDER_SCREENING</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-WITHDRAWN-23" data-look="classic" transform="translate(850.15234375, 776)"><rect class="basic label-container" style="" rx="5" ry="5" x="-52.421875" y="-20" width="104.84375" height="40"/><g class="label" style="" transform="translate(-44.421875, -12)"><rect/><foreignObject width="88.84375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>WITHDRAWN</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-DESK_REJECTED-20" data-look="classic" transform="translate(73.5, 890)"><rect class="basic label-container" style="" rx="5" ry="5" x="-65.5" y="-20" width="131" height="40"/><g class="label" style="" transform="translate(-57.5, -12)"><rect/><foreignObject width="115" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>DESK_REJECTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-UNDER_REVIEW-16" data-look="classic" transform="translate(784.28515625, 434)"><rect class="basic label-container" style="" rx="5" ry="5" x="-63.3046875" y="-20" width="126.609375" height="40"/><g class="label" style="" transform="translate(-55.3046875, -12)"><rect/><foreignObject width="110.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>UNDER_REVIEW</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-REVISION_REQUESTED-15" data-look="classic" transform="translate(693.80078125, 662)"><rect class="basic label-container" style="" rx="5" ry="5" x="-86.140625" y="-20" width="172.28125" height="40"/><g class="label" style="" transform="translate(-78.140625, -12)"><rect/><foreignObject width="156.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>REVISION_REQUESTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-REVIEWS_COMPLETE-13" data-look="classic" transform="translate(346.5859375, 548)"><rect class="basic label-container" style="" rx="5" ry="5" x="-80.59375" y="-20" width="161.1875" height="40"/><g class="label" style="" transform="translate(-72.59375, -12)"><rect/><foreignObject width="145.1875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>REVIEWS_COMPLETE</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-ACCEPTED-18" data-look="classic" transform="translate(235.7265625, 662)"><rect class="basic label-container" style="" rx="5" ry="5" x="-44.875" y="-20" width="89.75" height="40"/><g class="label" style="" transform="translate(-36.875, -12)"><rect/><foreignObject width="73.75" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>ACCEPTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-REJECTED-21" data-look="classic" transform="translate(376.1171875, 890)"><rect class="basic label-container" style="" rx="5" ry="5" x="-43.6640625" y="-20" width="87.328125" height="40"/><g class="label" style="" transform="translate(-35.6640625, -12)"><rect/><foreignObject width="71.328125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>REJECTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-RESUBMITTED-17" data-look="classic" transform="translate(1009.46484375, 776)"><rect class="basic label-container" style="" rx="5" ry="5" x="-56.890625" y="-20" width="113.78125" height="40"/><g class="label" style="" transform="translate(-48.890625, -12)"><rect/><foreignObject width="97.78125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>RESUBMITTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-SCHEDULED-19" data-look="classic" transform="translate(235.7265625, 776)"><rect class="basic label-container" style="" rx="5" ry="5" x="-49.4921875" y="-20" width="98.984375" height="40"/><g class="label" style="" transform="translate(-41.4921875, -12)"><rect/><foreignObject width="82.984375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>SCHEDULED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-PUBLISHED-22" data-look="classic" transform="translate(235.7265625, 890)"><rect class="basic label-container" style="" rx="5" ry="5" x="-46.7265625" y="-20" width="93.453125" height="40"/><g class="label" style="" transform="translate(-38.7265625, -12)"><rect/><foreignObject width="77.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>PUBLISHED</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-state-root_end-23" data-look="classic" transform="translate(305.921875, 967)"><g class="outer-path"><path d="M7 0 C7 0.40517908122283747, 6.964012880168563 0.816513743121899, 6.893654271085456 1.2155372436685123 C6.823295662002349 1.6145607442151257, 6.716427752933756 2.013397210557766, 6.5778483455013586 2.394141003279681 C6.439268938068961 2.7748847960015954, 6.26476736710249 3.149104622578984, 6.062177826491071 3.4999999999999996 C5.859588285879653 3.8508953774210153, 5.622755194947063 4.189128084166967, 5.362311101832846 4.499513267805774 C5.10186700871863 4.809898451444582, 4.809898451444583 5.10186700871863, 4.499513267805775 5.362311101832846 C4.189128084166968 5.622755194947063, 3.8508953774210166 5.859588285879652, 3.500000000000001 6.06217782649107 C3.149104622578985 6.264767367102489, 2.7748847960015963 6.439268938068961, 2.3941410032796817 6.5778483455013586 C2.013397210557767 6.716427752933756, 1.6145607442151264 6.823295662002349, 1.2155372436685128 6.893654271085456 C0.8165137431218992 6.964012880168563, 0.4051790812228379 7, 4.286263797015736e-16 7 C-0.405179081222837 7, -0.8165137431218985 6.964012880168563, -1.2155372436685121 6.893654271085456 C-1.6145607442151257 6.823295662002349, -2.0133972105577667 6.716427752933756, -2.394141003279681 6.5778483455013586 C-2.774884796001595 6.439268938068961, -3.149104622578983 6.26476736710249, -3.4999999999999982 6.062177826491071 C-3.8508953774210135 5.859588285879653, -4.189128084166966 5.6227551949470636, -4.499513267805773 5.362311101832848 C-4.809898451444581 5.101867008718632, -5.101867008718628 4.809898451444586, -5.3623111018328435 4.499513267805779 C-5.622755194947059 4.189128084166971, -5.859588285879649 3.8508953774210206, -6.062177826491068 3.5000000000000053 C-6.264767367102486 3.14910462257899, -6.439268938068958 2.774884796001602, -6.577848345501356 2.394141003279688 C-6.716427752933754 2.0133972105577738, -6.823295662002347 1.614560744215134, -6.893654271085454 1.215537243668521 C-6.9640128801685615 0.816513743121908, -6.999999999999999 0.4051790812228472, -7 1.0183126166254463e-14 C-7.000000000000001 -0.40517908122282686, -6.964012880168565 -0.8165137431218878, -6.893654271085459 -1.215537243668501 C-6.823295662002352 -1.6145607442151142, -6.716427752933759 -2.0133972105577542, -6.577848345501363 -2.394141003279669 C-6.439268938068967 -2.7748847960015834, -6.264767367102496 -3.149104622578972, -6.062177826491078 -3.4999999999999876 C-5.859588285879661 -3.8508953774210033, -5.6227551949470715 -4.1891280841669545, -5.362311101832856 -4.499513267805763 C-5.10186700871864 -4.809898451444571, -4.809898451444594 -5.10186700871862, -4.499513267805787 -5.362311101832836 C-4.189128084166979 -5.622755194947053, -3.850895377421028 -5.859588285879643, -3.5000000000000133 -6.062177826491062 C-3.1491046225789985 -6.264767367102482, -2.774884796001611 -6.439268938068954, -2.3941410032796973 -6.577848345501353 C-2.0133972105577835 -6.716427752933752, -1.6145607442151435 -6.823295662002345, -1.2155372436685306 -6.893654271085453 C-0.8165137431219176 -6.9640128801685615, -0.40517908122285695 -6.999999999999999, -1.9937625952807352e-14 -7 C0.4051790812228171 -7.000000000000001, 0.8165137431218781 -6.964012880168565, 1.2155372436684913 -6.89365427108546 C1.6145607442151044 -6.823295662002354, 2.013397210557745 -6.716427752933763, 2.3941410032796595 -6.5778483455013665 C2.774884796001574 -6.43926893806897, 3.149104622578963 -6.2647673671025, 3.499999999999979 -6.062177826491083 C3.8508953774209953 -5.859588285879665, 4.189128084166947 -5.622755194947077, 4.499513267805756 -5.362311101832862 C4.809898451444564 -5.1018670087186475, 5.101867008718613 -4.809898451444602, 5.362311101832829 -4.499513267805796 C5.622755194947046 -4.189128084166989, 5.859588285879637 -3.8508953774210393, 6.062177826491056 -3.500000000000025 C6.2647673671024755 -3.1491046225790105, 6.439268938068949 -2.774884796001623, 6.577848345501348 -2.3941410032797092 C6.716427752933747 -2.0133972105577955, 6.823295662002342 -1.6145607442151562, 6.893654271085451 -1.2155372436685434 C6.96401288016856 -0.8165137431219307, 6.982275711847575 -0.2025895406114567, 7 -3.2800750208310675e-14 C7.017724288152425 0.2025895406113911, 7.017724288152424 -0.2025895406114242, 7 0" stroke="none" stroke-width="0" fill="#ECECFF" style=""/><path d="M7 0 C7 0.40517908122283747, 6.964012880168563 0.816513743121899, 6.893654271085456 1.2155372436685123 C6.823295662002349 1.6145607442151257, 6.716427752933756 2.013397210557766, 6.5778483455013586 2.394141003279681 C6.439268938068961 2.7748847960015954, 6.26476736710249 3.149104622578984, 6.062177826491071 3.4999999999999996 C5.859588285879653 3.8508953774210153, 5.622755194947063 4.189128084166967, 5.362311101832846 4.499513267805774 C5.10186700871863 4.809898451444582, 4.809898451444583 5.10186700871863, 4.499513267805775 5.362311101832846 C4.189128084166968 5.622755194947063, 3.8508953774210166 5.859588285879652, 3.500000000000001 6.06217782649107 C3.149104622578985 6.264767367102489, 2.7748847960015963 6.439268938068961, 2.3941410032796817 6.5778483455013586 C2.013397210557767 6.716427752933756, 1.6145607442151264 6.823295662002349, 1.2155372436685128 6.893654271085456 C0.8165137431218992 6.964012880168563, 0.4051790812228379 7, 4.286263797015736e-16 7 C-0.405179081222837 7, -0.8165137431218985 6.964012880168563, -1.2155372436685121 6.893654271085456 C-1.6145607442151257 6.823295662002349, -2.0133972105577667 6.716427752933756, -2.394141003279681 6.5778483455013586 C-2.774884796001595 6.439268938068961, -3.149104622578983 6.26476736710249, -3.4999999999999982 6.062177826491071 C-3.8508953774210135 5.859588285879653, -4.189128084166966 5.6227551949470636, -4.499513267805773 5.362311101832848 C-4.809898451444581 5.101867008718632, -5.101867008718628 4.809898451444586, -5.3623111018328435 4.499513267805779 C-5.622755194947059 4.189128084166971, -5.859588285879649 3.8508953774210206, -6.062177826491068 3.5000000000000053 C-6.264767367102486 3.14910462257899, -6.439268938068958 2.774884796001602, -6.577848345501356 2.394141003279688 C-6.716427752933754 2.0133972105577738, -6.823295662002347 1.614560744215134, -6.893654271085454 1.215537243668521 C-6.9640128801685615 0.816513743121908, -6.999999999999999 0.4051790812228472, -7 1.0183126166254463e-14 C-7.000000000000001 -0.40517908122282686, -6.964012880168565 -0.8165137431218878, -6.893654271085459 -1.215537243668501 C-6.823295662002352 -1.6145607442151142, -6.716427752933759 -2.0133972105577542, -6.577848345501363 -2.394141003279669 C-6.439268938068967 -2.7748847960015834, -6.264767367102496 -3.149104622578972, -6.062177826491078 -3.4999999999999876 C-5.859588285879661 -3.8508953774210033, -5.6227551949470715 -4.1891280841669545, -5.362311101832856 -4.499513267805763 C-5.10186700871864 -4.809898451444571, -4.809898451444594 -5.10186700871862, -4.499513267805787 -5.362311101832836 C-4.189128084166979 -5.622755194947053, -3.850895377421028 -5.859588285879643, -3.5000000000000133 -6.062177826491062 C-3.1491046225789985 -6.264767367102482, -2.774884796001611 -6.439268938068954, -2.3941410032796973 -6.577848345501353 C-2.0133972105577835 -6.716427752933752, -1.6145607442151435 -6.823295662002345, -1.2155372436685306 -6.893654271085453 C-0.8165137431219176 -6.9640128801685615, -0.40517908122285695 -6.999999999999999, -1.9937625952807352e-14 -7 C0.4051790812228171 -7.000000000000001, 0.8165137431218781 -6.964012880168565, 1.2155372436684913 -6.89365427108546 C1.6145607442151044 -6.823295662002354, 2.013397210557745 -6.716427752933763, 2.3941410032796595 -6.5778483455013665 C2.774884796001574 -6.43926893806897, 3.149104622578963 -6.2647673671025, 3.499999999999979 -6.062177826491083 C3.8508953774209953 -5.859588285879665, 4.189128084166947 -5.622755194947077, 4.499513267805756 -5.362311101832862 C4.809898451444564 -5.1018670087186475, 5.101867008718613 -4.809898451444602, 5.362311101832829 -4.499513267805796 C5.622755194947046 -4.189128084166989, 5.859588285879637 -3.8508953774210393, 6.062177826491056 -3.500000000000025 C6.2647673671024755 -3.1491046225790105, 6.439268938068949 -2.774884796001623, 6.577848345501348 -2.3941410032797092 C6.716427752933747 -2.0133972105577955, 6.823295662002342 -1.6145607442151562, 6.893654271085451 -1.2155372436685434 C6.96401288016856 -0.8165137431219307, 6.982275711847575 -0.2025895406114567, 7 -3.2800750208310675e-14 C7.017724288152425 0.2025895406113911, 7.017724288152424 -0.2025895406114242, 7 0" stroke="#333333" stroke-width="2" fill="none" stroke-dasharray="0 0" style=""/><g><path d="M2.5 0 C2.5 0.14470681472244193, 2.487147457203058 0.29161205111496386, 2.46201938253052 0.4341204441673258 C2.436891307857982 0.5766288372196877, 2.3987241974763416 0.7190704323420595, 2.3492315519647713 0.8550503583141718 C2.299738906453201 0.991030284286284, 2.2374169168223177 1.124680222349637, 2.165063509461097 1.2499999999999998 C2.092710102099876 1.3753197776503625, 2.0081268553382365 1.496117172916774, 1.915111107797445 1.6069690242163481 C1.8220953602566536 1.7178208755159223, 1.7178208755159226 1.8220953602566536, 1.6069690242163484 1.915111107797445 C1.4961171729167742 2.0081268553382365, 1.375319777650363 2.0927101020998755, 1.2500000000000002 2.1650635094610964 C1.1246802223496375 2.2374169168223172, 0.9910302842862845 2.2997389064532, 0.8550503583141721 2.349231551964771 C0.7190704323420597 2.3987241974763416, 0.576628837219688 2.436891307857982, 0.43412044416732604 2.46201938253052 C0.291612051114964 2.487147457203058, 0.14470681472244212 2.5, 1.5308084989341916e-16 2.5 C-0.1447068147224418 2.5, -0.2916120511149638 2.487147457203058, -0.43412044416732576 2.46201938253052 C-0.5766288372196877 2.436891307857982, -0.7190704323420595 2.3987241974763416, -0.8550503583141718 2.3492315519647713 C-0.991030284286284 2.299738906453201, -1.124680222349637 2.2374169168223177, -1.2499999999999996 2.165063509461097 C-1.375319777650362 2.092710102099876, -1.4961171729167733 2.008126855338237, -1.6069690242163475 1.9151111077974459 C-1.7178208755159217 1.8220953602566548, -1.822095360256653 1.7178208755159234, -1.9151111077974443 1.6069690242163495 C-2.0081268553382357 1.4961171729167755, -2.0927101020998746 1.3753197776503645, -2.1650635094610955 1.250000000000002 C-2.2374169168223164 1.1246802223496395, -2.2997389064531992 0.9910302842862865, -2.34923155196477 0.8550503583141743 C-2.3987241974763407 0.7190704323420621, -2.436891307857981 0.5766288372196907, -2.4620193825305194 0.434120444167329 C-2.487147457203058 0.29161205111496724, -2.5 0.14470681472244545, -2.5 3.636830773662308e-15 C-2.5 -0.14470681472243818, -2.4871474572030587 -0.2916120511149599, -2.4620193825305208 -0.4341204441673218 C-2.436891307857983 -0.5766288372196837, -2.398724197476343 -0.7190704323420553, -2.3492315519647726 -0.8550503583141675 C-2.2997389064532023 -0.9910302842862798, -2.23741691682232 -1.1246802223496328, -2.165063509461099 -1.2499999999999956 C-2.092710102099878 -1.3753197776503583, -2.00812685533824 -1.4961171729167695, -1.9151111077974488 -1.606969024216344 C-1.8220953602566576 -1.7178208755159183, -1.7178208755159263 -1.82209536025665, -1.6069690242163523 -1.9151111077974416 C-1.4961171729167784 -2.0081268553382334, -1.3753197776503672 -2.0927101020998724, -1.2500000000000047 -2.1650635094610937 C-1.1246802223496422 -2.237416916822315, -0.9910302842862897 -2.299738906453198, -0.8550503583141776 -2.3492315519647686 C-0.7190704323420656 -2.3987241974763394, -0.5766288372196942 -2.4368913078579806, -0.43412044416733236 -2.462019382530519 C-0.29161205111497057 -2.4871474572030574, -0.1447068147224489 -2.4999999999999996, -7.120580697431198e-15 -2.5 C0.14470681472243463 -2.5000000000000004, 0.29161205111495647 -2.487147457203059, 0.4341204441673183 -2.4620193825305217 C0.5766288372196802 -2.436891307857984, 0.7190704323420518 -2.3987241974763442, 0.8550503583141642 -2.349231551964774 C0.9910302842862766 -2.2997389064532037, 1.1246802223496295 -2.2374169168223212, 1.2499999999999925 -2.165063509461101 C1.3753197776503554 -2.0927101020998804, 1.4961171729167668 -2.008126855338242, 1.6069690242163412 -1.915111107797451 C1.7178208755159157 -1.82209536025666, 1.8220953602566472 -1.7178208755159294, 1.915111107797439 -1.6069690242163557 C2.0081268553382308 -1.496117172916782, 2.09271010209987 -1.3753197776503712, 2.1650635094610915 -1.2500000000000089 C2.237416916822313 -1.1246802223496466, 2.299738906453196 -0.9910302842862939, 2.3492315519647673 -0.855050358314182 C2.3987241974763385 -0.71907043234207, 2.4368913078579792 -0.5766288372196986, 2.462019382530518 -0.4341204441673369 C2.487147457203057 -0.29161205111497523, 2.4936698970884197 -0.07235340736123454, 2.5 -1.1714553645825241e-14 C2.5063301029115803 0.07235340736121111, 2.50633010291158 -0.07235340736122292, 2.5 0" stroke="none" stroke-width="0" fill="#9370DB" style=""/><path d="M2.5 0 C2.5 0.14470681472244193, 2.487147457203058 0.29161205111496386, 2.46201938253052 0.4341204441673258 C2.436891307857982 0.5766288372196877, 2.3987241974763416 0.7190704323420595, 2.3492315519647713 0.8550503583141718 C2.299738906453201 0.991030284286284, 2.2374169168223177 1.124680222349637, 2.165063509461097 1.2499999999999998 C2.092710102099876 1.3753197776503625, 2.0081268553382365 1.496117172916774, 1.915111107797445 1.6069690242163481 C1.8220953602566536 1.7178208755159223, 1.7178208755159226 1.8220953602566536, 1.6069690242163484 1.915111107797445 C1.4961171729167742 2.0081268553382365, 1.375319777650363 2.0927101020998755, 1.2500000000000002 2.1650635094610964 C1.1246802223496375 2.2374169168223172, 0.9910302842862845 2.2997389064532, 0.8550503583141721 2.349231551964771 C0.7190704323420597 2.3987241974763416, 0.576628837219688 2.436891307857982, 0.43412044416732604 2.46201938253052 C0.291612051114964 2.487147457203058, 0.14470681472244212 2.5, 1.5308084989341916e-16 2.5 C-0.1447068147224418 2.5, -0.2916120511149638 2.487147457203058, -0.43412044416732576 2.46201938253052 C-0.5766288372196877 2.436891307857982, -0.7190704323420595 2.3987241974763416, -0.8550503583141718 2.3492315519647713 C-0.991030284286284 2.299738906453201, -1.124680222349637 2.2374169168223177, -1.2499999999999996 2.165063509461097 C-1.375319777650362 2.092710102099876, -1.4961171729167733 2.008126855338237, -1.6069690242163475 1.9151111077974459 C-1.7178208755159217 1.8220953602566548, -1.822095360256653 1.7178208755159234, -1.9151111077974443 1.6069690242163495 C-2.0081268553382357 1.4961171729167755, -2.0927101020998746 1.3753197776503645, -2.1650635094610955 1.250000000000002 C-2.2374169168223164 1.1246802223496395, -2.2997389064531992 0.9910302842862865, -2.34923155196477 0.8550503583141743 C-2.3987241974763407 0.7190704323420621, -2.436891307857981 0.5766288372196907, -2.4620193825305194 0.434120444167329 C-2.487147457203058 0.29161205111496724, -2.5 0.14470681472244545, -2.5 3.636830773662308e-15 C-2.5 -0.14470681472243818, -2.4871474572030587 -0.2916120511149599, -2.4620193825305208 -0.4341204441673218 C-2.436891307857983 -0.5766288372196837, -2.398724197476343 -0.7190704323420553, -2.3492315519647726 -0.8550503583141675 C-2.2997389064532023 -0.9910302842862798, -2.23741691682232 -1.1246802223496328, -2.165063509461099 -1.2499999999999956 C-2.092710102099878 -1.3753197776503583, -2.00812685533824 -1.4961171729167695, -1.9151111077974488 -1.606969024216344 C-1.8220953602566576 -1.7178208755159183, -1.7178208755159263 -1.82209536025665, -1.6069690242163523 -1.9151111077974416 C-1.4961171729167784 -2.0081268553382334, -1.3753197776503672 -2.0927101020998724, -1.2500000000000047 -2.1650635094610937 C-1.1246802223496422 -2.237416916822315, -0.9910302842862897 -2.299738906453198, -0.8550503583141776 -2.3492315519647686 C-0.7190704323420656 -2.3987241974763394, -0.5766288372196942 -2.4368913078579806, -0.43412044416733236 -2.462019382530519 C-0.29161205111497057 -2.4871474572030574, -0.1447068147224489 -2.4999999999999996, -7.120580697431198e-15 -2.5 C0.14470681472243463 -2.5000000000000004, 0.29161205111495647 -2.487147457203059, 0.4341204441673183 -2.4620193825305217 C0.5766288372196802 -2.436891307857984, 0.7190704323420518 -2.3987241974763442, 0.8550503583141642 -2.349231551964774 C0.9910302842862766 -2.2997389064532037, 1.1246802223496295 -2.2374169168223212, 1.2499999999999925 -2.165063509461101 C1.3753197776503554 -2.0927101020998804, 1.4961171729167668 -2.008126855338242, 1.6069690242163412 -1.915111107797451 C1.7178208755159157 -1.82209536025666, 1.8220953602566472 -1.7178208755159294, 1.915111107797439 -1.6069690242163557 C2.0081268553382308 -1.496117172916782, 2.09271010209987 -1.3753197776503712, 2.1650635094610915 -1.2500000000000089 C2.237416916822313 -1.1246802223496466, 2.299738906453196 -0.9910302842862939, 2.3492315519647673 -0.855050358314182 C2.3987241974763385 -0.71907043234207, 2.4368913078579792 -0.5766288372196986, 2.462019382530518 -0.4341204441673369 C2.487147457203057 -0.29161205111497523, 2.4936698970884197 -0.07235340736123454, 2.5 -1.1714553645825241e-14 C2.5063301029115803 0.07235340736121111, 2.50633010291158 -0.07235340736122292, 2.5 0" stroke="#9370DB" stroke-width="2" fill="none" stroke-dasharray="0 0" style=""/></g></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg></figure>
+
+<h4 id="413-spec-versus-code-disagreement--resubmitted-routing">4.1.3
+Spec-versus-code disagreement — RESUBMITTED routing</h4>
+<p>The design specification's §6.2 diagram draws
+<code>RESUBMITTED</code> flowing directly into
+<code>REVIEWS_COMPLETE</code> ("<code>RESUBMITTED</code> ◀── … ▶
+<code>REVIEWS_COMPLETE</code>"), implying a resubmission closes the
+review round automatically. The implemented
+<code>LEGAL_TRANSITIONS</code> table instead routes
+<code>RESUBMITTED</code> to <strong>either</strong>
+<code>UNDER_REVIEW</code> <strong>or</strong>
+<code>UNDER_SCREENING</code>, at editorial discretion — a resubmission
+may need fresh review, or may need re-screening first, but never closes
+the review round by itself. <strong>The code governs</strong>, per this
+document's instruction: FR-13's postcondition and the state diagram
+above are written to the implemented behaviour, not the narrative
+diagram. This is a genuine, load-bearing disagreement between the two
+documents and is recorded here rather than silently resolved in one
+direction without comment.</p>
+<h3 id="42-actoruse-case-mapping">4.2 Actor/use-case mapping</h3>
+<table>
+<thead>
+<tr>
+<th>Actor</th>
+<th>Use cases (effort estimation §3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Author</td>
+<td>UC1, UC2, UC4, UC9 (as respondent is Reviewer; Author has no UC9
+role), UC12, UC13, UC19, UC21 (recipient), UC23</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>UC1, UC2, UC9, UC10, UC21 (recipient)</td>
+</tr>
+<tr>
+<td>Editor</td>
+<td>UC2, UC3 (Administrator only, not Editor — see note), UC6, UC7, UC8,
+UC11, UC18, UC21 (recipient)</td>
+</tr>
+<tr>
+<td>Editor-in-Chief</td>
+<td>All Editor use cases, plus UC14, UC22, UC24</td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td>UC3</td>
+</tr>
+<tr>
+<td>Reader</td>
+<td>UC15, UC16, UC17, UC19 (public export, distinct from FR-19's audit
+view), UC20 (indirectly, as the harvested party), UC25</td>
+</tr>
+<tr>
+<td>Head of Department</td>
+<td>UC22 (read-only consumer)</td>
+</tr>
+<tr>
+<td>Indexing service</td>
+<td>UC20</td>
+</tr>
+<tr>
+<td>System (no human actor)</td>
+<td>UC5, UC7 (computation), UC21 (dispatch)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note:</em> UC3 ("manage roles") is an Administrator-only use case
+per FR-03's actor column; it is listed once and not duplicated against
+Editor.</p>
+<h3 id="43-authorisation-matrix">4.3 Authorisation matrix</h3>
+<p>Derived directly from
+<code>backend/src/ugjcs/domain/policies.py</code> —
+<code>_ROLE_GRANTS</code> for role-only actions,
+<code>_OWNERSHIP_ACTIONS</code> and <code>_can_view</code> for actions
+that also depend on the actor's relationship to a specific manuscript,
+and the policy module's own docstring for the one action
+(<code>REVIEW</code>) that is deliberately under-specified today.</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Author</th>
+<th>Reviewer</th>
+<th>Editor</th>
+<th>Editor-in-Chief</th>
+<th>Administrator</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>VIEW</code></td>
+<td>Own manuscripts only</td>
+<td>— <em>(no dedicated action; see gap below)</em></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>SUBMIT</code></td>
+<td>Yes</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>SCREEN</code></td>
+<td>—</td>
+<td>—</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>ASSIGN_REVIEWER</code></td>
+<td>—</td>
+<td>—</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>REVIEW</code></td>
+<td>—</td>
+<td>Yes <em>(role-only — no conflict-of-interest predicate;
+TD-02)</em></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>DECIDE</code></td>
+<td>—</td>
+<td>—</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>RESUBMIT</code></td>
+<td>Corresponding author only</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>PUBLISH</code></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>MANAGE_USERS</code></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><code>VIEW_AUDIT</code></td>
+<td>—</td>
+<td>—</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>— <em>(role grant exists; no route reaches it — §5, FR-19)</em></td>
+</tr>
+<tr>
+<td><code>WITHDRAW</code> <em>(FR-25a)</em></td>
+<td>Corresponding author only — <strong>implemented &amp;
+tested</strong></td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p><strong>FR-25a is closed.</strong> <code>Action.WITHDRAW</code> now
+exists in <code>_OWNERSHIP_ACTIONS</code> alongside
+<code>RESUBMIT</code> (<code>policies.py</code>), and
+<code>POST /manuscripts/{tracking_code}/withdraw</code>
+(<code>manuscripts.py</code>) calls
+<code>authorize(actor, Action.WITHDRAW, manuscript)</code> before
+withdrawing.
+<code>test_corresponding_author_may_withdraw_own_manuscript</code>,
+<code>test_another_author_may_not_withdraw_someone_elses_manuscript</code>
+and
+<code>test_a_listed_co_author_who_is_not_corresponding_may_not_withdraw</code>
+(<code>test_policies.py</code>), plus
+<code>test_the_corresponding_author_can_withdraw</code> and
+<code>test_a_co_author_who_is_not_corresponding_cannot_withdraw</code>
+(<code>test_manuscripts_router.py</code>), cover it end to end. The gap
+this row previously recorded — first noticed as a mismatch between
+<code>transitions.py</code> (which already permitted
+<code>WITHDRAWN</code>) and <code>policies.py</code> (which had no gate
+for it) — is resolved, not merely documented.</p>
+<p><strong>Known gaps still open in this matrix, cross-referenced to the
+technical debt register:</strong></p>
+<ul>
+<li><code>REVIEW</code> is granted to any actor holding the
+<code>REVIEWER</code> role with no check that they are not also an
+author of, or affiliated with, the manuscript in question
+(<strong>TD-02</strong> — critical, still open). The reviews API
+(<code>reviews.py</code>) adds one partial mitigation not present when
+this gap was first recorded: <code>_assigned_or_403</code> refuses a
+reviewer who was never assigned to the manuscript. It does
+<strong>not</strong> stop a reviewer who <em>was</em> assigned, and who
+also happens to be a listed author, from reviewing their own work —
+<code>assign_reviewer</code> (<code>editorial.py</code>) never checks
+<code>author_ids</code> before creating an assignment. Because
+<code>Manuscript.record_review</code> also does not check the submitting
+reviewer's identity against an accepted assignment or against reviewers
+who already submitted (<strong>TD-03</strong> — critical, still open), a
+reviewer with an existing assignment could in principle call
+<code>POST /reviews/{tracking_code}/submit</code> twice and reach the
+quorum alone. Neither gap has been closed by the API layer; both remain
+exactly as critical as the technical debt register states.</li>
+<li>There is no <code>Action</code> connecting
+<code>blinding.blind()</code> to <code>policies.can()</code> — a caller
+must remember to call <code>blind()</code> before serving a reviewer,
+and nothing in the authorisation layer enforces it
+(<strong>TD-07</strong> — scheduled). In the delivered code,
+<code>reviews.py</code>'s <code>my_assignments</code> handler does call
+<code>blind()</code> correctly, and <code>test_blinding_leak.py</code>
+proves no author identity leaks through it today — but that is adapter
+discipline holding, which is precisely the weakness TD-07 names, not the
+gap being closed.</li>
+<li>The editorial event log has no blinded projection and is protected
+by <code>VIEW_AUDIT</code> policy alone rather than by the type system
+(<strong>TD-06</strong> — scheduled). No reviewer-facing path reads the
+log in the delivered system, so the risk TD-06 describes remains
+theoretical, exactly as originally recorded.</li>
+</ul>
+<hr />
+<h2 id="5-requirements-traceability-matrix">5. Requirements traceability
+matrix</h2>
+<p><strong>Revised 2026-08-12 against the finished system</strong> (see
+the revision note on p.1). Status categories: <strong>Implemented &amp;
+tested</strong> (the requirement's behaviour is reachable end to end —
+domain rule, API route and, where the requirement names one, a frontend
+screen — and is covered by an automated test in the delivered codebase);
+<strong>Partially implemented</strong> (some layer of the requirement is
+built and tested but a named, specific piece is missing — never "mostly
+done" without saying what the remainder is); <strong>Not
+implemented</strong> (no code exists for this requirement's behaviour,
+stated as such rather than described euphemistically).</p>
+<table>
+<thead>
+<tr>
+<th>FR</th>
+<th>Use case</th>
+<th>Module / endpoint</th>
+<th>Test</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-01</td>
+<td>UC1</td>
+<td><code>application/identity.py</code>
+(<code>RegistrationService</code>) — account creation, email
+verification token issue and redemption</td>
+<td><code>test_identity.py</code>:
+<code>test_registering_creates_an_unverified_account_and_sends_one_message</code>,
+<code>test_a_valid_verification_token_verifies_the_account</code>,
+<code>test_a_verification_token_cannot_be_replayed</code>,
+<code>test_registering_an_existing_email_raises_and_sends_no_second_message</code></td>
+<td><strong>Partially implemented.</strong> The service layer is fully
+built and tested, including duplicate-email and replay handling. But no
+<code>/auth/register</code> route exists (absent from the live
+<code>/openapi.json</code>) and the frontend has no registration screen
+— only <code>/login</code>. Accounts in the deployed system are
+provisioned by seed data (the judge accounts in
+<code>docs/06-testing-report.md</code> §5), not self-registration.
+Missing: the API route and the frontend form that would call it.</td>
+</tr>
+<tr>
+<td>FR-02</td>
+<td>UC2</td>
+<td><code>api/routers/auth.py</code> (<code>/auth/login</code>,
+<code>/auth/refresh</code>, <code>/auth/logout</code>,
+<code>/auth/me</code>); <code>application/identity.py</code>
+(<code>SessionService</code>)</td>
+<td><code>test_auth_router.py</code> (unit, all four routes);
+integration <code>test_refresh_rotation.py</code>:
+<code>test_replaying_a_rotated_refresh_token_revokes_the_entire_family</code>,
+<code>test_roles_revoked_after_a_token_was_issued_take_effect_immediately</code>,
+<code>test_an_expired_refresh_token_is_refused</code></td>
+<td><strong>Implemented &amp; tested.</strong> Session issuance,
+explicit revocation (<code>/logout</code>), and expiry are all live and
+covered, including the security-sensitive case (stolen-refresh-token
+family revocation) against a real database.</td>
+</tr>
+<tr>
+<td>FR-03</td>
+<td>UC3</td>
+<td><code>domain/policies.py</code> (<code>Action.MANAGE_USERS</code>,
+granted to <code>Administrator</code>);
+<code>infrastructure/db/account_repository.py</code> (role grant/revoke
+persistence)</td>
+<td><code>test_policies.py</code> (grant); integration
+<code>test_account_repository.py</code>:
+<code>test_granting_a_role_and_saving_persists_it</code>,
+<code>test_revoking_a_role_and_saving_removes_it</code></td>
+<td><strong>Partially implemented.</strong> The authorisation grant and
+the persistence of a role change are both implemented and tested against
+a real database. No <code>/admin</code> API route or frontend screen
+exists to let an Administrator invoke this — confirmed absent from
+<code>/openapi.json</code> and from <code>frontend/src/app/</code>, and
+stated explicitly in <code>docs/06-testing-report.md</code> §5: "no UI
+surface exists for this yet."</td>
+</tr>
+<tr>
+<td>FR-04</td>
+<td>UC4</td>
+<td><code>api/routers/manuscripts.py</code>
+(<code>POST /manuscripts</code>, multipart with <code>file</code>);
+<code>domain/manuscript.py</code>; <code>domain/transitions.py</code>
+(<code>DRAFT→SUBMITTED</code>); frontend
+<code>app/author/submit/page.tsx</code></td>
+<td><code>test_manuscripts_router.py</code>:
+<code>test_an_author_can_submit_a_manuscript_with_a_pdf</code>;
+<code>test_transitions.py</code>, <code>test_manuscript.py</code></td>
+<td><strong>Implemented &amp; tested</strong>, end to end: route,
+upload, lifecycle guard and the author's submission form all exist and
+are exercised by the cited tests plus the live UAT pass in §5 of the
+testing report.</td>
+</tr>
+<tr>
+<td>FR-05</td>
+<td>UC4</td>
+<td><code>application/documents.py</code>
+(<code>validate_document</code> — magic-byte check, independent of
+client-supplied <code>Content-Type</code>)</td>
+<td><code>test_documents.py</code>:
+<code>test_a_client_supplied_content_type_cannot_substitute_for_the_magic_number</code>,
+<code>test_content_exceeding_the_size_cap_is_rejected</code>;
+<code>test_manuscripts_router.py</code>:
+<code>test_a_non_pdf_upload_is_rejected_with_415</code>,
+<code>test_an_oversized_upload_is_rejected_with_413</code></td>
+<td><strong>Implemented &amp; tested</strong>, at the unit level
+(validation logic) and the API level (<code>415</code>/<code>413</code>
+responses).</td>
+</tr>
+<tr>
+<td>FR-06</td>
+<td>UC5</td>
+<td><code>infrastructure/storage/anonymize.py</code>
+(<code>strip_pdf_metadata</code>); wired into
+<code>manuscripts.py</code>'s <code>_store_document</code>, which writes
+both an original and an anonymised S3 key on every submit/resubmit</td>
+<td><code>test_anonymize.py</code>; <code>test_documents.py</code>:
+<code>test_original_and_anonymised_keys_differ_for_the_same_manuscript_and_version</code>,
+<code>test_keys_carry_no_title_or_author_identifying_text</code></td>
+<td><strong>Implemented &amp; tested.</strong> Every submitted document
+produces a metadata-stripped derivative, distinct from the original,
+before either reaches storage. <strong>Note the scope of what
+"anonymised" means here</strong> — see §7: XMP/DocInfo metadata is
+stripped; visible body text (a title or abstract that names the author)
+is not touched, which is FR-06 as designed, not a shortfall against
+it.</td>
+</tr>
+<tr>
+<td>FR-07</td>
+<td>UC6</td>
+<td><code>api/routers/editorial.py</code>
+(<code>POST /editorial/{tracking_code}/screen</code> →
+<code>begin_screening</code>;
+<code>POST /editorial/{tracking_code}/decision</code> with
+<code>DESK_REJECT</code>/<code>SEND_TO_REVIEW</code>/<code>REQUEST_REVISION</code>
+→ the three FR-07 outcomes); <code>domain/transitions.py</code>;
+<code>domain/policies.py</code> (<code>Action.SCREEN</code>,
+<code>Action.DECIDE</code>)</td>
+<td><code>test_editorial_router.py</code>:
+<code>test_an_editor_can_begin_screening</code>,
+<code>test_a_decision_moves_the_manuscript_to_review</code>,
+<code>test_a_reviewer_cannot_record_a_decision</code>;
+<code>test_transitions.py</code>, <code>test_policies.py</code></td>
+<td><strong>Implemented &amp; tested.</strong> The three-way screening
+outcome is reached through the same <code>/decision</code> route FR-12
+uses (one action, <code>Action.DECIDE</code>, gates the post-screening
+and post-review decisions alike) rather than a dedicated
+<code>/screen</code>-outcome route; <code>/screen</code> itself only
+performs the <code>SUBMITTED→UNDER_SCREENING</code> intake step. This is
+a routing detail, not a missing behaviour — all three outcomes are
+reachable and tested.</td>
+</tr>
+<tr>
+<td>FR-08</td>
+<td>UC7</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> No matching or ranking code exists
+anywhere in <code>backend/src/ugjcs/</code> — grep for TF-IDF,
+Hungarian-algorithm, or any "matcher" module returns nothing. An editor
+assigns a reviewer by supplying a raw <code>reviewer_id</code>
+(<code>AssignReviewerRequest</code>, <code>editorial.py</code>); there
+is no candidate list, no score, no conflict-of-interest exclusion, and
+no capacity check at assignment time. Recorded as future evolution
+alongside TD-02/TD-03, which are the conflict-of-interest gaps this
+requirement's "excluding conflicts of interest" clause would close.</td>
+</tr>
+<tr>
+<td>FR-09</td>
+<td>UC8</td>
+<td><code>api/routers/editorial.py</code>
+(<code>POST /editorial/{tracking_code}/reviewers</code>);
+<code>domain/policies.py</code>
+(<code>Action.ASSIGN_REVIEWER</code>)</td>
+<td><code>test_editorial_router.py</code>:
+<code>test_assigning_a_reviewer_records_it</code>,
+<code>test_assigning_a_reviewer_to_a_missing_manuscript_is_404</code>;
+integration <code>test_review_assignment_repository.py</code>:
+<code>test_an_assignment_is_visible_to_both_parties</code>,
+<code>test_assigning_the_same_reviewer_twice_is_rejected</code></td>
+<td><strong>Implemented &amp; tested</strong> for the invite mechanism
+itself. The "may override any system recommendation" clause is vacuously
+true rather than exercised — FR-08 (the recommendation) does not exist,
+so every invitation is, in effect, an override with nothing to override.
+<code>assign_reviewer</code> also does not check the invited reviewer
+against <code>author_ids</code> (TD-02) before creating the
+assignment.</td>
+</tr>
+<tr>
+<td>FR-10</td>
+<td>UC9</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> <code>AssignmentStatus</code>
+declares
+<code>INVITED</code>/<code>ACCEPTED</code>/<code>DECLINED</code>/<code>SUBMITTED</code>/<code>EXPIRED</code>,
+but the assignment repository writes the literal string
+<code>"assigned"</code> on creation
+(<code>assignment_repository.py</code>) — a value that is not even one
+of the enum's own members — and no route lets a reviewer accept or
+decline. A reviewer's assignment is usable immediately; there is no
+invitation-response step at all.</td>
+</tr>
+<tr>
+<td>FR-11</td>
+<td>UC10</td>
+<td><code>api/routers/reviews.py</code>
+(<code>POST /reviews/{tracking_code}/submit</code>);
+<code>api/schemas.py</code>
+(<code>SubmitReviewRequest: recommendation, comments</code>);
+<code>domain/manuscript.py</code> (<code>record_review</code>, quorum
+counter)</td>
+<td><code>test_reviews_router.py</code>:
+<code>test_submitting_a_review_counts_it_and_records_the_content</code>,
+<code>test_submitting_without_an_assignment_is_forbidden</code>;
+integration <code>test_review_assignment_repository.py</code>:
+<code>test_marking_submitted_records_the_review_content</code></td>
+<td><strong>Partially implemented.</strong> A reviewer can submit a
+recommendation and free-text comments, gated on holding an assignment
+(<code>_assigned_or_403</code>). Missing against the requirement text:
+<strong>criterion-level scores</strong>
+(<code>SubmitReviewRequest</code> carries only
+<code>recommendation</code> and a single <code>comments</code> string —
+no per-criterion structure), and the <strong>two-channel comment
+split</strong> ("comments to the author" vs "confidential comments to
+the editor") — there is one <code>comments</code> field, not two. The
+acceptance criterion "confidential comments never appear in any
+author-facing view" holds today only because no view exposes any review
+comments to an author at all, not because a confidential channel is
+enforced. The quorum-counting defect (TD-03, an actor with an accepted
+assignment could submit twice and close the round alone) is unresolved —
+see §4.3.</td>
+</tr>
+<tr>
+<td>FR-12</td>
+<td>UC11</td>
+<td><code>api/routers/editorial.py</code>
+(<code>POST /editorial/{tracking_code}/decision</code>);
+<code>domain/transitions.py</code>; <code>domain/policies.py</code>
+(<code>Action.DECIDE</code>)</td>
+<td><code>test_editorial_router.py</code>:
+<code>test_a_decision_moves_the_manuscript_to_review</code>,
+<code>test_a_reviewer_cannot_record_a_decision</code>;
+<code>test_transitions.py</code>, <code>test_manuscript.py</code>:
+<code>test_a_decision_requires_the_minimum_review_count</code></td>
+<td><strong>Implemented &amp; tested.</strong> Quorum enforcement and
+role gating both hold; quorum <em>correctness</em> still depends on the
+unresolved TD-03 defect in FR-11, which is a defect in what feeds the
+count, not in this requirement's own enforcement of it.</td>
+</tr>
+<tr>
+<td>FR-13</td>
+<td>UC12</td>
+<td><code>api/routers/manuscripts.py</code>
+(<code>POST /manuscripts/{tracking_code}/resubmit</code>, multipart with
+<code>response_to_reviewers</code>); <code>domain/policies.py</code>
+(<code>Action.RESUBMIT</code>, ownership-checked)</td>
+<td><code>test_manuscripts_router.py</code>:
+<code>test_the_corresponding_author_can_resubmit_with_a_revised_file</code>,
+<code>test_a_stranger_cannot_resubmit_someone_elses_manuscript</code>,
+<code>test_resubmitting_a_non_pdf_is_rejected</code>;
+<code>test_manuscript.py</code>:
+<code>test_resubmission_increments_the_version_and_resets_review_count</code></td>
+<td><strong>Implemented &amp; tested</strong>, including the
+response-to-reviewers letter and the ownership check.</td>
+</tr>
+<tr>
+<td>FR-14</td>
+<td>UC13</td>
+<td><code>api/routers/manuscripts.py</code>
+(<code>GET /manuscripts/mine</code>); <code>domain/policies.py</code>
+(<code>Action.VIEW</code>, <code>_can_view</code>); frontend
+<code>app/author/page.tsx</code>,
+<code>app/author/[trackingCode]/page.tsx</code></td>
+<td><code>test_manuscripts_router.py</code>:
+<code>test_mine_lists_only_the_callers_manuscripts</code>,
+<code>test_retrieving_someone_elses_manuscript_is_forbidden</code>; live
+UAT (<code>docs/06-testing-report.md</code> §5): ten submissions listed
+with correct tracking codes and statuses</td>
+<td><strong>Partially implemented.</strong> An author's own-manuscripts
+list, correctly scoped and rendered, is implemented, tested and
+confirmed live. The <strong>status timeline</strong> clause is not met
+literally: <code>ManuscriptOut</code> carries only the manuscript's
+<em>current</em> <code>status</code>, not a history of transitions — the
+same underlying gap as FR-19 (no event/audit data is exposed on the wire
+at all, by the deliberate design recorded in <code>schemas.py</code>'s
+<code>ManuscriptOut</code> docstring). An author sees where a manuscript
+is now, not the sequence of states it passed through.</td>
+</tr>
+<tr>
+<td>FR-15</td>
+<td>UC14</td>
+<td><code>api/routers/editorial.py</code>
+(<code>POST /editorial/{tracking_code}/schedule</code>,
+<code>POST /editorial/{tracking_code}/publish</code>);
+<code>domain/transitions.py</code>
+(<code>ACCEPTED→SCHEDULED→PUBLISHED</code>);
+<code>domain/policies.py</code> (<code>Action.PUBLISH</code>,
+EiC-only)</td>
+<td><code>test_editorial_router.py</code>:
+<code>test_the_editor_in_chief_can_schedule_an_accepted_manuscript</code>,
+<code>test_the_editor_in_chief_can_publish_a_scheduled_manuscript</code>,
+<code>test_a_plain_editor_cannot_schedule</code>,
+<code>test_a_plain_editor_cannot_publish</code>,
+<code>test_publishing_without_scheduling_first_is_a_conflict</code>,
+<code>test_scheduling_the_same_volume_and_number_twice_yields_the_same_issue_id</code></td>
+<td><strong>Implemented &amp; tested.</strong> <code>Issue</code> is not
+a persisted aggregate — an <code>IssueId</code> is derived
+deterministically from <code>(volume, number)</code>
+(<code>domain/ids.py</code>, <code>mint_issue_id</code>) rather than
+looked up — a documented simplification, not a gap against this
+requirement's testable behaviour. <code>docs/06-testing-report.md</code>
+§4.5 records that these two routes, plus resubmission, were at one point
+fully domain-tested but reachable by no route at all; that gap is closed
+and is exactly what the cited tests now pin.</td>
+</tr>
+<tr>
+<td>FR-16</td>
+<td>UC15</td>
+<td><code>api/routers/archive.py</code> (<code>GET /archive</code>,
+<code>GET /archive/{tracking_code}</code> — no auth dependency);
+frontend <code>app/(public)/papers/[trackingCode]/page.tsx</code></td>
+<td><code>test_archive_router.py</code>:
+<code>test_the_archive_requires_no_authentication</code>,
+<code>test_retrieving_a_published_paper_by_tracking_code</code>,
+<code>test_an_unpublished_manuscript_is_not_found_via_the_archive</code>;
+route audit
+<code>test_the_archive_prefix_genuinely_has_no_authorization_dependency</code></td>
+<td><strong>Implemented &amp; tested</strong>, including the negative
+case (an unpublished manuscript is not reachable through this path) and
+the route-audit proof that the entire <code>/archive</code> prefix is
+genuinely, not accidentally, public.</td>
+</tr>
+<tr>
+<td>FR-17</td>
+<td>UC16</td>
+<td><code>infrastructure/db/repository.py</code>
+(<code>search_published</code> — <code>ILIKE</code> over
+<code>title</code>/<code>abstract</code>);
+<code>api/routers/archive.py</code> (<code>GET /archive/search</code>);
+frontend <code>app/(public)/search/page.tsx</code></td>
+<td><code>test_archive_router.py</code>:
+<code>test_search_finds_a_matching_paper</code>,
+<code>test_search_with_no_match_returns_an_empty_list</code>;
+integration <code>test_archive_queries.py</code></td>
+<td><strong>Implemented, but simplified against the requirement's
+design.</strong> Search works and is tested, but it is a
+case-insensitive substring match (<code>ILIKE '%query%'</code>) over
+title and abstract, not the <code>tsvector</code>/GIN ranked full-text
+search the design specification (§16) called for — no keyword or date
+filter exists either. NFR-09's 800 ms p95 bound is unverified:
+<code>docs/06-testing-report.md</code> §6 states plainly that no load or
+performance test exists in this project.</td>
+</tr>
+<tr>
+<td>FR-18</td>
+<td>UC17</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented — a genuine gap the code and this
+requirement still disagree on.</strong> <code>ArchivePaperOut</code>
+(<code>api/schemas.py</code>) carries no document field,
+<code>archive.py</code> has no document/download route, and the public
+paper page (<code>app/(public)/papers/[trackingCode]/page.tsx</code>)
+contains no download link at all — its own source comment still reads
+"no <code>pdf_url</code> field, no file storage… re-add this once a
+document-storage capability exists," which is now stale: document
+storage exists (FR-04/FR-06) and is reachable by authenticated actors
+via <code>GET /manuscripts/{tracking_code}/document</code>, but that
+route requires authentication and an anonymous reader cannot call it.
+Closing this needs one new public, unauthenticated route serving the
+<em>original</em> document for a published manuscript only — a small,
+well-scoped gap, not a large one, but a real one.</td>
+</tr>
+<tr>
+<td>FR-19</td>
+<td>UC18</td>
+<td><code>domain/hashchain.py</code>; PostgreSQL append-only triggers
+(Alembic migration)</td>
+<td><code>test_hashchain.py</code>; integration
+<code>test_append_only.py</code>:
+<code>test_updating_an_event_is_rejected_by_the_database</code>,
+<code>test_truncating_the_event_log_is_rejected</code>;
+<code>test_chain_persistence.py</code></td>
+<td><strong>Partially implemented.</strong> The hash chain itself —
+construction, tamper detection, and persistence-level enforcement
+against <code>UPDATE</code>/<code>DELETE</code>/<code>TRUNCATE</code> —
+is complete and thoroughly tested, including at the database boundary.
+But no API route exposes it: there is no
+<code>/manuscripts/{tracking_code}/audit</code> endpoint in the live
+<code>/openapi.json</code>, and <code>ManuscriptOut</code>'s own
+docstring states the omission is deliberate ("no separate summary/detail
+variant… any event/audit trail" is absent by design at this layer). An
+Editor or Editor-in-Chief today has no way to view the audit trail
+through the system; the guarantee exists and is provably sound, but
+nothing surfaces it.</td>
+</tr>
+<tr>
+<td>FR-20</td>
+<td>UC5</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> No similarity-screening, MinHash,
+or LSH code exists anywhere in the delivered backend.</td>
+</tr>
+<tr>
+<td>FR-21</td>
+<td>UC19</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> No BibTeX/RIS export code or route
+exists.</td>
+</tr>
+<tr>
+<td>FR-22</td>
+<td>UC20</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> No OAI-PMH endpoint exists.</td>
+</tr>
+<tr>
+<td>FR-23</td>
+<td>UC21</td>
+<td><code>infrastructure/email/logging_sender.py</code>
+(<code>LoggingEmailSender</code>)</td>
+<td><em>(none beyond FR-01's registration tests, which exercise the
+logging stub incidentally)</em></td>
+<td><strong>Not implemented</strong>, beyond a stub.
+<code>LoggingEmailSender</code> only logs a registration verification
+link — it does not send email, and there is no in-app notification
+record of any kind, no delivery for editorial events (decisions,
+assignments, publication), and no notification data model at all. Named
+explicitly in the design spec as future evolution; it remains that.</td>
+</tr>
+<tr>
+<td>FR-24</td>
+<td>UC22</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> No analytics computation or
+endpoint exists.</td>
+</tr>
+<tr>
+<td>FR-25</td>
+<td>UC23</td>
+<td><code>api/routers/manuscripts.py</code>
+(<code>POST /manuscripts/{tracking_code}/withdraw</code>);
+<code>domain/transitions.py</code> (<code>WITHDRAWN</code> reachable
+from five states); <code>domain/policies.py</code>
+(<code>Action.WITHDRAW</code>, ownership-checked — see FR-25a)</td>
+<td><code>test_manuscripts_router.py</code>:
+<code>test_the_corresponding_author_can_withdraw</code>,
+<code>test_a_co_author_who_is_not_corresponding_cannot_withdraw</code>,
+<code>test_withdrawing_a_missing_manuscript_is_404</code>;
+<code>test_transitions.py</code></td>
+<td><strong>Implemented &amp; tested</strong>, now including the
+authorisation half this line previously lacked — see FR-25a.</td>
+</tr>
+<tr>
+<td>FR-25a</td>
+<td>UC23</td>
+<td><code>domain/policies.py</code> (<code>Action.WITHDRAW</code> in
+<code>_OWNERSHIP_ACTIONS</code>);
+<code>api/routers/manuscripts.py</code>
+(<code>authorize(actor, Action.WITHDRAW, manuscript)</code>)</td>
+<td><code>test_policies.py</code>:
+<code>test_corresponding_author_may_withdraw_own_manuscript</code>,
+<code>test_another_author_may_not_withdraw_someone_elses_manuscript</code>,
+<code>test_a_listed_co_author_who_is_not_corresponding_may_not_withdraw</code></td>
+<td><strong>Implemented &amp; tested — this gap is closed.</strong> The
+authorisation predicate this line was added to demand now exists, is
+wired into the live route, and is directly tested for both the positive
+case and two distinct negative cases (a stranger; a non-corresponding
+co-author). §4.3 records this as resolved rather than merely
+documented.</td>
+</tr>
+<tr>
+<td>FR-26</td>
+<td>UC24</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> Deferred (Could-have; effort
+estimation §8.1) — no policy-configuration route or UI exists.</td>
+</tr>
+<tr>
+<td>FR-27</td>
+<td>UC25</td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> Deferred (Could-have) — no
+persistent-identifier resolution route exists.</td>
+</tr>
+<tr>
+<td>FR-28</td>
+<td><em>(no dedicated UC — reporting over UC10/UC22 data, effort
+estimation §3)</em></td>
+<td><em>(none)</em></td>
+<td><em>(none)</em></td>
+<td><strong>Not implemented.</strong> Deferred (Could-have) — no
+reviewer-performance endpoint exists.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading this matrix honestly.</strong> Of the 29 requirement
+lines (FR-01…FR-28 plus FR-25a), <strong>12 are implemented and tested
+end to end</strong> (FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, FR-12,
+FR-13, FR-15, FR-16, FR-25, FR-25a), <strong>6 are partially implemented
+with a specifically named remainder</strong> (FR-01, FR-03, FR-11,
+FR-14, FR-17, FR-19), and <strong>11 are genuinely not
+implemented</strong> (FR-08, FR-10, FR-18, FR-20, FR-21, FR-22, FR-23,
+FR-24, FR-26, FR-27, FR-28). This is a large improvement on the version
+of this matrix written before the API and frontend existed, when the
+great majority of lines read "Planned" — but it is not a claim that the
+system is complete. FR-08 (reviewer expertise matching), FR-20
+(similarity screening) and their shared prerequisite infrastructure,
+FR-22 (OAI-PMH), FR-21 (citation export), FR-23 (notifications) and
+FR-24 (analytics) remain exactly as unbuilt as the technical debt
+register and the design specification's future- evolution section
+describe them. FR-18 (public PDF download) is the one item on this list
+found only during this revision, not previously flagged: a small,
+well-scoped, genuine gap between what the requirement promises and what
+the deployed archive currently serves. A matrix claiming everything is
+delivered would be worse than the stale one it replaces, because it
+would be false rather than merely out of date.</p>
+<hr />
+<h2 id="6-requirements-prioritisation">6. Requirements
+prioritisation</h2>
+<p>Prioritisation uses MoSCoW, carried unchanged from the design
+specification (§5) and made authoritative by the effort estimation
+document's scope decision (§8):</p>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Use cases</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Must</td>
+<td>UC1–UC18</td>
+<td>Implemented to production quality</td>
+</tr>
+<tr>
+<td>Should</td>
+<td>UC19–UC23</td>
+<td>Implemented only if Must-have work completes early</td>
+</tr>
+<tr>
+<td>Could</td>
+<td>UC24, UC25</td>
+<td>Deferred; recorded as technical debt with a repayment plan</td>
+</tr>
+</tbody>
+</table>
+<p><strong>How the estimate drove the cut.</strong> Use Case Points
+sized the Must-have subset alone at 188 UUCP → 125.7 UCP → 2,514
+person-hours (effort estimation §6), against a 48-hour development
+window — 1.9% of the Must-have estimate. COCOMO II Early Design, an
+independent cross-check on different inputs (source lines of code and
+process/product ratings rather than actor and transaction counts),
+priced the full system at approximately 7,170 person-hours. The two
+methods disagree by roughly 2.2× on the exact figure but agree on the
+order of magnitude: both place the full system in the
+one-to-four-person-year range, nearly two orders of magnitude beyond the
+available window (effort estimation §7). That agreement, not either
+figure's precision, is what forced a MoSCoW cut rather than an attempt
+to build everything thinly. Should-have items are attempted only after
+every Must-have item reaches production quality; Could-have items
+(FR-26, FR-27, FR-28) are not attempted within the window under any
+circumstance.</p>
+<p><strong>Consequence for what exists today.</strong> At the time this
+document was first written, the domain layer was complete while the
+application, API and frontend layers were still planned — consistent
+with, not contrary to, the MoSCoW cut: the cut governs <em>what</em> is
+built, not the <em>order</em> in which layers within a use case are
+built, and a hexagonal architecture's domain core is the natural first
+layer to complete and verify in isolation (design specification §7.1).
+That sequencing has since played out as intended: §5's revised
+traceability matrix shows the API and frontend layers have caught up for
+most of the Must-have set (12 of 29 requirement lines implemented and
+tested end to end, domain through frontend). Where a gap remains within
+the Must-have set — FR-08's reviewer matching and FR-19's audit-trail
+route being the clearest examples — it is a gap in a specific layer or
+route, not evidence that an entire layer was skipped; §5 states each one
+by name rather than folding them back into a single "still catching up"
+claim.</p>
+<hr />
+<h2 id="7-constraints-and-limitations">7. Constraints and
+limitations</h2>
+<p>This system does not guarantee everything its feature list might
+suggest. The following limitations are stated plainly, each
+cross-referenced to <code>docs/04-technical-debt-register.md</code>.</p>
+<ul>
+<li><strong>Double-blind review is not text-scrubbed — implemented as
+designed, with a limit that is now demonstrated in production, not
+merely anticipated.</strong> Anonymisation strips XMP and DocInfo
+metadata from every submitted document (FR-06, live at
+<code>POST /manuscripts</code> and
+<code>POST /manuscripts/{tracking_code}/resubmit</code>,
+<code>infrastructure/storage/anonymize.py::strip_pdf_metadata</code>)
+and omits author fields from the <code>BlindedManuscript</code> type by
+construction (<code>blinding.py</code>), but <code>title</code>,
+<code>abstract</code> and <code>keywords</code> are copied to reviewers
+<strong>verbatim</strong>. An author who writes their own name into the
+title, or an abstract that says "extending our earlier work in [Obeng
+2025]", reaches the reviewer unchanged. Double-blind integrity therefore
+depends partly on author compliance, not entirely on the system
+(<strong>TD-05</strong>, scheduled). This is unchanged by the API and
+frontend build — it was always the intended scope of FR-06, not a
+shortfall the implementation introduced.</li>
+<li><strong>The audit trail has no external anchor.</strong> Hash
+chaining (NFR-07, <code>hashchain.py</code>) detects alteration,
+reordering and removal <em>within</em> the chain, and a PostgreSQL
+trigger blocks <code>UPDATE</code>, <code>DELETE</code> and
+<code>TRUNCATE</code> on the event table — both properties are proven
+against a real database by <code>test_append_only.py</code> and
+<code>test_chain_persistence.py</code>. But truncation of the tail, a
+forged event appended through the legitimate API, or a wholly fabricated
+history rebuilt from the genesis hash, are <strong>undetectable by the
+application alone</strong> — there is no periodically published,
+independently held checkpoint to compare against
+(<strong>TD-04</strong>, scheduled). Deployment did not change this: no
+checkpoint-publishing mechanism was added, and — see FR-19 above — there
+is currently no API route at all through which anyone could view the
+chain to notice tampering even if the chain itself remained sound.</li>
+<li><strong>A reviewer's conflict of interest is not checked by the
+authorisation layer — and this is now a live gap, not a theoretical
+one.</strong> <code>Action.REVIEW</code> is granted to any actor holding
+the <code>REVIEWER</code> role, with no per-manuscript predicate
+excluding authors or affiliated actors (<strong>TD-02</strong>,
+critical). <code>POST /editorial/{tracking_code}/reviewers</code>
+creates an assignment without checking the reviewer against the
+manuscript's <code>author_ids</code>, and
+<code>POST /reviews/{tracking_code}/submit</code> counts a submission
+without checking it against reviewers who already submitted
+(<strong>TD-03</strong>, critical): a reviewer who also holds the
+<code>AUTHOR</code> role, or one who is assigned and calls submit twice,
+could in principle close a review round alone. Both routes are built and
+deployed today — the gap this bullet describes is no longer a forecast
+about what a future endpoint might do.</li>
+<li><strong>Withdrawal authorisation now exists and is enforced — this
+bullet previously recorded a gap that is closed.</strong> The lifecycle
+permits <code>WITHDRAWN</code> from five states
+(<code>transitions.py</code>), and <code>Action.WITHDRAW</code>
+(<code>policies.py</code>) now gates
+<code>POST /manuscripts/{tracking_code}/withdraw</code> on the actor
+being the manuscript's corresponding author, exactly as FR-25a
+specified. See §4.3 and §5 (FR-25a) for the tests that prove it. This
+entry is retained here, rather than deleted, so the document's history —
+a gap identified, then closed — stays legible.</li>
+<li><strong>The editorial event log has no blinded view.</strong>
+<code>EditorialEvent</code> carries <code>actor_id</code> and an
+editor's free-text rationale; there is no <code>BlindedEvent</code>
+projection, so a reviewer-facing audit view, if ever built, must not
+simply reuse <code>VIEW_AUDIT</code>'s current shape without one
+(<strong>TD-06</strong>, scheduled).</li>
+<li><strong>The current state is materialised, not derived by event
+replay.</strong> The hybrid design (event log plus a materialised
+<code>status</code> column) is a deliberate trade-off against full event
+sourcing, mitigated by routing every state change through one
+<code>_transition</code> method. Two representations of the same fact
+could in principle diverge if that discipline is ever broken
+(<strong>TD-09</strong>, acceptable).</li>
+<li><strong>Coverage is a floor, not a proof of correctness.</strong>
+The CI gate at 85% (NFR-14) is a regression floor, not a target
+(<strong>TD-10</strong>); <code>make check</code> reports
+<strong>88.24%</strong> on the current commit against that 85% gate —
+275 unit tests pass, plus 60 integration tests against a real PostgreSQL
+container, run separately (confirmed directly against this commit; see
+NFR-14). Separately, mutation testing during final review found defects
+surviving a suite at 100% line coverage — including deletion of the
+single line that makes the hash chain a chain — which coverage alone did
+not catch (<strong>TD-11</strong>, acceptable, provided compensated by
+targeted review; systematic mutation testing is recorded as future
+evolution, not yet in CI).</li>
+<li><strong>No reviewer accept/decline step exists (FR-10).</strong> An
+assignment is usable by the reviewer immediately on creation; the
+<code>AssignmentStatus</code> vocabulary declares
+<code>INVITED</code>/<code>ACCEPTED</code>/<code>DECLINED</code>, but
+nothing in the delivered code writes or reads those states, and no route
+lets a reviewer decline. See §5, FR-10.</li>
+<li><strong>A published paper cannot be downloaded by an anonymous
+reader (FR-18).</strong> Document storage, upload, and authenticated
+download all exist (FR-04/FR-06), but no public, unauthenticated route
+serves a published manuscript's PDF, and the public paper page has no
+download link. This is the one gap this revision found that was not
+previously recorded anywhere in this project's documentation — see §5,
+FR-18.</li>
+<li><strong>AWS access currently uses root credentials.</strong> The
+toolchain authenticates as the AWS account root user rather than a
+least-privilege IAM principal (<strong>TD-01</strong>, critical).
+Deployment to App Runner, S3 and the rest of the live infrastructure has
+already happened under this arrangement, mitigated only by keeping the
+root keys off CI and used solely from the developer's own workstation
+(TD-01's full entry). That mitigation reduces exposure; it does not
+resolve the underlying debt, which remains the highest-priority item in
+the technical debt register.</li>
+<li><strong>Explicit out-of-scope items</strong> (design specification
+§4.2), restated here as hard limits rather than soft gaps: no payment or
+article-processing-charge handling; no copy-editing or typesetting
+workflow; no production-quality PDF galley generation; no multi-journal
+tenancy; no ORCID federation; identifiers are DOI-<em>shaped</em> but
+not registered with Crossref; similarity screening (FR-20, not
+implemented — see §5) would in any case be against the internal corpus
+only, never the open web; email deliverability is not implemented at all
+today (FR-23 — see §5), let alone guaranteed through a transactional
+provider; reviewer expertise-matching (FR-08), OAI-PMH (FR-22), citation
+export (FR-21) and editorial analytics (FR-24) are, likewise, not
+implemented, consistent with the design specification's future-evolution
+section and the technical debt register — this list is not exhaustive of
+§5's not-implemented rows, only a restatement of the ones the original
+specification called out as deliberately out of scope.</li>
+<li><strong>Requirements traceability reflects the finished system, not
+the pre-implementation build.</strong> §5 of this document, revised
+2026-08-12, shows 12 of 29 requirement lines implemented and tested end
+to end, 6 partially implemented with a named remainder, and 11 genuinely
+not implemented. That is a large shift from the version of this document
+written before the API and frontend existed, when the great majority of
+lines read "Planned" — but §5's closing paragraph is explicit that this
+is still not a claim of completeness, and this document's own revision
+note (p.1) records when and against what evidence that shift was
+made.</li>
+</ul>
+</main>
+<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+</body>
+</html>

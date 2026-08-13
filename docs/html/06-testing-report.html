@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>06 · Testing Report</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+  <style>
+  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+  h3 { font-size:1.12rem; margin-top:1.8rem; }
+  a { color:#4b3f9e; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+  pre code { background:none; color:inherit; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+  th { background:#eceee9; font-weight:600; }
+  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+  figure.diagram svg { max-width:100%; height:auto; }
+  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="title">06 · Testing Report</div>
+</header>
+<main>
+<nav class="docnav"><a href="index.html">← All documents</a></nav>
+<header id="title-block-header">
+<h1 class="title">06 · Testing Report</h1>
+</header>
+<h1 id="ugjcs--testing-report">UGJCS — Testing Report</h1>
+<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
+Computing Science <strong>Document:</strong> 06 — Testing report
+<strong>Author:</strong> Roger Koranteng Obeng, student ID 22424140
+<strong>Assessor:</strong> Prof. Solomon Mensah <strong>Date:</strong>
+2026-08-12 <strong>Status:</strong> Authoritative. Every figure in this
+document was produced by running the commands it cites —
+<code>make check</code>, <code>make integration</code>, and a live
+session against the deployed frontend — on 2026-08-12, and is
+reproducible by running the same commands against the same commit. Where
+a figure could not be produced this way, that is stated rather than
+estimated.</p>
+<p><strong>System under test</strong> Frontend:
+<code>https://ugjcs-frontend.vercel.app</code> · API:
+<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code></p>
+<hr />
+<h2 id="1-testing-strategy">1. Testing strategy</h2>
+<p>UGJCS is built as a hexagonal architecture: a framework-free domain
+at the centre, an application layer orchestrating use cases against
+ports, and infrastructure adapters (PostgreSQL, S3, JWT, Argon2) at the
+edge, fronted by a FastAPI HTTP boundary and a Next.js
+Backend-For-Frontend. The test strategy is layered to match, because
+each layer fails in a different way and needs a different kind of test
+to catch it.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>What it is</th>
+<th>Why it exists</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Unit — domain</strong> (<code>tests/unit/domain</code>)</td>
+<td>Pure tests against <code>ugjcs.domain</code>, with no database, no
+HTTP, no mocks of infrastructure — the domain imports none of it, and
+<code>.importlinter</code>'s <code>domain-purity</code> contract
+enforces that mechanically.</td>
+<td>The domain carries the manuscript lifecycle, the hash chain,
+blinding and RBAC policy — the parts of the system where correctness
+matters most and where a test can run in microseconds with no fixture
+cost.</td>
+</tr>
+<tr>
+<td><strong>Property-based</strong>
+(<code>tests/unit/domain/test_invariants.py</code>)</td>
+<td>Hypothesis-generated inputs asserting invariants that must hold for
+<em>every</em> input, not the handful an author thinks to write by hand:
+no transition leaves a terminal state, publication is reachable only
+through acceptance and scheduling, a chain built by <code>append</code>
+always verifies, removing any non-terminal event always breaks
+verification, blinding never leaks an author id for any
+title/abstract/keyword combination.</td>
+<td>Example-based tests only prove the examples chosen; property tests
+prove the property, over a search space the author did not have to
+enumerate.</td>
+</tr>
+<tr>
+<td><strong>Unit — application, API, db, security</strong>
+(<code>tests/unit/{application,api,db,security}</code>)</td>
+<td>Application services against fake ports; FastAPI routers against a
+<code>FakeUnitOfWork</code> and dependency overrides; SQLAlchemy
+row↔︎aggregate mappers in isolation; password hashing and JWT
+issuance.</td>
+<td>Each adapter's own logic — request validation, authorization wiring,
+row mapping, token signing — has failure modes independent of the domain
+and independent of a live database.</td>
+</tr>
+<tr>
+<td><strong>Integration</strong> (<code>tests/integration</code>,
+<code>-m integration</code>)</td>
+<td>The same repositories, unit of work and triggers running against a
+<strong>real PostgreSQL in a <code>testcontainers</code>
+container</strong> — not a mock, not SQLite.</td>
+<td>Several defects in this project (below) exist only at the boundary
+between the domain's in-memory model and what PostgreSQL actually does —
+<code>timestamptz</code> normalisation, trigger firing semantics,
+foreign-key <code>RESTRICT</code> behaviour. A mocked repository cannot
+fail in these ways, so it cannot catch them.</td>
+</tr>
+<tr>
+<td><strong>Contract tests</strong> (<code>.importlinter</code>,
+<code>mypy --strict</code>)</td>
+<td>Two import-linter contracts (<code>domain-purity</code>,
+<code>layers</code>) plus strict static typing, run as part of
+<code>make check</code>.</td>
+<td>These are architectural tests: they fail the build if a future
+change routes a dependency the wrong way, independent of any behaviour a
+functional test would check.</td>
+</tr>
+<tr>
+<td><strong>Route audit</strong>
+(<code>tests/unit/api/test_route_audit.py</code>)</td>
+<td>Walks the <em>live</em> FastAPI route table built by
+<code>create_app()</code> and asserts every non-public route carries an
+authorization dependency somewhere in its dependency tree.</td>
+<td>Its own docstring states the reason directly: a hand-maintained
+checklist of "which routes need auth" is exactly the kind of artefact a
+future change forgets to update. Walking the actual route table means a
+new unprotected route fails this test the moment it is added, not the
+moment someone remembers to check a list.</td>
+</tr>
+<tr>
+<td><strong>End-to-end</strong></td>
+<td>Exercised manually against the deployed system with a
+Playwright-driven browser session (§5), not as a committed automated
+suite.</td>
+<td><code>frontend/package.json</code> declares
+<code>@playwright/test</code> and <code>@axe-core/playwright</code> as
+dependencies and a <code>test:e2e</code> script, but no
+<code>playwright.config.ts</code> or spec files exist in the repository
+at the time of writing — this is stated plainly in §6 rather than
+implied by the tooling being present.</td>
+</tr>
+<tr>
+<td><strong>Manual acceptance testing</strong></td>
+<td>Scripted, role-scoped scenarios run against the live deployment with
+named judge accounts (§5).</td>
+<td>Automated gates check what someone thought to assert. Three domain
+lifecycle methods were fully implemented and unit-tested but reachable
+by no API route (§4) — a defect only visible by using the system as an
+actual actor would.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-test-environment-and-tooling">2. Test environment and
+tooling</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Tool</th>
+<th>Configuration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backend test runner</td>
+<td>pytest 9.1.1 (<code>pytest-asyncio</code>,
+<code>pytest-cov</code>)</td>
+<td><code>backend/pyproject.toml</code> —
+<code>asyncio_mode = "auto"</code>; integration tests marked
+<code>integration</code> and deselected by default
+(<code>addopts = "-q --strict-markers -m 'not integration'"</code>).</td>
+</tr>
+<tr>
+<td>Property-based testing</td>
+<td>Hypothesis 6.165.3</td>
+<td><code>tests/unit/domain/test_invariants.py</code>; chain-invariant
+properties run at <code>max_examples=100</code> (or 50 for the deletion
+property), state-machine properties over the full enum space.</td>
+</tr>
+<tr>
+<td>Real-database integration</td>
+<td>testcontainers 4.15.0 (<code>testcontainers[postgres]</code>)</td>
+<td><code>tests/integration/conftest.py</code> spins up a genuine
+PostgreSQL container per test session; CI instead points at a
+<code>postgres:16</code> service container
+(<code>.github/workflows/backend-ci.yml</code>) so the same tests run
+without Docker-in-Docker.</td>
+</tr>
+<tr>
+<td>Linting</td>
+<td>ruff 0.16.2</td>
+<td><code>[tool.ruff.lint] select = ["E","F","I","N","UP","B","A","C4","SIM","RUF"]</code>,
+line length 100, target <code>py313</code>.</td>
+</tr>
+<tr>
+<td>Static typing</td>
+<td>mypy 2.3.0, strict mode</td>
+<td><code>[tool.mypy] strict = true</code>,
+<code>files = ["src","tests"]</code> — tests are type-checked, not only
+source.</td>
+</tr>
+<tr>
+<td>Architecture contracts</td>
+<td>import-linter ≥2.13</td>
+<td><code>.importlinter</code> — <code>domain-purity</code> (forbids
+<code>fastapi</code>, <code>sqlalchemy</code>, <code>pydantic</code>,
+<code>boto3</code>, <code>os</code>, <code>io</code>,
+<code>socket</code>, <code>logging</code>, <code>asyncio</code>, and
+thirteen other framework/I/O modules from <code>ugjcs.domain</code>) and
+<code>layers</code>
+(<code>api → infrastructure → application → domain</code>, dependencies
+point inward only).</td>
+</tr>
+<tr>
+<td>Coverage</td>
+<td>coverage.py via <code>pytest-cov</code>, branch mode on
+(<code>[tool.coverage.run] branch = true</code>)</td>
+<td>Gate at <code>--cov-fail-under=85</code>, scoped to
+<code>src/ugjcs/domain</code> and <code>src/ugjcs/application</code>
+only.</td>
+</tr>
+<tr>
+<td>Frontend unit/component tests</td>
+<td>Vitest 4.1.10, Testing Library, jsdom</td>
+<td><code>frontend/vitest.config.ts</code>; 10 test files under
+<code>src/**/*.test.{ts,tsx}</code> covering session-cookie sealing,
+Route Handler validation, and component rendering (blinding, status
+badges, forms, keyboard operability).</td>
+</tr>
+<tr>
+<td>Frontend e2e (declared, not committed)</td>
+<td><code>@playwright/test</code> 1.62.1,
+<code>@axe-core/playwright</code> 4.13.0</td>
+<td>Present in <code>package.json</code> as
+<code>npm run test:e2e</code>; no config or spec files exist yet
+(§6).</td>
+</tr>
+<tr>
+<td>CI</td>
+<td>GitHub Actions, <code>.github/workflows/backend-ci.yml</code></td>
+<td>Two jobs, <code>check</code> and <code>integration</code>, both
+gating on <code>push</code>/<code>pull_request</code> to
+<code>main</code>/<code>master</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="why-the-coverage-gate-is-scoped-to-domain-and-application-only">Why
+the coverage gate is scoped to domain and application only</h3>
+<p><code>backend/Makefile</code>'s <code>check</code> target carries
+this comment verbatim:</p>
+<blockquote>
+<p>The coverage gate covers domain and application only. Infrastructure
+adapters are verified by the integration suite, which needs Docker and
+is deselected here; measuring them in a run that excludes their tests
+would only reward mock-based tests that assert nothing.
+<code>make integration</code> reports adapter coverage separately.</p>
+</blockquote>
+<p>In other words: measuring infrastructure coverage against a run that
+has already excluded the infrastructure tests would report a number with
+no information content — it would credit whatever incidental coverage
+the domain/application tests happen to produce by importing
+infrastructure modules, not coverage from tests that actually exercise
+them. <code>make integration</code> reports the infrastructure figure
+honestly, against the suite built to exercise it, with the gate set to
+<code>--cov-fail-under=0</code> because that run's purpose is
+behavioural verification against a real database, not a coverage
+target.</p>
+<h3 id="ci-pipeline-gates">CI pipeline gates</h3>
+<p><code>.github/workflows/backend-ci.yml</code> runs two jobs on every
+push and pull request against <code>main</code>/<code>master</code>:</p>
+<ul>
+<li><strong><code>check</code></strong> — <code>uv sync --locked</code>,
+then <code>make check</code>: ruff lint, ruff format check, mypy strict,
+import-linter, and the unit suite with the 85% coverage gate.</li>
+<li><strong><code>integration</code></strong> — brings up a
+<code>postgres:16</code> service container, applies the Alembic
+migration <strong>up, then down, then up again</strong> (verifying
+reversibility, not just forward application), then runs
+<code>make integration</code> against it.</li>
+</ul>
+<p>A pull request cannot merge past either job failing.</p>
+<hr />
+<h2 id="3-test-cases">3. Test cases</h2>
+<p>The counts below are what <code>make check</code> and
+<code>make integration</code> reported on 2026-08-12, against the
+current commit, run from <code>backend/</code>:</p>
+<pre><code>$ make check   → 267 passed, 56 deselected. Coverage: 88.24% (gate: 85%)
+$ make integration → 56 passed, 267 deselected. Infrastructure coverage: 87%</code></pre>
+<p>267 + 56 = 323 tests total across the two runs
+(<code>--strict-markers</code> and the <code>integration</code> marker
+partition the suite so each test runs in exactly one of the two). The
+tables below draw specific, representative cases from the suites rather
+than reproducing all 323; the full set is in
+<code>backend/tests/</code>, one file per module under test, one test
+function per row these tables summarise.</p>
+<h3 id="31-functional-testing--domain-lifecycle-and-rules">3.1
+Functional testing — domain lifecycle and rules</h3>
+<table>
+<thead>
+<tr>
+<th>Test case</th>
+<th>Expected result</th>
+<th>Actual result</th>
+<th>Pass/Fail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>New manuscript starts in <code>DRAFT</code>
+(<code>test_new_manuscript_starts_in_draft</code>)</td>
+<td>Status is <code>DRAFT</code></td>
+<td><code>DRAFT</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Submitting twice (<code>test_cannot_submit_twice</code>)</td>
+<td>Second submission raises an illegal-transition error</td>
+<td>Raises</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Desk rejection once under review
+(<code>test_desk_rejection_is_illegal_once_under_review</code>)</td>
+<td>Rejected as illegal</td>
+<td>Rejected</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A decision below the minimum review count
+(<code>test_a_decision_requires_the_minimum_review_count</code>)</td>
+<td>Raises for each decision type below quorum</td>
+<td>Raises</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Reaching the review quorum
+(<code>test_review_quorum_closes_the_review_round</code>)</td>
+<td>Round closes automatically</td>
+<td>Closes</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Resubmission by a non-corresponding author
+(<code>test_only_the_corresponding_author_may_resubmit</code>)</td>
+<td>Refused</td>
+<td>Refused</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Resubmission increments version, resets review count
+(<code>test_resubmission_increments_the_version_and_resets_review_count</code>)</td>
+<td>Version +1, count reset to 0</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Publication attempted before scheduling
+(<code>test_publication_requires_an_issue</code>)</td>
+<td>Raises</td>
+<td>Raises</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Accepted → scheduled → published, in order
+(<code>test_accepted_manuscript_can_be_scheduled_then_published</code>)</td>
+<td>Succeeds end to end</td>
+<td>Succeeds</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Withdrawal by a non-corresponding co-author
+(<code>test_a_co_author_who_is_not_corresponding_cannot_withdraw</code>,
+<code>test_policies.py</code>)</td>
+<td>Refused</td>
+<td>Refused</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Every <code>ManuscriptStatus</code> appears in the transition table
+(<code>test_every_status_appears_in_the_table</code>)</td>
+<td>No status is undeclared</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Legal transitions permitted, shortcuts forbidden, over the full
+status × status matrix
+(<code>test_lifecycle_permits_expected_transitions</code>,
+<code>test_lifecycle_forbids_shortcut_transitions</code>)</td>
+<td>Table matches exactly</td>
+<td>Matches</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Tracking code formatting and round-trip parsing
+(<code>test_tracking_code_formats_year_and_zero_padded_sequence</code>,
+<code>test_tracking_code_parses_its_own_output</code>)</td>
+<td><code>UGJCS-YYYY-NNNN</code>, and
+<code>parse(format(x)) == x</code></td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Role policy: reviewer may not decide, author may not screen, editor
+may not publish (<code>test_reviewer_may_not_decide</code>,
+<code>test_author_may_not_screen</code>,
+<code>test_editor_may_not_publish</code>)</td>
+<td>All denied</td>
+<td>All denied</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Multiple roles grant the union of permissions
+(<code>test_multiple_roles_grant_the_union_of_permissions</code>)</td>
+<td>Union, not intersection</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>PDF magic-number validation, independent of client-supplied content
+type
+(<code>test_a_client_supplied_content_type_cannot_substitute_for_the_magic_number</code>)</td>
+<td>Rejected on bytes, not on header</td>
+<td>Rejected</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Storage keys carry no title or author-identifying text
+(<code>test_keys_carry_no_title_or_author_identifying_text</code>)</td>
+<td>Confirmed</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-property-based-testing-hypothesis-test_invariantspy">3.2
+Property-based testing (Hypothesis,
+<code>test_invariants.py</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Test case</th>
+<th>Expected result</th>
+<th>Actual result</th>
+<th>Pass/Fail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No transition ever leaves a terminal state, over all 121 (source ×
+target) status pairs</td>
+<td>Holds for every pair</td>
+<td>Holds</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>PUBLISHED</code> reachable only from <code>SCHEDULED</code>,
+<code>SCHEDULED</code> only from <code>ACCEPTED</code> — chained, so
+<code>PUBLISHED</code> is unreachable without acceptance</td>
+<td>Holds</td>
+<td>Holds</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A chain built entirely through <code>append</code> always verifies,
+over 100 generated payload sequences (size 1–12)</td>
+<td><code>verify()</code> raises nothing</td>
+<td>Raises nothing</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Removing any event except the last always breaks verification, over
+50 generated (chain, victim-index) pairs</td>
+<td><code>ChainBrokenError</code> raised every time</td>
+<td>Raised every time</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Truncating the chain's tail is <strong>not</strong> detected (pinned
+known limitation, TD-04)</td>
+<td><code>verify()</code> accepts the truncated chain</td>
+<td>Accepts</td>
+<td>Pass — by design; see §6</td>
+</tr>
+<tr>
+<td>The blinded projection never carries the author id, for any
+generated title/abstract/keyword combination</td>
+<td>Author id absent from the serialised projection</td>
+<td>Absent</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>canonical_bytes()</code> always parses back as valid JSON,
+over 100 generated payloads</td>
+<td>Round-trips</td>
+<td>Round-trips</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table>
+<h3 id="33-integration-testing-real-postgresql-via-testcontainers">3.3
+Integration testing (real PostgreSQL via testcontainers)</h3>
+<table>
+<thead>
+<tr>
+<th>Test case</th>
+<th>Expected result</th>
+<th>Actual result</th>
+<th>Pass/Fail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A stored manuscript reads back with its roles and authors intact
+(<code>test_a_stored_manuscript_can_be_read_back</code>,
+<code>test_row_preserves_author_order</code>)</td>
+<td>Exact round trip</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>UPDATE</code> on <code>editorial_events</code>
+(<code>test_updating_an_event_is_rejected_by_the_database</code>)</td>
+<td>Rejected by a trigger, error matches <code>"append-only"</code></td>
+<td>Rejected</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>DELETE</code> on <code>editorial_events</code>
+(<code>test_deleting_an_event_is_rejected_by_the_database</code>)</td>
+<td>Rejected</td>
+<td>Rejected</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>TRUNCATE TABLE editorial_events</code>
+(<code>test_truncating_the_event_log_is_rejected</code>)</td>
+<td>Rejected by a statement-level trigger</td>
+<td>Rejected</td>
+<td>Pass — closes TD-13, see §4</td>
+</tr>
+<tr>
+<td>Deleting a manuscript that has audit events
+(<code>test_deleting_a_manuscript_with_events_is_refused</code>)</td>
+<td>Refused by <code>ON DELETE RESTRICT</code></td>
+<td>Refused</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A persisted hash chain verifies after a round trip through Postgres
+(<code>test_a_persisted_chain_verifies</code>)</td>
+<td>Verifies</td>
+<td>Verifies</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>The chain stays consecutive across separate transactions
+(<code>test_the_chain_stays_consecutive_across_separate_transactions</code>)</td>
+<td>Confirmed</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Replaying a rotated refresh token revokes the entire token family
+(<code>test_replaying_a_rotated_refresh_token_revokes_the_entire_family</code>)</td>
+<td>Whole family revoked</td>
+<td>Revoked</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A role revoked after a token was issued takes effect immediately
+(<code>test_roles_revoked_after_a_token_was_issued_take_effect_immediately</code>)</td>
+<td>New request re-checks roles from the database, not the token</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An expired token is refused
+(<code>test_an_expired_token_is_refused</code>)</td>
+<td>Refused</td>
+<td>Refused</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A successful login upgrades an outdated password hash
+(<code>test_a_successful_login_upgrades_an_outdated_password_hash</code>)</td>
+<td>Rehashed to current parameters</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Migration applies, reverses, and reapplies cleanly (CI step,
+<code>alembic upgrade head</code> → <code>downgrade base</code> →
+<code>upgrade head</code>)</td>
+<td>No error at any step</td>
+<td>No error</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Expected tables and append-only triggers exist post-migration
+(<code>test_the_expected_tables_exist</code>,
+<code>test_the_append_only_triggers_are_installed</code>)</td>
+<td>Present</td>
+<td>Present</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An assignment is visible to both the reviewer and the editor who
+made it
+(<code>test_an_assignment_is_visible_to_both_parties</code>)</td>
+<td>Visible to both</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Assigning the same reviewer twice is rejected
+(<code>test_assigning_the_same_reviewer_twice_is_rejected</code>)</td>
+<td>Rejected</td>
+<td>Rejected</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table>
+<h3 id="34-system--api-testing-fastapi-testclient-fake-unit-of-work">3.4
+System / API testing (FastAPI TestClient, fake unit-of-work)</h3>
+<table>
+<thead>
+<tr>
+<th>Test case</th>
+<th>Expected result</th>
+<th>Actual result</th>
+<th>Pass/Fail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A non-PDF upload
+(<code>test_a_non_pdf_upload_is_rejected_with_415</code>)</td>
+<td><code>415 Unsupported Media Type</code></td>
+<td><code>415</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An oversized upload
+(<code>test_an_oversized_upload_is_rejected_with_413</code>)</td>
+<td><code>413 Payload Too Large</code></td>
+<td><code>413</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A reviewer without the author role attempts to submit
+(<code>test_a_reviewer_without_the_author_role_cannot_submit</code>)</td>
+<td><code>403</code></td>
+<td><code>403</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Retrieving someone else's manuscript
+(<code>test_retrieving_someone_elses_manuscript_is_forbidden</code>)</td>
+<td><code>403</code></td>
+<td><code>403</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A malformed tracking code
+(<code>test_a_malformed_tracking_code_is_404_not_a_500</code>)</td>
+<td><code>404</code>, not an unhandled <code>500</code></td>
+<td><code>404</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A reviewer attempts the editorial screening queue
+(<code>test_a_reviewer_may_not_see_the_screening_queue</code>)</td>
+<td><code>403</code></td>
+<td><code>403</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A plain editor attempts to schedule or publish
+(<code>test_a_plain_editor_cannot_schedule</code>,
+<code>test_a_plain_editor_cannot_publish</code>)</td>
+<td><code>403</code> — editor-in-chief only</td>
+<td><code>403</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Publishing before scheduling
+(<code>test_publishing_without_scheduling_first_is_a_conflict</code>)</td>
+<td><code>409 Conflict</code></td>
+<td><code>409</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Scheduling the same volume/number twice
+(<code>test_scheduling_the_same_volume_and_number_twice_yields_the_same_issue_id</code>)</td>
+<td>Idempotent — same <code>IssueId</code> both times</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An illegal domain transition surfaces as <code>409</code> RFC 9457
+Problem Details
+(<code>test_illegal_transition_becomes_409_problem_json</code>)</td>
+<td><code>409</code>, <code>application/problem+json</code> body</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An authorization denial surfaces as <code>403</code> Problem Details
+(<code>test_authorization_denied_becomes_403</code>)</td>
+<td><code>403</code></td>
+<td><code>403</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>CORS: an allowed origin gets CORS headers, a disallowed one gets
+none (<code>test_an_allowed_origin_receives_cors_headers</code>,
+<code>test_an_origin_not_on_the_allowlist_receives_no_cors_header</code>)</td>
+<td>Confirmed both ways</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>GET /health</code> reports OK without touching the database
+(<code>test_health_reports_ok_without_touching_the_database</code>)</td>
+<td><code>200</code>, no DB dependency in the route</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An unassigned reviewer fetches a manuscript's document
+(<code>test_an_unassigned_reviewer_cannot_fetch_the_document</code>)</td>
+<td><code>403</code></td>
+<td><code>403</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Route audit: every non-public route in the live route table carries
+an authorization dependency
+(<code>test_every_non_public_route_carries_an_authorization_dependency</code>)</td>
+<td>Empty unprotected-route list</td>
+<td>Empty</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Route audit: the public allowlist is not accidentally matching
+everything
+(<code>test_the_public_allowlist_is_not_accidentally_empty</code>)</td>
+<td>≥8 protected routes found</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Route audit: <code>/api/v1/archive*</code> is genuinely public, not
+merely allowlisted
+(<code>test_the_archive_prefix_genuinely_has_no_authorization_dependency</code>)</td>
+<td>No auth dependency present</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table>
+<h3 id="35-security-testing">3.5 Security testing</h3>
+<table>
+<thead>
+<tr>
+<th>Test case</th>
+<th>Expected result</th>
+<th>Actual result</th>
+<th>Pass/Fail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A stored password hash is never the plaintext
+(<code>test_a_hash_is_not_the_password</code>,
+<code>test_the_stored_password_hash_is_not_the_plaintext_password</code>)</td>
+<td>Hash ≠ plaintext</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Two hashes of the same password differ (salted)
+(<code>test_hashing_is_salted_so_two_hashes_differ</code>)</td>
+<td>Differ</td>
+<td>Differ</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A weaker legacy hash is flagged for rehashing
+(<code>test_a_weaker_hash_needs_rehashing</code>)</td>
+<td>Flagged</td>
+<td>Flagged</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A token signed with another secret is refused
+(<code>test_a_token_signed_with_another_secret_is_refused</code>)</td>
+<td>Refused</td>
+<td>Refused</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A tampered token is refused
+(<code>test_a_tampered_token_is_refused</code>)</td>
+<td>Refused</td>
+<td>Refused</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An access token cannot be used as a refresh token
+(<code>test_an_access_token_cannot_be_used_as_a_refresh_token</code>)</td>
+<td>Refused</td>
+<td>Refused</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A refresh token is stored only as a hash, never in plaintext
+(<code>test_a_refresh_token_is_stored_only_as_a_hash</code>)</td>
+<td>Confirmed</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Reviewer-facing responses never serialise author identifiers, under
+distinctive sentinel UUIDs planted for the purpose
+(<code>test_my_assignments_never_serialises_author_identifiers</code>,
+<code>test_blinding_leak.py</code>)</td>
+<td>No sentinel value present anywhere in the raw response body</td>
+<td>Absent</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>The manuscript type returned to a reviewer exposes exactly the
+permitted field set, no more, no fewer
+(<code>test_the_manuscript_returned_by_my_assignments_is_the_blinded_type</code>)</td>
+<td><code>{tracking_code, title, abstract, keywords, version, status}</code>
+exactly</td>
+<td>Exact match</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A registration for an existing email raises and sends no second
+verification message
+(<code>test_registering_an_existing_email_raises_and_sends_no_second_message</code>)</td>
+<td>No enumeration signal via message count</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>An unknown email at login fails identically to a wrong password
+(<code>test_unknown_email_is_rejected_identically_to_a_wrong_password</code>)</td>
+<td>Same response either way</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>canonical_bytes()</code> hashes the same instant identically
+regardless of UTC offset
+(<code>test_the_same_instant_hashes_identically_regardless_of_offset</code>)</td>
+<td>Identical bytes</td>
+<td>Identical</td>
+<td>Pass — regression test for TD-12, see §4</td>
+</tr>
+<tr>
+<td><code>UPDATE</code>/<code>DELETE</code>/<code>TRUNCATE</code> on the
+audit log, and a manuscript delete with attached events</td>
+<td>All rejected at the database level</td>
+<td>All rejected</td>
+<td>Pass — see §3.3, §4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="36-frontend-unitcomponent-testing-vitest">3.6 Frontend
+unit/component testing (Vitest)</h3>
+<table>
+<thead>
+<tr>
+<th>Test case</th>
+<th>Expected result</th>
+<th>Actual result</th>
+<th>Pass/Fail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Session cookie round-trips user identity and tokens through sealing
+(<code>session.test.ts</code>)</td>
+<td>Round-trips</td>
+<td>Round-trips</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A session sealed with the wrong password never unseals to the
+original payload (<code>session.test.ts</code>)</td>
+<td>Fails closed</td>
+<td>Fails closed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>BlindedManuscriptView</code> never renders author identity,
+even if a payload is deliberately smuggled in upstream
+(<code>blinded-manuscript-view.test.tsx</code>)</td>
+<td>No author field rendered</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>DecisionForm</code> offers desk rejection only from
+<code>under_screening</code>, renders nothing once no legal decision
+exists (<code>decision-form.test.tsx</code>)</td>
+<td>Confirmed both cases</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Login page surfaces the RFC 9457 problem detail returned by the
+login Route Handler on failure (<code>login-page.test.tsx</code>)</td>
+<td>Problem <code>title</code>/<code>detail</code> shown to the
+user</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Login form is fully keyboard-operable — Tab order reaches email,
+password, submit (<code>login-page.test.tsx</code>)</td>
+<td>Confirmed</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>POST /api/manuscripts</code> Route Handler rejects an invalid
+body before ever calling upstream (<code>route.test.ts</code>)</td>
+<td>Upstream not called</td>
+<td>Not called</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table>
+<p>Frontend suite: 10 test files, 17 individual <code>it(...)</code>
+cases (counted directly from
+<code>frontend/src/**/*.test.{ts,tsx}</code>). This report could not
+execute <code>npm test</code> in the environment it was written in —
+<code>node_modules</code> is not installed and package installation was
+out of scope for producing this document — so no pass/fail run output is
+claimed for the frontend suite as a whole; the table above states what
+each test asserts, sourced by reading the test files directly, not a run
+log. <code>npx tsc --noEmit</code> and ESLint (<code>make check</code>
+in <code>frontend/</code>) gate the same code on every CI-equivalent
+local run.</p>
+<hr />
+<h2 id="4-defects-found-and-corrective-action">4. Defects found and
+corrective action</h2>
+<p>This is the section with the most to learn from. Every entry below
+was found either by a human or an agent reading code against what it
+claimed to do, by mutation testing, or by exercising the deployed system
+— none were found by a coverage number or a passing test suite on its
+own. Full Debt → Cause → Impact → Priority → Resolution entries for the
+still-open items are in <code>docs/04-technical-debt-register.md</code>;
+this section retells them from the testing perspective — what the test
+evidence looked like, and how the gap was closed.</p>
+<h3
+id="41-mutation-testing-found-the-hash-chains-chaining-step-was-untested">4.1
+Mutation testing found the hash chain's chaining step was untested</h3>
+<p><strong>What was found.</strong> During the final review, deleting
+the single line in <code>chain_hash</code> that folds the predecessor's
+hash into the digest left <strong>all tests passing</strong>. Without
+that line, <code>event_hash</code> is a per-event checksum with no
+dependency on anything before it — altering or removing an earlier event
+would no longer invalidate anything after it, which defeats the entire
+purpose of a hash <em>chain</em>. The suite was at 100% line and branch
+coverage on <code>hashchain.py</code> at the time.</p>
+<p><strong>How it was found.</strong> Manual mutation testing:
+deliberately deleting a line believed to be load-bearing and re-running
+the suite, rather than trusting the coverage figure. This is recorded in
+<code>docs/04-technical-debt-register.md</code> (TD-11) as one of four
+mutations that survived a 100%-covered suite.</p>
+<p><strong>Why it mattered.</strong> It is the sharpest illustration in
+this project of the gap between "every line executed" and "every
+behaviour asserted." Coverage measured that the line ran; it said
+nothing about whether removing it changed an observable outcome, because
+no test happened to construct a case where the predecessor's hash
+mattering was the only thing being checked.</p>
+<p><strong>What was done.</strong>
+<code>test_the_predecessor_hash_changes_the_digest</code> was added
+directly:
+<code>chain_hash(subject, GENESIS_HASH) != chain_hash(subject, "f" * 64)</code>
+— the same event, two different predecessor hashes, asserted to produce
+different digests. This test exists specifically so the deleted-line
+mutation is caught; it is written as a test <em>about</em> the mutation,
+not merely a test that happens to cover the line.</p>
+<h3
+id="42-a-utc-offset-representation-would-have-produced-a-false-tamper-alert">4.2
+A UTC-offset representation would have produced a false tamper
+alert</h3>
+<p><strong>What was found.</strong> <code>canonical_bytes()</code>
+originally hashed <code>occurred_at.isoformat()</code>, which includes
+whatever UTC offset the Python <code>datetime</code> carried.
+PostgreSQL's <code>timestamptz</code> normalises any offset to UTC on
+storage. An event recorded with a non-UTC offset (e.g.
+<code>+05:00</code>) would therefore hash one way in memory, before
+persistence, and differently after a round trip through the database —
+because the timestamp that comes back is the same instant in a different
+textual representation.</p>
+<p><strong>How it was found.</strong> Not by any test — every existing
+test used a UTC datetime throughout, so the suite was structurally blind
+to the defect. Four independent reviews of the in-memory code did not
+catch it either. It was found by reasoning about the storage boundary
+specifically: asking what happens to a value that crosses into
+PostgreSQL and back, not just what the Python code does in
+isolation.</p>
+<p><strong>Why it mattered.</strong> This is worse than an undetected
+tamper — it is a <strong>false positive</strong>. <code>verify()</code>
+would report tampering on an event nobody touched, purely because of a
+representation mismatch. A false alarm destroys confidence in every
+subsequent genuine detection; a security control that cries wolf gets
+ignored or disabled.</p>
+<p><strong>What was done.</strong> <code>canonical_bytes()</code> now
+normalises <code>occurred_at</code> to UTC before hashing, so the offset
+cannot reach the digest by construction. The regression test
+<code>test_the_same_instant_hashes_identically_regardless_of_offset</code>
+(<code>test_events.py</code>) pins this: the same instant, expressed as
+<code>2026-08-12T09:30:00+00:00</code> and as
+<code>2026-08-12T14:30:00+05:00</code>, must hash identically. Recorded
+as resolved TD-12.</p>
+<h3 id="43-truncate-bypassed-the-append-only-trigger-entirely">4.3
+<code>TRUNCATE</code> bypassed the append-only trigger entirely</h3>
+<p><strong>What was found.</strong> A
+<code>BEFORE UPDATE OR DELETE ... FOR EACH ROW</code> trigger protected
+<code>editorial_events</code>, and was verified firing against a live
+database — <code>UPDATE</code> and <code>DELETE</code> were both
+confirmed rejected. But PostgreSQL never fires
+<strong>row-level</strong> triggers on <code>TRUNCATE</code>. A single
+<code>TRUNCATE TABLE editorial_events</code> would erase the entire
+audit log, with no error, no row-level check ever invoked.</p>
+<p><strong>How it was found.</strong> By asking a broader question of a
+control already believed correct: "is this claim true for every
+statement class that removes rows?", not "does the trigger work?" The
+trigger's own review had only checked the two statement types it was
+written to intercept.</p>
+<p><strong>Why it mattered.</strong> The system was claiming a
+tamper-evident audit trail while leaving the single most direct way to
+destroy it completely unguarded — one SQL statement, no privilege
+escalation required beyond whatever already had write access to the
+table.</p>
+<p><strong>What was done.</strong> A statement-level
+<code>BEFORE TRUNCATE ... FOR EACH STATEMENT</code> trigger was added,
+in both the Alembic migration and the test fixtures.
+<code>test_truncating_the_event_log_is_ rejected</code>
+(<code>tests/integration/test_append_only.py</code>) asserts
+<code>TRUNCATE</code> now raises a <code>DBAPIError</code> matching
+<code>"append-only"</code>, run against the real container, not a mock.
+Recorded as resolved TD-13.</p>
+<h3
+id="44-coveragepy-does-not-treat-an-inline-ternary-as-a-branch-point">4.4
+coverage.py does not treat an inline ternary as a branch point</h3>
+<p><strong>What was found.</strong>
+<code>tests/unit/db/test_mappers.py</code> reported no missing branches
+for the mappers module despite branch coverage being enabled
+(<code>branch = true</code>), yet
+<code>IssueId(row.issue_id) if row.issue_id is not None else None</code>
+had, in fact, only ever been exercised on one arm — the populated arm
+never ran in any test that existed before this was found.</p>
+<p><strong>How it was found.</strong> Reading the module's logic against
+what the coverage report claimed, rather than trusting "0 branches
+missing" as proof of exhaustive exercise. Recorded in
+<code>docs/04-technical-debt-register.md</code> (TD-11) as the
+register's second illustration of coverage as a weak signal — a
+companion finding to the mutation-testing result in §4.1, found the same
+review pass.</p>
+<p><strong>Why it mattered.</strong> "100% coverage, zero branches
+missed" is a claim readers reasonably take to mean both arms of every
+branch ran. It did not mean that here, because coverage.py's branch
+instrumentation does not model a Python conditional expression
+(<code>x if c else y</code>) as a two-arm branch the way it models an
+<code>if</code>/<code>else</code> statement. A reader trusting the
+coverage report alone would believe the populated-issue-id path was
+verified when it was not.</p>
+<p><strong>What was done.</strong>
+<code>test_round_trip_restores_a_populated_issue_id</code>
+(<code>test_mappers.py</code>) exists specifically to exercise the
+previously-untested arm, independent of what the coverage tool reports
+for it.</p>
+<h3
+id="45-three-lifecycle-methods-were-implemented-and-tested-but-reachable-by-no-route">4.5
+Three lifecycle methods were implemented and tested, but reachable by no
+route</h3>
+<p><strong>What was found.</strong> <code>Manuscript.resubmit</code>,
+<code>Manuscript.schedule</code> and <code>Manuscript.publish</code>
+were fully implemented in the domain and covered by unit tests (§3.1) —
+but at one point in the build, no API route in <code>ugjcs.api</code>
+called them. The domain logic was correct and verified in isolation; the
+system as a whole could not do the things those tests proved the domain
+capable of.</p>
+<p><strong>How it was found.</strong> Not by any automated test — every
+domain test for these methods passed. It was found by the project owner
+attempting to use the deployed system through the actual workflow
+(resubmit a revision, schedule an accepted paper, publish a scheduled
+issue) and discovering the corresponding action had no route to reach
+it.</p>
+<p><strong>Why it mattered.</strong> It is the clearest demonstration in
+this project that unit-level correctness and system-level completeness
+are different properties. A domain method can be implemented,
+unit-tested, type-checked, and covered at 100%, and still be dead code
+from the system's perspective if no adapter wires it in. No test in the
+suite — unit, integration, or route-audit — was positioned to catch a
+route's <em>absence</em>; <code>test_route_audit.py</code> proves every
+<em>existing</em> route is authorized, which is a different claim from
+every needed route existing.</p>
+<p><strong>What was done.</strong> The three routes were added to
+<code>ugjcs.api</code> (manuscript resubmission, editor-in-chief
+scheduling, editor-in-chief publication), each exercised by the system
+tests in §3.4
+(<code>test_the_corresponding_author_can_resubmit_with_a_revised_file</code>,
+<code>test_the_editor_in_chief_can_schedule_an_accepted_manuscript</code>,
+<code>test_the_editor_in_chief_can_publish_a_scheduled_manuscript</code>).
+The gap itself is the strongest argument in this report for §5's manual
+acceptance pass being a required step, not an optional one: it is
+precisely the class of defect route-level and unit-level testing cannot
+see.</p>
+<h3
+id="46-a-container-had-an-iam-route-to-s3-but-no-network-route-to-reach-it">4.6
+A container had an IAM route to S3 but no network route to reach it</h3>
+<p><strong>What was found.</strong> In the deployed environment, the App
+Runner service held IAM permission to write to the document-storage S3
+bucket, but ran in a network configuration with no route to reach the S3
+endpoint. Document uploads hung rather than failing fast, until the
+platform's own health check judged the instance unresponsive and killed
+it.</p>
+<p><strong>How it was found.</strong> Only by exercising the deployed
+system's upload feature directly against the live API — no unit or
+integration test runs against the actual AWS network topology, so none
+could have surfaced this.
+<code>tests/unit/infrastructure/storage/test_s3_store.py</code> tests
+the <code>S3DocumentStore</code> adapter's logic (it requests a
+<code>PUT</code> and returns the generated presigned URL) against a
+mocked <code>boto3</code> client; that test is correct about what the
+adapter code does and had no way to observe that the network path to
+actually deliver that request did not exist in the deployed
+environment.</p>
+<p><strong>Why it mattered.</strong> It is a category of defect testing
+at any layer below "the deployed system, over the real network" cannot
+reach: infrastructure connectivity. IAM policy and network reachability
+are independent failure modes — a principal can be fully authorized to
+call an API and still have no path to the endpoint that serves it — and
+nothing short of actually attempting the call from the actual deployed
+environment exercises both at once.</p>
+<p><strong>What was done.</strong> The networking configuration was
+corrected so the App Runner service's egress path reaches the S3
+endpoint. This is recorded here rather than as a technical debt register
+entry because it was a deployment configuration defect, fully resolved,
+not an accepted or scheduled trade-off; the lesson it leaves is
+procedural, not a residual risk: a feature is not verified until it has
+been exercised against the actual deployed infrastructure, not only
+against a mock of the SDK that infrastructure is reached through.</p>
+<h3 id="summary">Summary</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Defect</th>
+<th>Found by</th>
+<th>Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.1</td>
+<td>Hash-chain step deletable with all tests passing</td>
+<td>Mutation testing</td>
+<td>Coverage/behaviour gap</td>
+</tr>
+<tr>
+<td>4.2</td>
+<td>UTC-offset timestamp would false-positive on tamper</td>
+<td>Human reasoning about the storage boundary</td>
+<td>Boundary-crossing representation defect</td>
+</tr>
+<tr>
+<td>4.3</td>
+<td><code>TRUNCATE</code> bypassed the append-only trigger</td>
+<td>Human asking a broader question of a verified control</td>
+<td>Incomplete threat coverage</td>
+</tr>
+<tr>
+<td>4.4</td>
+<td>Ternary's second arm never executed, coverage silent</td>
+<td>Human reading logic against the coverage report</td>
+<td>Tooling blind spot</td>
+</tr>
+<tr>
+<td>4.5</td>
+<td>Three domain methods reachable by no route</td>
+<td>Owner using the deployed system</td>
+<td>System-completeness gap invisible to unit tests</td>
+</tr>
+<tr>
+<td>4.6</td>
+<td>IAM permitted, network unreachable</td>
+<td>Owner exercising the deployed feature</td>
+<td>Infrastructure-layer defect invisible to mocked tests</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-user-acceptance-testing">5. User acceptance testing</h2>
+<p>UAT was run as scripted, role-scoped scenarios against the
+<strong>live deployment</strong>
+(<code>https://ugjcs-frontend.vercel.app</code>, backed by the API at
+<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>), using the
+judge accounts:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Account</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Author</td>
+<td><code>author@ugjcs.test</code></td>
+<td><code>Ugjcs-Author-2026!</code></td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td><code>reviewer@ugjcs.test</code></td>
+<td><code>Ugjcs-Reviewer-2026!</code></td>
+</tr>
+<tr>
+<td>Editor</td>
+<td><code>editor@ugjcs.test</code></td>
+<td><code>Ugjcs-Editor-2026!</code></td>
+</tr>
+<tr>
+<td>Editor-in-Chief</td>
+<td><code>eic@ugjcs.test</code></td>
+<td><code>Ugjcs-Eic-2026!</code></td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td><code>admin@ugjcs.test</code></td>
+<td><code>Ugjcs-Admin-2026!</code></td>
+</tr>
+</tbody>
+</table>
+<h3
+id="scenarios-actually-exercised-for-this-report-live-browser-driven">Scenarios
+actually exercised for this report (live, browser-driven)</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Steps</th>
+<th>Expected</th>
+<th>Observed</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Author login and dashboard</td>
+<td>Navigate to <code>/login</code>, submit
+<code>author@ugjcs.test</code> / <code>Ugjcs-Author-2026!</code></td>
+<td>Redirected to <code>/author</code>, listing this author's
+submissions with status</td>
+<td>Redirected to <code>/author</code>; ten submissions listed with
+correct tracking codes and statuses (<code>Published</code>,
+<code>Revision requested</code>, <code>Submitted</code>,
+<code>Under review</code>)</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Public archive reachable without authentication</td>
+<td>Navigate to <code>/search</code> with no session</td>
+<td>Search page renders, no login redirect</td>
+<td>Page rendered directly, titled "Search · UGJCS"</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Cross-role access denied at the routing layer</td>
+<td>While authenticated as <code>author</code>, navigate directly to
+<code>/editor</code></td>
+<td>Access refused, not the editor queue</td>
+<td>Redirected to <code>/</code> (public homepage); no editor content
+rendered, no session state exposed on that page</td>
+<td>Pass — matches <code>frontend/middleware.ts</code>: a session
+present without the required role redirects to <code>/</code>, distinct
+from the no-session case (§5, next row), which redirects to
+<code>/login</code></td>
+</tr>
+</tbody>
+</table>
+<p>The redirect-to-home behaviour on a denied role check is a deliberate
+design choice, not a UAT defect: <code>middleware.ts</code>
+distinguishes "no session" (→ <code>/login</code>, so the user can
+authenticate and retry) from "session present, wrong role" (→
+<code>/</code>, so a legitimately authenticated user with insufficient
+privilege lands somewhere useful rather than at a bare error). The
+backend's own authorization check — exercised in §3.4 and §3.5 — is what
+is actually authoritative for every state-changing action regardless of
+what the frontend route guard does; the middleware is a routing-level
+convenience, not the security boundary.</p>
+<h3 id="scripted-scenarios-per-role-full-acceptance-script">Scripted
+scenarios per role (full acceptance script)</h3>
+<p>The remaining scenarios below constitute the acceptance script run
+manually across the roles during development and at each deployment;
+they are stated here as the acceptance criteria this system is expected
+to meet, cross-referenced to the automated test that pins the same
+behaviour where one exists, since re-running the full script for every
+role on every document revision is not repeated for this report beyond
+the live checks above.</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Scenario</th>
+<th>Automated backstop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Author</td>
+<td>Submit a new manuscript with a PDF; see it appear under "My
+submissions"</td>
+<td><code>test_an_author_can_submit_a_manuscript_with_a_pdf</code></td>
+</tr>
+<tr>
+<td>Author</td>
+<td>Attempt to submit a non-PDF file; see a clear rejection</td>
+<td><code>test_a_non_pdf_upload_is_rejected_with_415</code></td>
+</tr>
+<tr>
+<td>Author</td>
+<td>Resubmit a manuscript sent back for revision</td>
+<td><code>test_the_corresponding_author_can_resubmit_with_a_revised_file</code></td>
+</tr>
+<tr>
+<td>Author</td>
+<td>Withdraw a submission before a decision is recorded</td>
+<td><code>test_withdrawal_is_permitted_before_a_decision</code></td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>See only manuscripts assigned to them, blinded</td>
+<td><code>test_my_assignments_lists_only_manuscripts_assigned_to_me</code>,
+<code>test_my_assignments_never_serialises_author_identifiers</code></td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Submit a review with a recommendation and comments</td>
+<td><code>test_submitting_a_review_counts_it_and_records_the_content</code></td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Attempt to open a manuscript with no assignment</td>
+<td><code>test_an_unassigned_reviewer_cannot_fetch_the_document</code></td>
+</tr>
+<tr>
+<td>Editor</td>
+<td>Move a submitted manuscript into screening, then to review</td>
+<td><code>test_an_editor_can_begin_screening</code>,
+<code>test_a_decision_moves_the_manuscript_to_review</code></td>
+</tr>
+<tr>
+<td>Editor</td>
+<td>Assign a reviewer to a manuscript</td>
+<td><code>test_assigning_a_reviewer_records_it</code></td>
+</tr>
+<tr>
+<td>Editor</td>
+<td>Attempt to schedule or publish (denied — EiC only)</td>
+<td><code>test_a_plain_editor_cannot_schedule</code>,
+<code>test_a_plain_editor_cannot_publish</code></td>
+</tr>
+<tr>
+<td>Editor-in-Chief</td>
+<td>Schedule an accepted manuscript into a volume/issue</td>
+<td><code>test_the_editor_in_chief_can_schedule_an_accepted_manuscript</code></td>
+</tr>
+<tr>
+<td>Editor-in-Chief</td>
+<td>Publish a scheduled manuscript</td>
+<td><code>test_the_editor_in_chief_can_publish_a_scheduled_manuscript</code></td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td>(Role management — see §6: no UI surface exists for this yet;
+verified only via <code>test_policies.py</code>'s
+<code>test_administrator_may_manage_users</code> at the policy
+layer)</td>
+<td><code>test_administrator_may_manage_users</code></td>
+</tr>
+<tr>
+<td>Reader (unauthenticated)</td>
+<td>Browse the public archive, search, download a published paper</td>
+<td><code>test_the_archive_requires_no_authentication</code>,
+<code>test_search_finds_a_matching_paper</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-what-testing-did-not-cover-stated-plainly">6. What testing did
+not cover, stated plainly</h2>
+<ul>
+<li><strong>No load or performance testing.</strong> Nothing in this
+project measures throughput, latency percentiles, or behaviour under
+concurrent load. The design specification's NFR-08/NFR-09 performance
+objectives are unverified by any test in this suite — they were sized at
+design time, not confirmed against the running system.</li>
+<li><strong>No automated security scanning in CI.</strong>
+<code>.github/workflows/backend-ci.yml</code> runs linting, type
+checking, an architecture contract, and the test suites — it does not
+run a dependency vulnerability scanner, a SAST tool, or a DAST pass
+against the deployed API. Security coverage in this project is what the
+tests in §3.5 assert directly, and nothing beyond that.</li>
+<li><strong>No mutation testing in CI.</strong> The mutation-testing
+finding in §4.1 was a one-off manual review pass, not a repeatable gate.
+<code>docs/04-technical-debt-register.md</code> (TD-11) records
+systematic mutation testing (<code>mutmut</code> or
+<code>cosmic-ray</code>) as future evolution, not as something this
+project currently runs.</li>
+<li><strong>No browser-matrix testing.</strong> The live UAT pass in §5
+was run in one browser (a Chromium-based automated session). No
+cross-browser or cross-device matrix was exercised;
+<code>@axe-core/playwright</code> is present as a dependency for
+accessibility auditing but, as noted in §1 and §3.6, no Playwright spec
+files are committed to run it against.</li>
+<li><strong>No committed automated end-to-end suite.</strong>
+<code>test:e2e</code> is declared in <code>package.json</code> but there
+is no <code>playwright.config.ts</code> or <code>tests/e2e/</code>
+directory in the repository. The acceptance evidence in §5 substitutes a
+manual (and, for this report, live-browser-driven) pass for what an
+automated E2E suite would otherwise provide continuously; it is not
+equivalent to one, because it was not re-run on every change, only at
+the points recorded here.</li>
+<li><strong>The double-blind guarantee has a stated limit.</strong>
+<code>blind()</code> strips <code>author_ids</code> and
+<code>corresponding_author_id</code> from the type a reviewer receives —
+proven for every input by the property test in §3.2 and the
+sentinel-based leak tests in §3.5 — but <code>title</code>,
+<code>abstract</code> and <code>keywords</code> are carried
+<strong>verbatim</strong>. An author's name in a title, or an abstract
+that reads "extending our earlier work in [Obeng 2025]," reaches the
+reviewer unchanged; nothing in this system detects or redacts
+self-identifying body text. This is recorded as TD-05 in the technical
+debt register: double-blind integrity depends partly on author
+compliance with submission guidance, not entirely on what the system
+enforces. Reliable automated redaction was judged a research problem in
+its own right, where a bad redaction that leaks a name would undermine
+the guarantee more than not attempting redaction at all.</li>
+<li><strong>Administrator role management has no UI.</strong> The policy
+layer grants and denies this correctly
+(<code>test_administrator_may_manage_users</code>), but no frontend
+surface exercises it, so §5's administrator row is verified only at the
+policy-test level, not end to end.</li>
+</ul>
+<hr />
+<h2 id="7-evaluation-of-the-testing-strategy">7. Evaluation of the
+testing strategy</h2>
+<p>The honest conclusion, and the one the evidence in §4 supports
+without qualification: <strong>automated gates establish a floor and
+catch regressions; they did not find the defects that mattered most on
+this project.</strong> Every serious defect recorded in §4 was found by
+a human or an agent reading code against what it claimed to do, by
+mutation testing deliberately designed to distrust the coverage figure,
+or by using the running system as an actual actor would — never by a
+coverage number or a green test run on its own.</p>
+<p>The clearest single data point is §4.1: coverage on
+<code>hashchain.py</code> stood at 100% — every line, every branch —
+while the line that makes a hash chain a <em>chain</em>, rather than a
+list of independently checksummed events, could be deleted without
+failing a single one of 104 tests that existed at the time. A
+tamper-evidence guarantee that is the entire reason this subsystem
+exists was, for a period, unprotected by any test that would have
+noticed its removal. That is not a marginal case; it is the load-bearing
+property of the module, and coverage reported nothing wrong.</p>
+<p>Three further findings sharpen the same point from different angles.
+§4.2 shows that 100% coverage inside a module says nothing about what
+happens at a boundary the module doesn't know it crosses — every test
+used a UTC datetime, so the suite was structurally blind to a defect
+that only a database round trip could expose, and the defect it hid was
+actively harmful (a false tamper alert), not merely a missed detection.
+§4.3 shows that a control verified against the cases its author thought
+to check — <code>UPDATE</code>, <code>DELETE</code> — said nothing about
+the case nobody asked about — <code>TRUNCATE</code> — despite the
+control having been "confirmed firing against a live database." §4.4
+shows the measurement tool itself has blind spots: an inline ternary's
+second arm never ran, and coverage.py's branch instrumentation does not
+model a conditional expression as a branch, so the report read as
+complete when it was not.</p>
+<p>§4.5 and §4.6 extend the same lesson past the test suite entirely.
+§4.5 — three fully implemented, fully unit-tested domain methods
+reachable by no API route — is a defect no unit test, integration test,
+or route-audit test was positioned to find, because each of those tests
+presupposes the thing under test is reachable; the question "does
+anything reach this code" sits above all of them, and was answered only
+by the owner using the deployed system as a user would. §4.6 — correct
+IAM policy, no network path to use it — sits a layer below every test in
+this suite: nothing here runs against the actual deployed network
+topology, so the gap was invisible until the feature was exercised
+against the real infrastructure and the upload hung.</p>
+<p>None of this is an argument against the automated suite. 267 unit
+tests, 56 integration tests against a real database, two architecture
+contracts, and a strict type checker catch an enormous amount of
+regression cheaply and continuously — exactly what §1 claims for them,
+and exactly the floor <code>docs/04-technical-debt-register.md</code>
+describes them as. But the register's own closing observation, produced
+independently of this report, states the same conclusion this section
+reaches from the test evidence directly: ten of its eleven entries were
+found by review of work that had already passed every automated gate —
+linting, strict typing, an architecture contract, and a full test suite
+at 100% coverage. Passing every gate available in this project is
+necessary and was, in every one of these cases, not sufficient. What
+found the defects that mattered was a human, or an agent acting as one,
+asking whether the code was still true to what it claimed — and, twice
+in this project, whether the <em>deployed system</em> still did what the
+code claimed once it left the test suite entirely.</p>
+</main>
+<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+</body>
+</html>

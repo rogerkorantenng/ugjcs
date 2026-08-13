@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>03 · Effort Estimation (UCP + COCOMO II)</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+  <style>
+  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+  h3 { font-size:1.12rem; margin-top:1.8rem; }
+  a { color:#4b3f9e; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+  pre code { background:none; color:inherit; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+  th { background:#eceee9; font-weight:600; }
+  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+  figure.diagram svg { max-width:100%; height:auto; }
+  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="title">03 · Effort Estimation (UCP + COCOMO II)</div>
+</header>
+<main>
+<nav class="docnav"><a href="index.html">← All documents</a></nav>
+<header id="title-block-header">
+<h1 class="title">03 · Effort Estimation (UCP + COCOMO II)</h1>
+</header>
+<h1 id="effort-estimation">Effort Estimation</h1>
+<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
+Computing Science <strong>Document:</strong> 03 — Effort estimation
+<strong>Author:</strong> Roger Koranteng Obeng, student ID 22424140
+<strong>Date:</strong> 2026-08-12 <strong>Status:</strong>
+Authoritative. This document's MoSCoW cut (§8) governs the scope of
+Plans 2–6.</p>
+<hr />
+<h2 id="1-method">1. Method</h2>
+<p>Per the design specification's estimation approach (§14), <strong>Use
+Case Points (UCP)</strong> is the primary technique: UGJCS is defined by
+actor interactions with a stable use-case boundary — the situation UCP
+was designed for — and the unadjusted actor and use-case weights can be
+read directly off the functional requirements table (§5.1) rather than
+guessed. <strong>COCOMO II Early Design</strong> serves as an
+independent cross-check from a size-and-cost-driver perspective, using
+different inputs entirely (source lines of code and
+process/product/personnel ratings rather than actor and transaction
+counts). Agreement — or a <em>diagnosable</em> disagreement — between
+two methods driven by different inputs is stronger evidence than
+precision from either one alone.</p>
+<p>The estimate is computed before implementation. Its output determines
+the MoSCoW cut recorded in §8: requirements that do not fit the
+available 48-hour window are demoted rather than rushed, and the
+demotion is recorded with its reason. Every intermediate figure below
+shows its arithmetic so a reader can recompute it independently rather
+than trust a stated total.</p>
+<hr />
+<h2 id="2-actor-inventory-and-unadjusted-actor-weight-uaw">2. Actor
+inventory and unadjusted actor weight (UAW)</h2>
+<p>Actor weights follow Karner's classification: <strong>Simple</strong>
+(another system through a defined API) = 1, <strong>Average</strong>
+(another system through a protocol, or a human through a text interface)
+= 2, <strong>Complex</strong> (a human through a graphical interface) =
+3.</p>
+<table>
+<thead>
+<tr>
+<th>Actor</th>
+<th>Classification</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Author</td>
+<td>Complex — GUI</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td>Complex — GUI</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Editor</td>
+<td>Complex — GUI</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Editor-in-Chief</td>
+<td>Complex — GUI</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td>Complex — GUI</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Reader</td>
+<td>Complex — GUI</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Indexing service (OAI-PMH harvester)</td>
+<td>Simple — defined API</td>
+<td>1</td>
+</tr>
+<tr>
+<td><strong>UAW</strong></td>
+<td></td>
+<td><strong>19</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Arithmetic: six GUI actors at weight 3 plus one API actor at weight 1
+— <code>(6 × 3) + (1 × 1) = 18 + 1 = 19</code>.</p>
+<hr />
+<h2 id="3-use-case-inventory-and-unadjusted-use-case-weight-uucw">3.
+Use-case inventory and unadjusted use-case weight (UUCW)</h2>
+<p>Use-case weights follow Karner's transaction-count classification:
+<strong>Simple</strong> (≤3 transactions) = 5, <strong>Average</strong>
+(4–7) = 10, <strong>Complex</strong> (&gt;7) = 15. The <code>FR</code>
+column traces each use case back to the functional requirement it
+implements in the design specification (§5.1), so the inventory is
+derived rather than invented.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Use case</th>
+<th>FR</th>
+<th>Class</th>
+<th>Wt</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC1</td>
+<td>Register account</td>
+<td>FR-01</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC2</td>
+<td>Authenticate and manage session</td>
+<td>FR-02</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC3</td>
+<td>Manage roles</td>
+<td>FR-03</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC4</td>
+<td>Create submission</td>
+<td>FR-04, FR-05</td>
+<td>Complex</td>
+<td>15</td>
+</tr>
+<tr>
+<td>UC5</td>
+<td>Process submission asynchronously</td>
+<td>FR-06, FR-20</td>
+<td>Complex</td>
+<td>15</td>
+</tr>
+<tr>
+<td>UC6</td>
+<td>Screen submission</td>
+<td>FR-07</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC7</td>
+<td>Recommend reviewers</td>
+<td>FR-08</td>
+<td>Complex</td>
+<td>15</td>
+</tr>
+<tr>
+<td>UC8</td>
+<td>Invite and assign reviewers</td>
+<td>FR-09</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC9</td>
+<td>Respond to review invitation</td>
+<td>FR-10</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC10</td>
+<td>Submit review</td>
+<td>FR-11</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC11</td>
+<td>Record editorial decision</td>
+<td>FR-12</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC12</td>
+<td>Submit revision</td>
+<td>FR-13</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC13</td>
+<td>Track own submissions</td>
+<td>FR-14</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC14</td>
+<td>Compose and publish issue</td>
+<td>FR-15</td>
+<td>Complex</td>
+<td>15</td>
+</tr>
+<tr>
+<td>UC15</td>
+<td>Browse archive</td>
+<td>FR-16</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC16</td>
+<td>Search papers</td>
+<td>FR-17</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC17</td>
+<td>Download paper</td>
+<td>FR-18</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC18</td>
+<td>View audit trail</td>
+<td>FR-19</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC19</td>
+<td>Export citation</td>
+<td>FR-21</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC20</td>
+<td>Harvest metadata (OAI-PMH)</td>
+<td>FR-22</td>
+<td>Complex</td>
+<td>15</td>
+</tr>
+<tr>
+<td>UC21</td>
+<td>Notify actors</td>
+<td>FR-23</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC22</td>
+<td>View editorial analytics</td>
+<td>FR-24</td>
+<td>Average</td>
+<td>10</td>
+</tr>
+<tr>
+<td>UC23</td>
+<td>Withdraw submission</td>
+<td>FR-25</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC24</td>
+<td>Configure journal policy</td>
+<td>FR-26</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td>UC25</td>
+<td>Resolve persistent identifier</td>
+<td>FR-27</td>
+<td>Simple</td>
+<td>5</td>
+</tr>
+<tr>
+<td><strong>UUCW</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>225</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Arithmetic: summing the 25 weights in the Wt column —
+<code>10+10+5+15+15+10+15+10+5+10+10+10+5+15+5+10+5+5+5+15+10+10+5+5+5 = 225</code>.</p>
+<p>FR-28 (reviewer performance history, priority Could) has no
+corresponding use case here: it is a reporting feature over data already
+captured by UC10 and UC22 rather than an independent actor-facing
+transaction, so it does not add a separate UCP line; it is nonetheless
+carried in the technical debt register as a Could-have deferral
+consistent with its spec priority.</p>
+<pre><code>UUCP = UAW + UUCW = 19 + 225 = 244</code></pre>
+<hr />
+<h2 id="4-technical-complexity-factor-tcf">4. Technical complexity
+factor (TCF)</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Technical factor</th>
+<th>Wt</th>
+<th>Rating</th>
+<th>Product</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T1</td>
+<td>Distributed system</td>
+<td>2</td>
+<td>4</td>
+<td>8.0</td>
+<td>ECS, RDS, S3, Redis, CloudFront, Vercel</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>Performance objectives</td>
+<td>1</td>
+<td>4</td>
+<td>4.0</td>
+<td>p95 targets in NFR-08, NFR-09</td>
+</tr>
+<tr>
+<td>T3</td>
+<td>End-user efficiency</td>
+<td>1</td>
+<td>3</td>
+<td>3.0</td>
+<td>Editorial queues optimised for throughput</td>
+</tr>
+<tr>
+<td>T4</td>
+<td>Complex internal processing</td>
+<td>1</td>
+<td>5</td>
+<td>5.0</td>
+<td>Hungarian assignment, MinHash LSH, hash chain</td>
+</tr>
+<tr>
+<td>T5</td>
+<td>Reusability</td>
+<td>1</td>
+<td>3</td>
+<td>3.0</td>
+<td>Hexagonal seams; multi-journal deferred</td>
+</tr>
+<tr>
+<td>T6</td>
+<td>Ease of installation</td>
+<td>0.5</td>
+<td>3</td>
+<td>1.5</td>
+<td>Terraform reproducible</td>
+</tr>
+<tr>
+<td>T7</td>
+<td>Ease of use</td>
+<td>0.5</td>
+<td>4</td>
+<td>2.0</td>
+<td>Public archive serves non-technical readers</td>
+</tr>
+<tr>
+<td>T8</td>
+<td>Portability</td>
+<td>2</td>
+<td>3</td>
+<td>6.0</td>
+<td>Containerised; adapters isolate vendors</td>
+</tr>
+<tr>
+<td>T9</td>
+<td>Ease of change</td>
+<td>1</td>
+<td>4</td>
+<td>4.0</td>
+<td>Hexagonal architecture is the point</td>
+</tr>
+<tr>
+<td>T10</td>
+<td>Concurrency</td>
+<td>1</td>
+<td>4</td>
+<td>4.0</td>
+<td>Async API plus worker pool</td>
+</tr>
+<tr>
+<td>T11</td>
+<td>Special security objectives</td>
+<td>1</td>
+<td>5</td>
+<td>5.0</td>
+<td>Double-blind, RBAC, tamper-evident audit</td>
+</tr>
+<tr>
+<td>T12</td>
+<td>Third-party direct access</td>
+<td>1</td>
+<td>4</td>
+<td>4.0</td>
+<td>OAI-PMH harvesting</td>
+</tr>
+<tr>
+<td>T13</td>
+<td>User training facilities</td>
+<td>1</td>
+<td>1</td>
+<td>1.0</td>
+<td>User manual only</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>TFactor</strong></td>
+<td></td>
+<td></td>
+<td><strong>50.5</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Arithmetic:
+<code>8.0+4.0+3.0+5.0+3.0+1.5+2.0+6.0+4.0+4.0+5.0+4.0+1.0 = 50.5</code>.</p>
+<pre><code>TCF = 0.6 + (0.01 × 50.5) = 0.6 + 0.505 = 1.105</code></pre>
+<hr />
+<h2 id="5-environmental-complexity-factor-ecf">5. Environmental
+complexity factor (ECF)</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Environmental factor</th>
+<th>Wt</th>
+<th>Rating</th>
+<th>Product</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E1</td>
+<td>Familiarity with process</td>
+<td>1.5</td>
+<td>4</td>
+<td>6.0</td>
+<td>Lifecycle taught this semester</td>
+</tr>
+<tr>
+<td>E2</td>
+<td>Application experience</td>
+<td>0.5</td>
+<td>3</td>
+<td>1.5</td>
+<td>Scholarly publishing newly studied</td>
+</tr>
+<tr>
+<td>E3</td>
+<td>Object-oriented experience</td>
+<td>1</td>
+<td>4</td>
+<td>4.0</td>
+<td>Strong</td>
+</tr>
+<tr>
+<td>E4</td>
+<td>Lead analyst capability</td>
+<td>0.5</td>
+<td>4</td>
+<td>2.0</td>
+<td>Sole analyst</td>
+</tr>
+<tr>
+<td>E5</td>
+<td>Motivation</td>
+<td>1</td>
+<td>5</td>
+<td>5.0</td>
+<td>Assessed capstone</td>
+</tr>
+<tr>
+<td>E6</td>
+<td>Stable requirements</td>
+<td>2</td>
+<td>5</td>
+<td>10.0</td>
+<td>Self-defined and frozen at spec sign-off</td>
+</tr>
+<tr>
+<td>E7</td>
+<td>Part-time staff</td>
+<td>−1</td>
+<td>0</td>
+<td>0.0</td>
+<td>None</td>
+</tr>
+<tr>
+<td>E8</td>
+<td>Difficult programming language</td>
+<td>−1</td>
+<td>2</td>
+<td>−2.0</td>
+<td>Python and TypeScript are familiar</td>
+</tr>
+<tr>
+<td></td>
+<td><strong>EFactor</strong></td>
+<td></td>
+<td></td>
+<td><strong>26.5</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Arithmetic:
+<code>6.0+1.5+4.0+2.0+5.0+10.0+0.0+(-2.0) = 26.5</code>.</p>
+<pre><code>ECF = 1.4 + (−0.03 × 26.5) = 1.4 − 0.795 = 0.605</code></pre>
+<hr />
+<h2 id="6-use-case-points-and-full-system-effort">6. Use Case Points and
+full-system effort</h2>
+<pre><code>UCP        = UUCP × TCF × ECF = 244 × 1.105 × 0.605 = 163.1
+Effort     = UCP × PF         = 163.1 × 20 = 3,262 person-hours
+                              ≈ 21.5 person-months (at 152 h/month)
+                              ≈ 1.8 person-years</code></pre>
+<p>Arithmetic: <code>244 × 1.105 = 269.62</code>;
+<code>269.62 × 0.605 = 163.12</code> → 163.1 UCP.
+<code>163.1 × 20 = 3,262</code> person-hours.
+<code>3,262 ÷ 152 = 21.46</code> → 21.5 person-months.
+<code>3,262 ÷ (152 × 12) = 1.79</code> → 1.8 person-years.</p>
+<p><strong>Why PF = 20.</strong> Karner's productivity-factor rule
+counts how many of E1–E6 are rated below 3 and how many of E7–E8 are
+rated above 3, and sums the two counts. Here: E1–E6 are rated 4, 3, 4,
+4, 5, 5 — none below 3, so that count is 0. E7–E8 are rated 0 and 2 —
+neither above 3, so that count is 0 as well. The total is 0, which sits
+within the documented ≤2 threshold for PF = 20 h/UCP (the standard
+alternative is PF = 28 at a total of exactly 3, with the project flagged
+for reconsideration above that). PF = 20 is therefore the correct rate
+for this factor profile, not a default assumption.</p>
+<p><strong>Must-have subset.</strong> Repeating the calculation
+restricted to UC1–UC18, with the Simple indexing-service actor excluded
+(its use case, UC20, is not in the Must-have set):</p>
+<pre><code>UAW  = 18            (6 GUI actors × 3, indexing service excluded)
+UUCW = 170            (sum of UC1–UC18 weights: 10+10+5+15+15+10+15+10+5+10+10+10+5+15+5+10+5+5)
+UUCP = 18 + 170 = 188
+UCP  = 188 × 1.105 × 0.605 = 125.7
+Effort = 125.7 × 20 = 2,514 person-hours</code></pre>
+<p>Arithmetic: <code>188 × 1.105 = 207.74</code>;
+<code>207.74 × 0.605 = 125.68</code> → 125.7 UCP.
+<code>125.7 × 20 = 2,514</code> person-hours.</p>
+<p>TCF and ECF are unchanged: they rate the <em>system</em> being built,
+not the subset of it in scope for a given milestone, so the same 1.105
+and 0.605 apply to both calculations.</p>
+<hr />
+<h2 id="7-cocomo-ii-early-design-cross-check">7. COCOMO II Early Design
+cross-check</h2>
+<pre><code>Size  = 12 KSLOC   (backend ~6, frontend ~5, infrastructure ~1)
+Scale factors: PREC 3.72, FLEX 2.03, RESL 2.83, TEAM 1.10, PMAT 4.68  → ΣSF = 14.36
+E     = 0.91 + 0.01 × 14.36 = 1.0536
+Effort multipliers: RCPX 1.33, RUSE 1.00, PDIF 1.29, PERS 0.63,
+                    PREX 0.87, FCIL 0.87, SCED 1.43              → ∏EM = 1.1699
+PM    = 2.94 × 12^1.0536 × 1.1699 = 47.2 person-months ≈ 7,170 person-hours</code></pre>
+<p>Arithmetic: <code>ΣSF = 3.72+2.03+2.83+1.10+4.68 = 14.36</code>.
+<code>E = 0.91 + 0.1436 = 1.0536</code>.
+<code>∏EM = 1.33 × 1.00 × 1.29 × 0.63 × 0.87 × 0.87 × 1.43 = 1.1699</code>.
+<code>12^1.0536 = 13.71</code>.
+<code>PM = 2.94 × 13.71 × 1.1699 = 47.2</code> person-months.
+<code>47.2 × 152 ≈ 7,170</code> person-hours (the unrounded product of
+the full-precision intermediates, 47.155 × 152 = 7,167.6, rounds to the
+same figure at two significant figures; both paths land within a few
+hours of 7,170 and the discrepancy between them is rounding noise in the
+third significant figure, not a computational error).</p>
+<p><strong>Reconciliation.</strong> The two methods differ by roughly
+2.2× (7,170 ÷ 3,262 = 2.20). This is not a failure of either method; it
+is explained by what each one is built to measure. COCOMO II is
+calibrated on projects that carry formal verification, configuration
+management and management overhead that this project does not incur — a
+solo, ungoverned capstone has none of the process weight the model's
+historical dataset assumes as baseline. Its <code>SCED = 1.43</code>
+penalty for extreme schedule compression compounds multiplicatively with
+the already-high <code>RCPX</code> (1.33, reliability and complexity)
+and <code>PDIF</code> (1.29, platform difficulty), so the compressed
+timeline is charged three times over in the effort-multiplier product.
+UCP, by contrast, counts only externally visible actor transactions; it
+is structurally blind to platform work — Terraform, CI/CD, the hash
+chain, the anonymisation pipeline's internals — of which this project
+has a great deal relative to its use-case count. Each method
+under-weights what the other over-weights. They do not converge on a
+single number, and are not expected to; what they do is <strong>bound
+the answer from the same side</strong>: both estimates exceed the
+48-hour window by roughly two orders of magnitude, and <strong>the full
+system is a roughly two-to-four person-year effort</strong> by either
+reckoning (1.8 person-years from UCP on the full scope, up to 47.2 ÷ 12
+≈ 3.9 person-years from COCOMO II). That agreement — on the scale of the
+problem, not its exact magnitude — is what governs the scope decision in
+§8.</p>
+<hr />
+<h2 id="8-scope-decision">8. Scope decision</h2>
+<p>48 hours is 1.5% of the lower (UCP, full-scope) estimate of 3,262
+hours (<code>48 ÷ 3,262 = 0.0147</code>). Even against the Must-have
+subset alone (2,514 hours), 48 hours is 1.9% of the estimate. Under
+either reading, the available time is nearly two orders of magnitude
+short of what classical estimation predicts the full system requires.
+The estimate therefore governs scope in two ways: it forces a MoSCoW cut
+(below), and it forces an explicit reckoning with the fact that the
+build method itself — not just the schedule — has to absorb that gap
+(§9).</p>
+<h3 id="81-moscow-cut--authoritative-scope-for-plans-26">8.1 MoSCoW cut
+— authoritative scope for Plans 2–6</h3>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Use cases</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Must</td>
+<td>UC1–UC18</td>
+<td>Implemented to production quality</td>
+</tr>
+<tr>
+<td>Should</td>
+<td>UC19–UC23</td>
+<td>Implemented only if Plans 2–5 complete early</td>
+</tr>
+<tr>
+<td>Could</td>
+<td>UC24, UC25</td>
+<td>Deferred; entered in the technical debt register</td>
+</tr>
+</tbody>
+</table>
+<p>This table is authoritative: Plans 2–6 treat it as the ranked scope
+contract. Should-have items are attempted only after every Must-have
+item is complete to production quality and time remains; Could-have
+items are not attempted within the 48-hour window under any circumstance
+and are recorded as deferred technical debt with a repayment plan rather
+than silently dropped.</p>
+<hr />
+<h2 id="9-productivity-reconciliation-and-ai-assisted-development">9.
+Productivity reconciliation and AI-assisted development</h2>
+<p>The Must-have estimate of 2,514 person-hours assumes Karner's PF = 20
+h/UCP, a rate calibrated on manual development. The realised effort for
+this project will be a small fraction of that figure, because this build
+is AI-assisted software development, conducted with Claude Code
+(Anthropic) pair-programming the implementation under the author's
+direction and review. That is a change of development
+<strong>method</strong>, not merely of pace — the same reason a
+productivity factor is described as a <em>calibration parameter</em> by
+the UCP literature rather than a physical constant: it encodes the rate
+at which a given method converts UCP into hours, and it must be
+re-derived whenever the method changes materially enough that the
+historical rate no longer describes it.</p>
+<p>Four things follow from that:</p>
+<ol type="1">
+<li><strong>The realised PF is a local calibration, not a general
+claim.</strong> It will be reported in §10 once the build completes,
+computed as <code>actual hours ÷ UCP of the delivered scope</code>. It
+describes this developer, this tool, this domain and this 48-hour
+window. The sample size is one project, by one developer, and the figure
+does not generalise to other developers, other tools, or other problem
+domains — it is evidence about this build, not a claim about AI-assisted
+development in general.</li>
+<li><strong>A lower PF does not mean the 2,514-hour estimate was
+wrong.</strong> UCP still correctly sizes the <em>problem</em>; what
+changes is the rate at which the chosen method converts that size into
+elapsed hours. The estimate remains the correct basis for the MoSCoW cut
+in §8, which was decided before the method's realised productivity was
+known.</li>
+<li><strong>The gap between estimated and realised hours is not free
+capacity — it is capacity that was not spent on activities the classical
+estimate priced in.</strong> Three of those are named here and
+cross-referenced forward to the technical debt register (not yet created
+at the time of writing; it is produced in a later implementation plan
+and each item below will carry a Debt → Cause → Impact → Priority →
+Proposed resolution entry per the design specification's technical debt
+policy, §15):
+<ul>
+<li><strong>Test depth below what 2,514 hours would buy.</strong> A
+fully-priced manual effort would include exhaustive edge-case testing,
+mutation testing and broader property-based coverage than a 48-hour
+window permits even with AI assistance. The domain and application
+layers meet the ≥85% line coverage gate (NFR-14) as a floor, not as
+evidence of exhaustive behavioural coverage.</li>
+<li><strong>Documentation formality.</strong> Architecture decision
+records, API reference documentation and onboarding material that a
+fully-staffed project would produce as a matter of course are reduced to
+what this estimation document, the design specification and inline code
+documentation provide.</li>
+<li><strong>Security hardening.</strong> Threat modelling, penetration
+testing and defence-in-depth beyond the NFR-01–NFR-06 baseline are not
+attempted within the window; NFR compliance is verified, but hardening
+beyond the specified baseline is not.</li>
+</ul></li>
+<li><strong>Acknowledgement.</strong> Consistent with the requirement to
+acknowledge all external resources and tools used in this work, AI
+assistance (Claude Code, Anthropic) is acknowledged here as a
+substantive contributor to implementation, and again in §11 (References
+and acknowledgements), which records the specific tools and the boundary
+of their use: direction, review and final acceptance of all code and
+documentation rest with the author.</li>
+</ol>
+<hr />
+<h2 id="10-assumptions-constraints-and-estimated-versus-actual">10.
+Assumptions, constraints and estimated-versus-actual</h2>
+<h3 id="101-assumptions">10.1 Assumptions</h3>
+<ul>
+<li>A single developer builds the entire system.</li>
+<li>Requirements are frozen at spec sign-off (this design specification)
+and do not change materially during the build.</li>
+<li>System size is estimated at 12 KSLOC (backend ~6, frontend ~5,
+infrastructure ~1), used only as the COCOMO II sizing input.</li>
+<li>Managed AWS services (ECS, RDS, S3, CloudFront) are used rather than
+self-hosted equivalents, which is why the COCOMO II <code>FCIL</code>
+(facilities) multiplier is favourable at 0.87.</li>
+<li>Seed data is synthetic; no real departmental submissions or reviewer
+data are used.</li>
+</ul>
+<h3 id="102-constraints">10.2 Constraints</h3>
+<ul>
+<li>A 48-hour development window, which is the constraint the estimate
+is measured against in §8.</li>
+<li>No registered domain is available, which shapes the CloudFront TLS
+strategy recorded in the design specification (§16) rather than the
+estimate itself, but is recorded here as a project constraint.</li>
+<li>A solo developer, which is why the COCOMO II <code>TEAM</code> scale
+factor is rated at the Very High end (1.10, the lowest-penalty rating) —
+there is no cross-team coordination overhead to pay for — and why
+Karner's <code>E7</code> (part-time staff) is rated 0: there is no
+part-time staff to discount for.</li>
+</ul>
+<h3 id="103-estimated-versus-actual">10.3 Estimated versus actual</h3>
+<p>This section states the method now; the figures it produces are
+filled in at project close, once the build is complete and the commit
+history is final. Filling them in is a mechanical application of the
+method below, not a matter of judgement, so that the comparison is
+reproducible by a reader who was not present for the build.</p>
+<p><strong>Actual hours per phase, from commit history.</strong></p>
+<ol type="1">
+<li>Extract every commit's timestamp and message:
+<code>git log --all --format='%H %ad %s' --date=iso-strict</code>.</li>
+<li>Partition the ordered commits into working sessions: a gap of more
+than 45 minutes between two consecutive commit timestamps starts a new
+session. A session's duration is
+<code>last_commit_ts − first_commit_ts</code> within that session,
+floored at 15 minutes so that a session containing a single commit —
+which still represents real drafting, review and verification time not
+evidenced by a second commit — is not credited as zero.</li>
+<li>Tag each commit to a phase (Plan 1–6, and within Plan 1 to a task)
+using its Conventional Commit type and message, which this project's
+implementation plans specify verbatim, task by task. Where a session
+spans commits from more than one phase, apportion that session's
+duration across the phases in proportion to the commit count each phase
+contributes to the session.</li>
+<li>Sum apportioned session-hours by phase to give actual hours per
+phase, and sum all phases to give total actual hours.</li>
+</ol>
+<p><strong>Realised productivity factor.</strong>
+<code>PF_actual = total actual hours ÷ UCP of the scope actually delivered at project close</code>
+— UCP taken from §6's Must-have figure (125.7) if only Must-have use
+cases ship, or recomputed by the same method as §3 over whichever
+Should-have use cases from §8.1 are also delivered, if any are. This is
+the single figure §9 describes as "a local calibration, not a general
+claim."</p>
+<p><strong>Variance percentage.</strong>
+<code>Variance % = (actual hours − estimated hours) ÷ estimated hours × 100</code>,
+computed against the Must-have UCP estimate (2,514 hours) as the primary
+comparison, since that is the estimate the MoSCoW cut in §8 was built
+against. A secondary variance figure against the COCOMO II estimate
+(7,170 hours) is reported alongside it, since §7 established that the
+two methods bound the same answer from different sides and a large
+variance against one without checking the other would be misleading.</p>
+<p><strong>Hindsight re-rating of factors.</strong> At project close,
+each Technical (§4) and Environmental (§5) factor rating, and each
+COCOMO II scale factor and effort multiplier (§7), is re-examined
+against what was actually observed during the build, and any rating that
+the build's evidence contradicts is flagged with what it should have
+been rated and why. Three ratings are already flagged here as
+pre-registered candidates for revision, precisely so that the hindsight
+analysis is not free to cherry-pick after the fact:</p>
+<ul>
+<li><strong><code>SCED</code> (schedule compression, COCOMO II, rated
+1.43).</strong> This penalty models compression of a <em>manual</em>
+schedule. Whether the same penalty structure applies to an AI-assisted
+schedule compressed to the same degree is exactly the open question this
+project's realised PF speaks to, and is revisited directly.</li>
+<li><strong>T4 and T11 (complex internal processing and special security
+objectives, both rated 5).</strong> These were rated from the design
+specification's description of the Hungarian assignment algorithm,
+MinHash LSH similarity screening and the hash-chained audit log before
+any of the three was implemented. Whether 5 (the maximum rating) was
+accurate is checked against how much of the build's actual effort those
+three subsystems consumed relative to the rest of the system.</li>
+<li><strong>PMAT (process maturity, COCOMO II, rated 4.68).</strong>
+This scale factor ordinarily reflects an organisation's measured process
+maturity; here it was rated for a solo, ungoverned capstone process,
+which is a judgement call revisited once the build's actual defect and
+rework rate — visible in the commit history as revert or fix-up commits
+following a feature commit — is known.</li>
+</ul>
+<hr />
+<h2 id="11-references-and-acknowledgements">11. References and
+acknowledgements</h2>
+<ul>
+<li>Karner, G. (1993). <em>Use Case Points</em> method for effort
+estimation, as codified in Cockburn, A. (2000), <em>Writing Effective
+Use Cases</em>, and Schneider &amp; Winters (1998), <em>Applying Use
+Cases: A Practical Guide</em> — actor and use-case weighting rules (§2,
+§3) and the productivity-factor rule (§6) follow this method.</li>
+<li>Boehm, B. et al. (2000). <em>Software Cost Estimation with COCOMO
+II</em> — Early Design model, scale factors and effort multipliers (§7)
+follow this method.</li>
+<li><code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code>
+— the design specification this estimate is derived from: §5.1 supplies
+the functional-requirement inventory behind §3's use cases; §14 sets the
+estimation approach this document follows; §15 sets the technical debt
+policy referenced in §9; §16 supplies the assumptions and constraints
+reproduced in §10.</li>
+<li><strong>AI-assisted development.</strong> This document, and the
+implementation plans and code it governs the scope of, were produced
+with Claude Code (Anthropic), an AI coding assistant, under the
+direction and review of the author. The assistant drafted prose and code
+from the author's instructions and the design specification; the author
+directed the work, reviewed every output, and accepts sole
+responsibility for its correctness and for the estimates and decisions
+recorded in this document. This acknowledgement satisfies the
+requirement to declare all external resources and tools used in this
+work, and is cross-referenced from §9, where the productivity
+consequence of that method is analysed rather than merely
+disclosed.</li>
+</ul>
+</main>
+<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+</body>
+</html>

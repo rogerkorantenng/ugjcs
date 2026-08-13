@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>07 · User Manual</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+  <style>
+  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+  h3 { font-size:1.12rem; margin-top:1.8rem; }
+  a { color:#4b3f9e; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+  pre code { background:none; color:inherit; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+  th { background:#eceee9; font-weight:600; }
+  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+  figure.diagram svg { max-width:100%; height:auto; }
+  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="title">07 · User Manual</div>
+</header>
+<main>
+<nav class="docnav"><a href="index.html">← All documents</a></nav>
+<header id="title-block-header">
+<h1 class="title">07 · User Manual</h1>
+</header>
+<h1 id="ugjcs--user-manual">UGJCS — User Manual</h1>
+<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
+Computing Science <strong>Author:</strong> Roger Koranteng Obeng
+(22424140) <strong>Assessor:</strong> Prof. Solomon Mensah
+<strong>Date:</strong> 2026-08-12 <strong>Status:</strong> Written from
+the live, deployed system, not from the source code. Every screen,
+label, button caption and error message described below was observed by
+signing in as each role in turn — author, reviewer, editor,
+Editor-in-Chief and administrator — and operating the real application
+at the addresses below. Where a screen does not exist, this manual says
+so rather than describing one that would be convenient.</p>
+<p><strong>Application:</strong>
+<code>https://ugjcs-frontend.vercel.app</code> <strong>API:</strong>
+<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code></p>
+<hr />
+<h2 id="1-introduction">1. Introduction</h2>
+<p>UGJCS (the University of Ghana Journal of Computing Science) is a web
+application for running a small academic journal end to end: an author
+submits a manuscript, an editor screens it and sends it for review, one
+or more reviewers assess it without knowing who wrote it, an editor
+records a decision, and — once a manuscript is accepted — the
+Editor-in-Chief schedules it into a numbered issue and publishes it to
+the public archive.</p>
+<p>The system recognises five kinds of user, and a person may hold more
+than one role at once:</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>What they do in UGJCS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Reader</strong></td>
+<td>Anyone with a web browser. No account is needed to browse or search
+published papers.</td>
+</tr>
+<tr>
+<td><strong>Author</strong></td>
+<td>Submits manuscripts, tracks their progress, downloads their own
+submitted files, and responds when a revision is requested.</td>
+</tr>
+<tr>
+<td><strong>Reviewer</strong></td>
+<td>Is assigned manuscripts to assess, reads an anonymised copy, and
+submits a recommendation and comments.</td>
+</tr>
+<tr>
+<td><strong>Editor</strong></td>
+<td>Screens newly submitted manuscripts, assigns reviewers, and records
+editorial decisions (desk-reject, send to review, request revision,
+accept, reject).</td>
+</tr>
+<tr>
+<td><strong>Editor-in-Chief</strong></td>
+<td>Everything an editor can do, plus the exclusive authority to
+schedule an accepted manuscript into a volume and issue number, and to
+publish it.</td>
+</tr>
+</tbody>
+</table>
+<p>An <strong>Administrator</strong> account also exists for signing in
+to the API, but at the time of writing the web application has no
+screens built for it — see §9 for what this means in practice.</p>
+<p>Every manuscript's progress is described entirely by its
+<strong>status</strong> (Submitted, Under screening, Under review, and
+so on). §8 explains every status in plain language.</p>
+<hr />
+<h2 id="2-getting-started">2. Getting started</h2>
+<h3 id="21-reaching-the-site">2.1 Reaching the site</h3>
+<p>Open a web browser and go to:</p>
+<pre><code>https://ugjcs-frontend.vercel.app</code></pre>
+<p>The home page is public. It shows a short introduction to the journal
+and a "Recently published" list of papers. No account is required to
+reach it.</p>
+<h3 id="22-what-is-public-and-what-needs-an-account">2.2 What is public
+and what needs an account</h3>
+<table>
+<thead>
+<tr>
+<th>Without signing in</th>
+<th>Requires signing in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The home page and its "Recently published" list</td>
+<td>Submitting a manuscript</td>
+</tr>
+<tr>
+<td>Opening any published paper's page</td>
+<td>Tracking a manuscript's status</td>
+</tr>
+<tr>
+<td>Searching the archive</td>
+<td>Reviewing an assigned manuscript</td>
+</tr>
+<tr>
+<td></td>
+<td>Screening, assigning reviewers, and recording decisions</td>
+</tr>
+<tr>
+<td></td>
+<td>Scheduling and publishing an accepted manuscript</td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-signing-in">2.3 Signing in</h3>
+<ol type="1">
+<li><p>Click <strong>Sign in</strong> at the top right of any public
+page, or go directly to
+<code>https://ugjcs-frontend.vercel.app/login</code>.</p></li>
+<li><p>You should see a page headed <strong>Sign in</strong>, with an
+<strong>Email</strong> field, a <strong>Password</strong> field, and a
+<strong>Sign in</strong> button.</p></li>
+<li><p>Enter your account's email and password and click <strong>Sign
+in</strong>.</p></li>
+<li><p>If your credentials are correct, you are taken to the working
+area for your role: authors land on <strong>My submissions</strong>,
+reviewers on <strong>My assignments</strong>, and editors and the
+Editor-in-Chief on the <strong>Screening queue</strong>. The page banner
+along the top now shows your email address and a <strong>Sign
+out</strong> button in place of the <strong>Sign in</strong>
+link.</p></li>
+<li><p>If your credentials are wrong, the page stays on the sign-in form
+and shows an alert reading:</p>
+<blockquote>
+<p><strong>AuthenticationError</strong> email or password is
+incorrect</p>
+</blockquote>
+<p>Check for typing mistakes — in particular a mistyped password — and
+try again.</p></li>
+</ol>
+<p>A person with more than one role (the Editor-in-Chief account, for
+example, also carries editor authority) can move between the different
+working areas by editing the address bar — <code>/author</code>,
+<code>/reviewer</code>, <code>/editor</code> — once signed in; the
+navigation bar at the top only ever shows a link to one of them at a
+time.</p>
+<h3 id="24-signing-out">2.4 Signing out</h3>
+<p>Click <strong>Sign out</strong> in the top navigation bar, next to
+your email address. You are returned to the sign-in page. If you then
+try to open a page that needs an account — for instance by using the
+browser's back button — you are sent back to the sign-in page
+automatically, with the page you wanted attached so you return to it
+after signing in again.</p>
+<hr />
+<h2 id="3-for-readers-no-account-needed">3. For readers (no account
+needed)</h2>
+<h3 id="31-browsing-the-archive">3.1 Browsing the archive</h3>
+<ol type="1">
+<li>Go to <code>https://ugjcs-frontend.vercel.app</code>.</li>
+<li>Under the heading <strong>Recently published</strong>, you will see
+a list of published papers. Each entry shows its tracking code (for
+example <code>UGJCS-2026-0005</code>), its title, its author or authors,
+a short abstract, and its keywords.</li>
+<li>Click any paper's title to open it.</li>
+</ol>
+<h3 id="32-opening-a-paper">3.2 Opening a paper</h3>
+<p>A paper's page (<code>/papers/&lt;tracking-code&gt;</code>) shows its
+tracking code, title, author(s), keywords and abstract.</p>
+<p><strong>Limitation to be aware of:</strong> the paper page does not
+currently offer a way to download the manuscript's PDF, and it does not
+show a publication date, volume or issue number. Only the title,
+authors, keywords and abstract are shown. If you need the full text,
+there is currently no public download link for it.</p>
+<h3 id="33-searching">3.3 Searching</h3>
+<ol type="1">
+<li>Click <strong>Search</strong> in the top navigation bar, or go to
+<code>/search</code>.</li>
+<li>You will see a single search box labelled <strong>Search
+papers</strong>, with the placeholder text "Title, abstract or keyword",
+and a <strong>Search</strong> button.</li>
+<li>Type a word or phrase and either press Enter or click
+<strong>Search</strong>.</li>
+<li>Matching papers appear as a list below the search box, in the same
+format as the home page's "Recently published" list.</li>
+<li>If nothing matches, the page reads "No papers matched "your search
+term"" with the suggestion "Try a different title, keyword or author
+name."</li>
+</ol>
+<p><strong>Limitation to be aware of:</strong> despite that suggestion,
+searching by an author's name did not return that author's papers when
+tested against the live archive (searching "Ama Serwaa", an author of
+five published papers, returned no results). In practice, search
+reliably matches words that appear in a paper's <strong>title</strong>,
+<strong>abstract</strong> or <strong>keywords</strong> — do not rely on
+it to find a particular author's work.</p>
+<hr />
+<h2 id="4-for-authors">4. For authors</h2>
+<p>Sign in with an author account (or any account that also carries
+author rights) to reach <strong>My submissions</strong> at
+<code>/author</code>.</p>
+<h3 id="41-submitting-a-manuscript">4.1 Submitting a manuscript</h3>
+<ol type="1">
+<li>From <strong>My submissions</strong>, click <strong>Submit</strong>
+in the top navigation bar, or go to <code>/author/submit</code>. You
+should see a page headed <strong>Submit a manuscript</strong>.</li>
+<li>Fill in the fields:
+<ul>
+<li><strong>Title</strong></li>
+<li><strong>Abstract</strong></li>
+<li><strong>Keywords (comma-separated)</strong> — for example
+<code>edge computing, rural connectivity</code></li>
+<li><strong>Co-author account ids (comma-separated, optional)</strong> —
+leave this blank unless a co-author already has a UGJCS account and its
+account id.</li>
+</ul></li>
+<li>Under <strong>Manuscript PDF (max 10 MB)</strong>, either drag your
+PDF onto the box that reads "Drag a PDF here, or click to browse", or
+click it to open a file picker. Once a file is chosen, its name and size
+(in MB) replace that text.</li>
+<li>Click <strong>Submit manuscript</strong>.</li>
+<li>If the submission succeeds, you are taken straight to the
+manuscript's own page, which now shows a <strong>Submitted</strong>
+badge and a newly minted tracking code (for example
+<code>UGJCS-2026-939860</code>). If it fails, an alert appears above the
+form explaining why — see §9 for the two most common reasons (wrong file
+type, file too large).</li>
+</ol>
+<p><strong>Preparing your file for double-blind review is your
+responsibility.</strong> UGJCS strips the PDF's embedded metadata
+(author name, document title, etc.) automatically before a reviewer ever
+sees it — but it has no way to read the words printed on the page. If
+your name, your institution, or an obvious self-citation ("as we showed
+in our earlier work…") appears in the body of the manuscript itself,
+anonymisation will not remove it. Before submitting, check that the
+manuscript text itself does not identify you.</p>
+<h3 id="42-tracking-your-submissions-and-understanding-their-status">4.2
+Tracking your submissions and understanding their status</h3>
+<p>From <strong>My submissions</strong>, every manuscript you have
+submitted is listed with its title, tracking code, and a coloured status
+badge (Submitted, Under review, Resubmitted, Published, and so on).
+Click any entry to see its full detail page.</p>
+<p>That detail page shows:</p>
+<ul>
+<li>The title and current status badge.</li>
+<li>The tracking code.</li>
+<li>The abstract.</li>
+<li>A line reading "<em>N</em> of <em>M</em> reviews submitted" — how
+many of the required reviews are in.</li>
+<li>A <strong>Download my submitted document</strong> button/link, which
+downloads the exact PDF you uploaded.</li>
+<li>A red <strong>Withdraw submission</strong> button, present at every
+stage up to and including "Revision requested" — click it to pull the
+manuscript out of consideration. Withdrawal cannot be undone.</li>
+</ul>
+<p>See §8 for what each status means and what happens next.</p>
+<h3 id="43-downloading-your-own-submission">4.3 Downloading your own
+submission</h3>
+<p>On any of your manuscripts' detail pages, click <strong>Download my
+submitted document</strong>. This starts a download of your original
+PDF, exactly as you uploaded it (not the anonymised copy reviewers see).
+The link is time-limited internally, so if it ever fails, simply reload
+the page and click it again to get a fresh one.</p>
+<h3 id="44-responding-to-a-requested-revision">4.4 Responding to a
+requested revision</h3>
+<p>When a manuscript's status is <strong>Revision requested</strong>,
+its detail page grows a new section headed <strong>Resubmit a revised
+manuscript</strong>, with:</p>
+<ul>
+<li><strong>Revised manuscript PDF (max 10 MB)</strong> — the same
+drag-and-drop/click-to-browse control used when submitting.</li>
+<li><strong>Response to reviewers</strong> — a required text box (at
+least 20 characters) where you explain, point by point, what you changed
+and why.</li>
+<li>A <strong>Resubmit manuscript</strong> button.</li>
+</ul>
+<p>To respond to a revision request:</p>
+<ol type="1">
+<li>Open the manuscript from <strong>My submissions</strong>.</li>
+<li>Attach your revised PDF.</li>
+<li>Write your response to reviewers in the text box provided.</li>
+<li>Click <strong>Resubmit manuscript</strong>.</li>
+<li>On success, the manuscript's status changes to
+<strong>Resubmitted</strong> and it goes back into the editorial process
+— an editor decides from there whether it returns to review or moves
+straight to a decision.</li>
+</ol>
+<hr />
+<h2 id="5-for-reviewers">5. For reviewers</h2>
+<p>Sign in with a reviewer account to reach <strong>My
+assignments</strong> at <code>/reviewer</code> — a list of every
+manuscript currently assigned to you, showing each one's title and
+tracking code.</p>
+<h3 id="51-opening-an-assignment">5.1 Opening an assignment</h3>
+<p>Click any assignment to open it. You will see the manuscript's
+tracking code, title, a short abstract, and its keywords, followed by a
+<strong>Download anonymised manuscript</strong> link and a
+<strong>Submit your review</strong> form.</p>
+<h3 id="52-what-anonymised-means-here--read-this-before-you-review">5.2
+What "anonymised" means here — read this before you review</h3>
+<p><strong>The copy you are given to review has had two layers of
+identifying information removed:</strong></p>
+<ol type="1">
+<li><strong>No author name is shown anywhere on the page.</strong> The
+reviewer's view of a manuscript never displays who wrote it — not on the
+assignment list, not on the manuscript's own page. This is enforced
+structurally: the reviewer-facing screens are built from a version of
+the data that has no author field to display in the first place, not by
+a filter that might be forgotten.</li>
+<li><strong>The PDF itself has had its embedded metadata
+stripped</strong> before it is stored as the copy reviewers download.
+Clicking <strong>Download anonymised manuscript</strong> downloads this
+stripped version — never the author's original file, which reviewers
+have no route to reach at all.</li>
+</ol>
+<p><strong>What this does <em>not</em> do:</strong> metadata stripping
+removes information embedded in the PDF file (author, title, and similar
+fields set by the word processor that produced it) — it cannot touch
+anything printed as visible text on the page. If an author's name,
+institution, or an identifying self-reference is typed into the body of
+the manuscript, you may still see it. Anonymisation is therefore a
+shared responsibility: the system strips what it can strip
+automatically, and authors are asked to prepare a manuscript that does
+not identify itself in its own text (§4.1). If you do recognise or infer
+an author's identity from the text itself, treat that as you would in
+any double-blind process — it is not something the platform can
+prevent.</p>
+<h3 id="53-submitting-your-review">5.3 Submitting your review</h3>
+<p>The <strong>Submit your review</strong> form has two fields:</p>
+<ul>
+<li><strong>Recommendation</strong> — a dropdown with four options:
+<code>accept</code>, <code>minor revision</code>,
+<code>major revision</code>, <code>reject</code>.</li>
+<li><strong>Comments</strong> — a free-text box for your written
+assessment.</li>
+</ul>
+<p>There is no separate numeric scoring by criterion (originality,
+methodology, clarity, etc.) — the review consists solely of your chosen
+recommendation and your written comments.</p>
+<p>To submit:</p>
+<ol type="1">
+<li>Choose the option from <strong>Recommendation</strong> that best
+reflects your judgement.</li>
+<li>Write your comments in the <strong>Comments</strong> box. This is
+what the editor — and, indirectly, the author — will read, so be
+specific.</li>
+<li>Click <strong>Submit review</strong>.</li>
+<li>On success you are returned to <strong>My assignments</strong>; the
+manuscript no longer requires further action from you. Once every
+reviewer assigned to a manuscript has submitted, its status moves on
+automatically (§8) and the editor is able to record a decision.</li>
+</ol>
+<hr />
+<h2 id="6-for-editors">6. For editors</h2>
+<p>Sign in with an editor account (or the Editor-in-Chief account, which
+also carries editor rights) to reach the <strong>Screening
+queue</strong> at <code>/editor</code>.</p>
+<h3 id="61-the-screening-queue">6.1 The screening queue</h3>
+<p>The queue is a table of <strong>Tracking code</strong>,
+<strong>Title</strong> and <strong>Status</strong>, captioned
+"Manuscripts awaiting editorial action". <strong>It lists only
+manuscripts whose status is "Submitted"</strong> — as soon as you begin
+screening one, it disappears from this table. If you need to return to a
+manuscript that is already under screening, under review, or awaiting a
+decision, you will need its tracking code (from an earlier visit, or
+from the author) and can go directly to
+<code>/editor/&lt;tracking-code&gt;</code> — there is currently no
+second queue listing manuscripts waiting on a decision.</p>
+<h3 id="62-screening-a-submission">6.2 Screening a submission</h3>
+<ol type="1">
+<li>From the queue, click a manuscript's tracking code to open it. You
+should see its title, a <strong>Submitted</strong> status badge, its
+abstract, the reviews-submitted count, a <strong>Download
+manuscript</strong> link, and a <strong>Begin screening</strong>
+button.</li>
+<li>Read the manuscript (download it if needed) and click <strong>Begin
+screening</strong>.</li>
+<li>The page updates in place: the status badge changes to <strong>Under
+screening</strong>, and two new sections appear — <strong>Assign a
+reviewer</strong> and <strong>Decision</strong>.</li>
+</ol>
+<h3 id="63-assigning-reviewers">6.3 Assigning reviewers</h3>
+<p>Under <strong>Assign a reviewer</strong>, you will see a single
+field, <strong>Reviewer account id</strong>, and an
+<strong>Assign</strong> button.</p>
+<p><strong>This expects the reviewer's account id, not their name or
+email address.</strong> There is no picker or search box to choose a
+reviewer from — you must already know the id of the account you want to
+assign, obtained separately (for example from your own records or from
+the reviewer directly).</p>
+<ol type="1">
+<li>Enter the reviewer's account id.</li>
+<li>Click <strong>Assign</strong>.</li>
+<li>The field clears on success. Repeat for each reviewer you want
+assigned; two are normally expected before a decision on the reviews
+becomes possible (§8).</li>
+</ol>
+<h3 id="64-recording-a-decision">6.4 Recording a decision</h3>
+<p>The <strong>Decision</strong> section shows a
+<strong>Decision</strong> dropdown and a required
+<strong>Rationale</strong> text box (at least 20 characters), followed
+by a <strong>Record decision</strong> button. The options offered in the
+dropdown depend on the manuscript's current status:</p>
+<ul>
+<li>While the manuscript is <strong>Under screening</strong>, the
+choices are <strong>desk reject</strong> and <strong>send to
+review</strong>.</li>
+<li>Once every assigned reviewer has submitted their review and the
+manuscript's status has become <strong>Reviews complete</strong>, the
+choices become <strong>request revision</strong>,
+<strong>accept</strong> and <strong>reject</strong>.</li>
+<li>At any other status, no decision is currently possible and this
+section shows only its heading with no form under it.</li>
+</ul>
+<p>To record a decision:</p>
+<ol type="1">
+<li>Choose the option that reflects your editorial judgement.</li>
+<li>Write your reasoning in <strong>Rationale</strong> (this is required
+and must be at least 20 characters — a one-word rationale will be
+rejected).</li>
+<li>Click <strong>Record decision</strong>.</li>
+<li>The manuscript's status badge updates immediately to reflect the
+outcome (see §8 for what each decision leads to).</li>
+</ol>
+<p><em>A small labelling quirk you may notice:</em> the "send to review"
+option is occasionally rendered by the interface as <strong>"send
+to_review"</strong>, with the underscore left in. This is a cosmetic
+formatting slip, not a different option — it is still the same "send to
+review" decision.</p>
+<hr />
+<h2 id="7-for-the-editor-in-chief">7. For the Editor-in-Chief</h2>
+<p>Everything in §6 is also available to the Editor-in-Chief account. In
+addition, on any manuscript whose status is <strong>Accepted</strong> or
+<strong>Scheduled</strong>, a further <strong>Publication</strong>
+section appears on its detail page — visible only to the
+Editor-in-Chief, not to ordinary editors.</p>
+<h3 id="71-scheduling-an-accepted-manuscript-into-an-issue">7.1
+Scheduling an accepted manuscript into an issue</h3>
+<ol type="1">
+<li>Open an <strong>Accepted</strong> manuscript's page (from
+<code>/editor/&lt;tracking-code&gt;</code>).</li>
+<li>Under <strong>Publication</strong>, you will see a small form with
+two number fields, <strong>Volume</strong> and <strong>Number</strong>,
+and a <strong>Schedule</strong> button.</li>
+<li>Enter the volume and issue number you want this manuscript to appear
+in (for example Volume <code>3</code>, Number <code>1</code>).</li>
+<li>Click <strong>Schedule</strong>.</li>
+<li>The status badge updates to <strong>Scheduled</strong>, and the
+<strong>Publication</strong> section is replaced by a single
+<strong>Publish</strong> button.</li>
+</ol>
+<h3 id="72-publishing">7.2 Publishing</h3>
+<ol type="1">
+<li>On a <strong>Scheduled</strong> manuscript's page, click the
+<strong>Publish</strong> button under <strong>Publication</strong>.</li>
+<li>The status badge updates to <strong>Published</strong>. The paper
+now appears in the public archive ("Recently published" on the home
+page, its own <code>/papers/&lt;tracking-code&gt;</code> page, and in
+search results) immediately.</li>
+</ol>
+<p>Publishing is not reversible through the web application — there is
+no "unpublish" action.</p>
+<hr />
+<h2 id="8-understanding-manuscript-status">8. Understanding manuscript
+status</h2>
+<p>Every manuscript carries exactly one status at a time, shown as a
+coloured badge throughout the application. The table below explains each
+one in plain language: what it means, who can act on it next, and what
+they can do. ("Terminal" means the manuscript stays there permanently —
+nothing in the application can move it any further.)</p>
+<table>
+<thead>
+<tr>
+<th>Status badge</th>
+<th>What it means</th>
+<th>Who can act</th>
+<th>What they can do</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>(Draft — never shown)</em></td>
+<td>An internal starting point created for an instant when a manuscript
+is first submitted, immediately superseded by "Submitted" in the same
+action. No screen in the application ever shows a manuscript sitting at
+this status.</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Submitted</strong></td>
+<td>The author has uploaded the manuscript and it is waiting for an
+editor to look at it. Appears in the editor's screening queue.</td>
+<td>Editor</td>
+<td>Begin screening, or the author may withdraw it.</td>
+</tr>
+<tr>
+<td><strong>Under screening</strong></td>
+<td>An editor has opened the manuscript and is deciding whether it
+deserves review.</td>
+<td>Editor</td>
+<td>Assign reviewers; record a desk-reject or send-to-review decision;
+or the author may withdraw it.</td>
+</tr>
+<tr>
+<td><strong>Desk rejected</strong></td>
+<td><em>Terminal.</em> The editor decided, without sending it for
+review, that the manuscript is not suitable for the journal.</td>
+<td>—</td>
+<td>Nothing further happens to this manuscript.</td>
+</tr>
+<tr>
+<td><strong>Under review</strong></td>
+<td>The manuscript has been sent to one or more reviewers and is
+awaiting their assessments.</td>
+<td>Reviewer(s)</td>
+<td>Submit their review; the author may still withdraw it.</td>
+</tr>
+<tr>
+<td><strong>Reviews complete</strong></td>
+<td>Every required review has been submitted. The manuscript is waiting
+for an editor to record a decision.</td>
+<td>Editor</td>
+<td>Record a decision: request revision, accept, or reject; or the
+author may withdraw it.</td>
+</tr>
+<tr>
+<td><strong>Revision requested</strong></td>
+<td>The editor has asked the author to revise the manuscript before it
+can proceed.</td>
+<td>Author</td>
+<td>Upload a revised PDF and a written response to reviewers (§4.4); or
+withdraw the manuscript instead.</td>
+</tr>
+<tr>
+<td><strong>Resubmitted</strong></td>
+<td>The author has uploaded a revised version and explained the changes.
+It is back with the editor.</td>
+<td>Editor</td>
+<td>Decide whether it needs another round of review (send back to Under
+screening) or straight to review (Under review) — this is an editorial
+judgement call, not shown as a distinct button in the interface at the
+time of writing.</td>
+</tr>
+<tr>
+<td><strong>Accepted</strong></td>
+<td>The editor has decided to accept the manuscript for
+publication.</td>
+<td>Editor-in-Chief</td>
+<td>Schedule it into a volume and issue number (§7.1).</td>
+</tr>
+<tr>
+<td><strong>Rejected</strong></td>
+<td><em>Terminal.</em> The editor decided, after review, not to publish
+the manuscript.</td>
+<td>—</td>
+<td>Nothing further happens to this manuscript.</td>
+</tr>
+<tr>
+<td><strong>Scheduled</strong></td>
+<td>The Editor-in-Chief has assigned the manuscript to a specific volume
+and issue number, but it is not yet public.</td>
+<td>Editor-in-Chief</td>
+<td>Publish it (§7.2).</td>
+</tr>
+<tr>
+<td><strong>Published</strong></td>
+<td><em>Terminal.</em> The manuscript is live on the public site —
+visible on the home page, its own paper page, and in search.</td>
+<td>—</td>
+<td>Nothing further happens to this manuscript through the
+application.</td>
+</tr>
+<tr>
+<td><strong>Withdrawn</strong></td>
+<td><em>Terminal.</em> The author pulled the manuscript out of
+consideration. Available from Submitted, Under screening, Under review,
+Reviews complete, or Revision requested.</td>
+<td>—</td>
+<td>Nothing further happens to this manuscript.</td>
+</tr>
+</tbody>
+</table>
+<p>A manuscript that reaches <strong>Accepted</strong> cannot be
+withdrawn through the application — once it is accepted, the only paths
+forward are scheduling and publishing.</p>
+<hr />
+<h2 id="9-troubleshooting">9. Troubleshooting</h2>
+<p><strong>"UnsupportedDocumentTypeError — document does not begin with
+the PDF magic number"</strong> The file you attached is not actually a
+PDF (or is empty/corrupted), regardless of its file extension. UGJCS
+checks the file's own contents, not its name, so renaming a Word
+document to <code>.pdf</code> will not get past this check. Export or
+print your document to a genuine PDF and try again.</p>
+<p><strong>"That file is too large — the limit is 10 MB"</strong>
+Manuscript and revision uploads are capped at 10 MB. This message
+appears immediately, before you even click Submit. If your PDF is
+larger, reduce it — flattening embedded images or re-exporting at a
+lower image resolution usually brings a typeset paper well under the
+limit — and attach the smaller file instead.</p>
+<p><strong>You are dropped back at the sign-in page while working, or a
+page you expect to see redirects you to "Sign in"</strong> Your session
+has ended — either you were signed out, or enough time has passed that
+you are no longer recognised as signed in. Sign in again with your
+account's email and password; you should be returned to roughly where
+you were.</p>
+<p><strong>"AuthenticationError — email or password is
+incorrect"</strong> Exactly what it says: the email/password combination
+you entered does not match an account. Check for typing mistakes,
+particularly trailing spaces or the Caps Lock key, and try again.</p>
+<p><strong>A button or form you expect to see is missing (for example,
+no "Begin screening" button, or the Decision section shows only its
+heading and nothing else)</strong> This almost always means the
+manuscript is not currently in the status that action requires. UGJCS
+only offers an action when the manuscript's status allows it — for
+example, the Decision form's "accept/reject/request revision" choices
+only appear once every assigned review is in (status "Reviews
+complete"); while reviews are still outstanding, that section is empty
+on purpose. Check the status badge at the top of the page against §8 to
+see what is expected before the action you want becomes available.</p>
+<p><strong>You try to act on a manuscript and are told "cannot move
+manuscript from <em>X</em> to <em>Y</em>"</strong> This is the same rule
+as above, surfaced as an error rather than a hidden button — it usually
+happens if a manuscript's status changed (for instance, another editor
+acted on it) between when you opened the page and when you clicked the
+button. Reload the page to see its current status and try again from
+there.</p>
+<p><strong>A manuscript you are screening or deciding on has disappeared
+from the Screening queue</strong> This is expected, not a fault: the
+queue only lists manuscripts whose status is "Submitted". The moment you
+begin screening one, it moves to "Under screening" and drops out of the
+queue table. Keep a note of its tracking code, or navigate directly to
+<code>/editor/&lt;tracking-code&gt;</code>, to return to it.</p>
+<p><strong>"Could not assign that reviewer — Check the account id and
+try again."</strong> The reviewer assignment field expects an account
+id, not an email address or name, and there is no directory or search
+box built into the form to look one up. Confirm you have the correct
+account id for the reviewer before retrying.</p>
+<p><strong>As a reader, you cannot find a way to download a paper's
+PDF</strong> This is a genuine gap in the current system, not a mistake
+on your part — the public paper page shows only the title, authors,
+keywords and abstract; no PDF download link is offered to readers at the
+time of writing.</p>
+<p><strong>Signing in with the Administrator account does not lead
+anywhere useful</strong> This is expected with the system as currently
+built: the Administrator account authenticates successfully, but the web
+application has no screens built for it. Signing in redirects straight
+back to the public home page, and none of the <code>/author</code>,
+<code>/reviewer</code> or <code>/editor</code> areas will admit it.
+There is nothing further for this role to do in the browser at the time
+of writing.</p>
+</main>
+<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+</body>
+</html>

@@ -453,7 +453,7 @@ erDiagram
         bool is_active
     }
     USER_ROLES {
-        uuid user_id PK_FK
+        uuid user_id PK, FK
         string role PK
     }
     REFRESH_TOKENS {
@@ -482,7 +482,7 @@ erDiagram
         string anonymised_document_key
     }
     MANUSCRIPT_AUTHORS {
-        uuid manuscript_id PK_FK
+        uuid manuscript_id PK, FK
         uuid author_id PK
         int position
     }
@@ -497,7 +497,7 @@ erDiagram
         timestamptz submitted_at
     }
     EDITORIAL_EVENTS {
-        uuid manuscript_id PK_FK
+        uuid manuscript_id PK, FK
         int sequence PK
         string event_type
         json payload

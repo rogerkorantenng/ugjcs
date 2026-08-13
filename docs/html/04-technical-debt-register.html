@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>04 · Technical Debt Register</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="" />
+  <style>
+  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+  h3 { font-size:1.12rem; margin-top:1.8rem; }
+  a { color:#4b3f9e; }
+  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+  pre code { background:none; color:inherit; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+  th { background:#eceee9; font-weight:600; }
+  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+  figure.diagram svg { max-width:100%; height:auto; }
+  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="title">04 · Technical Debt Register</div>
+</header>
+<main>
+<nav class="docnav"><a href="index.html">← All documents</a></nav>
+<header id="title-block-header">
+<h1 class="title">04 · Technical Debt Register</h1>
+</header>
+<h1 id="ugjcs--technical-debt-register">UGJCS — Technical Debt
+Register</h1>
+<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
+Computing Science <strong>Author:</strong> Roger Koranteng Obeng
+(22424140) <strong>Opened:</strong> 2026-08-12 <strong>Status:</strong>
+Live. Entries are added at the moment debt is incurred, not
+reconstructed afterwards.</p>
+<h2 id="how-this-register-is-kept">How this register is kept</h2>
+<p>Every entry records <strong>Debt → Cause → Impact → Priority →
+Proposed resolution</strong>, and is classified by Fowler's distinction
+between debt taken <em>deliberately</em> to meet a constraint and debt
+arising from <em>inadvertence</em>. Priority uses three levels:</p>
+<ul>
+<li><strong>Critical</strong> — must be resolved before real users are
+admitted to the system.</li>
+<li><strong>Scheduled</strong> — accepted now, with a named release for
+repayment.</li>
+<li><strong>Acceptable</strong> — a conscious trade-off that may remain
+indefinitely. Each states the condition that would change that
+judgement.</li>
+</ul>
+<p>An entry is only recorded here once the debt actually exists in the
+codebase. Consequences of work not yet begun are forecasts, not debt,
+and are kept in the relevant implementation plan instead.</p>
+<hr />
+<h2 id="critical">Critical</h2>
+<h3 id="td-01--aws-access-uses-root-account-credentials">TD-01 — AWS
+access uses root account credentials</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>The system is provisioned and deployed using the AWS account root
+user rather than a least-privilege IAM principal.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate, and decided explicitly by the owner under deadline
+pressure. Creating a scoped IAM deploy user was planned as the first
+task of deployment; it was dropped to protect the time needed to deliver
+the API, the frontend and the submission documents. Enabling MFA on root
+was separately considered and declined.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>Root credentials cannot be scoped to a service, cannot be rotated
+per-service, and cannot be revoked without disrupting every other use of
+the account. Their compromise is unrecoverable within the account.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Critical.</strong> This is the highest-severity item in this
+register and the first that must be closed before the system carries
+real submissions.</td>
+</tr>
+<tr>
+<td><strong>Mitigation actually applied</strong></td>
+<td>The root access keys are used only from the developer's local
+machine and are deliberately <strong>not</strong> stored as GitHub
+Actions secrets. Deployment is therefore run locally rather than from
+CI. This is a meaningful reduction in exposure — CI secret stores are a
+far broader attack surface than a single workstation — but it is a
+mitigation, not a fix.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Create an IAM deploy user restricted to App Runner, ECR, RDS, S3,
+Secrets Manager and CloudWatch on this project's resources; move the
+deployment pipeline to GitHub Actions using that user's credentials;
+enable MFA on root; and stop using root entirely. Estimated at under an
+hour.</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="td-02--a-reviewer-may-be-authorised-to-review-their-own-manuscript">TD-02
+— A reviewer may be authorised to review their own manuscript</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td><code>Action.REVIEW</code> is granted on the <code>REVIEWER</code>
+role alone, with no per-manuscript predicate. An actor holding both
+<code>AUTHOR</code> and <code>REVIEWER</code> is not prevented by the
+policy layer from reviewing work they wrote.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Inadvertent, found by the final whole-branch review.
+<code>_OWNERSHIP_ACTIONS</code> covers <code>RESUBMIT</code> but the
+same reasoning was not applied to <code>REVIEW</code>.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>The central conflict-of-interest failure for a double-blind journal.
+No exploit exists today because no HTTP surface calls the action, but
+the gap is real the moment one does.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Critical before real users.</strong></td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Introduce reviewer assignment as a first-class entity; make
+<code>REVIEW</code> an ownership-style action predicated on an accepted
+assignment, and exclude actors appearing in <code>author_ids</code>.
+Documented in <code>policies.py</code>'s module docstring so it cannot
+be forgotten.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="td-15--get-apiv1peoplelookup-has-no-rate-limiting">TD-15 —
+<code>GET /api/v1/people/lookup</code> has no rate limiting</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>The exact-email person lookup
+(<code>ugjcs.api.routers.people.lookup</code>) requires only an
+authenticated caller — any role — and no request throttling sits in
+front of it.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate scope limitation. The endpoint exists to let an author
+find a co-author's account id and an editor find a reviewer's, both of
+which need only an exact-match lookup; building it was in scope,
+building a rate limiter was not.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>An authenticated caller can distinguish "an account exists for this
+address" from "no account exists" one exact guess at a time, and nothing
+currently bounds how many guesses per minute. Over a large-enough
+guessed address list this becomes account enumeration by any registered
+user, not merely by an anonymous attacker.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Critical before real users.</strong> Exact-match-only (no
+fuzzy/partial search) already narrows the exposure to confirming
+addresses the caller already suspects, but that is a mitigation, not a
+fix.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Put this endpoint behind a per-caller rate limiter (e.g. a
+fixed-window or token-bucket check keyed on the authenticated user id,
+enforced at the ASGI/middleware layer or an API gateway in front of App
+Runner) before onboarding real users. Noted in the endpoint's own
+docstring so it cannot be forgotten.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="td-03--submitted-reviews-are-counted-not-identified">TD-03 —
+Submitted reviews are counted, not identified</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td><code>Manuscript.record_review</code> increments an integer counter
+and never checks the supplied <code>reviewer_id</code> against an
+assignment, against <code>author_ids</code>, or against reviewers who
+have already submitted.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate scope limitation — assignment tracking belongs with the
+reviewer-matching subsystem, which is not yet built.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>One reviewer calling the method twice reaches the two-review quorum
+alone and closes the review round, so an editorial decision could rest
+on a single opinion.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Critical before real users.</strong></td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Replace <code>submitted_reviews: int</code> with
+<code>frozenset[UserId]</code> of reviewers who have submitted, and
+reject a submission from a reviewer without an accepted assignment.
+Documented in the method's docstring.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="scheduled">Scheduled</h2>
+<h3 id="td-04--the-audit-chain-has-no-external-anchor">TD-04 — The audit
+chain has no external anchor</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>Hash chaining detects alteration, reordering and removal
+<em>within</em> the chain, but cannot detect truncation of the tail, a
+forged event appended through the legitimate API, or a wholly fabricated
+history rebuilt from the genesis hash.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate. An anchor is an operational concern outside the domain
+layer, and building one was not affordable in the available time.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>An attacker with write access to the event store could truncate
+recent history, or replace it entirely, without the application
+detecting it. Partially mitigated: a PostgreSQL trigger rejects
+<code>UPDATE</code> and <code>DELETE</code> on the event table, and the
+foreign key refuses to delete a manuscript that has audit events.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Scheduled</strong> — next release after deployment.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Publish a periodically signed checkpoint of the latest
+<code>event_hash</code> to storage the application cannot rewrite, and
+assert an expected event count at the persistence boundary. Stated
+explicitly in <code>hashchain.py</code>'s module docstring so no caller
+assumes more than the code provides.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="td-05--blinding-does-not-scrub-the-manuscript-body">TD-05 —
+Blinding does not scrub the manuscript body</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td><code>BlindedManuscript</code> carries <code>title</code>,
+<code>abstract</code> and <code>keywords</code> verbatim.
+Self-identifying text — an author's name in the title, or an abstract
+reading "extending our earlier work in [Obeng 2025]" — reaches the
+reviewer unchanged.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate. Reliable text redaction is a research problem; a bad
+redaction that leaks one name would undermine the guarantee more
+thoroughly than not attempting it.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>Double-blind integrity depends partly on author compliance rather
+than entirely on the system.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Scheduled.</strong></td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Screening surfaces detected author-name matches to the editor before
+reviewers are assigned; submission guidance requires authors to
+anonymise their own manuscript. Automated body-text redaction is
+recorded as future evolution, not as a near-term fix.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="td-06--the-editorial-event-log-has-no-blinded-projection">TD-06
+— The editorial event log has no blinded projection</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>Events carry <code>actor_id</code>, and decision events carry an
+editor's free-text rationale. There is no <code>BlindedEvent</code>
+type; the log is protected by authorisation policy alone
+(<code>VIEW_AUDIT</code> is editor-only).</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Inadvertent — blinding was designed around the aggregate, and the
+event log was not considered as a second surface a reviewer might
+read.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>None today, because no reviewer-facing path reads the log. The risk
+is that a future endpoint exposes editorial history without a projection
+to make the omission structural.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Scheduled</strong>, before any reviewer-facing audit view is
+built.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Add a <code>BlindedEvent</code> projection following the same "omit
+the field from the type" principle as <code>BlindedManuscript</code>.
+Noted in <code>blinding.py</code>'s docstring.</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="td-07--no-authorisation-action-maps-to-the-blinded-projection">TD-07
+— No authorisation action maps to the blinded projection</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td><code>blind()</code> exists and <code>policies.can()</code> exists,
+but no <code>Action</code> connects them. An adapter serving a reviewer
+must remember to call <code>blind()</code>; nothing enforces it.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Inadvertent. The two modules were specified independently and the
+seam between them was never designed.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>The double-blind guarantee rests on adapter discipline rather than
+on a check the system can enforce — the exact weakness the structural
+approach was chosen to avoid.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Scheduled</strong>, alongside TD-02.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Introduce an action representing "read as an assigned reviewer"
+whose only successful return path is the blinded projection.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="td-08--the-tail-append-capability-is-unverified">TD-08 — The
+tail-append capability is unverified</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td><code>hashchain.append</code> derives the expected sequence from the
+last link rather than the chain length, so it can append onto a chain
+tail. No test pins that capability; reverting to the older length-based
+form still passes the whole suite.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Inadvertent. The change was made to remove an O(n)-per-write
+coupling, and the test that would protect it was not added with it.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>A future refactor could silently reintroduce whole-history loads on
+every write.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Scheduled</strong> — with the persistence work that first
+exploits tail-appending.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>A test appending onto a sliced tail whose last sequence exceeds its
+length, plus a repository that loads only the last link rather than the
+full chain.</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="td-14--deployed-infrastructure-is-app-runner-not-the-specified-ecsalbcloudfront">TD-14
+— Deployed infrastructure is App Runner, not the specified
+ECS/ALB/CloudFront</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>The live deployment runs the FastAPI backend on AWS App Runner
+behind its own <code>*.awsapprunner.com</code> TLS endpoint, rather than
+the ECS Fargate / Application Load Balancer / CloudFront topology
+designed in
+<code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code>
+§7.3.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate. Provisioning the ECS/ALB/CloudFront stack — a VPC, a
+target group and listener rules, a CloudFront distribution, task
+definitions and a service, and the IAM wiring between all of it —
+measured at 4–6 hours against a 48-hour budget that, at the point this
+trade-off was made, still owed a working API, a working frontend, and
+five accompanying documents.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>The examiner reaches a functioning, HTTPS-verified backend, and the
+ECS/ALB/CloudFront design is assessed on its own architectural merits
+wherever the spec is read — but the two do not match. No functional
+capability is lost: App Runner supplies the identical
+trusted-TLS-without-a-registered-domain guarantee CloudFront was chosen
+for, over the same container image, with less to operate and less to
+tear down.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Scheduled</strong> — repayable once the document and feature
+backlog this budget was protecting is clear, i.e. after submission, not
+before.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Provision <code>infra/</code> from the ECS/ALB/CloudFront design
+already specified in §7.3, migrate the container from an App Runner
+source to an ECS Fargate service behind a new target group, and
+decommission the App Runner service once the ALB responds on the same
+health check. Recorded in
+<code>docs/superpowers/plans/2026-08-12-ugjcs-plan-6-deployment.md</code>'s
+"Why this is smaller than the specification" section, so the gap is a
+documented, bounded decision rather than unnoticed drift.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="acceptable">Acceptable</h2>
+<h3 id="td-09--a-hybrid-event-log-rather-than-full-event-sourcing">TD-09
+— A hybrid event log rather than full event sourcing</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>Current state is materialised on the manuscript row alongside the
+append-only event log, rather than being derived by replaying
+events.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate architectural trade-off, decided at design time and
+recorded in the specification.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>Two representations of the same truth could in principle diverge.
+Mitigated by routing every state change through a single
+<code>_transition</code> method that writes both in one transaction; a
+grep confirms exactly one assignment to <code>status</code> in the
+entire aggregate.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Acceptable.</strong></td>
+</tr>
+<tr>
+<td><strong>Condition that would change this</strong></td>
+<td>If projections multiply beyond the current single materialised view,
+or if replaying history to a past state becomes a requirement, full
+event sourcing with rebuildable projections becomes worth its cost.</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="td-10--the-coverage-gate-sits-at-85-while-the-code-delivers-100">TD-10
+— The coverage gate sits at 85% while the code delivers 100%</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>The CI gate fails below 85% line and branch coverage, well under
+what the branch actually achieves.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Deliberate. The gate is a floor that prevents regression, not a
+target.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>Coverage could fall by fifteen points without CI objecting.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Acceptable.</strong></td>
+</tr>
+<tr>
+<td><strong>Condition that would change this</strong></td>
+<td>Raising the floor is cheap and would be worthwhile if coverage ever
+drifts down. It is deliberately not set to 100%, because a gate at
+exactly the current figure makes any legitimate refactor fail the build
+for reasons unrelated to quality.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="td-12--a-timestamp-representation-reached-the-audit-hash">TD-12
+— A timestamp representation reached the audit hash</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>Resolved, recorded because the class of defect matters.
+<code>canonical_bytes()</code> hashed
+<code>occurred_at.isoformat()</code>, which includes the UTC offset,
+while PostgreSQL <code>timestamptz</code> normalises any offset to UTC
+on storage. An event recorded at a non-UTC offset would hash one way
+before persistence and differently after.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Inadvertent. Every test used a UTC datetime, so the suite was
+structurally blind to it. Four independent reviews of the in-memory code
+did not find it; it was found by reasoning about the database
+boundary.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td><code>verify()</code> would have reported tampering on an event
+nobody touched. A false positive is worse than no check, because it
+destroys confidence in every genuine detection.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Resolved</strong> — <code>canonical_bytes()</code> now
+normalises to UTC, so the offset cannot reach the digest by
+construction.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Done. The lesson stands: a value that crosses a storage boundary may
+return in a different representation than it went in, and only an
+integration test or explicit canonicalisation catches it.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="td-13--truncate-bypassed-the-append-only-guarantee">TD-13 —
+TRUNCATE bypassed the append-only guarantee</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>Resolved, recorded because of how it was found. A
+<code>BEFORE UPDATE OR DELETE ... FOR EACH ROW</code> trigger protected
+the editorial event log, and it was verified firing against a live
+database. But PostgreSQL never fires row-level triggers on
+<code>TRUNCATE</code>, so a single
+<code>TRUNCATE TABLE editorial_events</code> erased the entire audit log
+with no error.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Inadvertent. The trigger was written, reviewed, and empirically
+confirmed rejecting <code>UPDATE</code> and <code>DELETE</code>. Nobody
+asked whether the guarantee held for <em>every</em> class of statement
+that removes rows.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>The system claimed a tamper-evident audit trail while leaving the
+single most obvious way to destroy it completely unguarded.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Resolved</strong> — a statement-level
+<code>BEFORE TRUNCATE ... FOR EACH STATEMENT</code> trigger now closes
+it, in both the migration and the test fixtures, with a test that fails
+when the trigger is removed.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Done. The lesson: a control verified against the cases you thought
+of is not a control verified against the cases that matter. The question
+that found this was "is this claim true for every statement class?", not
+"does the trigger work?"</td>
+</tr>
+</tbody>
+</table>
+<h3
+id="td-11--coverage-is-a-weak-signal-and-this-project-has-the-evidence">TD-11
+— Coverage is a weak signal, and this project has the evidence</h3>
+<table>
+<tbody>
+<tr>
+<td><strong>Debt</strong></td>
+<td>Not debt in the code, but a recorded limitation of the verification
+strategy that shapes how the other entries should be read.</td>
+</tr>
+<tr>
+<td><strong>Cause</strong></td>
+<td>Structural property of line and branch coverage.</td>
+</tr>
+<tr>
+<td><strong>Impact</strong></td>
+<td>Mutation testing during the final review found four mutations
+surviving a suite at 100% coverage — including deletion of the single
+line that makes the hash chain a chain, which left every test passing.
+Coverage measured that lines executed, not that behaviour was
+asserted.</td>
+</tr>
+<tr>
+<td><strong>Priority</strong></td>
+<td><strong>Acceptable</strong> as a known limitation, provided it is
+compensated.</td>
+</tr>
+<tr>
+<td><strong>Second illustration</strong></td>
+<td>Coverage reported <code>Branch 0</code> for the mappers module
+despite branch coverage being enabled, because coverage.py does not
+treat an inline ternary as a branch point. "100% coverage, zero branches
+missed" therefore did not prove both arms of
+<code>IssueId(row.issue_id) if ... else None</code> had run — and the
+populated arm never had.</td>
+</tr>
+<tr>
+<td><strong>Resolution</strong></td>
+<td>Four gaps were closed by targeted tests once identified. Systematic
+mutation testing (for example <code>mutmut</code> or
+<code>cosmic-ray</code>) in CI is recorded as future evolution; it is
+the only automated technique that would have found these without a
+reviewer reading for intent.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="summary">Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Count</th>
+<th>Entries</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Critical</td>
+<td>4</td>
+<td>TD-01, TD-02, TD-03, TD-15</td>
+</tr>
+<tr>
+<td>Scheduled</td>
+<td>6</td>
+<td>TD-04 … TD-08, TD-14</td>
+</tr>
+<tr>
+<td>Acceptable</td>
+<td>3</td>
+<td>TD-09, TD-10, TD-11</td>
+</tr>
+<tr>
+<td>Resolved, retained as a record</td>
+<td>2</td>
+<td>TD-12, TD-13</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Repayment sequence.</strong> TD-01 before any infrastructure
+is provisioned. TD-02, TD-03 and TD-07 are one piece of work — they are
+all consequences of reviewer assignment not existing yet — and should be
+repaid together in the release that introduces it. TD-04 follows
+deployment. TD-05, TD-06 and TD-08 are independent and may be scheduled
+by convenience. TD-14 is repayable only after submission; it is not on
+the pre-viva critical path. TD-15 should be repaid before real users are
+admitted, alongside TD-01.</p>
+<p><strong>How this register was produced.</strong> Ten of these eleven
+entries were found by independent review of work that had already passed
+every automated gate: linting, strict type checking, an architecture
+contract, and a full test suite at 100% coverage. That is the register's
+most useful lesson, and it is recorded here rather than only in the
+retrospective: automated gates establish a floor, and reading code for
+what it <em>claims</em> is what finds the things above it.</p>
+</main>
+<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+</body>
+</html>
