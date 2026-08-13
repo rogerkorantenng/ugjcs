@@ -383,9 +383,27 @@ async def _fully_seeded(uow: SqlAlchemyUnitOfWork) -> bool:
     fully seeded. That earlier run left the last manuscript PUBLISHED but with no document
     keys; without checking for them here too, `--if-empty` would see a fully-published
     corpus, declare victory, and never call `_advance_manuscript` again to backfill it.
+
+    The last-reviewer check exists for the same reason, one deploy later: the external
+    reviewer pool (`REVIEWER3_EMAIL`..`REVIEWER7_EMAIL`) was added to `JUDGE_ACCOUNTS`
+    after some databases were already fully seeded under the old, five-reviewer roster.
+    Checking only the administrator account, as this function used to, would see that
+    old roster and the fully-published corpus, declare victory, and never call
+    `_ensure_accounts` again to create the five new reviewers — leaving the reviewer
+    picker exactly as broken (every candidate excluded, none eligible) as before this
+    fix. `REVIEWER7_EMAIL` is checked as the roster's canary for the same reason
+    `_LAST_SEQUENCE` tracks the manuscript corpus: the fast path must track what it
+    guards, not just its first-ever shape.
     """
     admin = await uow.accounts.get_by_email(EmailAddress(ADMIN_EMAIL))
     if admin is None or not admin.is_verified or Role.ADMINISTRATOR not in admin.roles:
+        return False
+    last_reviewer = await uow.accounts.get_by_email(EmailAddress(REVIEWER7_EMAIL))
+    if (
+        last_reviewer is None
+        or not last_reviewer.is_verified
+        or Role.REVIEWER not in last_reviewer.roles
+    ):
         return False
     last = await uow.manuscripts.get_by_tracking_code(
         TrackingCode.mint(SEED_TRACKING_YEAR, _LAST_SEQUENCE)

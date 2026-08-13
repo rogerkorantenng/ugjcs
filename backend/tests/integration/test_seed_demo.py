@@ -17,6 +17,8 @@ from io import BytesIO
 import pytest
 from pypdf import PdfReader
 
+from ugjcs.domain.account import EmailAddress
+from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import TrackingCode
 from ugjcs.infrastructure.config import get_settings
 from ugjcs.infrastructure.db.base import Base
@@ -132,6 +134,30 @@ async def test_the_if_empty_fast_path_still_backfills_documents_a_prior_run_left
         assert manuscript is not None
         assert manuscript.original_document_key is not None
         assert manuscript.anonymised_document_key is not None
+
+
+async def test_the_if_empty_fast_path_still_creates_reviewers_a_prior_run_never_had() -> None:
+    """Simulates redeploying this feature onto a database an earlier, five-reviewer
+    version of the seed script already fully populated: `--if-empty` must not mistake
+    that old roster plus a fully PUBLISHED corpus for nothing left to do, or the external
+    reviewer pool this feature adds would never actually get created on such a database.
+    """
+    store = FakeDocumentStore()
+    await seed_demo.run(only_if_empty=False, documents=store)
+
+    async with await _uow() as uow:
+        last_reviewer = await uow.accounts.get_by_email(EmailAddress(seed_demo.REVIEWER7_EMAIL))
+        assert last_reviewer is not None
+        last_reviewer.revoke(Role.REVIEWER)
+        await uow.accounts.save(last_reviewer)
+        await uow.commit()
+
+    await seed_demo.run(only_if_empty=True, documents=store)
+
+    async with await _uow() as uow:
+        last_reviewer = await uow.accounts.get_by_email(EmailAddress(seed_demo.REVIEWER7_EMAIL))
+        assert last_reviewer is not None
+        assert Role.REVIEWER in last_reviewer.roles
 
 
 async def test_the_authors_original_carries_their_name_and_the_reviewers_copy_does_not() -> None:
