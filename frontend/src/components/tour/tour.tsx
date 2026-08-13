@@ -198,11 +198,16 @@ export function Tour({ steps, storageKey }: { steps: TourStep[]; storageKey: str
       boxShadow: "0 0 0 2px var(--color-stamp), 0 0 0 9999px rgba(18, 21, 26, 0.55)",
     };
     const left = Math.min(Math.max(rect.left, GUTTER), Math.max(GUTTER, window.innerWidth - CARD_WIDTH - GUTTER));
-    const spaceBelow = window.innerHeight - (rect.top + rect.height);
-    cardStyle =
-      spaceBelow >= CARD_CLEARANCE || rect.top < CARD_CLEARANCE
-        ? { top: rect.top + rect.height + RING_PADDING + 12, left }
-        : { bottom: window.innerHeight - rect.top + RING_PADDING + 12, left };
+    // Below the target when there's room, above it when there's room up there instead,
+    // and pinned inside the viewport when the target is taller than the screen (a whole
+    // manuscript list, say) — the card must be readable without any scrolling at all.
+    const below = rect.top + rect.height + RING_PADDING + 12;
+    const above = rect.top - RING_PADDING - 12 - CARD_CLEARANCE;
+    let top: number;
+    if (below + CARD_CLEARANCE + GUTTER <= window.innerHeight) top = below;
+    else if (above >= GUTTER) top = above;
+    else top = window.innerHeight - CARD_CLEARANCE - GUTTER;
+    cardStyle = { top: Math.max(GUTTER, top), left };
   }
 
   return (
@@ -219,7 +224,7 @@ export function Tour({ steps, storageKey }: { steps: TourStep[]; storageKey: str
         aria-modal="true"
         aria-labelledby="tour-step-title"
         aria-describedby="tour-step-body"
-        className={`fixed w-[21rem] max-w-[calc(100vw-2rem)] rounded-[3px] border border-rule bg-surface p-4 shadow-[0_10px_24px_rgba(18,21,26,0.25)] outline-none ${
+        className={`fixed max-h-[calc(100vh-2rem)] w-[21rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[3px] border border-rule bg-surface p-4 shadow-[0_10px_24px_rgba(18,21,26,0.25)] outline-none ${
           targeted ? "" : "left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         }`}
         style={cardStyle}
