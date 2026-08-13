@@ -56,6 +56,18 @@
     scroll-behavior: smooth;
   }
 
+  /* Tailwind v4's preflight leaves buttons with the arrow cursor; every enabled
+     control here should read as clickable the way links do. Disabled stays the
+     not-allowed arrow so "can't press this yet" remains visible at the cursor. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  select:not(:disabled),
+  input[type="file"]:not(:disabled),
+  label:has(> input[type="radio"]:not(:disabled)),
+  label:has(> input[type="checkbox"]:not(:disabled)) {
+    cursor: pointer;
+  }
+
   h1, h2, h3 {
     text-wrap: balance;
     font-family: var(--font-display);
