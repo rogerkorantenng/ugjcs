@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { ProblemAlert } from "@/components/ui/alert";
-import { postAccountAction } from "@/components/admin/actions";
-import { AccountActions, type AccountActionKind } from "@/components/admin/account-actions";
+import { postAccountAction, type AccountActionKind } from "@/components/admin/actions";
+import { AccountActions } from "@/components/admin/account-actions";
 import type { ProblemDetails } from "@/types/api";
 import type { AdminAccount } from "@/types/wave2";
 

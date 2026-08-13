@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import type { AccountActionKind } from "@/components/admin/actions";
 import type { AdminAccount } from "@/types/wave2";
-
-export type AccountActionKind = "capacity" | "role" | "active";
 
 /**
  * The per-row action buttons: grant/revoke the reviewer role, and the active toggle.

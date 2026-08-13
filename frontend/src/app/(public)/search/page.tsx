@@ -5,9 +5,7 @@ import { buttonClasses } from "@/components/ui/button";
 
 export const metadata = { title: "Search" };
 
-interface SearchParams { q?: string }
-
-export default async function SearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
   const results = q ? await searchArchive(q) : [];
 
