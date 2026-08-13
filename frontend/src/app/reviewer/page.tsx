@@ -8,6 +8,8 @@ import { TrackingChip } from "@/components/ui/tracking-chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { cardLinkClasses } from "@/components/ui/card";
 import { ManuscriptListSkeleton } from "@/components/skeletons";
+import { Tour } from "@/components/tour/tour";
+import { REVIEWER_TOUR } from "@/components/tour/steps";
 import type { BlindedManuscript } from "@/types/api";
 
 /** See the author dashboard's `SubmittedBanner` for why this is isolated behind its own
@@ -33,7 +35,8 @@ export default function ReviewerAssignments() {
       <Suspense fallback={null}>
         <SubmittedBanner />
       </Suspense>
-      <h1 className="font-display-heading text-2xl font-semibold text-ink">My review assignments</h1>
+      <Tour steps={REVIEWER_TOUR.steps} storageKey={REVIEWER_TOUR.storageKey} />
+      <h1 data-tour="reviewer-welcome" className="font-display-heading text-2xl font-semibold text-ink">My review assignments</h1>
 
       {isLoading && <ManuscriptListSkeleton withBadge={false} label="Loading your assignments…" />}
 
@@ -53,10 +56,15 @@ export default function ReviewerAssignments() {
       )}
 
       {data && data.length > 0 && (
-        <ul className="mt-4 space-y-3">
-          {data.map((manuscript) => (
+        <ul data-tour="reviewer-list" className="mt-4 space-y-3">
+          {data.map((manuscript, index) => (
             <li key={manuscript.tracking_code}>
-              <Link href={`/reviewer/${manuscript.tracking_code}`} className={cardLinkClasses()}>
+              {/* The first card doubles as the tour's "open an assignment" anchor. */}
+              <Link
+                href={`/reviewer/${manuscript.tracking_code}`}
+                data-tour={index === 0 ? "reviewer-card" : undefined}
+                className={cardLinkClasses()}
+              >
                 <p className="font-medium text-ink">{manuscript.title}</p>
                 <TrackingChip code={manuscript.tracking_code} className="mt-1" />
               </Link>
