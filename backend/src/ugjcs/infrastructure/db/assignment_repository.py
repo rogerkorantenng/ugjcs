@@ -10,7 +10,7 @@ from uuid import uuid4
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ugjcs.application.ports import ReviewAssignmentRecord
+from ugjcs.application.ports import REVIEW_PERIOD, ReviewAssignmentRecord
 from ugjcs.domain.ids import ManuscriptId, UserId
 from ugjcs.infrastructure.db.mappers import assignment_row_to_record
 from ugjcs.infrastructure.db.models import ReviewAssignmentRow
@@ -23,6 +23,10 @@ class SqlAlchemyReviewAssignmentRepository:
     async def assign(
         self, manuscript_id: ManuscriptId, reviewer_id: UserId, *, occurred_at: datetime
     ) -> None:
+        # `due_at` is stamped here, not defaulted in the column definition: the deadline
+        # is derived from the same `occurred_at` the caller supplies for `assigned_at`,
+        # and a server-side `now() + interval` default would let the two drift apart for
+        # any caller (the seed, a test) that assigns with a non-wall-clock timestamp.
         self._session.add(
             ReviewAssignmentRow(
                 id=uuid4(),
@@ -30,6 +34,7 @@ class SqlAlchemyReviewAssignmentRepository:
                 reviewer_id=reviewer_id,
                 status="assigned",
                 assigned_at=occurred_at,
+                due_at=occurred_at + REVIEW_PERIOD,
             )
         )
         # Flushed rather than left buffered: the uniqueness violation a duplicate
@@ -49,6 +54,16 @@ class SqlAlchemyReviewAssignmentRepository:
     ) -> list[ReviewAssignmentRecord]:
         result = await self._session.execute(
             select(ReviewAssignmentRow).where(ReviewAssignmentRow.manuscript_id == manuscript_id)
+        )
+        return [assignment_row_to_record(row) for row in result.scalars()]
+
+    async def list_all(self) -> list[ReviewAssignmentRecord]:
+        """A deliberate full-table scan — see the port's docstring for why no filter.
+
+        Ordered by `assigned_at` only so the result is deterministic; the analytics
+        consumer aggregates and never depends on the order."""
+        result = await self._session.execute(
+            select(ReviewAssignmentRow).order_by(ReviewAssignmentRow.assigned_at)
         )
         return [assignment_row_to_record(row) for row in result.scalars()]
 

@@ -5,6 +5,7 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ugjcs.application.ports import REVIEW_PERIOD
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.infrastructure.db.assignment_repository import SqlAlchemyReviewAssignmentRepository
@@ -48,6 +49,40 @@ async def test_an_assignment_is_visible_to_both_parties(session: AsyncSession) -
     assert for_reviewer[0].status == "assigned"
     assert for_reviewer[0].recommendation is None
     assert for_reviewer[0].submitted_at is None
+
+
+async def test_a_new_assignment_is_due_twenty_one_days_after_assignment(
+    session: AsyncSession,
+) -> None:
+    """The adapter stamps `due_at` from the same `occurred_at` it writes into
+    `assigned_at` — see `SqlAlchemyReviewAssignmentRepository.assign` — so the two can
+    never drift, and the interval is `REVIEW_PERIOD`, the one constant the fake and the
+    Alembic backfill share."""
+    manuscript_id = await stored_manuscript(session, sequence=54)
+    repository = SqlAlchemyReviewAssignmentRepository(session)
+    await repository.assign(manuscript_id, REVIEWER, occurred_at=NOW)
+    await session.commit()
+
+    [record] = await repository.list_for_reviewer(REVIEWER)
+    assert record.due_at == NOW + REVIEW_PERIOD
+    assert record.due_at == record.assigned_at + REVIEW_PERIOD
+
+
+async def test_list_all_returns_every_assignment_across_manuscripts(
+    session: AsyncSession,
+) -> None:
+    first = await stored_manuscript(session, sequence=55)
+    second = await stored_manuscript(session, sequence=56)
+    repository = SqlAlchemyReviewAssignmentRepository(session)
+    await repository.assign(first, REVIEWER, occurred_at=NOW)
+    await repository.assign(second, OTHER_REVIEWER, occurred_at=NOW)
+    await session.commit()
+
+    everything = await repository.list_all()
+    assert {(a.manuscript_id, a.reviewer_id) for a in everything} == {
+        (first, REVIEWER),
+        (second, OTHER_REVIEWER),
+    }
 
 
 async def test_assigning_the_same_reviewer_twice_is_rejected(session: AsyncSession) -> None:

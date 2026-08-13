@@ -88,3 +88,19 @@ async def test_document_key_columns_exist_and_are_nullable(session: AsyncSession
         "original_document_key": ("YES", 512),
         "anonymised_document_key": ("YES", 512),
     }
+
+
+async def test_review_assignment_due_at_is_a_nullable_timestamptz(session: AsyncSession) -> None:
+    """The metadata half of `0006_review_due_dates`' parity: `due_at` must be nullable
+    (a pre-backfill NULL means "no deadline", never "overdue") and `timestamptz`, not
+    naive, or comparisons against `datetime.now(UTC)` in the assignments route would be
+    undefined. The migration's data half — the 21-day backfill — is proven by running
+    the real Alembic scripts in `test_due_at_migration.py`."""
+    result = await session.execute(
+        text(
+            "SELECT is_nullable, data_type "
+            "FROM information_schema.columns WHERE table_name = 'review_assignments' "
+            "AND column_name = 'due_at'"
+        )
+    )
+    assert [(row[0], row[1]) for row in result] == [("YES", "timestamp with time zone")]
