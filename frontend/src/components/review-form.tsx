@@ -63,13 +63,14 @@ export function ReviewForm({ trackingCode, onSubmitted }: { trackingCode: string
         name="comments_to_author"
         required
         minLength={20}
+        hint="At least 20 characters. The author will read this once a decision is recorded."
       />
       <Textarea
         label="Confidential comments to the editor"
         name="confidential_comments_to_editor"
         required
         minLength={10}
-        hint="Seen only by the handling editor — the author never sees this field."
+        hint="At least 10 characters. Seen only by the handling editor — the author never sees this field."
       />
       <Button type="submit" isLoading={submitting}>{submitting ? "Submitting…" : "Submit review"}</Button>
     </form>

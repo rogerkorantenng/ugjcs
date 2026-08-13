@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
+import { Fraunces, IBM_Plex_Mono, Public_Sans } from "next/font/google";
 import "./globals.css";
 
-const sourceSerif = Source_Serif_4({
+// Fraunces: the display face. Variable, loaded with its optical-size axis (so a 14px
+// tracking chip and a 48px masthead numeral aren't the same letterforms stretched) and its
+// "wonk" axis available for the one place — the masthead nameplate — that uses it.
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-source-serif",
-  weight: ["500", "600", "700"],
+  variable: "--font-fraunces",
+  axes: ["opsz", "WONK"],
 });
-const plexSans = IBM_Plex_Sans({
+const publicSans = Public_Sans({
   subsets: ["latin"],
-  variable: "--font-plex-sans",
-  weight: ["400", "500", "600"],
+  variable: "--font-public-sans",
+  weight: ["400", "500", "600", "700"],
 });
 const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -25,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sourceSerif.variable} ${plexSans.variable} ${plexMono.variable}`}>
+    <html lang="en" className={`${fraunces.variable} ${publicSans.variable} ${plexMono.variable}`}>
       <body className="min-h-screen bg-paper font-sans text-ink antialiased">{children}</body>
     </html>
   );

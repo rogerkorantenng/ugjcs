@@ -15,7 +15,7 @@ export function Card({ className = "", ...props }: HTMLAttributes<HTMLDivElement
  * `buttonClasses` centralises the button look.
  */
 export function cardLinkClasses(className = "", padding: "p-4" | "p-5" = "p-4") {
-  return `block ${BASE} ${padding} transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-teal/50
+  return `block ${BASE} ${padding} transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-stamp/50
     hover:shadow-[0_10px_24px_rgba(18,32,58,0.1)] focus-visible:outline-none focus-visible:ring-2
-    focus-visible:ring-amber ${className}`;
+    focus-visible:ring-stamp ${className}`;
 }
