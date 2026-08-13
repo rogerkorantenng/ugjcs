@@ -15,12 +15,18 @@ from uuid import UUID, uuid4
 from pypdf import PdfWriter
 
 from ugjcs.application.identity import AuthenticationError
-from ugjcs.application.ports import ReviewAssignmentRecord
+from ugjcs.application.ports import REVIEW_PERIOD, ReviewAssignmentRecord
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.enums import Role
+from ugjcs.domain.hashchain import ChainedEvent
+from ugjcs.domain.hashchain import append as chain_append
 from ugjcs.domain.ids import ManuscriptId, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Actor
+
+# Defined before the fakes that use it as a dataclass field default (`FakeReviewContent`),
+# which is evaluated at class-definition time, not lazily.
+NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
 
 
 @dataclass
@@ -30,6 +36,7 @@ class FakeAccount:
     roles: frozenset[Role]
     full_name: str = "Test Author"
     affiliation: str = "Test University"
+    expertise: tuple[str, ...] = ()
     reviewer_capacity: int = 3
     is_active: bool = True
     is_verified: bool = True
@@ -120,13 +127,32 @@ class FakeSessionService:
 
 @dataclass
 class FakeManuscriptRepository:
-    """Enough of `ManuscriptRepository` for router tests: an in-memory dict, no chain."""
+    """Enough of `ManuscriptRepository` for router tests: an in-memory dict, plus a real
+    hash chain per manuscript so the analytics route (which reads event timestamps
+    through `chain_for`) has genuine history to aggregate. The chain is built with the
+    same `hashchain.append` the real repository uses — cheaper than a parallel fake
+    event format, and it keeps sequence rules honest.
+
+    A manuscript placed straight into `store` (as most tests do) has its buffered events
+    still on the aggregate; they are drained into the chain only when a route later
+    calls `save`, mirroring the real repository's flush-on-save. A test that needs the
+    history present *before* any route runs should call `ingest` instead of writing to
+    `store` directly.
+    """
 
     store: dict[ManuscriptId, Manuscript] = field(default_factory=dict)
+    chains: dict[ManuscriptId, list[ChainedEvent]] = field(default_factory=dict)
+
+    def ingest(self, manuscript: Manuscript) -> None:
+        """Store the manuscript and link its pending events onto its chain, the way a
+        real `add`/`save` round-trip would have."""
+        self.store[manuscript.id] = manuscript
+        chain = self.chains.setdefault(manuscript.id, [])
+        for event in manuscript.pull_events():
+            chain.append(chain_append(chain, event))
 
     async def add(self, manuscript: Manuscript) -> None:
-        self.store[manuscript.id] = manuscript
-        manuscript.pull_events()
+        self.ingest(manuscript)
 
     async def get(self, manuscript_id: ManuscriptId) -> Manuscript | None:
         return self.store.get(manuscript_id)
@@ -136,11 +162,10 @@ class FakeManuscriptRepository:
         return next((m for m in self.store.values() if m.tracking_code.value == value), None)
 
     async def save(self, manuscript: Manuscript) -> None:
-        self.store[manuscript.id] = manuscript
-        manuscript.pull_events()
+        self.ingest(manuscript)
 
-    async def chain_for(self, manuscript_id: ManuscriptId) -> list[object]:
-        return []
+    async def chain_for(self, manuscript_id: ManuscriptId) -> list[ChainedEvent]:
+        return self.chains.get(manuscript_id, [])
 
     async def list_by_author(self, author_id: UserId) -> list[Manuscript]:
         return [m for m in self.store.values() if author_id in m.author_ids]
@@ -172,11 +197,17 @@ class FakeAssignmentRepository:
 
     assignments: list[tuple[ManuscriptId, UserId]] = field(default_factory=list)
     submitted: dict[tuple[ManuscriptId, UserId], "FakeReviewContent"] = field(default_factory=dict)
+    # Deadlines keyed per pair so a test can plant a past `due_at` (to exercise the
+    # overdue flag) without touching every other assignment. Pairs appended straight to
+    # `assignments` — the shortcut existing tests take — fall back to `NOW + REVIEW_PERIOD`
+    # in `_record`, mirroring what the real adapter stamps at assignment time.
+    due_dates: dict[tuple[ManuscriptId, UserId], datetime | None] = field(default_factory=dict)
 
     async def assign(
         self, manuscript_id: ManuscriptId, reviewer_id: UserId, *, occurred_at: datetime
     ) -> None:
         self.assignments.append((manuscript_id, reviewer_id))
+        self.due_dates[(manuscript_id, reviewer_id)] = occurred_at + REVIEW_PERIOD
 
     async def list_for_reviewer(self, reviewer_id: UserId) -> list[ReviewAssignmentRecord]:
         return [
@@ -193,6 +224,9 @@ class FakeAssignmentRepository:
             for manuscript, reviewer in self.assignments
             if manuscript == manuscript_id
         ]
+
+    async def list_all(self) -> list[ReviewAssignmentRecord]:
+        return [self._record(manuscript, reviewer) for manuscript, reviewer in self.assignments]
 
     async def mark_submitted(
         self,
@@ -216,6 +250,7 @@ class FakeAssignmentRepository:
             significance_score=significance_score,
             comments_to_author=comments_to_author,
             confidential_comments_to_editor=confidential_comments_to_editor,
+            submitted_at=occurred_at,
         )
 
     def _record(self, manuscript_id: ManuscriptId, reviewer_id: UserId) -> ReviewAssignmentRecord:
@@ -235,14 +270,19 @@ class FakeAssignmentRepository:
                 content.confidential_comments_to_editor if content is not None else None
             ),
             assigned_at=NOW,
-            submitted_at=NOW if content is not None else None,
+            due_at=self.due_dates.get(pair, NOW + REVIEW_PERIOD),
+            submitted_at=content.submitted_at if content is not None else None,
         )
 
 
 @dataclass(frozen=True, slots=True)
 class FakeReviewContent:
     """What `mark_submitted` recorded for one (manuscript, reviewer) pair — grouped so
-    `FakeAssignmentRepository.submitted` doesn't carry a seven-element tuple positionally."""
+    `FakeAssignmentRepository.submitted` doesn't carry a seven-element tuple positionally.
+
+    `submitted_at` carries the `occurred_at` the caller passed, defaulting to `NOW`, so a
+    performance test can plant a submission time later than `assigned_at` and get a
+    non-zero turnaround."""
 
     recommendation: str
     originality_score: int
@@ -251,6 +291,7 @@ class FakeReviewContent:
     significance_score: int
     comments_to_author: str
     confidential_comments_to_editor: str
+    submitted_at: datetime = NOW
 
 
 @dataclass
@@ -284,9 +325,6 @@ class FakeUnitOfWork:
 
     async def rollback(self) -> None:
         return None
-
-
-NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
 
 
 def new_user_id() -> UserId:

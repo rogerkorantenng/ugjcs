@@ -183,5 +183,6 @@ def assignment_row_to_record(row: ReviewAssignmentRow) -> ReviewAssignmentRecord
         comments_to_author=row.comments_to_author,
         confidential_comments_to_editor=row.confidential_comments_to_editor,
         assigned_at=row.assigned_at,
+        due_at=row.due_at,
         submitted_at=row.submitted_at,
     )

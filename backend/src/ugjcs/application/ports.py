@@ -118,6 +118,16 @@ class RefreshTokenRepository(Protocol):
         ...
 
 
+REVIEW_PERIOD = timedelta(days=21)
+"""How long a reviewer has before an assignment is considered due.
+
+Lives here, next to `ReviewAssignmentRecord`, rather than in the SQL adapter: the adapter
+that stamps `due_at` on new assignments and the in-memory fake the API unit tests use
+must agree on the interval, or a test would prove a policy production does not apply.
+Twenty-one days is the journal's standing review window (the same figure the Alembic
+backfill in `0006_review_due_dates` uses for rows that predate the column)."""
+
+
 @dataclass(frozen=True, slots=True)
 class ReviewAssignmentRecord:
     """A read model, not an aggregate — there is no invariant here for a domain type to
@@ -127,6 +137,11 @@ class ReviewAssignmentRecord:
     recommendation, comments to the author, and comments to the editor alone. The last
     field is the one that must never reach an author-facing response model — see
     `ugjcs.api.schemas.ReviewOut`, which is built only from an editor-gated route.
+
+    `due_at` is `None` only for rows that predate the deadline feature and were never
+    backfilled; every assignment recorded since `0006_review_due_dates` carries
+    `assigned_at + REVIEW_PERIOD`. Callers deriving "overdue" must treat `None` as
+    "no deadline", never as "overdue".
     """
 
     manuscript_id: ManuscriptId
@@ -140,6 +155,7 @@ class ReviewAssignmentRecord:
     comments_to_author: str | None
     confidential_comments_to_editor: str | None
     assigned_at: datetime
+    due_at: datetime | None
     submitted_at: datetime | None
 
 
@@ -157,6 +173,15 @@ class ReviewAssignmentRepository(Protocol):
     async def list_for_manuscript(
         self, manuscript_id: ManuscriptId
     ) -> list[ReviewAssignmentRecord]: ...
+
+    async def list_all(self) -> list[ReviewAssignmentRecord]:
+        """Every assignment ever recorded — the analytics endpoint's raw material.
+
+        Deliberately unfiltered: iterating `list_for_reviewer` over the current REVIEWER
+        roster instead would silently drop assignments whose reviewer has since been
+        deactivated or lost the role, and an average computed over a quietly shrunken
+        population is worse than an honest full scan at this journal's scale."""
+        ...
 
     async def mark_submitted(
         self,

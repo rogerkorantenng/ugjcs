@@ -1,7 +1,9 @@
-"""Screening, decisions, and reviewer assignment — the editor's desk."""
+"""Screening, decisions, reviewer assignment and analytics — the editor's desk."""
 
+from collections import Counter
 from datetime import UTC, datetime
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
@@ -11,16 +13,23 @@ from ugjcs.api.schemas import (
     AssignReviewerRequest,
     ManuscriptOut,
     RecordDecisionRequest,
-    ReviewerCandidateOut,
     ReviewOut,
     ScheduleManuscriptRequest,
+)
+from ugjcs.api.schemas_analytics import (
+    AssignmentDeadlineOut,
+    EditorialAnalyticsOut,
+    MonthlySubmissions,
+    PipelineCounts,
+    RankedReviewerCandidateOut,
+    ReviewerPerformanceOut,
 )
 from ugjcs.api.wiring import UowDep
 from ugjcs.application.ports import UnitOfWork
 from ugjcs.domain.account import Account
 from ugjcs.domain.conflicts import exclusion_reason
+from ugjcs.domain.enums import EventType, Role
 from ugjcs.domain.enums import ManuscriptStatus as S
-from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import UserId, mint_issue_id
 from ugjcs.domain.policies import Action, Actor
 
@@ -54,6 +63,11 @@ AssignReviewerDep = Annotated[Actor, Depends(require_action(Action.ASSIGN_REVIEW
 # commits this manuscript to an issue" authority split into two steps, not two separate
 # permissions — there is no `Action.SCHEDULE` in the domain vocabulary to gate with instead.
 PublishDep = Annotated[Actor, Depends(require_action(Action.PUBLISH))]
+# `Action.VIEW_AUDIT` (editor + editor-in-chief, per `_ROLE_GRANTS`) gates the analytics
+# routes: reading aggregate history over the whole desk is exactly the "inspect the
+# record" authority that action names, and reusing it keeps the domain vocabulary closed
+# rather than minting an `Action.VIEW_ANALYTICS` that would grant the identical role set.
+AuditDep = Annotated[Actor, Depends(require_action(Action.VIEW_AUDIT))]
 
 
 @router.get("/queue", response_model=list[ManuscriptOut])
@@ -63,6 +77,165 @@ async def screening_queue(actor: ScreenDep, uow: UowDep) -> list[ManuscriptOut]:
     are excluded: none of them is work still owed to an editor."""
     manuscripts = await uow.manuscripts.list_by_statuses(_QUEUE_STATUSES)
     return [ManuscriptOut.from_domain(m) for m in manuscripts]
+
+
+# Everything that has ever reached the editorial desk: the full status vocabulary minus
+# DRAFT, which never leaves the author. Terminal states are deliberately included here,
+# unlike `_QUEUE_STATUSES` — analytics is history, and history is mostly terminal.
+_ANALYTICS_STATUSES: frozenset[S] = frozenset(S) - frozenset({S.DRAFT})
+
+# The two sides of the acceptance rate, by *current* status. SCHEDULED and PUBLISHED
+# count as accepted — every one of them passed through an accept decision to get there,
+# and counting only manuscripts still sitting at ACCEPTED would make the rate fall every
+# time the Editor-in-Chief publishes something.
+_ACCEPTED_OUTCOMES: frozenset[S] = frozenset({S.ACCEPTED, S.SCHEDULED, S.PUBLISHED})
+_REJECTED_OUTCOMES: frozenset[S] = frozenset({S.REJECTED, S.DESK_REJECTED})
+
+# Decision-time is measured to the accept/reject that ends peer review, matching the
+# ACCEPTED/REJECTED anchor the metric is defined against. `desk_reject` is deliberately
+# not here: a screening-stage rejection takes days, not months, and averaging it in
+# would flatter the peer-review pipeline this number exists to describe.
+_TERMINAL_DECISIONS: frozenset[str] = frozenset({"accept", "reject"})
+
+_SECONDS_PER_DAY = 86400.0
+
+
+def _days_between(start: datetime, end: datetime) -> float:
+    return (end - start).total_seconds() / _SECONDS_PER_DAY
+
+
+@router.get("/analytics", response_model=EditorialAnalyticsOut)
+async def analytics(actor: AuditDep, uow: UowDep) -> EditorialAnalyticsOut:
+    """Aggregate desk metrics, computed from manuscripts and their event chains.
+
+    Definitions, stated precisely because each had alternatives:
+
+    - `pipeline`: manuscripts per *current* status; `desk_rejected` folds into
+      `rejected` and drafts are absent — see `PipelineCounts`.
+    - `submissions_by_month`: `MANUSCRIPT_SUBMITTED` events bucketed by UTC `YYYY-MM`.
+      One per manuscript; resubmissions emit `REVISION_SUBMITTED` and are not recounted.
+    - `acceptance_rate`: accepted-side statuses over all finally-decided manuscripts
+      (`_ACCEPTED_OUTCOMES` / (`_ACCEPTED_OUTCOMES` + `_REJECTED_OUTCOMES`)), rounded to
+      two decimals. Desk rejections count as rejections here (the journal declined the
+      paper), even though they are excluded from the decision-time average below.
+    - `avg_days_submission_to_decision`: mean days from the `MANUSCRIPT_SUBMITTED` event
+      to the first `DECISION_RECORDED` event whose decision is accept/reject
+      (`_TERMINAL_DECISIONS`), rounded to one decimal.
+    - `avg_days_review_turnaround`: mean days from `assigned_at` to `submitted_at` over
+      every submitted review assignment, rounded to one decimal. Assignment-to-submission
+      is what this schema records honestly; there is no per-round clock to measure
+      instead, because rounds exist only as events, not as an entity with its own dates.
+
+    Every rate/average is `None` when its denominator is empty. Event chains are read
+    per manuscript through the same `chain_for` the audit endpoint trusts — an O(n)
+    sequence of queries that is deliberate: this journal's corpus is dozens of papers,
+    and a bespoke aggregate SQL path would be a second, unverified implementation of
+    the chain's meaning.
+    """
+    manuscripts = await uow.manuscripts.list_by_statuses(_ANALYTICS_STATUSES)
+    status_counts = Counter(m.status for m in manuscripts)
+    monthly: Counter[str] = Counter()
+    decision_days: list[float] = []
+    for manuscript in manuscripts:
+        submitted_at: datetime | None = None
+        for link in await uow.manuscripts.chain_for(manuscript.id):
+            event = link.event
+            if event.event_type is EventType.MANUSCRIPT_SUBMITTED and submitted_at is None:
+                submitted_at = event.occurred_at
+                monthly[event.occurred_at.astimezone(UTC).strftime("%Y-%m")] += 1
+            elif (
+                event.event_type is EventType.DECISION_RECORDED
+                and event.payload.get("decision") in _TERMINAL_DECISIONS
+                and submitted_at is not None
+            ):
+                decision_days.append(_days_between(submitted_at, event.occurred_at))
+                # At most one terminal decision exists per manuscript (the lifecycle
+                # table permits no path out of ACCEPTED/REJECTED back to another
+                # decision), and MANUSCRIPT_SUBMITTED always precedes it, so nothing
+                # later in this chain can change either number.
+                break
+
+    accepted = sum(status_counts[outcome] for outcome in _ACCEPTED_OUTCOMES)
+    rejected = sum(status_counts[outcome] for outcome in _REJECTED_OUTCOMES)
+    decided = accepted + rejected
+
+    turnaround_days = [
+        _days_between(record.assigned_at, record.submitted_at)
+        for record in await uow.assignments.list_all()
+        if record.status == "submitted" and record.submitted_at is not None
+    ]
+
+    return EditorialAnalyticsOut(
+        pipeline=PipelineCounts(
+            submitted=status_counts[S.SUBMITTED],
+            under_screening=status_counts[S.UNDER_SCREENING],
+            under_review=status_counts[S.UNDER_REVIEW],
+            reviews_complete=status_counts[S.REVIEWS_COMPLETE],
+            revision_requested=status_counts[S.REVISION_REQUESTED],
+            resubmitted=status_counts[S.RESUBMITTED],
+            accepted=status_counts[S.ACCEPTED],
+            scheduled=status_counts[S.SCHEDULED],
+            published=status_counts[S.PUBLISHED],
+            rejected=status_counts[S.REJECTED] + status_counts[S.DESK_REJECTED],
+            withdrawn=status_counts[S.WITHDRAWN],
+        ),
+        submissions_by_month=[
+            MonthlySubmissions(month=month, count=count)
+            for month, count in sorted(monthly.items())
+        ],
+        acceptance_rate=round(accepted / decided, 2) if decided else None,
+        avg_days_submission_to_decision=(
+            round(sum(decision_days) / len(decision_days), 1) if decision_days else None
+        ),
+        avg_days_review_turnaround=(
+            round(sum(turnaround_days) / len(turnaround_days), 1) if turnaround_days else None
+        ),
+    )
+
+
+@router.get("/reviewer-performance", response_model=list[ReviewerPerformanceOut])
+async def reviewer_performance(actor: AuditDep, uow: UowDep) -> list[ReviewerPerformanceOut]:
+    """Workload and track record for every reviewer in the current pool.
+
+    Built over `AccountRepository.list_by_role`, so it shows exactly the reviewers an
+    editor could assign today — an account that was deactivated or lost the REVIEWER
+    role is absent, which is the roster an editor planning assignments actually needs
+    (its historical reviews still count in `analytics`' turnaround average, which reads
+    the assignment table directly). Sorted by name for a stable, human-scannable list.
+    """
+    performance: list[ReviewerPerformanceOut] = []
+    for account in await uow.accounts.list_by_role(Role.REVIEWER):
+        records = await uow.assignments.list_for_reviewer(account.id)
+        completed = [
+            record
+            for record in records
+            if record.status == "submitted" and record.submitted_at is not None
+        ]
+        turnarounds = [
+            _days_between(record.assigned_at, record.submitted_at)
+            for record in completed
+            if record.submitted_at is not None  # re-narrow for the type checker
+        ]
+        performance.append(
+            ReviewerPerformanceOut(
+                id=UUID(str(account.id)),
+                full_name=account.full_name,
+                affiliation=account.affiliation,
+                active_assignments=sum(1 for r in records if r.status == "assigned"),
+                reviewer_capacity=account.reviewer_capacity,
+                reviews_completed=len(completed),
+                avg_turnaround_days=(
+                    round(sum(turnarounds) / len(turnarounds), 1) if turnarounds else None
+                ),
+                last_activity_at=(
+                    max(record.submitted_at for record in completed if record.submitted_at)
+                    if completed
+                    else None
+                ),
+            )
+        )
+    performance.sort(key=lambda entry: entry.full_name)
+    return performance
 
 
 @router.post("/{tracking_code}/screen", response_model=ManuscriptOut)
@@ -107,11 +280,66 @@ async def assign_reviewer(
     await uow.commit()
 
 
-@router.get("/{tracking_code}/reviewer-candidates", response_model=list[ReviewerCandidateOut])
+@router.get("/{tracking_code}/assignments", response_model=list[AssignmentDeadlineOut])
+async def list_assignments(
+    tracking_code: str, actor: AssignReviewerDep, uow: UowDep
+) -> list[AssignmentDeadlineOut]:
+    """Every reviewer asked to review this manuscript, with deadline status.
+
+    Gated by `Action.ASSIGN_REVIEWER` — the same grant that let the editor create these
+    assignments — because chasing an overdue review is part of managing the assignment,
+    not a separate privilege. Reviewer names are served openly here: the blind this
+    journal enforces is author↔reviewer (`ugjcs.domain.blinding`), never
+    editor↔reviewer, and no author-reachable route builds `AssignmentDeadlineOut`.
+    """
+    manuscript = await _get_or_404(uow, tracking_code)
+    now = datetime.now(UTC)
+    deadlines: list[AssignmentDeadlineOut] = []
+    for record in await uow.assignments.list_for_manuscript(manuscript.id):
+        reviewer = await uow.accounts.get(record.reviewer_id)
+        submitted = record.status == "submitted"
+        deadlines.append(
+            AssignmentDeadlineOut(
+                reviewer_id=UUID(str(record.reviewer_id)),
+                # A vanished account (deactivated after assignment) still owes context to
+                # the editor chasing the review, so the row stays with a placeholder name
+                # rather than disappearing.
+                reviewer_name=reviewer.full_name if reviewer is not None else "Unknown reviewer",
+                assigned_at=record.assigned_at,
+                due_at=record.due_at,
+                submitted=submitted,
+                # A submitted review is never overdue however late it landed, and a
+                # NULL deadline (pre-backfill row) never counts as overdue — see
+                # `AssignmentDeadlineOut`'s docstring.
+                overdue=not submitted and record.due_at is not None and record.due_at < now,
+            )
+        )
+    return deadlines
+
+
+def _match_score(keywords: tuple[str, ...], expertise: tuple[str, ...]) -> int:
+    """How many of the manuscript's keywords appear in the reviewer's expertise list.
+
+    Case-insensitive whole-token comparison: `"Fraud Detection"` matches
+    `"fraud detection"`, but deliberately not the bare substring `"fraud"` — keyword
+    vocabularies here are curated phrases (see the seed's `REVIEWER_PROFILES`, which
+    echo manuscript keywords verbatim), and substring matching would invent expertise
+    from coincidences like "systems" ⊂ "ecosystems". Scored over the manuscript's
+    keywords, so the ceiling is how much of *this paper* the reviewer covers, not how
+    long their expertise list is.
+    """
+    expertise_tokens = {entry.strip().lower() for entry in expertise}
+    return sum(1 for keyword in keywords if keyword.strip().lower() in expertise_tokens)
+
+
+@router.get(
+    "/{tracking_code}/reviewer-candidates", response_model=list[RankedReviewerCandidateOut]
+)
 async def reviewer_candidates(
     tracking_code: str, actor: AssignReviewerDep, uow: UowDep
-) -> list[ReviewerCandidateOut]:
-    """Every verified, active `REVIEWER`, conflict-of-interest verdict included.
+) -> list[RankedReviewerCandidateOut]:
+    """Every verified, active `REVIEWER`, conflict-of-interest verdict included, ranked
+    by how well their declared expertise matches this manuscript's keywords.
 
     Excluded candidates are returned in the list with their reason rather than filtered
     out — see `ugjcs.domain.conflicts.exclusion_reason`, the pure function that decides
@@ -127,7 +355,7 @@ async def reviewer_candidates(
         UserId(record.reviewer_id)
         for record in await uow.assignments.list_for_manuscript(manuscript.id)
     )
-    candidates: list[ReviewerCandidateOut] = []
+    candidates: list[RankedReviewerCandidateOut] = []
     for account in await uow.accounts.list_by_role(Role.REVIEWER):
         active = await _active_assignment_count(uow, account.id)
         reason = exclusion_reason(
@@ -140,13 +368,21 @@ async def reviewer_candidates(
             reviewer_capacity=account.reviewer_capacity,
         )
         candidates.append(
-            ReviewerCandidateOut.from_domain(
-                account, active_assignments=active, excluded_reason=reason
+            RankedReviewerCandidateOut.from_account(
+                account,
+                active_assignments=active,
+                excluded_reason=reason,
+                match_score=_match_score(manuscript.keywords, account.expertise),
             )
         )
-    # Eligible before excluded (`False < True`), then by lowest current load, so
-    # assignment naturally spreads work — see the route's docstring.
-    candidates.sort(key=lambda c: (c.excluded_reason is not None, c.active_assignments))
+    # Eligible before excluded (`False < True`), then best expertise match first, then
+    # by lowest current load so equal matches naturally spread work — see the route's
+    # docstring. Excluded candidates sink to the bottom but keep the same internal
+    # ordering, so the reason an editor reads there is attached to the likeliest
+    # near-miss first.
+    candidates.sort(
+        key=lambda c: (c.excluded_reason is not None, -c.match_score, c.active_assignments)
+    )
     return candidates
 
 

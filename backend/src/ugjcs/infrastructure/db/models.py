@@ -129,6 +129,12 @@ class ReviewAssignmentRow(Base):
     confidential_comments_to_editor: Mapped[str | None] = mapped_column(Text, nullable=True)
     """Never serialised to an author — see `ugjcs.api.schemas.ReviewOut`."""
     assigned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    """When the review is expected back — `assigned_at + REVIEW_PERIOD` (21 days, see
+    `ugjcs.application.ports.REVIEW_PERIOD`) for every assignment recorded since
+    `0006_review_due_dates`, which also backfilled older rows from their `assigned_at`.
+    Nullable because a deadline is bookkeeping, not an invariant: a NULL here means "no
+    deadline recorded", and nothing downstream may treat it as "overdue"."""
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (

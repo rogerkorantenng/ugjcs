@@ -402,7 +402,8 @@ def test_reviewer_candidates_omits_unverified_inactive_and_non_reviewer_accounts
 
 def test_reviewer_candidates_lists_eligible_and_excluded_with_their_reasons() -> None:
     """One of each conflict-of-interest rule, plus two clean candidates whose ordering
-    proves the sort: eligible before excluded, lowest current load first."""
+    proves the load tiebreak: eligible before excluded, and — with every expertise list
+    empty, so every `match_score` is 0 — lowest current load first."""
     conflicted_author_reviewer = new_user_id()
     manuscript = Manuscript(
         id=ManuscriptId(uuid4()),
@@ -503,3 +504,100 @@ def test_reviewer_candidates_lists_eligible_and_excluded_with_their_reasons() ->
     ids_in_order = [c["id"] for c in body]
     assert ids_in_order[:2] == [str(eligible_low_load), str(eligible_high_load)]
     assert all(c["excluded_reason"] is not None for c in body[2:])
+    # With no expertise declared anywhere, every candidate scores 0 — and the field is
+    # present on excluded candidates too, by design (see `RankedReviewerCandidateOut`).
+    assert all(c["match_score"] == 0 for c in body)
+
+
+def test_reviewer_candidates_are_ranked_by_expertise_match_then_load() -> None:
+    """The expertise ranking, isolated: a better keyword match outranks a lighter load,
+    load only breaks score ties, and a strongly-matching excluded candidate still sinks
+    below every eligible one."""
+    manuscript = Manuscript(
+        id=ManuscriptId(uuid4()),
+        tracking_code=TrackingCode.mint(2026, 154),
+        title="T",
+        abstract="A.",
+        keywords=("edge computing", "renewable energy", "rural connectivity"),
+        author_ids=(AUTHOR,),
+        corresponding_author_id=AUTHOR,
+    )
+    manuscript.submit(actor_id=AUTHOR, occurred_at=NOW)
+
+    unmatched_idle = new_user_id()
+    specialist_busy = new_user_id()
+    specialist_idle = new_user_id()
+    excluded_expert = new_user_id()
+    elsewhere_manuscript_id = ManuscriptId(uuid4())
+
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    app = create_app()
+    uow = FakeUnitOfWork()
+    uow.manuscripts.store[manuscript.id] = manuscript
+    uow.accounts.accounts[AUTHOR] = FakeAccount(
+        id=AUTHOR,
+        email="author@sdj.test",
+        roles=frozenset({Role.AUTHOR}),
+        affiliation="University of Ghana",
+    )
+    uow.accounts.accounts[unmatched_idle] = FakeAccount(
+        id=unmatched_idle,
+        email="unmatched@sdj.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="Elsewhere University",
+        expertise=("blockchain",),
+    )
+    # Case-insensitive whole-phrase matching, and no substring credit: "EDGE Computing"
+    # and "Renewable Energy" both count; "connectivity" alone does not.
+    uow.accounts.accounts[specialist_busy] = FakeAccount(
+        id=specialist_busy,
+        email="specialist-busy@sdj.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="Elsewhere University",
+        expertise=("EDGE Computing", "Renewable Energy", "connectivity"),
+    )
+    uow.accounts.accounts[specialist_idle] = FakeAccount(
+        id=specialist_idle,
+        email="specialist-idle@sdj.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="Elsewhere University",
+        expertise=("edge computing", "renewable energy"),
+    )
+    uow.accounts.accounts[excluded_expert] = FakeAccount(
+        id=excluded_expert,
+        email="excluded-expert@sdj.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="University of Ghana",  # same as the author: conflict, excluded
+        expertise=("edge computing", "renewable energy", "rural connectivity"),
+    )
+    uow.assignments.assignments.append((elsewhere_manuscript_id, specialist_busy))
+
+    async def _uow() -> AsyncIterator[FakeUnitOfWork]:
+        yield uow
+
+    app.dependency_overrides[get_uow] = _uow
+    app.dependency_overrides[get_current_actor] = lambda: actor
+    client = TestClient(app)
+
+    response = client.get(f"/api/v1/editorial/{manuscript.tracking_code.value}/reviewer-candidates")
+    assert response.status_code == 200
+    body = response.json()
+    by_id = {c["id"]: c for c in body}
+
+    assert by_id[str(specialist_idle)]["match_score"] == 2
+    assert by_id[str(specialist_busy)]["match_score"] == 2
+    assert by_id[str(unmatched_idle)]["match_score"] == 0
+    assert by_id[str(excluded_expert)]["match_score"] == 3
+    assert by_id[str(excluded_expert)]["excluded_reason"] == (
+        "shares an affiliation with an author"
+    )
+
+    # Best match first; the 2-2 tie broken by lower load; the zero-match idle reviewer
+    # after both specialists despite their heavier loads; the excluded expert last of
+    # all, its 3-keyword score notwithstanding.
+    assert [c["id"] for c in body] == [
+        str(specialist_idle),
+        str(specialist_busy),
+        str(unmatched_idle),
+        str(excluded_expert),
+    ]
