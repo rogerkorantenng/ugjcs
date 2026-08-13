@@ -40,6 +40,9 @@ class DictAccountRepository:
             a for a in self._by_id.values() if role in a.roles and a.is_verified and a.is_active
         ]
 
+    async def list_all(self) -> list[Account]:
+        return sorted(self._by_id.values(), key=lambda a: a.email.value)
+
 
 class FakeEmailSender:
     def __init__(self) -> None:

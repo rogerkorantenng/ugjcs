@@ -149,8 +149,8 @@ def make_register_client() -> tuple[TestClient, FakeAccountRepository]:
         uow.accounts,  # type: ignore[arg-type]
         _FakeVerificationTokens(),  # type: ignore[arg-type]
         _FakeHasher(),  # type: ignore[arg-type]
-        _FakeEmails(),  # type: ignore[arg-type]
-        _FakeClock(),  # type: ignore[arg-type]
+        _FakeEmails(),
+        _FakeClock(),
     )
     app.dependency_overrides[get_registration_service] = lambda: registration
     app.dependency_overrides[get_session_service] = lambda: session_service

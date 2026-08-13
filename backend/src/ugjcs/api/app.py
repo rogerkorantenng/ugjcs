@@ -48,8 +48,10 @@ def create_app() -> FastAPI:
         return {"status": "ready"}
 
     from ugjcs.api.routers import (
+        admin,
         archive,
         auth,
+        billing,
         certificate,
         editorial,
         manuscripts,
@@ -58,6 +60,8 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+    app.include_router(admin.router, prefix="/api/v1/admin", tags=["admin"])
+    app.include_router(billing.router, prefix="/api/v1/billing", tags=["billing"])
     app.include_router(manuscripts.router, prefix="/api/v1/manuscripts", tags=["manuscripts"])
     app.include_router(editorial.router, prefix="/api/v1/editorial", tags=["editorial"])
     app.include_router(

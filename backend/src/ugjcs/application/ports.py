@@ -17,6 +17,22 @@ from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 
 
+@dataclass(frozen=True, slots=True)
+class PublishedSearchHit:
+    """One archive search result: the manuscript, plus where the match came from.
+
+    `snippet` is non-`None` exactly when the query matched the paper's extracted
+    full text (`manuscripts.fulltext`) — it carries a `ts_headline`-style fragment of
+    the surrounding context. A `None` snippet means the match came from the metadata
+    fields (title, abstract or keywords), where the caller can already see the match
+    for itself in the returned fields; echoing a fragment of the title back as a
+    "snippet" would be noise pretending to be signal.
+    """
+
+    manuscript: Manuscript
+    snippet: str | None
+
+
 class ManuscriptRepository(Protocol):
     """Persistence for the manuscript aggregate and its event chain."""
 
@@ -46,6 +62,27 @@ class ManuscriptRepository(Protocol):
 
     async def search_published(self, query: str) -> list[Manuscript]:
         """Published manuscripts whose title or abstract contains `query`, case-insensitively."""
+        ...
+
+    async def search_published_with_snippets(self, query: str) -> list[PublishedSearchHit]:
+        """Published manuscripts matching `query` in title, abstract, keywords OR extracted
+        full text — the archive search endpoint's source since the full-text feature.
+
+        Kept separate from `search_published` rather than widening it: that method's
+        narrower title/abstract contract is proven by existing tests and callers, and a
+        full-text hit needs to carry *where* it matched (the snippet), which is a
+        different return shape — see `PublishedSearchHit`.
+        """
+        ...
+
+    async def store_fulltext(self, manuscript_id: ManuscriptId, text: str) -> None:
+        """Persist the text extracted from a manuscript's published PDF.
+
+        Deliberately not part of the `Manuscript` aggregate: extracted body text is a
+        search index input derived from the stored document, not editorial state — no
+        invariant guards it, no event records it, and loading megabytes of prose into
+        every aggregate rehydration would tax every route to serve one feature.
+        """
         ...
 
     async def list_by_author(self, author_id: UserId) -> list[Manuscript]:
@@ -86,6 +123,16 @@ class AccountRepository(Protocol):
         caller to filter — the reviewer-candidates endpoint (`ugjcs.api.routers.editorial`)
         relies on that: such an account must be omitted entirely, never listed with a
         reason, and the simplest way to guarantee that is never fetching it at all.
+        """
+        ...
+
+    async def list_all(self) -> list[Account]:
+        """Every account, in a stable order, whatever its state.
+
+        Unlike `list_by_role` this deliberately includes inactive and unverified
+        accounts: the admin console (`ugjcs.api.routers.admin`) exists precisely to fix
+        accounts in those states, so a listing that hid them would hide the console's
+        own work queue. Reached only from `Action.MANAGE_USERS`-gated routes.
         """
         ...
 
@@ -199,6 +246,87 @@ class ReviewAssignmentRepository(Protocol):
     ) -> None: ...
 
 
+DEFAULT_APC_PESEWAS = 15_000
+"""The article processing charge, in pesewas: GHS 150.00, a deliberately small test-mode
+figure. Lives here, beside the record it prices, for the same reason `REVIEW_PERIOD`
+does: the decision route that creates invoices and the in-memory fake the API unit tests
+use must agree on the amount, or a test would prove a tariff production does not charge."""
+
+
+@dataclass(frozen=True, slots=True)
+class ApcInvoiceRecord:
+    """An `apc_invoices` row, as far as the application layer needs to see it.
+
+    A read model, not an aggregate, by the same reasoning as `ReviewAssignmentRecord`:
+    the only invariants (one invoice per manuscript, a closed status vocabulary) are
+    schema constraints, and the status transitions are single hops recorded by the
+    billing routes — there is no lifecycle rich enough to earn a domain type.
+
+    `status` takes exactly the values `"pending"`, `"paid"` and `"waived"`.
+    `paystack_reference` is the transaction reference this API minted and handed to
+    Paystack at initialisation — never a secret, safe to echo to the invoice's owner —
+    and stays `None` for invoices settled in mock mode or waived outright.
+    """
+
+    id: UUID
+    manuscript_id: ManuscriptId
+    amount_pesewas: int
+    status: str
+    paystack_reference: str | None
+    created_at: datetime
+    settled_at: datetime | None
+
+
+class ApcInvoiceRepository(Protocol):
+    """Persistence for article-processing-charge invoices, one per accepted manuscript."""
+
+    async def create_if_absent(
+        self, manuscript_id: ManuscriptId, *, amount_pesewas: int, created_at: datetime
+    ) -> None:
+        """Open a pending invoice unless this manuscript already has one.
+
+        Idempotent by explicit precheck, unlike `ReviewAssignmentRepository.assign`:
+        an accept decision is the caller, and the decision path must stay repeatable
+        in tests and seeds without a duplicate-invoice error masking the decision
+        it was recording. The `manuscript_id` unique constraint still backstops races.
+        """
+        ...
+
+    async def get_for_manuscript(self, manuscript_id: ManuscriptId) -> ApcInvoiceRecord | None: ...
+
+    async def set_reference(self, manuscript_id: ManuscriptId, reference: str) -> None:
+        """Record the Paystack transaction reference an initialisation minted."""
+        ...
+
+    async def mark_paid(self, manuscript_id: ManuscriptId, *, settled_at: datetime) -> None: ...
+
+    async def mark_waived(self, manuscript_id: ManuscriptId, *, settled_at: datetime) -> None: ...
+
+
+class PaymentGateway(Protocol):
+    """A card-payment processor, as billing needs to see one.
+
+    The port speaks in this journal's terms (minor currency units, a caller-minted
+    reference) so the application and API layers never learn Paystack's wire format;
+    the translation lives entirely in `ugjcs.infrastructure.payments.paystack`. The
+    secret key is a constructor concern of the adapter — no method here ever sees it.
+    """
+
+    async def initialize_transaction(
+        self, *, email: str, amount_minor_units: int, reference: str
+    ) -> str:
+        """Open a checkout for `amount_minor_units` and return its authorization URL.
+
+        `reference` is minted by the caller and echoed back by the processor, so a
+        later `verify_transaction` needs no processor-issued identifier stored.
+        """
+        ...
+
+    async def verify_transaction(self, reference: str) -> bool:
+        """Whether the processor reports the referenced transaction as successfully paid."""
+        ...
+
+
 class UnitOfWork(Protocol):
     """A transactional boundary. Exiting without `commit` rolls back."""
 
@@ -206,6 +334,7 @@ class UnitOfWork(Protocol):
     accounts: AccountRepository
     refresh_tokens: RefreshTokenRepository
     assignments: ReviewAssignmentRepository
+    invoices: ApcInvoiceRepository
 
     async def __aenter__(self) -> Self: ...
 
@@ -281,6 +410,16 @@ class DocumentStore(Protocol):
 
     async def put(self, key: str, data: bytes, *, content_type: str) -> None:
         """Write `data` under `key`, replacing whatever was there before."""
+        ...
+
+    async def get(self, key: str) -> bytes:
+        """Read the object stored under `key`, or raise `LookupError` if none exists.
+
+        Added for full-text extraction at publish time — the one moment this API ever
+        reads a document's *bytes* back rather than minting a pre-signed URL for a
+        browser to fetch directly. `LookupError` (not an adapter-specific exception)
+        keeps callers ignorant of which store raised it.
+        """
         ...
 
     async def presigned_url(self, key: str, *, expires_in: timedelta) -> str:

@@ -24,14 +24,16 @@ from ugjcs.api.schemas_analytics import (
     RankedReviewerCandidateOut,
     ReviewerPerformanceOut,
 )
-from ugjcs.api.wiring import UowDep
-from ugjcs.application.ports import UnitOfWork
+from ugjcs.api.wiring import DocumentStoreDep, UowDep
+from ugjcs.application.ports import DEFAULT_APC_PESEWAS, UnitOfWork
 from ugjcs.domain.account import Account
 from ugjcs.domain.conflicts import exclusion_reason
-from ugjcs.domain.enums import EventType, Role
+from ugjcs.domain.enums import DecisionType, EventType, Role
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.ids import UserId, mint_issue_id
+from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Action, Actor
+from ugjcs.infrastructure.storage.fulltext import extract_pdf_text
 
 router = APIRouter()
 
@@ -262,6 +264,14 @@ async def record_decision(
         occurred_at=datetime.now(UTC),
     )
     await uow.manuscripts.save(manuscript)
+    if body.decision is DecisionType.ACCEPT:
+        # Acceptance is the moment the APC becomes owed, so the invoice is opened in
+        # the same transaction that records the decision — never one without the
+        # other. `create_if_absent` keeps a re-recorded accept (or a race) from
+        # double-billing; settlement is the billing router's business, not this one's.
+        await uow.invoices.create_if_absent(
+            manuscript.id, amount_pesewas=DEFAULT_APC_PESEWAS, created_at=datetime.now(UTC)
+        )
     await uow.commit()
     return ManuscriptOut.from_domain(manuscript)
 
@@ -432,9 +442,34 @@ async def schedule(
 
 
 @router.post("/{tracking_code}/publish", response_model=ManuscriptOut)
-async def publish(tracking_code: str, actor: PublishDep, uow: UowDep) -> ManuscriptOut:
+async def publish(
+    tracking_code: str, actor: PublishDep, uow: UowDep, documents: DocumentStoreDep
+) -> ManuscriptOut:
     manuscript = await _get_or_404(uow, tracking_code)
     manuscript.publish(actor_id=UserId(actor.id), occurred_at=datetime.now(UTC))
     await uow.manuscripts.save(manuscript)
+    await _index_fulltext(uow, manuscript, documents)
     await uow.commit()
     return ManuscriptOut.from_domain(manuscript)
+
+
+async def _index_fulltext(
+    uow: UnitOfWork, manuscript: Manuscript, documents: DocumentStoreDep
+) -> None:
+    """Extract the freshly published PDF's text into `manuscripts.fulltext`.
+
+    Best-effort by design: publication is an editorial act, search indexing a
+    convenience derived from it, so no storage hiccup or unreadable PDF may roll the
+    publish back — hence the deliberately broad `except Exception`. A paper that slips
+    through unindexed is picked up by the entrypoint backfill
+    (`ugjcs.scripts.backfill_fulltext`) on the next deploy, which is the same code
+    path serving papers published before this feature existed.
+    """
+    if manuscript.original_document_key is None:
+        return
+    try:
+        text = extract_pdf_text(await documents.get(manuscript.original_document_key))
+    except Exception:  # deliberately broad - see docstring: indexing never blocks publishing
+        return
+    if text:
+        await uow.manuscripts.store_fulltext(manuscript.id, text)

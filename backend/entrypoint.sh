@@ -22,5 +22,11 @@ python -m ugjcs.scripts.seed_demo --if-empty
 echo "Pruning manuscripts left behind by live verification runs..."
 python -m ugjcs.scripts.prune_junk
 
+# After prune, so effort is never spent extracting text from manuscripts the prune is
+# about to delete. Idempotent: only published rows with NULL fulltext are touched, so
+# steady-state boots select nothing and move straight on.
+echo "Backfilling full-text search for already-published papers..."
+python -m ugjcs.scripts.backfill_fulltext
+
 echo "Starting API server..."
 exec uvicorn ugjcs.api.main:app --host 0.0.0.0 --port 8000

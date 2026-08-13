@@ -1,8 +1,9 @@
 """PostgreSQL implementation of the manuscript repository port."""
 
-from sqlalchemy import func, select
+from sqlalchemy import case, func, null, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ugjcs.application.ports import PublishedSearchHit
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.hashchain import ChainedEvent, append
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
@@ -87,6 +88,53 @@ class SqlAlchemyManuscriptRepository:
         )
         rows = result.scalars().all()
         return [await self._rehydrate(row) for row in rows]  # type: ignore[misc]
+
+    async def search_published_with_snippets(self, query: str) -> list[PublishedSearchHit]:
+        """Metadata (title/abstract/keywords, substring) OR full text (`tsquery`) search.
+
+        The metadata side keeps `search_published`'s forgiving ILIKE semantics — a
+        reader typing half a word still finds the paper — while the full-text side uses
+        `plainto_tsquery`, which is what makes stemming ("scheduling" finds "scheduled")
+        and the `ts_headline` snippet possible at all. The snippet is computed only when
+        the full text matched: a `CASE` guard, because `ts_headline` would otherwise
+        happily highlight nothing and return the document's opening words as noise.
+        """
+        ts_query = func.plainto_tsquery("english", query)
+        ts_vector = func.to_tsvector("english", func.coalesce(ManuscriptRow.fulltext, ""))
+        fulltext_match = ts_vector.op("@@")(ts_query)
+        snippet = case(
+            (fulltext_match, func.ts_headline("english", ManuscriptRow.fulltext, ts_query)),
+            else_=null(),
+        )
+        like = f"%{query}%"
+        result = await self._session.execute(
+            select(ManuscriptRow, snippet.label("snippet"))
+            .where(
+                ManuscriptRow.status == S.PUBLISHED.value,
+                or_(
+                    ManuscriptRow.title.ilike(like),
+                    ManuscriptRow.abstract.ilike(like),
+                    # Keywords are an ARRAY(Text); flattening to one string keeps the
+                    # match substring-forgiving, consistent with title and abstract.
+                    func.array_to_string(ManuscriptRow.keywords, " ").ilike(like),
+                    fulltext_match,
+                ),
+            )
+            .order_by(ManuscriptRow.id)
+        )
+        hits: list[PublishedSearchHit] = []
+        for row, snippet_text in result.all():
+            manuscript = await self._rehydrate(row)
+            assert manuscript is not None  # row came from the select just above
+            hits.append(PublishedSearchHit(manuscript=manuscript, snippet=snippet_text))
+        return hits
+
+    async def store_fulltext(self, manuscript_id: ManuscriptId, text: str) -> None:
+        # A direct UPDATE, not a load-modify-save through the aggregate: `fulltext` is
+        # deliberately not a `Manuscript` field — see the port's docstring.
+        await self._session.execute(
+            update(ManuscriptRow).where(ManuscriptRow.id == manuscript_id).values(fulltext=text)
+        )
 
     async def list_by_author(self, author_id: UserId) -> list[Manuscript]:
         result = await self._session.execute(

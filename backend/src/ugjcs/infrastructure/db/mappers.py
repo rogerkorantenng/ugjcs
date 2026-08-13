@@ -4,7 +4,7 @@ Kept apart from `models.py` because the two change for different reasons: models
 with the schema, mappers with the domain.
 """
 
-from ugjcs.application.ports import RefreshTokenRecord, ReviewAssignmentRecord
+from ugjcs.application.ports import ApcInvoiceRecord, RefreshTokenRecord, ReviewAssignmentRecord
 from ugjcs.domain.account import Account, EmailAddress
 from ugjcs.domain.enums import EventType, Role
 from ugjcs.domain.enums import ManuscriptStatus as S
@@ -13,6 +13,7 @@ from ugjcs.domain.hashchain import ChainedEvent
 from ugjcs.domain.ids import IssueId, ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.infrastructure.db.models import (
+    ApcInvoiceRow,
     EditorialEventRow,
     ManuscriptAuthorRow,
     ManuscriptRow,
@@ -167,6 +168,18 @@ def row_to_refresh_token(row: RefreshTokenRow) -> RefreshTokenRecord:
         expires_at=row.expires_at,
         revoked_at=row.revoked_at,
         replaced_by=row.replaced_by,
+    )
+
+
+def invoice_row_to_record(row: ApcInvoiceRow) -> ApcInvoiceRecord:
+    return ApcInvoiceRecord(
+        id=row.id,
+        manuscript_id=ManuscriptId(row.manuscript_id),
+        amount_pesewas=row.amount_pesewas,
+        status=row.status,
+        paystack_reference=row.paystack_reference,
+        created_at=row.created_at,
+        settled_at=row.settled_at,
     )
 
 

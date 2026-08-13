@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 pytestmark = pytest.mark.integration
 
-EXPECTED_TABLES = {"editorial_events", "manuscript_authors", "manuscripts"}
+EXPECTED_TABLES = {"editorial_events", "manuscript_authors", "manuscripts", "apc_invoices"}
 
 
 async def test_the_expected_tables_exist(session: AsyncSession) -> None:
@@ -88,6 +88,54 @@ async def test_document_key_columns_exist_and_are_nullable(session: AsyncSession
         "original_document_key": ("YES", 512),
         "anonymised_document_key": ("YES", 512),
     }
+
+
+async def test_apc_invoices_enforce_one_invoice_per_manuscript(session: AsyncSession) -> None:
+    """The metadata half of `0007_apc_invoices`' parity: a UNIQUE on `manuscript_id`
+    (one acceptance, one charge) and the CHECK-constrained status vocabulary. The
+    migration half is exercised by `test_due_at_migration.py`'s upgrade-to-head run."""
+    unique = await session.execute(
+        text(
+            "SELECT indexdef FROM pg_indexes "
+            "WHERE tablename = 'apc_invoices' AND indexdef LIKE '%UNIQUE%manuscript_id%'"
+        )
+    )
+    assert unique.first() is not None
+    checks = await session.execute(
+        text(
+            "SELECT conname FROM pg_constraint "
+            "WHERE conrelid = 'apc_invoices'::regclass AND contype = 'c'"
+        )
+    )
+    names = {row[0] for row in checks}
+    assert "ck_apc_invoices_apc_status_vocabulary" in names
+    assert "ck_apc_invoices_apc_amount_positive" in names
+
+
+async def test_manuscripts_fulltext_is_nullable_text_with_a_gin_index(
+    session: AsyncSession,
+) -> None:
+    """The metadata half of `0008_manuscript_fulltext`' parity: nullable TEXT (NULL is
+    "not extracted", a legal steady state) plus the GIN expression index the search
+    query is written against."""
+    column = await session.execute(
+        text(
+            "SELECT is_nullable, data_type "
+            "FROM information_schema.columns WHERE table_name = 'manuscripts' "
+            "AND column_name = 'fulltext'"
+        )
+    )
+    assert [(row[0], row[1]) for row in column] == [("YES", "text")]
+    index = await session.execute(
+        text(
+            "SELECT indexdef FROM pg_indexes "
+            "WHERE tablename = 'manuscripts' AND indexname = 'ix_manuscripts_fulltext_tsv'"
+        )
+    )
+    rows = index.fetchall()
+    assert len(rows) == 1
+    assert "gin" in rows[0][0]
+    assert "to_tsvector" in rows[0][0]
 
 
 async def test_review_assignment_due_at_is_a_nullable_timestamptz(session: AsyncSession) -> None:

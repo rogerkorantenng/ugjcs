@@ -41,6 +41,7 @@ _OLD_BRAND_EMAIL_SUFFIX = "@ugjcs.test"
 _WIPE_ORDER: tuple[str, ...] = (
     "editorial_events",
     "review_assignments",
+    "apc_invoices",
     "manuscript_authors",
     "manuscripts",
     "refresh_tokens",

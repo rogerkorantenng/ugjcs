@@ -49,6 +49,12 @@ class SqlAlchemyAccountRepository:
         for role in wanted - held:
             row.roles.append(UserRoleRow(user_id=account.id, role=role))
 
+    async def list_all(self) -> list[Account]:
+        """Every account, inactive and unverified included — the admin console's roster.
+        Ordered by email: stable across calls and human-scannable, unlike UUID order."""
+        result = await self._session.execute(select(UserRow).order_by(UserRow.email))
+        return [row_to_account(row) for row in result.scalars()]
+
     async def list_by_role(self, role: Role) -> list[Account]:
         result = await self._session.execute(
             select(UserRow)
