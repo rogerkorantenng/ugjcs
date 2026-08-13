@@ -6,6 +6,7 @@ import { ProblemAlert } from "@/components/ui/alert";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { QueueTableSkeleton } from "@/components/skeletons";
+import { ReviewOverdueChip } from "@/components/review-overdue-chip";
 import { Tour } from "@/components/tour/tour";
 import { EDITOR_TOUR } from "@/components/tour/steps";
 import type { Manuscript, ManuscriptStatus } from "@/types/api";
@@ -121,7 +122,12 @@ export default function EditorialQueue() {
                               {manuscript.title}
                             </Link>
                           </td>
-                          <td className="text-right"><StatusBadge status={manuscript.status} /></td>
+                          <td className="text-right">
+                            <span className="inline-flex flex-wrap items-center justify-end gap-1.5">
+                              {section.status === "under_review" && <ReviewOverdueChip trackingCode={manuscript.tracking_code} />}
+                              <StatusBadge status={manuscript.status} />
+                            </span>
+                          </td>
                         </tr>
                       ))}
                     </tbody>

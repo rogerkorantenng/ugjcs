@@ -9,12 +9,16 @@ import { PdfViewer } from "@/components/ui/pdf-viewer";
 import { BackLink } from "@/components/ui/back-link";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerPicker } from "@/components/reviewer-picker";
+import { AssignmentsPanel } from "@/components/assignments-panel";
 import { DecisionForm } from "@/components/decision-form";
 import { PublicationPanel } from "@/components/publication-panel";
 import { ReviewsPanel } from "@/components/reviews-panel";
 import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
 
 const PUBLICATION_STATUSES = new Set(["accepted", "scheduled"]);
+// A decision certificate only exists once a decision has been recorded — the backend
+// answers 409 before that, so the link renders only from these statuses onward.
+const DECIDED_STATUSES = new Set(["accepted", "rejected", "scheduled", "published"]);
 // `begin_screening` is legal from both SUBMITTED and RESUBMITTED (`domain/transitions.py`)
 // — a resubmission goes through screening again, the same way a first submission does.
 const SCREENABLE_STATUSES = new Set(["submitted", "resubmitted"]);
@@ -107,6 +111,13 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         </div>
       )}
 
+      {(data.status === "under_screening" || REVIEWABLE_STATUSES.has(data.status)) && (
+        <div className="mt-6 border-t border-rule pt-6">
+          <h2 className="font-display-heading text-lg font-semibold text-ink">Assigned reviewers</h2>
+          <AssignmentsPanel trackingCode={trackingCode} />
+        </div>
+      )}
+
       {REVIEWABLE_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">
           <h2 className="font-display-heading text-lg font-semibold text-ink">Reviews</h2>
@@ -117,6 +128,15 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
       <div className="mt-6 border-t border-rule pt-6">
         <h2 className="font-display-heading text-lg font-semibold text-ink">Decision</h2>
         <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
+        {DECIDED_STATUSES.has(data.status) && (
+          <a
+            href={`/api/editorial-certificate/${trackingCode}`}
+            className="mt-4 inline-flex items-center gap-1.5 rounded-[3px] text-sm font-medium text-stamp underline decoration-stamp/40 underline-offset-2 hover:decoration-stamp focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            Download decision certificate
+            <span aria-hidden="true" className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/45">PDF</span>
+          </a>
+        )}
       </div>
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
