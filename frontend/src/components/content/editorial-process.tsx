@@ -5,7 +5,7 @@ import { NumberedStep, TermRow, TermList } from "./prose-page";
 const STEPS = [
   {
     title: "Submission",
-    body: "The corresponding author submits a title, abstract, keywords and a PDF manuscript, and adds any co-authors by email. The system issues a tracking code (for example UGJCS-2026-0012) that identifies the manuscript for its whole life.",
+    body: "The corresponding author submits a title, abstract, keywords and a PDF manuscript, and adds any co-authors by email. The portal issues a tracking code (for example SDJ-2026-0012) that identifies the manuscript for its whole life.",
   },
   {
     title: "Screening",
@@ -56,7 +56,7 @@ const DECISIONS = [
   },
   {
     term: "Reject",
-    body: "The manuscript will not be published in UGJCS, either at screening (desk rejection) or after review. Rejection is final for that manuscript.",
+    body: "The manuscript will not be published in the journal, either at screening (desk rejection) or after review. Rejection is final for that manuscript.",
   },
 ];
 

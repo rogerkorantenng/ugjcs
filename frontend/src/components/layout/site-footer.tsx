@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const FOOTER_LINKS = [
-  { href: "/about", label: "About the journal" },
+  { href: "/about", label: "About the portal" },
   { href: "/for-authors", label: "For authors" },
   { href: "/for-reviewers", label: "For reviewers" },
   { href: "/search", label: "Search the archive" },
@@ -19,15 +19,16 @@ export function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <p className="font-display-heading text-base font-semibold text-ink">
-              University of Ghana Journal of Computing Science
+              Science and Development Journal
             </p>
             <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink/60">
-              A double-blind peer-reviewed journal publishing original research in computing and
-              information systems, from the Department of Computer Science, University of Ghana.
+              The editorial portal of the Science and Development Journal, published by the College
+              of Basic and Applied Sciences, University of Ghana — submission, double-blind peer
+              review, decisions and publishing in one place.
             </p>
           </div>
           <div className="text-sm">
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink/40">The journal</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink/40">The portal</p>
             <ul className="mt-2 space-y-1.5">
               {FOOTER_LINKS.map((link) => (
                 <li key={link.href}>
@@ -48,10 +49,10 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-6">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink/40">UGJCS</p>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink/40">SDJ</p>
           <p className="text-xs text-ink/45">
-            Demo project for an Advanced Software Engineering exam — not an official University of
-            Ghana publication.
+            Capstone prototype for an Advanced Software Engineering exam — not an official CBAS or
+            University of Ghana system.
           </p>
         </div>
       </div>

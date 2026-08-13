@@ -22,8 +22,9 @@ const plexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "UGJCS", template: "%s · UGJCS" },
-  description: "University of Ghana Journal of Computing Science",
+  title: { default: "SDJ Editorial Portal", template: "%s · SDJ Editorial Portal" },
+  description:
+    "Submission and double-blind peer-review portal for the Science and Development Journal, College of Basic and Applied Sciences, University of Ghana.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

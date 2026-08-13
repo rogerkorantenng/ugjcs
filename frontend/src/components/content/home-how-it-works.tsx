@@ -3,13 +3,13 @@ import Link from "next/link";
 const STEPS = [
   {
     title: "Submit",
-    body: "An author signs in and submits a title, abstract, keywords and a PDF manuscript, adding co-authors by email. The system issues a tracking code — like UGJCS-2026-0012 — that follows the manuscript for life.",
+    body: "An author signs in and submits a title, abstract, keywords and a PDF manuscript, adding co-authors by email. The portal issues a tracking code — like SDJ-2026-0012 — that follows the manuscript for life.",
     href: "/for-authors",
     linkLabel: "Read the author guidelines",
   },
   {
     title: "Double-blind review",
-    body: "After an editor screens it, two independent reviewers read an anonymised copy — byline withheld, identifying metadata stripped. The editor weighs their reports and decides: accept, revise, or reject.",
+    body: "After an editor screens it, two independent reviewers read an anonymised copy — byline withheld, identifying metadata stripped by the portal. The editor weighs their reports and decides: accept, revise, or reject.",
     href: "/for-reviewers",
     linkLabel: "Read the reviewer guidelines",
   },
@@ -17,11 +17,11 @@ const STEPS = [
     title: "Publish",
     body: "Accepted manuscripts are scheduled into an issue and published to the open archive, byline restored, full text free for anyone to read. Revised papers return for a fresh review round first.",
     href: "/about",
-    linkLabel: "How the journal works",
+    linkLabel: "How the portal works",
   },
 ];
 
-/** Front-matter, not marketing: the three-stage editorial route in the journal's own
+/** Front-matter, not marketing: the portal's three-stage editorial route in the same
  * numbered-list language, each column ending in the guidance page that covers it. */
 export function HowItWorks() {
   return (

@@ -20,7 +20,7 @@ export const AUTHOR_TOUR: TourDefinition = {
     {
       target: "author-welcome",
       title: "Your submissions desk",
-      body: "Welcome to UGJCS. Every manuscript you send to the journal is tracked from this page — one card per submission, from first upload to final decision.",
+      body: "Welcome to the SDJ editorial portal. Every manuscript you send to the journal is tracked from this page — one card per submission, from first upload to final decision.",
     },
     {
       target: "author-submit",
@@ -55,7 +55,7 @@ export const REVIEWER_TOUR: TourDefinition = {
     },
     {
       title: "Double-blind, both ways",
-      body: "Reviews at UGJCS are fully anonymised: author names, affiliations, and acknowledgements are redacted before a paper reaches you, and authors never learn who reviewed them. You judge the work, not the names.",
+      body: "Reviews at the Science and Development Journal are fully anonymised: author names, affiliations, and acknowledgements are redacted before a paper reaches you, and authors never learn who reviewed them. You judge the work, not the names.",
     },
     {
       target: "reviewer-card",

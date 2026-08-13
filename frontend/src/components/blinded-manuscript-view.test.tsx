@@ -8,7 +8,7 @@ const AUTHOR_NAME_SENTINEL = "Kwame Osei-Sentinel";
 const AFFILIATION_SENTINEL = "University of Nowhere-Sentinel";
 
 const BASE_MANUSCRIPT: BlindedManuscript = {
-  tracking_code: "UGJCS-2026-0042",
+  tracking_code: "SDJ-2026-0042",
   title: "Fair Scheduling for Shared GPU Clusters",
   abstract: "A scheduler balancing fairness against utilisation.",
   keywords: ["scheduling"],

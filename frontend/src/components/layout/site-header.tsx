@@ -57,15 +57,15 @@ export function SiteHeader() {
     <header className="bg-ug-blue text-paper">
       <div className="border-b border-paper/10">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/50">
-          <span>Department of Computer Science · University of Ghana</span>
+          <span>College of Basic and Applied Sciences · University of Ghana</span>
           <span className="hidden sm:inline">Est. 2026</span>
         </div>
       </div>
       <div className="mx-auto flex max-w-5xl flex-wrap items-end justify-between gap-x-6 gap-y-4 px-4 py-6">
         <Link href="/" className="rounded-[3px] focus-visible:outline-2 focus-visible:outline-offset-2">
-          <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-ug-gold">A double-blind peer-reviewed journal</p>
+          <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-ug-gold">Editorial portal · Double-blind peer review</p>
           <p className="font-display-heading mt-1 max-w-lg text-2xl font-semibold leading-tight tracking-tight sm:text-[1.75rem]">
-            University of Ghana Journal of Computing Science
+            Science and Development Journal
           </p>
         </Link>
         <nav aria-label="Site" className="flex flex-wrap items-center gap-x-6 gap-y-2 pb-1 text-sm font-medium">

@@ -28,7 +28,7 @@ function mockFetch() {
 describe("ReviewerPicker", () => {
   it("shows an excluded candidate greyed out with its reason visible, not hidden", async () => {
     vi.stubGlobal("fetch", mockFetch());
-    render(<ReviewerPicker trackingCode="UGJCS-2026-0001" onAssigned={vi.fn()} />);
+    render(<ReviewerPicker trackingCode="SDJ-2026-0001" onAssigned={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByText("Dr. Kojo Mensah")).toBeInTheDocument());
     expect(screen.getByText(/shares an affiliation with an author/i)).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe("ReviewerPicker", () => {
   it("posts the selected candidate's id, not a typed id", async () => {
     const fetchSpy = mockFetch();
     vi.stubGlobal("fetch", fetchSpy);
-    render(<ReviewerPicker trackingCode="UGJCS-2026-0001" onAssigned={vi.fn()} />);
+    render(<ReviewerPicker trackingCode="SDJ-2026-0001" onAssigned={vi.fn()} />);
 
     await waitFor(() => expect(screen.getByText("Dr. Ama Owusu")).toBeInTheDocument());
     const radios = screen.getAllByRole("radio");
