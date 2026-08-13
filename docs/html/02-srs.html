@@ -51,7 +51,7 @@
 </head>
 <body>
 <header class="site">
-  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
   <div class="title">02 · Software Requirements Specification</div>
 </header>
 <main>
@@ -61,14 +61,24 @@
 </header>
 <h1 id="software-requirements-specification">Software Requirements
 Specification</h1>
-<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
-Computing Science <strong>Document:</strong> 02 — Software Requirements
-Specification <strong>Author:</strong> Roger Koranteng Obeng, student ID
-22424140 <strong>Assessor:</strong> Prof. Solomon Mensah
-<strong>Date:</strong> 2026-08-12 <strong>Conformance:</strong> Adapted
-from IEEE 830-1998 and ISO/IEC/IEEE 29148:2018 <strong>Status:</strong>
-Authoritative. Where this document and the implementation disagree, the
-implementation governs and the disagreement is recorded (§4.1, §7).</p>
+<p><strong>Project:</strong> SDJ Editorial Portal — an editorial portal
+for the Science and Development Journal (SDJ), published by the College
+of Basic and Applied Sciences (CBAS), University of Ghana
+<strong>Document:</strong> 02 — Software Requirements Specification
+<strong>Author:</strong> Roger Koranteng Obeng, student ID 22424140
+<strong>Assessor:</strong> Prof. Solomon Mensah <strong>Date:</strong>
+2026-08-12 <strong>Conformance:</strong> Adapted from IEEE 830-1998 and
+ISO/IEC/IEEE 29148:2018 <strong>Status:</strong> Authoritative. Where
+this document and the implementation disagree, the implementation
+governs and the disagreement is recorded (§4.1, §7).</p>
+<p><strong>Naming.</strong> The product specified here is the
+<strong>SDJ Editorial Portal</strong>. The repository
+(<code>github.com/rogerkorantenng/ugjcs</code>), hosting URLs, package
+names and infrastructure resource names retain the pilot's internal
+codename <strong>UGJCS</strong>; wherever <code>ugjcs</code> appears in
+a path, URL or identifier, it is that codename, not a separate system.
+The deployed system is a prototype built for an Advanced Software
+Engineering exam, not SDJ's official production system.</p>
 <p><strong>Revision note (2026-08-12, post-implementation).</strong>
 This document was originally authored before the API and frontend
 existed, when only the domain layer and the database persistence adapter
@@ -90,22 +100,24 @@ unchanged from the original.</p>
 <h2 id="1-introduction">1. Introduction</h2>
 <h3 id="11-purpose">1.1 Purpose</h3>
 <p>This document specifies the functional and non-functional
-requirements of UGJCS, a double-blind peer-reviewed journal management
-platform for the Department of Computer Science, University of Ghana. It
-is written for three audiences: the assessor judging
-requirements-engineering competence against this capstone's rubric, a
-future maintainer who needs to know what the system is contracted to do,
-and the author's own implementation, which this document constrains.
-Requirements are stated so that each is individually testable; no
-requirement is expressed as an unmeasurable quality goal.</p>
+requirements of the SDJ Editorial Portal, a double-blind peer-review and
+editorial management platform built for the Science and Development
+Journal (SDJ), published by the College of Basic and Applied Sciences,
+University of Ghana. It is written for three audiences: the assessor
+judging requirements-engineering competence against this capstone's
+rubric, a future maintainer who needs to know what the system is
+contracted to do, and the author's own implementation, which this
+document constrains. Requirements are stated so that each is
+individually testable; no requirement is expressed as an unmeasurable
+quality goal.</p>
 <h3 id="12-scope">1.2 Scope</h3>
-<p>UGJCS manages the complete scholarly publishing lifecycle: account
-registration and role-based access; manuscript submission with file
-upload; automated post-upload processing; editorial screening; assisted
-reviewer assignment; structured double-blind review; editorial decisions
-and revision rounds; issue composition and publication; a public archive
-with search, citation export and metadata harvesting; and a
-tamper-evident editorial audit trail. Payment processing,
+<p>The portal manages SDJ's complete scholarly publishing lifecycle:
+account registration and role-based access; manuscript submission with
+file upload; automated post-upload processing; editorial screening;
+assisted reviewer assignment; structured double-blind review; editorial
+decisions and revision rounds; issue composition and publication; a
+public archive with search, citation export and metadata harvesting; and
+a tamper-evident editorial audit trail. Payment processing,
 copy-editing/typesetting, multi-journal tenancy, ORCID federation, real
 DOI registration, and plagiarism screening against external corpora are
 explicitly out of scope (design specification §4.2). The full functional
@@ -122,9 +134,20 @@ acronyms and abbreviations</h3>
 </thead>
 <tbody>
 <tr>
+<td>SDJ</td>
+<td>Science and Development Journal — the established CBAS journal this
+portal is built for</td>
+</tr>
+<tr>
+<td>CBAS</td>
+<td>College of Basic and Applied Sciences, University of Ghana — SDJ's
+publisher and the project's client</td>
+</tr>
+<tr>
 <td>UGJCS</td>
-<td>University of Ghana Journal of Computing Science — the platform and
-the journal it hosts</td>
+<td>The pilot's internal codename for this system (see the naming note
+above) — survives only in package names, the repository name and hosting
+URLs</td>
 </tr>
 <tr>
 <td>Double-blind</td>
@@ -162,7 +185,8 @@ MoSCoW cut</td>
 </tr>
 <tr>
 <td>HoD</td>
-<td>Head of Department</td>
+<td>Head of Department — the design's shorthand for the
+college-leadership analytics consumer</td>
 </tr>
 <tr>
 <td>BFF</td>
@@ -175,7 +199,7 @@ for authenticated traffic</td>
 </tr>
 <tr>
 <td>DOI</td>
-<td>Digital Object Identifier (UGJCS issues DOI-<em>shaped</em> but
+<td>Digital Object Identifier (the portal issues DOI-<em>shaped</em> but
 unregistered identifiers — §4.2)</td>
 </tr>
 <tr>
@@ -230,10 +254,12 @@ cross-referenced to the technical debt register.</p>
 <hr />
 <h2 id="2-overall-description">2. Overall description</h2>
 <h3 id="21-product-perspective">2.1 Product perspective</h3>
-<p>UGJCS is a new, self-contained system; it replaces an ad hoc process
-of email and shared spreadsheets rather than integrating with an
-existing departmental system. It is a three-tier web application: a
-Next.js frontend (public archive, search, paper detail, and
+<p>The portal is a new, self-contained system built for the Science and
+Development Journal (SDJ), published by the College of Basic and Applied
+Sciences; it replaces the journal's current ad hoc process of email,
+shared drives and spreadsheets rather than integrating with an existing
+editorial system. It is a three-tier web application: a Next.js frontend
+(public archive, search, paper detail, and
 author/reviewer/editor/Editor-in-Chief screens, with all authenticated
 traffic proxied server-side as a Backend-For-Frontend), a FastAPI
 backend built as a hexagonal architecture with a framework-free domain
@@ -338,7 +364,7 @@ configuration</td>
 <td>Low</td>
 </tr>
 <tr>
-<td>Head of Department (secondary)</td>
+<td>CBAS college leadership (secondary)</td>
 <td>Consumes editorial throughput analytics</td>
 <td>Infrequent</td>
 <td>Low</td>
@@ -392,19 +418,20 @@ point inward only) — both gate <code>make check</code> and therefore CI
 on every push and pull request.</li>
 <li>The domain layer is framework-free by construction; this is a
 testable constraint, not an aspiration.</li>
-<li>Synthetic seed data only — no real departmental submissions or
-reviewer data are used.</li>
+<li>Synthetic seed data only — no real SDJ submissions or reviewer data
+are used.</li>
 </ul>
 <h3 id="26-assumptions-and-dependencies">2.6 Assumptions and
 dependencies</h3>
-<p>Assumptions: a single journal instance suffices; reviewers
-participate without incentive mechanisms; corpus scale is hundreds, not
-millions, of papers, justifying Postgres full-text search over a
-dedicated search engine; authors submit PDFs; a single transactional
-email provider is available. Dependencies: AWS managed services (ECS,
-RDS, S3, CloudFront), Vercel, and a transactional email provider must
-remain available and within free/low-cost tier limits for the system to
-operate as specified.</p>
+<p>Assumptions (stated as assumptions — the project had no access to
+real SDJ operational data): a single journal instance, SDJ itself,
+suffices; reviewers participate without incentive mechanisms; SDJ's
+corpus scale is hundreds, not millions, of papers, justifying Postgres
+full-text search over a dedicated search engine; authors submit PDFs; a
+single transactional email provider is available. Dependencies: AWS
+managed services (ECS, RDS, S3, CloudFront), Vercel, and a transactional
+email provider must remain available and within free/low-cost tier
+limits for the system to operate as specified.</p>
 <hr />
 <h2 id="3-specific-requirements">3. Specific requirements</h2>
 <p>Each functional requirement is stated as "the system shall …", is
@@ -1317,7 +1344,7 @@ UC11, UC18, UC21 (recipient)</td>
 view), UC20 (indirectly, as the harvested party), UC25</td>
 </tr>
 <tr>
-<td>Head of Department</td>
+<td>CBAS college leadership</td>
 <td>UC22 (read-only consumer)</td>
 </tr>
 <tr>
@@ -2230,6 +2257,6 @@ note (p.1) records when and against what evidence that shift was
 made.</li>
 </ul>
 </main>
-<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+<footer class="site">SDJ Editorial Portal — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
 </body>
 </html>

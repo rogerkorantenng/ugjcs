@@ -1,6 +1,7 @@
-# UGJCS — Testing Report
+# SDJ Editorial Portal — Testing Report
 
-**Project:** UGJCS — University of Ghana Journal of Computing Science
+**Project:** SDJ Editorial Portal — an editorial portal for the Science and Development
+Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana
 **Document:** 06 — Testing report
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Assessor:** Prof. Solomon Mensah
@@ -17,7 +18,7 @@ Frontend: `https://ugjcs-frontend.vercel.app` · API: `https://tsxsbf9rzp.us-eas
 
 ## 1. Testing strategy
 
-UGJCS is built as a hexagonal architecture: a framework-free domain at the centre, an
+The portal is built as a hexagonal architecture: a framework-free domain at the centre, an
 application layer orchestrating use cases against ports, and infrastructure adapters
 (PostgreSQL, S3, JWT, Argon2) at the edge, fronted by a FastAPI HTTP boundary and a Next.js
 Backend-For-Frontend. The test strategy is layered to match, because each layer fails in a
@@ -115,7 +116,7 @@ these tables summarise.
 | Withdrawal by a non-corresponding co-author (`test_a_co_author_who_is_not_corresponding_cannot_withdraw`, `test_policies.py`) | Refused | Refused | Pass |
 | Every `ManuscriptStatus` appears in the transition table (`test_every_status_appears_in_the_table`) | No status is undeclared | Confirmed | Pass |
 | Legal transitions permitted, shortcuts forbidden, over the full status × status matrix (`test_lifecycle_permits_expected_transitions`, `test_lifecycle_forbids_shortcut_transitions`) | Table matches exactly | Matches | Pass |
-| Tracking code formatting and round-trip parsing (`test_tracking_code_formats_year_and_zero_padded_sequence`, `test_tracking_code_parses_its_own_output`) | `UGJCS-YYYY-NNNN`, and `parse(format(x)) == x` | Confirmed | Pass |
+| Tracking code formatting and round-trip parsing (`test_tracking_code_formats_year_and_zero_padded_sequence`, `test_tracking_code_parses_its_own_output`) | `SDJ-YYYY-NNNN`, and `parse(format(x)) == x` | Confirmed | Pass |
 | Role policy: reviewer may not decide, author may not screen, editor may not publish (`test_reviewer_may_not_decide`, `test_author_may_not_screen`, `test_editor_may_not_publish`) | All denied | All denied | Pass |
 | Multiple roles grant the union of permissions (`test_multiple_roles_grant_the_union_of_permissions`) | Union, not intersection | Confirmed | Pass |
 | PDF magic-number validation, independent of client-supplied content type (`test_a_client_supplied_content_type_cannot_substitute_for_the_magic_number`) | Rejected on bytes, not on header | Rejected | Pass |
@@ -400,18 +401,18 @@ UAT was run as scripted, role-scoped scenarios against the **live deployment**
 
 | Role | Account | Password |
 |---|---|---|
-| Author | `author@ugjcs.test` | `Ugjcs-Author-2026!` |
-| Reviewer | `reviewer@ugjcs.test` | `Ugjcs-Reviewer-2026!` |
-| Editor | `editor@ugjcs.test` | `Ugjcs-Editor-2026!` |
-| Editor-in-Chief | `eic@ugjcs.test` | `Ugjcs-Eic-2026!` |
-| Administrator | `admin@ugjcs.test` | `Ugjcs-Admin-2026!` |
+| Author | `author@sdj.test` | `Sdj-Author-2026!` |
+| Reviewer | `reviewer@sdj.test` | `Sdj-Reviewer-2026!` |
+| Editor | `editor@sdj.test` | `Sdj-Editor-2026!` |
+| Editor-in-Chief | `eic@sdj.test` | `Sdj-EditorChief-2026!` |
+| Administrator | `admin@sdj.test` | `Sdj-Admin-2026!` |
 
 ### Scenarios actually exercised for this report (live, browser-driven)
 
 | Scenario | Steps | Expected | Observed | Result |
 |---|---|---|---|---|
-| Author login and dashboard | Navigate to `/login`, submit `author@ugjcs.test` / `Ugjcs-Author-2026!` | Redirected to `/author`, listing this author's submissions with status | Redirected to `/author`; ten submissions listed with correct tracking codes and statuses (`Published`, `Revision requested`, `Submitted`, `Under review`) | Pass |
-| Public archive reachable without authentication | Navigate to `/search` with no session | Search page renders, no login redirect | Page rendered directly, titled "Search · UGJCS" | Pass |
+| Author login and dashboard | Navigate to `/login`, submit `author@sdj.test` / `Sdj-Author-2026!` | Redirected to `/author`, listing this author's submissions with status | Redirected to `/author`; ten submissions listed with correct tracking codes and statuses (`Published`, `Revision requested`, `Submitted`, `Under review`) | Pass |
+| Public archive reachable without authentication | Navigate to `/search` with no session | Search page renders, no login redirect | Page rendered directly, titled "Search · SDJ Editorial Portal" | Pass |
 | Cross-role access denied at the routing layer | While authenticated as `author`, navigate directly to `/editor` | Access refused, not the editor queue | Redirected to `/` (public homepage); no editor content rendered, no session state exposed on that page | Pass — matches `frontend/middleware.ts`: a session present without the required role redirects to `/`, distinct from the no-session case (§5, next row), which redirects to `/login` |
 
 The redirect-to-home behaviour on a denied role check is a deliberate design choice, not a

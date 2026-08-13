@@ -1,4 +1,4 @@
-# QA Report — UGJCS Journal Platform
+# QA Report — SDJ Editorial Portal
 
 - **Target:** https://ugjcs-frontend.vercel.app (frontend, Vercel) + https://tsxsbf9rzp.us-east-1.awsapprunner.com (API, App Runner)
 - **Date:** 2026-08-13 (overnight autonomous sweep)
@@ -9,13 +9,13 @@
 
 **Public:** home, /about, /for-authors, /for-reviewers, /search (results, empty state, no-results state), paper detail + PDF access, unknown-paper URL, sitemap, login. Zero console errors on every public page.
 
-**Author** (author@ugjcs.test): sign-in, role-aware landing, onboarding tour (4 steps, advance/close verified), manuscript list and statuses, **full submission with a real PDF upload (201, redirect to detail with confirmation banner)**, co-author lookup, withdrawal, back links, session persistence (public header shows "My dashboard" while signed in; /login bounces a signed-in visitor to their desk).
+**Author** (author@sdj.test): sign-in, role-aware landing, onboarding tour (4 steps, advance/close verified), manuscript list and statuses, **full submission with a real PDF upload (201, redirect to detail with confirmation banner)**, co-author lookup, withdrawal, back links, session persistence (public header shows "My dashboard" while signed in; /login bounces a signed-in visitor to their desk).
 
 **Reviewer** (reviewer, reviewer2, reviewer3, reviewer6): sign-in lands on /reviewer (role-aware redirect), assignments list, double-blind check on the assignment page (**no author name, email, or affiliation anywhere; "Author withheld" redaction bar present**), review form (scores, recommendation, comments, confidential comments) submitted successfully by two reviewers.
 
 **Editor / EIC** (editor@, eic@): editorial queue by stage, begin screening, reviewer picker (**4 eligible external candidates; UG-affiliated candidates greyed out with "shares an affiliation with an author"; an at-capacity candidate excluded with reason**), two assignments, send-to-review decision, quorum auto-close after the second review (REVIEWS COMPLETE, 2 of 2), reject decision with its confirm step.
 
-The full editorial lifecycle was exercised on a disposable manuscript (UGJCS-2026-746109, itself QA junk scheduled for pruning): submit → screen → assign ×2 → send to review → review ×2 → quorum close → confirmed reject.
+The full editorial lifecycle was exercised on a disposable manuscript (SDJ-2026-746109, itself QA junk scheduled for pruning): submit → screen → assign ×2 → send to review → review ×2 → quorum close → confirmed reject.
 
 ## Issues found and fixed
 
@@ -41,7 +41,7 @@ Fixed earlier the same night (same session, pre-sweep): missing back links on al
 ## Known limitations (documented, not fixed)
 
 - Unknown-paper URLs render the not-found page but the HTTP status stays 200 — the streaming shell (loading.tsx) commits the status before the archive lookup resolves. A soft-404; crawlers handle these, readers never see the difference.
-- The withdrawn QA manuscript (UGJCS-2026-174588) demonstrates the WITHDRAWN state in the author dashboard until the next prune removes it.
+- The withdrawn QA manuscript (SDJ-2026-174588) demonstrates the WITHDRAWN state in the author dashboard until the next prune removes it.
 - Inline PDF preview falls back to an "Open PDF" button in browsers without a PDF plugin (by design; headless browsers exercise this fallback).
 
 ## Health score

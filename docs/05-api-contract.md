@@ -1,6 +1,7 @@
-# UGJCS — API Contract
+# SDJ Editorial Portal — API Contract
 
-**Project:** UGJCS — University of Ghana Journal of Computing Science
+**Project:** SDJ Editorial Portal — an editorial portal for the Science and Development
+Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana
 **Author:** Roger Koranteng Obeng (22424140)
 **Established:** 2026-08-12
 **Status:** Authoritative. This document is the single source of truth for the HTTP boundary between the FastAPI backend (Plan 4) and the Next.js frontend (Plan 5). Where either plan's prose disagrees with this document, this document wins; the disagreement is a defect in the plan, to be corrected there, not here.

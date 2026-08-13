@@ -1,6 +1,7 @@
 # Software Requirements Specification
 
-**Project:** UGJCS — University of Ghana Journal of Computing Science
+**Project:** SDJ Editorial Portal — an editorial portal for the Science and Development
+Journal (SDJ), published by the College of Basic and Applied Sciences (CBAS), University of Ghana
 **Document:** 02 — Software Requirements Specification
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Assessor:** Prof. Solomon Mensah
@@ -8,6 +9,12 @@
 **Conformance:** Adapted from IEEE 830-1998 and ISO/IEC/IEEE 29148:2018
 **Status:** Authoritative. Where this document and the implementation disagree, the
 implementation governs and the disagreement is recorded (§4.1, §7).
+
+**Naming.** The product specified here is the **SDJ Editorial Portal**. The repository
+(`github.com/rogerkorantenng/ugjcs`), hosting URLs, package names and infrastructure resource
+names retain the pilot's internal codename **UGJCS**; wherever `ugjcs` appears in a path, URL
+or identifier, it is that codename, not a separate system. The deployed system is a prototype
+built for an Advanced Software Engineering exam, not SDJ's official production system.
 
 **Revision note (2026-08-12, post-implementation).** This document was originally authored
 before the API and frontend existed, when only the domain layer and the database
@@ -28,9 +35,10 @@ this revision are unchanged from the original.
 
 ### 1.1 Purpose
 
-This document specifies the functional and non-functional requirements of UGJCS, a
-double-blind peer-reviewed journal management platform for the Department of Computer
-Science, University of Ghana. It is written for three audiences: the assessor judging
+This document specifies the functional and non-functional requirements of the SDJ Editorial
+Portal, a double-blind peer-review and editorial management platform built for the Science
+and Development Journal (SDJ), published by the College of Basic and Applied Sciences,
+University of Ghana. It is written for three audiences: the assessor judging
 requirements-engineering competence against this capstone's rubric, a future maintainer
 who needs to know what the system is contracted to do, and the author's own
 implementation, which this document constrains. Requirements are stated so that each is
@@ -38,7 +46,7 @@ individually testable; no requirement is expressed as an unmeasurable quality go
 
 ### 1.2 Scope
 
-UGJCS manages the complete scholarly publishing lifecycle: account registration and
+The portal manages SDJ's complete scholarly publishing lifecycle: account registration and
 role-based access; manuscript submission with file upload; automated post-upload
 processing; editorial screening; assisted reviewer assignment; structured double-blind
 review; editorial decisions and revision rounds; issue composition and publication; a
@@ -53,7 +61,9 @@ requirements in §3 of this document.
 
 | Term | Meaning |
 |---|---|
-| UGJCS | University of Ghana Journal of Computing Science — the platform and the journal it hosts |
+| SDJ | Science and Development Journal — the established CBAS journal this portal is built for |
+| CBAS | College of Basic and Applied Sciences, University of Ghana — SDJ's publisher and the project's client |
+| UGJCS | The pilot's internal codename for this system (see the naming note above) — survives only in package names, the repository name and hosting URLs |
 | Double-blind | Neither author nor reviewer identity is disclosed to the other party during review |
 | MoSCoW | Must/Should/Could/Won't — requirement prioritisation scheme |
 | UCP | Use Case Points — the effort-estimation technique that produced the MoSCoW cut |
@@ -62,10 +72,10 @@ requirements in §3 of this document.
 | RBAC | Role-based access control |
 | COI | Conflict of interest |
 | EiC | Editor-in-Chief |
-| HoD | Head of Department |
+| HoD | Head of Department — the design's shorthand for the college-leadership analytics consumer |
 | BFF | Backend-for-Frontend — the Next.js server-side proxy pattern used for authenticated traffic |
 | OAI-PMH | Open Archives Initiative Protocol for Metadata Harvesting |
-| DOI | Digital Object Identifier (UGJCS issues DOI-*shaped* but unregistered identifiers — §4.2) |
+| DOI | Digital Object Identifier (the portal issues DOI-*shaped* but unregistered identifiers — §4.2) |
 | TF-IDF | Term frequency–inverse document frequency, used for reviewer–manuscript matching |
 | LSH | Locality-sensitive hashing, used for near-duplicate similarity screening |
 | WCAG | Web Content Accessibility Guidelines |
@@ -96,8 +106,10 @@ system's limitations plainly, cross-referenced to the technical debt register.
 
 ### 2.1 Product perspective
 
-UGJCS is a new, self-contained system; it replaces an ad hoc process of email and shared
-spreadsheets rather than integrating with an existing departmental system. It is a
+The portal is a new, self-contained system built for the Science and Development Journal
+(SDJ), published by the College of Basic and Applied Sciences; it replaces the journal's
+current ad hoc process of email, shared drives and spreadsheets rather than integrating
+with an existing editorial system. It is a
 three-tier web application: a Next.js frontend (public archive, search, paper detail, and
 author/reviewer/editor/Editor-in-Chief screens, with all authenticated traffic proxied
 server-side as a Backend-For-Frontend), a FastAPI backend built as a hexagonal
@@ -152,7 +164,7 @@ and OAI-PMH harvesting (FR-21, FR-22) are not yet built.*
 | Editor-in-Chief | All Editor capability plus issue composition, publication and policy configuration | Regular; final authority | Moderate |
 | Administrator | Manages accounts, roles and reviewer capacity | Infrequent | Low |
 | Reader | Anonymous; discovers, reads, cites and downloads published work | Frequent, unauthenticated | Low |
-| Head of Department (secondary) | Consumes editorial throughput analytics | Infrequent | Low |
+| CBAS college leadership (secondary) | Consumes editorial throughput analytics | Infrequent | Low |
 | Indexing service (external system) | Harvests metadata via a defined API | Automated, scheduled | N/A — machine actor |
 
 A single account may hold multiple roles simultaneously (design specification §3); this
@@ -189,12 +201,13 @@ delivered infrastructure — nothing currently deployed depends on them (§2.1).
   therefore CI on every push and pull request.
 - The domain layer is framework-free by construction; this is a testable constraint,
   not an aspiration.
-- Synthetic seed data only — no real departmental submissions or reviewer data are used.
+- Synthetic seed data only — no real SDJ submissions or reviewer data are used.
 
 ### 2.6 Assumptions and dependencies
 
-Assumptions: a single journal instance suffices; reviewers participate without incentive
-mechanisms; corpus scale is hundreds, not millions, of papers, justifying Postgres
+Assumptions (stated as assumptions — the project had no access to real SDJ operational
+data): a single journal instance, SDJ itself, suffices; reviewers participate without
+incentive mechanisms; SDJ's corpus scale is hundreds, not millions, of papers, justifying Postgres
 full-text search over a dedicated search engine; authors submit PDFs; a single
 transactional email provider is available. Dependencies: AWS managed services (ECS, RDS,
 S3, CloudFront), Vercel, and a transactional email provider must remain available and
@@ -445,7 +458,7 @@ resolved in one direction without comment.
 | Editor-in-Chief | All Editor use cases, plus UC14, UC22, UC24 |
 | Administrator | UC3 |
 | Reader | UC15, UC16, UC17, UC19 (public export, distinct from FR-19's audit view), UC20 (indirectly, as the harvested party), UC25 |
-| Head of Department | UC22 (read-only consumer) |
+| CBAS college leadership | UC22 (read-only consumer) |
 | Indexing service | UC20 |
 | System (no human actor) | UC5, UC7 (computation), UC21 (dispatch) |
 

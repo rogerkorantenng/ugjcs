@@ -1,4 +1,4 @@
-# UGJCS — Project Documentation
+# SDJ Editorial Portal — Project Documentation
 
 **Document:** 01 — Consolidated project documentation (main submission document)
 **Author:** Roger Koranteng Obeng, student ID 22424140
@@ -8,6 +8,15 @@
 **Live system:** `https://ugjcs-frontend.vercel.app` · API `https://tsxsbf9rzp.us-east-1.awsapprunner.com`
 **Repository:** `github.com/rogerkorantenng/ugjcs`
 **Submitted as:** `Project_Documentation.pdf`
+
+**Naming.** The product documented here is the **SDJ Editorial Portal**, built for the
+**Science and Development Journal (SDJ)**, an established journal published by the College of
+Basic and Applied Sciences (CBAS), University of Ghana. The repository
+(`github.com/rogerkorantenng/ugjcs`), hosting URLs, package names and infrastructure resource
+names predate this naming and retain the pilot's internal codename **UGJCS**; wherever `ugjcs`
+appears in a path, URL or identifier in this document set, it is that codename, not a separate
+system. The deployed system is a prototype built for an Advanced Software Engineering exam —
+it is not SDJ's official production system.
 
 **Status of this document.** This is a consolidating document. It summarises and
 cross-references six authoritative supporting documents and the codebase itself rather than
@@ -33,18 +42,20 @@ rather than silently resolved in one direction (see §10.4).
 
 ## 1. Project title
 
-**UGJCS — University of Ghana Journal of Computing Science**, a double-blind peer-reviewed
-journal management platform built as an individual Advanced Software Engineering capstone
+**SDJ Editorial Portal** — a double-blind peer-review and editorial management platform built
+for the Science and Development Journal (SDJ), published by the College of Basic and Applied
+Sciences (CBAS), University of Ghana, as an individual Advanced Software Engineering capstone
 within a 48-hour development window.
 
 ---
 
 ## 2. Problem statement
 
-The Department of Computer Science, University of Ghana has no dedicated system for managing
-scholarly publication. Where departmental or faculty journals exist in the Ghanaian university
-context, the editorial process is typically conducted over email and shared spreadsheets. That
-approach fails in four specific ways (design specification §1):
+The College of Basic and Applied Sciences (CBAS), University of Ghana publishes the Science
+and Development Journal (SDJ), but the journal has no dedicated system for managing its
+editorial process: submissions, reviews and decisions are coordinated manually over email,
+shared drives and spreadsheets. That approach fails in four specific ways (design
+specification §1):
 
 1. **Blinding is not enforceable.** Double-blind review depends on a human remembering to strip
    identifying information from a document before forwarding it. Author names routinely survive
@@ -56,16 +67,16 @@ approach fails in four specific ways (design specification §1):
 4. **Published work is not discoverable.** Accepted papers end up as files on a shared drive
    rather than in a citable, indexable, harvestable archive.
 
-UGJCS addresses all four as first-class system responsibilities — enforced by the system —
-rather than as procedural guidance that depends on a human remembering to follow it.
+The portal addresses all four as first-class system responsibilities — enforced by the system
+— rather than as procedural guidance that depends on a human remembering to follow it.
 
 ---
 
 ## 3. Aim and objectives
 
-**Aim.** Deliver a deployed, production-quality platform that manages the complete scholarly
-publishing lifecycle from submission to public archival, with double-blind integrity and
-editorial auditability enforced by the system rather than by convention.
+**Aim.** Deliver a deployed, production-quality editorial portal for SDJ that manages the
+complete scholarly publishing lifecycle from submission to public archival, with double-blind
+integrity and editorial auditability enforced by the system rather than by convention.
 
 **Objectives:**
 
@@ -89,6 +100,10 @@ the evidence in §11.7, the objective this project delivers most convincingly.
 
 ## 4. Stakeholders
 
+The client is the editorial office of the Science and Development Journal at CBAS; the primary
+human actors are the journal's editor-in-chief, its handling editors, its reviewers and its
+authors.
+
 | Actor | Type | Primary concerns |
 |---|---|---|
 | Author | Primary, authenticated | Submit work, track progress, respond to reviews |
@@ -97,7 +112,7 @@ the evidence in §11.7, the objective this project delivers most convincingly.
 | Editor-in-Chief | Primary, authenticated | Compose issues, publish, configure journal policy, final authority |
 | Administrator | Secondary, authenticated | User accounts, role assignment, reviewer capacity |
 | Reader | Primary, anonymous | Discover, read, cite and download published papers |
-| Head of Department | Secondary | Editorial throughput and workload analytics |
+| CBAS college leadership | Secondary | Editorial throughput and workload analytics |
 | Indexing services | External system | Harvest metadata via OAI-PMH |
 
 Non-human stakeholders: the AWS platform (cost and operability, §13) and future maintainers,
@@ -112,9 +127,9 @@ not currently prevent an Author–Reviewer dual-role holder from reviewing their
 
 ## 5. Requirements analysis
 
-Requirements were elicited from the problem statement (§2) rather than from a real client, since
-no departmental submissions or reviewer data are available (SRS §2.6) — a stated constraint, not
-a hidden one. The analysis proceeded in four steps, each of which left an artefact this
+Requirements were elicited from the problem statement (§2) rather than from structured
+interviews with SDJ's editorial office, and no real SDJ submissions or reviewer data were
+available to the project (SRS §2.6) — a stated constraint, not a hidden one. The analysis proceeded in four steps, each of which left an artefact this
 consolidation points to rather than repeats:
 
 1. **Actor and use-case inventory.** Eight stakeholder classes (§4) were mapped to 25 use cases
@@ -1033,11 +1048,11 @@ accounts used for acceptance testing (testing report §5):
 
 | Role | Account |
 |---|---|
-| Author | `author@ugjcs.test` |
-| Reviewer | `reviewer@ugjcs.test` |
-| Editor | `editor@ugjcs.test` |
-| Editor-in-Chief | `eic@ugjcs.test` |
-| Administrator | `admin@ugjcs.test` |
+| Author | `author@sdj.test` |
+| Reviewer | `reviewer@sdj.test` |
+| Editor | `editor@sdj.test` |
+| Editor-in-Chief | `eic@sdj.test` |
+| Administrator | `admin@sdj.test` |
 
 ### 14.2 As an author
 
@@ -1288,7 +1303,7 @@ purpose is enforcing exactly the guarantees they undermine.
 
 ### 18.3 The honest summary
 
-UGJCS demonstrates that a domain-first, hexagonally-architected system, built under AI-assisted
+The SDJ Editorial Portal demonstrates that a domain-first, hexagonally-architected system, built under AI-assisted
 development, can deliver mechanically-enforced correctness for the properties that were designed
 in from the start — the lifecycle, the blinding, the audit chain's internal consistency — within a
 timeframe that would be absurd for the same guarantees built by conventional estimation. It
