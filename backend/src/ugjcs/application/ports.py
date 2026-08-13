@@ -11,7 +11,7 @@ from typing import Protocol, Self
 from uuid import UUID
 
 from ugjcs.domain.account import Account, EmailAddress
-from ugjcs.domain.enums import ManuscriptStatus
+from ugjcs.domain.enums import ManuscriptStatus, Role
 from ugjcs.domain.hashchain import ChainedEvent
 from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
@@ -77,6 +77,16 @@ class AccountRepository(Protocol):
 
     async def save(self, account: Account) -> None:
         """Persist scalar field changes and replace the role rows to match `account.roles`."""
+        ...
+
+    async def list_by_role(self, role: Role) -> list[Account]:
+        """Every verified, active account holding `role`.
+
+        An inactive or unverified holder is excluded at the query level, not handed to a
+        caller to filter — the reviewer-candidates endpoint (`ugjcs.api.routers.editorial`)
+        relies on that: such an account must be omitted entirely, never listed with a
+        reason, and the simplest way to guarantee that is never fetching it at all.
+        """
         ...
 
 

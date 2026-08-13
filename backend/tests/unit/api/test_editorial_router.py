@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
-from tests.unit.api.fakes import FakeUnitOfWork, new_user_id
+from tests.unit.api.fakes import FakeAccount, FakeUnitOfWork, new_user_id
 from ugjcs.api.app import create_app
 from ugjcs.api.deps import get_current_actor
 from ugjcs.api.wiring import get_uow
@@ -337,3 +337,169 @@ def test_scheduling_a_missing_manuscript_is_404() -> None:
         "/api/v1/editorial/UGJCS-2026-9999/schedule", json={"volume": 1, "number": 1}
     )
     assert response.status_code == 404
+
+
+def test_a_reviewer_cannot_see_reviewer_candidates() -> None:
+    manuscript = submitted_manuscript(150)
+    actor = Actor(id=REVIEWER, roles=frozenset({Role.REVIEWER}))
+    client = make_client(actor, manuscript)
+    response = client.get(f"/api/v1/editorial/{manuscript.tracking_code.value}/reviewer-candidates")
+    assert response.status_code == 403
+
+
+def test_reviewer_candidates_for_a_missing_manuscript_is_404() -> None:
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    client = make_client(actor)
+    response = client.get("/api/v1/editorial/UGJCS-2026-9999/reviewer-candidates")
+    assert response.status_code == 404
+
+
+def test_reviewer_candidates_is_accessible_to_the_editor_in_chief_too() -> None:
+    manuscript = submitted_manuscript(151)
+    actor = Actor(id=EIC, roles=frozenset({Role.EDITOR_IN_CHIEF}))
+    client = make_client(actor, manuscript)
+    response = client.get(f"/api/v1/editorial/{manuscript.tracking_code.value}/reviewer-candidates")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_reviewer_candidates_omits_unverified_inactive_and_non_reviewer_accounts() -> None:
+    manuscript = submitted_manuscript(152)
+    inactive_reviewer = new_user_id()
+    unverified_reviewer = new_user_id()
+    non_reviewer = new_user_id()
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    app = create_app()
+    uow = FakeUnitOfWork()
+    uow.manuscripts.store[manuscript.id] = manuscript
+    uow.accounts.accounts[inactive_reviewer] = FakeAccount(
+        id=inactive_reviewer,
+        email="inactive@ugjcs.test",
+        roles=frozenset({Role.REVIEWER}),
+        is_active=False,
+    )
+    uow.accounts.accounts[unverified_reviewer] = FakeAccount(
+        id=unverified_reviewer,
+        email="unverified@ugjcs.test",
+        roles=frozenset({Role.REVIEWER}),
+        is_verified=False,
+    )
+    uow.accounts.accounts[non_reviewer] = FakeAccount(
+        id=non_reviewer, email="noreviewer@ugjcs.test", roles=frozenset({Role.EDITOR})
+    )
+
+    async def _uow() -> AsyncIterator[FakeUnitOfWork]:
+        yield uow
+
+    app.dependency_overrides[get_uow] = _uow
+    app.dependency_overrides[get_current_actor] = lambda: actor
+    client = TestClient(app)
+
+    response = client.get(f"/api/v1/editorial/{manuscript.tracking_code.value}/reviewer-candidates")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_reviewer_candidates_lists_eligible_and_excluded_with_their_reasons() -> None:
+    """One of each conflict-of-interest rule, plus two clean candidates whose ordering
+    proves the sort: eligible before excluded, lowest current load first."""
+    conflicted_author_reviewer = new_user_id()
+    manuscript = Manuscript(
+        id=ManuscriptId(uuid4()),
+        tracking_code=TrackingCode.mint(2026, 153),
+        title="T",
+        abstract="A.",
+        keywords=(),
+        author_ids=(AUTHOR, conflicted_author_reviewer),
+        corresponding_author_id=AUTHOR,
+    )
+    manuscript.submit(actor_id=AUTHOR, occurred_at=NOW)
+
+    same_affiliation = new_user_id()
+    already_assigned = new_user_id()
+    at_capacity = new_user_id()
+    eligible_low_load = new_user_id()
+    eligible_high_load = new_user_id()
+    elsewhere_manuscript_id = ManuscriptId(uuid4())
+    another_elsewhere_manuscript_id = ManuscriptId(uuid4())
+
+    actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
+    app = create_app()
+    uow = FakeUnitOfWork()
+    uow.manuscripts.store[manuscript.id] = manuscript
+    uow.accounts.accounts[AUTHOR] = FakeAccount(
+        id=AUTHOR,
+        email="author@ugjcs.test",
+        roles=frozenset({Role.AUTHOR}),
+        affiliation="University of Ghana",
+    )
+    uow.accounts.accounts[conflicted_author_reviewer] = FakeAccount(
+        id=conflicted_author_reviewer,
+        email="conflicted@ugjcs.test",
+        roles=frozenset({Role.AUTHOR, Role.REVIEWER}),
+        affiliation="Independent",
+    )
+    uow.accounts.accounts[same_affiliation] = FakeAccount(
+        id=same_affiliation,
+        email="same-affiliation@ugjcs.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="university of ghana",
+    )
+    uow.accounts.accounts[already_assigned] = FakeAccount(
+        id=already_assigned,
+        email="already-assigned@ugjcs.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="Elsewhere University",
+    )
+    uow.accounts.accounts[at_capacity] = FakeAccount(
+        id=at_capacity,
+        email="at-capacity@ugjcs.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="Elsewhere University",
+        reviewer_capacity=1,
+    )
+    uow.accounts.accounts[eligible_low_load] = FakeAccount(
+        id=eligible_low_load,
+        email="low-load@ugjcs.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="Elsewhere University",
+    )
+    uow.accounts.accounts[eligible_high_load] = FakeAccount(
+        id=eligible_high_load,
+        email="high-load@ugjcs.test",
+        roles=frozenset({Role.REVIEWER}),
+        affiliation="Elsewhere University",
+    )
+
+    uow.assignments.assignments.append((manuscript.id, already_assigned))
+    uow.assignments.assignments.append((elsewhere_manuscript_id, at_capacity))
+    uow.assignments.assignments.append((another_elsewhere_manuscript_id, eligible_high_load))
+
+    async def _uow() -> AsyncIterator[FakeUnitOfWork]:
+        yield uow
+
+    app.dependency_overrides[get_uow] = _uow
+    app.dependency_overrides[get_current_actor] = lambda: actor
+    client = TestClient(app)
+
+    response = client.get(f"/api/v1/editorial/{manuscript.tracking_code.value}/reviewer-candidates")
+    assert response.status_code == 200
+    body = response.json()
+    by_id = {c["id"]: c for c in body}
+
+    assert by_id[str(conflicted_author_reviewer)]["excluded_reason"] == (
+        "is an author of this manuscript"
+    )
+    assert by_id[str(same_affiliation)]["excluded_reason"] == (
+        "shares an affiliation with an author"
+    )
+    assert by_id[str(already_assigned)]["excluded_reason"] == "already assigned"
+    assert by_id[str(at_capacity)]["excluded_reason"] == "at capacity"
+    assert by_id[str(eligible_low_load)]["excluded_reason"] is None
+    assert by_id[str(eligible_high_load)]["excluded_reason"] is None
+    assert by_id[str(eligible_low_load)]["active_assignments"] == 0
+    assert by_id[str(eligible_high_load)]["active_assignments"] == 1
+
+    ids_in_order = [c["id"] for c in body]
+    assert ids_in_order[:2] == [str(eligible_low_load), str(eligible_high_load)]
+    assert all(c["excluded_reason"] is not None for c in body[2:])

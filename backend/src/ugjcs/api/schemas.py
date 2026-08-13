@@ -7,6 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from ugjcs.application.ports import AccountRepository, ReviewAssignmentRecord
+from ugjcs.domain.account import Account
 from ugjcs.domain.blinding import BlindedManuscript
 from ugjcs.domain.enums import DecisionType
 from ugjcs.domain.manuscript import Manuscript
@@ -145,6 +146,55 @@ class ReviewOut(BaseModel):
             confidential_comments_to_editor=record.confidential_comments_to_editor,
             assigned_at=record.assigned_at,
             submitted_at=record.submitted_at,
+        )
+
+
+class PersonOut(BaseModel):
+    """An exact-email lookup's result — see `ugjcs.api.routers.people.lookup`.
+
+    Deliberately absent: the email address itself. The caller already supplied it to
+    make this match, and echoing it back would give this endpoint a second, harder to
+    justify way to confirm which addresses have accounts."""
+
+    id: UUID
+    full_name: str
+    affiliation: str
+
+    @classmethod
+    def from_domain(cls, account: Account) -> "PersonOut":
+        return cls(
+            id=UUID(str(account.id)), full_name=account.full_name, affiliation=account.affiliation
+        )
+
+
+class ReviewerCandidateOut(BaseModel):
+    """One candidate reviewer for a manuscript, conflict-of-interest verdict included.
+
+    `excluded_reason` is `None` for an eligible reviewer or a short human-readable
+    string when they must not be assigned — see `ugjcs.domain.conflicts.exclusion_reason`,
+    the pure function that decides it. Excluded candidates are returned in this list
+    with their reason rather than filtered out, by design: see
+    `ugjcs.api.routers.editorial.reviewer_candidates`.
+    """
+
+    id: UUID
+    full_name: str
+    affiliation: str
+    active_assignments: int
+    reviewer_capacity: int
+    excluded_reason: str | None
+
+    @classmethod
+    def from_domain(
+        cls, account: Account, *, active_assignments: int, excluded_reason: str | None
+    ) -> "ReviewerCandidateOut":
+        return cls(
+            id=UUID(str(account.id)),
+            full_name=account.full_name,
+            affiliation=account.affiliation,
+            active_assignments=active_assignments,
+            reviewer_capacity=account.reviewer_capacity,
+            excluded_reason=excluded_reason,
         )
 
 

@@ -6,6 +6,7 @@ import pytest
 
 from ugjcs.application.identity import RegistrationService
 from ugjcs.domain.account import Account, AccountError, EmailAddress
+from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import UserId
 from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
 from ugjcs.infrastructure.security.tokens import InvalidTokenError, JwtTokenService
@@ -33,6 +34,11 @@ class DictAccountRepository:
         if account.id not in self._by_id:
             raise LookupError(f"account {account.id} has never been persisted")
         self._by_id[account.id] = account
+
+    async def list_by_role(self, role: Role) -> list[Account]:
+        return [
+            a for a in self._by_id.values() if role in a.roles and a.is_verified and a.is_active
+        ]
 
 
 class FakeEmailSender:

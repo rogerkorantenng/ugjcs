@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ugjcs.domain.account import Account, EmailAddress
+from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import UserId
 from ugjcs.infrastructure.db.mappers import account_to_row, row_to_account
 from ugjcs.infrastructure.db.models import UserRoleRow, UserRow
@@ -47,3 +48,15 @@ class SqlAlchemyAccountRepository:
                 row.roles.remove(existing)
         for role in wanted - held:
             row.roles.append(UserRoleRow(user_id=account.id, role=role))
+
+    async def list_by_role(self, role: Role) -> list[Account]:
+        result = await self._session.execute(
+            select(UserRow)
+            .join(UserRoleRow, UserRoleRow.user_id == UserRow.id)
+            .where(
+                UserRoleRow.role == role.value,
+                UserRow.is_verified.is_(True),
+                UserRow.is_active.is_(True),
+            )
+        )
+        return [row_to_account(row) for row in result.scalars()]
