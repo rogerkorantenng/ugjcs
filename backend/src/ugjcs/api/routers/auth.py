@@ -10,14 +10,16 @@ dependency; `/login`, `/refresh` and `/logout` are the three entries
 `test_route_audit.py` allowlists as public for this router.
 """
 
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
 
 from ugjcs.api.deps import ActorDep
-from ugjcs.api.wiring import get_session_service
-from ugjcs.application.identity import SessionService
+from ugjcs.api.wiring import UowDep, get_registration_service, get_session_service
+from ugjcs.application.identity import RegistrationService, SessionService
+from ugjcs.domain.enums import Role
 from ugjcs.domain.policies import Actor
 
 router = APIRouter()
@@ -54,6 +56,41 @@ class ActorOut(BaseModel):
 
 
 SessionDep = Annotated[SessionService, Depends(get_session_service)]
+RegistrationDep = Annotated[RegistrationService, Depends(get_registration_service)]
+
+
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    affiliation: str
+
+
+@router.post("/register", response_model=TokenPairOut, status_code=status.HTTP_201_CREATED)
+async def register(
+    body: RegisterRequest, registration: RegistrationDep, sessions: SessionDep, uow: UowDep
+) -> TokenPairOut:
+    """Self-service sign-up, for authors only.
+
+    The AUTHOR role is granted automatically — it is the one role the public may hold.
+    Reviewer and editorial roles are appointed by the editorial office, never
+    self-selected here. Email delivery is mocked in this prototype (the verification
+    link is logged, not sent), so the account is verified immediately and signed in;
+    password policy (length, not composition) is enforced by `RegistrationService`.
+    """
+    account = await registration.register(
+        email=body.email,
+        password=body.password,
+        full_name=body.full_name,
+        affiliation=body.affiliation,
+    )
+    account.grant(Role.AUTHOR)
+    account.verify(occurred_at=datetime.now(UTC))
+    await uow.accounts.save(account)
+    await uow.commit()
+    pair = await sessions.log_in(body.email, body.password)
+    await uow.commit()
+    return TokenPairOut(access_token=pair.access_token, refresh_token=pair.refresh_token)
 
 
 @router.post("/login", response_model=TokenPairOut)

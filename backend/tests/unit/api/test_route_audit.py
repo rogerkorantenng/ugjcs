@@ -40,6 +40,10 @@ PUBLIC_PATHS = {
     "/redoc",
     "/api/v1/auth/login",
     "/api/v1/auth/refresh",
+    # Self-service sign-up is public by definition — the caller has no credentials yet.
+    # It can only ever create AUTHOR accounts; editorial roles are granted server-side
+    # by appointment, never through this route.
+    "/api/v1/auth/register",
     # Not in the plan's original allowlist (login and refresh only) — added per
     # `docs/05-api-contract.md` §6, which is authoritative over the plan where the two
     # disagree: "POST /auth/logout | none (refresh token in body)". This test caught the

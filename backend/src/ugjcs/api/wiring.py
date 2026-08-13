@@ -12,11 +12,12 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from ugjcs.application.identity import IdentityService, SessionService
+from ugjcs.application.identity import IdentityService, RegistrationService, SessionService
 from ugjcs.application.ports import DocumentStore, UnitOfWork
 from ugjcs.infrastructure.config import get_settings
 from ugjcs.infrastructure.db.engine import create_engine, session_factory
 from ugjcs.infrastructure.db.uow import SqlAlchemyUnitOfWork
+from ugjcs.infrastructure.email.logging_sender import LoggingEmailSender
 from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
 from ugjcs.infrastructure.security.tokens import JwtTokenService, SystemClock
 from ugjcs.infrastructure.storage.s3_store import S3DocumentStore
@@ -70,6 +71,14 @@ def _tokens() -> JwtTokenService:
 
 async def get_identity_service(uow: UowDep) -> IdentityService:
     return IdentityService(uow.accounts, _tokens())
+
+
+async def get_registration_service(uow: UowDep) -> RegistrationService:
+    """Self-service sign-up. Email delivery is a logged mock (`LoggingEmailSender`), the
+    same sender the seed uses — the register route compensates by verifying immediately."""
+    return RegistrationService(
+        uow.accounts, _tokens(), Argon2PasswordHasher(), LoggingEmailSender(), SystemClock()
+    )
 
 
 async def get_session_service(uow: UowDep) -> SessionService:

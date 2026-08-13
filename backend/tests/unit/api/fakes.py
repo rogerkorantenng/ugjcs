@@ -44,7 +44,16 @@ class FakeAccountRepository:
 
     async def get_by_email(self, email: object) -> FakeAccount | None:
         value = getattr(email, "value", email)
-        return next((a for a in self.accounts.values() if a.email == value), None)
+        return next(
+            (a for a in self.accounts.values() if getattr(a.email, "value", a.email) == value),
+            None,
+        )
+
+    async def add(self, account: object) -> None:
+        self.accounts[account.id] = account  # type: ignore[index,assignment]
+
+    async def save(self, account: object) -> None:
+        self.accounts[account.id] = account  # type: ignore[index,assignment]
 
     async def list_by_role(self, role: Role) -> list[FakeAccount]:
         return [
