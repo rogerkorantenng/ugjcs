@@ -34,7 +34,9 @@ Fixed earlier the same night (same session, pre-sweep): missing back links on al
 - Co-author lookup: `people/lookup → 200`, resolves "Kojo Antwi · University of Ghana", Add-as-co-author confirm chip.
 - Withdraw: click → warning panel ("Withdrawing is permanent…") → "Keep the submission" backs out with nothing changed.
 - Unknown paper: proper not-found page renders.
-- Unreadable-PDF 422 + junk prune: verified after backend rollout (see below).
+- Unreadable-PDF rejection: submitting the malformed file through the real form now returns 422 with "could not be read as one — re-export it" shown in the form; the author stays on the page and nothing is stored.
+- Junk prune: after the backend rollout the public archive holds exactly the five published corpus papers, and the author dashboard exactly the seven corpus manuscripts — every live-verification leftover (including the published one) is gone.
+- Final regression browse: zero console errors on every public page and the author dashboard.
 
 ## Known limitations (documented, not fixed)
 
