@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getPaper } from "@/lib/archive";
+import { ProblemDetailsError } from "@/lib/backend";
+import type { ArchivePaperOut } from "@/types/api";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { BackLink } from "@/components/ui/back-link";
 import { RevealedAuthorSlot } from "@/components/ui/redaction-bar";
@@ -9,9 +12,21 @@ interface Params { trackingCode: string }
 
 export const revalidate = 300;
 
+/** A 404 from the archive becomes Next's not-found page; anything else keeps throwing.
+ * Without this, an unknown tracking code returned HTTP 200 and left the reader staring
+ * at the loading skeleton forever. */
+async function getPaperOr404(trackingCode: string): Promise<ArchivePaperOut> {
+  try {
+    return await getPaper(trackingCode);
+  } catch (error) {
+    if (error instanceof ProblemDetailsError && error.status === 404) notFound();
+    throw error;
+  }
+}
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { trackingCode } = await params;
-  const paper = await getPaper(trackingCode);
+  const paper = await getPaperOr404(trackingCode);
   return {
     title: paper.title,
     description: paper.abstract.slice(0, 160),
@@ -21,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function PaperPage({ params }: { params: Promise<Params> }) {
   const { trackingCode } = await params;
-  const paper = await getPaper(trackingCode);
+  const paper = await getPaperOr404(trackingCode);
 
   // No `datePublished`/`identifier` (DOI): Plan 4 mints no DOI and exposes no publication
   // timestamp anywhere on the wire. Both are entered in the technical debt register rather
