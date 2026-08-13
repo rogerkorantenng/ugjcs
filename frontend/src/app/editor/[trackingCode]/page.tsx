@@ -1,9 +1,8 @@
 "use client";
-import { use, useState } from "react";
+import { use } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { StatusBadge, StatusExplanation } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { PdfViewer } from "@/components/ui/pdf-viewer";
 import { BackLink } from "@/components/ui/back-link";
@@ -12,28 +11,10 @@ import { ReviewerPicker } from "@/components/reviewer-picker";
 import { DecisionForm } from "@/components/decision-form";
 import { PublicationPanel } from "@/components/publication-panel";
 import { ReviewsPanel } from "@/components/reviews-panel";
+import { ScreenControl } from "@/components/screen-control";
 import { ApcPanel } from "@/components/apc-panel";
-import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
-
-const PUBLICATION_STATUSES = new Set(["accepted", "scheduled"]);
-// An APC invoice can only exist once acceptance is on the record; the summary sits beside
-// the decision/publication area because settling (or waiving) it is part of the same
-// path to print.
-const BILLABLE_STATUSES = new Set(["accepted", "scheduled", "published"]);
-// `begin_screening` is legal from both SUBMITTED and RESUBMITTED (`domain/transitions.py`)
-// — a resubmission goes through screening again, the same way a first submission does.
-const SCREENABLE_STATUSES = new Set(["submitted", "resubmitted"]);
-// Reviews only ever exist once a manuscript has left screening for the first time.
-const REVIEWABLE_STATUSES = new Set([
-  "under_review",
-  "reviews_complete",
-  "revision_requested",
-  "resubmitted",
-  "accepted",
-  "scheduled",
-  "published",
-  "rejected",
-]);
+import { BILLABLE_STATUSES, PUBLICATION_STATUSES, REVIEWABLE_STATUSES } from "@/lib/editorial-statuses";
+import type { Manuscript, SessionUser } from "@/types/api";
 
 export default function EditorialManuscriptPage({ params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = use(params);
@@ -43,8 +24,6 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
   // client learns the signed-in actor's roles.
   const { data: session } = useApi<{ user: SessionUser | null }>("/api/auth/me");
   const isEditorInChief = session?.user?.roles.includes("editor_in_chief") ?? false;
-  const [screening, setScreening] = useState(false);
-  const [screenProblem, setScreenProblem] = useState<ProblemDetails | null>(null);
 
   if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
   if (error)
@@ -54,19 +33,6 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
       />
     );
   if (!data) return null;
-
-  async function screen() {
-    setScreening(true);
-    setScreenProblem(null);
-    const response = await fetch(`/api/editorial/${trackingCode}/screen`, { method: "POST" });
-    setScreening(false);
-    if (!response.ok) {
-      const detail = await response.json().catch(() => null);
-      setScreenProblem(detail ?? { type: "about:blank", title: "Could not begin screening", status: response.status });
-      return;
-    }
-    mutate();
-  }
 
   return (
     <>
@@ -90,16 +56,7 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         />
       )}
 
-      {SCREENABLE_STATUSES.has(data.status) && (
-        <div className="mt-6 border-t border-rule pt-6">
-          {screenProblem && (
-            <div className="mb-4">
-              <ProblemAlert problem={screenProblem} />
-            </div>
-          )}
-          <Button isLoading={screening} onClick={screen}>{screening ? "Starting…" : "Begin screening"}</Button>
-        </div>
-      )}
+      <ScreenControl trackingCode={trackingCode} status={data.status} onScreened={mutate} />
 
       {data.status === "under_screening" && (
         <div className="mt-6 border-t border-rule pt-6">
