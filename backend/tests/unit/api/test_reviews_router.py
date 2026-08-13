@@ -132,7 +132,7 @@ def test_submitting_without_an_assignment_is_forbidden() -> None:
 def test_submitting_a_review_for_a_missing_manuscript_is_404() -> None:
     manuscript = under_review_manuscript()
     client = make_client(manuscript)
-    response = client.post("/api/v1/reviews/UGJCS-2026-9999/submit", json=_review_body())
+    response = client.post("/api/v1/reviews/SDJ-2026-9999/submit", json=_review_body())
     assert response.status_code == 404
 
 

@@ -160,7 +160,7 @@ def test_an_editor_can_retrieve_any_manuscript() -> None:
 def test_a_missing_tracking_code_is_404() -> None:
     actor = Actor(id=AUTHOR, roles=frozenset({Role.AUTHOR}))
     client, _, _ = make_client(actor)
-    response = client.get("/api/v1/manuscripts/UGJCS-2026-9999")
+    response = client.get("/api/v1/manuscripts/SDJ-2026-9999")
     assert response.status_code == 404
 
 
@@ -194,7 +194,7 @@ def test_a_co_author_who_is_not_corresponding_cannot_withdraw() -> None:
 def test_withdrawing_a_missing_manuscript_is_404() -> None:
     actor = Actor(id=AUTHOR, roles=frozenset({Role.AUTHOR}))
     client, _, _ = make_client(actor)
-    response = client.post("/api/v1/manuscripts/UGJCS-2026-9999/withdraw")
+    response = client.post("/api/v1/manuscripts/SDJ-2026-9999/withdraw")
     assert response.status_code == 404
 
 

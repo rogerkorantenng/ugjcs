@@ -73,36 +73,36 @@ from ugjcs.infrastructure.storage.s3_store import S3DocumentStore
 # Deployment_and_Source_Links.txt, which quotes these verbatim) can see exactly what is
 # being granted to whom. All are >= 12 characters, mix case, digits and punctuation, and
 # satisfy RegistrationService.MIN_PASSWORD_LENGTH.
-AUTHOR_PASSWORD = "Ugjcs-Author-2026!"
-AUTHOR2_PASSWORD = "Ugjcs-Author2-2026!"
-REVIEWER_PASSWORD = "Ugjcs-Reviewer-2026!"
-REVIEWER2_PASSWORD = "Ugjcs-Reviewer2-2026!"
+AUTHOR_PASSWORD = "Sdj-Author-2026!"
+AUTHOR2_PASSWORD = "Sdj-Author2-2026!"
+REVIEWER_PASSWORD = "Sdj-Reviewer-2026!"
+REVIEWER2_PASSWORD = "Sdj-Reviewer2-2026!"
 # Reviewer3..7 are the external reviewer pool (see `REVIEWER_PROFILES` below): every
 # seeded author and the first two reviewers share "University of Ghana", so without these
 # five, `exclusion_reason`'s affiliation rule (correctly) excludes every candidate the
 # reviewer picker could ever show. Real departmental journals recruit externally for
 # exactly this reason; these five accounts make that reachable in the demo corpus too.
-REVIEWER3_PASSWORD = "Ugjcs-Reviewer3-2026!"
-REVIEWER4_PASSWORD = "Ugjcs-Reviewer4-2026!"
-REVIEWER5_PASSWORD = "Ugjcs-Reviewer5-2026!"
-REVIEWER6_PASSWORD = "Ugjcs-Reviewer6-2026!"
-REVIEWER7_PASSWORD = "Ugjcs-Reviewer7-2026!"
-EDITOR_PASSWORD = "Ugjcs-Editor-2026!"
-EDITOR_IN_CHIEF_PASSWORD = "Ugjcs-EditorChief-2026!"
-ADMINISTRATOR_PASSWORD = "Ugjcs-Admin-2026!"
+REVIEWER3_PASSWORD = "Sdj-Reviewer3-2026!"
+REVIEWER4_PASSWORD = "Sdj-Reviewer4-2026!"
+REVIEWER5_PASSWORD = "Sdj-Reviewer5-2026!"
+REVIEWER6_PASSWORD = "Sdj-Reviewer6-2026!"
+REVIEWER7_PASSWORD = "Sdj-Reviewer7-2026!"
+EDITOR_PASSWORD = "Sdj-Editor-2026!"
+EDITOR_IN_CHIEF_PASSWORD = "Sdj-EditorChief-2026!"
+ADMINISTRATOR_PASSWORD = "Sdj-Admin-2026!"
 
-ADMIN_EMAIL = "admin@ugjcs.test"
-AUTHOR_EMAIL = "author@ugjcs.test"
-AUTHOR2_EMAIL = "author2@ugjcs.test"
-REVIEWER_EMAIL = "reviewer@ugjcs.test"
-REVIEWER2_EMAIL = "reviewer2@ugjcs.test"
-REVIEWER3_EMAIL = "reviewer3@ugjcs.test"
-REVIEWER4_EMAIL = "reviewer4@ugjcs.test"
-REVIEWER5_EMAIL = "reviewer5@ugjcs.test"
-REVIEWER6_EMAIL = "reviewer6@ugjcs.test"
-REVIEWER7_EMAIL = "reviewer7@ugjcs.test"
-EDITOR_EMAIL = "editor@ugjcs.test"
-EIC_EMAIL = "eic@ugjcs.test"
+ADMIN_EMAIL = "admin@sdj.test"
+AUTHOR_EMAIL = "author@sdj.test"
+AUTHOR2_EMAIL = "author2@sdj.test"
+REVIEWER_EMAIL = "reviewer@sdj.test"
+REVIEWER2_EMAIL = "reviewer2@sdj.test"
+REVIEWER3_EMAIL = "reviewer3@sdj.test"
+REVIEWER4_EMAIL = "reviewer4@sdj.test"
+REVIEWER5_EMAIL = "reviewer5@sdj.test"
+REVIEWER6_EMAIL = "reviewer6@sdj.test"
+REVIEWER7_EMAIL = "reviewer7@sdj.test"
+EDITOR_EMAIL = "editor@sdj.test"
+EIC_EMAIL = "eic@sdj.test"
 
 _UG = "University of Ghana"
 

@@ -76,7 +76,7 @@ def test_retrieving_a_published_paper_by_tracking_code() -> None:
 
 def test_retrieving_a_missing_tracking_code_is_404() -> None:
     client = make_client()
-    response = client.get("/api/v1/archive/UGJCS-2026-9999")
+    response = client.get("/api/v1/archive/SDJ-2026-9999")
     assert response.status_code == 404
 
 
@@ -143,7 +143,7 @@ def test_a_manuscript_still_under_review_cannot_be_downloaded_via_the_archive() 
 
 def test_downloading_a_missing_papers_document_is_404() -> None:
     client = make_client()
-    response = client.get("/api/v1/archive/UGJCS-2026-9999/document")
+    response = client.get("/api/v1/archive/SDJ-2026-9999/document")
     assert response.status_code == 404
 
 

@@ -13,6 +13,9 @@ set -eu
 echo "Running Alembic migrations..."
 alembic upgrade head
 
+echo "Wiping old-brand demo data if the pre-rebrand corpus is still present..."
+python -m ugjcs.scripts.rebrand_wipe
+
 echo "Seeding demo corpus and judge accounts if the database is empty..."
 python -m ugjcs.scripts.seed_demo --if-empty
 

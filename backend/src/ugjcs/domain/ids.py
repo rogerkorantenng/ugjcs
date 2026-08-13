@@ -34,7 +34,7 @@ def mint_issue_id(volume: int, number: int) -> IssueId:
     return IssueId(uuid5(_ISSUE_NAMESPACE, f"{volume}.{number}"))
 
 
-_TRACKING_PATTERN = re.compile(r"^UGJCS-(\d{4})-(\d{4,})$")
+_TRACKING_PATTERN = re.compile(r"^SDJ-(\d{4})-(\d{4,})$")
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,7 +54,7 @@ class TrackingCode:
             raise ValueError("year must be four digits")
         if sequence <= 0:
             raise ValueError("sequence must be positive")
-        return cls(f"UGJCS-{year:04d}-{sequence:04d}")
+        return cls(f"SDJ-{year:04d}-{sequence:04d}")
 
     @classmethod
     def parse(cls, raw: str) -> Self:

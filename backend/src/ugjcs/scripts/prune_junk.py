@@ -22,13 +22,19 @@ import asyncio
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from ugjcs.domain.ids import TrackingCode
 from ugjcs.infrastructure.config import get_settings
 from ugjcs.infrastructure.db.engine import create_engine
-from ugjcs.scripts.seed_demo import MANUSCRIPT_SPECS
+from ugjcs.scripts.seed_demo import MANUSCRIPT_SPECS, SEED_TRACKING_YEAR
 
 
 def corpus_allowlist() -> tuple[str, ...]:
-    return tuple(f"UGJCS-2026-{spec.sequence:04d}" for spec in MANUSCRIPT_SPECS)
+    """Tracking codes of the seeded corpus, minted through the same `TrackingCode`
+    the seed itself uses, so a rebrand of the code format can never strand this list
+    on a stale prefix."""
+    return tuple(
+        TrackingCode.mint(SEED_TRACKING_YEAR, spec.sequence).value for spec in MANUSCRIPT_SPECS
+    )
 
 
 async def prune(engine: AsyncEngine) -> int:
