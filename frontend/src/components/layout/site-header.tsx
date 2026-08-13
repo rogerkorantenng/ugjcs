@@ -49,7 +49,10 @@ export function SiteHeader() {
             University of Ghana Journal of Computing Science
           </p>
         </Link>
-        <nav aria-label="Site" className="flex items-center gap-6 pb-1 text-sm font-medium">
+        <nav aria-label="Site" className="flex flex-wrap items-center gap-x-6 gap-y-2 pb-1 text-sm font-medium">
+          {navLink("/about", "About")}
+          {navLink("/for-authors", "For authors")}
+          {navLink("/for-reviewers", "For reviewers")}
           {navLink("/search", "Search")}
           {navLink("/login", "Sign in")}
         </nav>
