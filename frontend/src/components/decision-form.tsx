@@ -25,6 +25,13 @@ const AVAILABLE_BY_STATUS: Record<ManuscriptStatus, DecisionType[]> = {
 // `request_revision` stays the routine `primary` look.
 const IRREVERSIBLE: Set<DecisionType> = new Set(["desk_reject", "reject"]);
 
+// Decisions that cannot be walked back once recorded take two clicks: the first arms the
+// form, the second — relabelled "Confirm …" beside a "Go back" escape — records it. This
+// is the same arm-then-confirm shape as withdrawing a submission or waiving an APC.
+// `accept` belongs here too: it issues the APC invoice and commits the manuscript to the
+// publication path, even though it isn't rendered as a danger.
+const CONFIRM_REQUIRED: Set<DecisionType> = new Set(["desk_reject", "reject", "accept"]);
+
 /** Whether `DecisionForm` would render anything for this status — the caller
  * (`editor/[trackingCode]/page.tsx`) uses this to decide whether to render the "Decision"
  * section heading at all, so a terminal-state manuscript doesn't show an empty heading
@@ -35,14 +42,22 @@ export function hasAvailableDecision(status: ManuscriptStatus): boolean {
 
 export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode: string; status: ManuscriptStatus; onDecided: () => void }) {
   const [submitting, setSubmitting] = useState(false);
+  const [armed, setArmed] = useState(false);
   const [problem, setProblem] = useState<ProblemDetails | null>(null);
   const available = AVAILABLE_BY_STATUS[status];
   const [decision, setDecision] = useState<DecisionType | "">(available[0] ?? "");
   if (available.length === 0) return null;
   const isDestructive = IRREVERSIBLE.has(decision as DecisionType);
+  const needsConfirm = CONFIRM_REQUIRED.has(decision as DecisionType);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (needsConfirm && !armed) {
+      // First click only arms the form — the browser has already run its validity
+      // checks by the time submit fires, so a half-filled form never reaches here.
+      setArmed(true);
+      return;
+    }
     const form = new FormData(event.currentTarget);
     setSubmitting(true);
     setProblem(null);
@@ -68,7 +83,10 @@ export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode
         name="decision"
         required
         value={decision}
-        onChange={(event) => setDecision(event.target.value as DecisionType)}
+        onChange={(event) => {
+          setDecision(event.target.value as DecisionType);
+          setArmed(false);
+        }}
       >
         {available.map((value) => (
           <option key={value} value={value}>{value.replaceAll("_", " ")}</option>
@@ -81,14 +99,27 @@ export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode
         minLength={20}
         hint="At least 20 characters — this is recorded against the manuscript's record."
       />
-      {isDestructive && (
+      {armed && (
         <p className="text-sm text-seal">
-          This decision ends this manuscript&apos;s path through review and cannot be undone.
+          {isDestructive
+            ? "This decision ends this manuscript's path through review and cannot be undone."
+            : "A recorded decision is final and cannot be edited afterwards."}
         </p>
       )}
-      <Button type="submit" variant={isDestructive ? "danger" : "primary"} isLoading={submitting}>
-        {submitting ? "Recording…" : isDestructive ? `Confirm ${decision.replaceAll("_", " ")}` : "Record decision"}
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button type="submit" variant={isDestructive ? "danger" : "primary"} isLoading={submitting}>
+          {submitting
+            ? "Recording…"
+            : armed
+              ? `Confirm ${decision.replaceAll("_", " ")}`
+              : "Record decision"}
+        </Button>
+        {armed && !submitting && (
+          <Button type="button" variant="secondary" onClick={() => setArmed(false)}>
+            Go back
+          </Button>
+        )}
+      </div>
     </form>
   );
 }
