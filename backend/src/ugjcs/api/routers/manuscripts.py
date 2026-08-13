@@ -6,6 +6,7 @@ from typing import Annotated, Literal
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile, status
+from pypdf.errors import PdfReadError
 
 from ugjcs.api.deps import ActorDep, require
 from ugjcs.api.schemas import DocumentUrlOut, ManuscriptOut
@@ -158,10 +159,21 @@ async def get_document(
 async def _store_document(
     documents: DocumentStoreDep, manuscript_id: ManuscriptId, version: int, data: bytes
 ) -> tuple[str, str]:
+    # Anonymise before storing anything: a file that opens with `%PDF` but cannot be
+    # parsed used to crash here AFTER the original was already written, leaving an
+    # orphaned object in storage and handing the author a bare 500. Producing the
+    # derivative first means an unreadable file rejects cleanly and stores nothing.
+    try:
+        anonymised = strip_pdf_metadata(data)
+    except (PdfReadError, ValueError, KeyError) as error:
+        raise HTTPException(
+            status_code=422,
+            detail="the file begins like a PDF but could not be read as one — re-export it",
+        ) from error
     o_key = original_key(manuscript_id, version=version)
     a_key = anonymised_key(manuscript_id, version=version)
     await documents.put(o_key, data, content_type="application/pdf")
-    await documents.put(a_key, strip_pdf_metadata(data), content_type="application/pdf")
+    await documents.put(a_key, anonymised, content_type="application/pdf")
     return o_key, a_key
 
 

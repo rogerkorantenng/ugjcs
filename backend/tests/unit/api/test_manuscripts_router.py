@@ -97,6 +97,19 @@ def test_an_oversized_upload_is_rejected_with_413() -> None:
     assert response.json()["title"] == "DocumentTooLargeError"
 
 
+def test_an_unparseable_pdf_is_rejected_with_422_and_stores_nothing() -> None:
+    # Regression: submitting a file that opens with `%PDF` but has no xref table used to
+    # crash strip_pdf_metadata AFTER the original was stored — a 500 for the author and an
+    # orphaned object in storage. Found by /qa on 2026-08-13.
+    actor = Actor(id=AUTHOR, roles=frozenset({Role.AUTHOR}))
+    client, uow, documents = make_client(actor)
+    response = _submit(client, file_bytes=b"%PDF-1.4 truncated, no xref, unreadable")
+    assert response.status_code == 422
+    assert "could not be read" in response.json()["detail"]
+    assert len(uow.manuscripts.store) == 0
+    assert documents.objects == {}
+
+
 def test_a_reviewer_without_the_author_role_cannot_submit() -> None:
     actor = Actor(id=AUTHOR, roles=frozenset({Role.REVIEWER}))
     client, _, _ = make_client(actor)
