@@ -1,5 +1,6 @@
 "use client";
 import { use } from "react";
+import { useSWRConfig } from "swr";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { StatusBadge, StatusExplanation } from "@/components/ui/badge";
@@ -25,6 +26,17 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
   // client learns the signed-in actor's roles.
   const { data: session } = useApi<{ user: SessionUser | null }>("/api/auth/me");
   const isEditorInChief = session?.user?.roles.includes("editor_in_chief") ?? false;
+  const { mutate: mutateKey } = useSWRConfig();
+
+  // Assigning a reviewer changes data three components render from three different SWR
+  // keys: the manuscript itself, the "Assigned reviewers" panel, and the candidate list
+  // (whose load counts shift). Revalidate all of them, or the panel keeps saying "No
+  // reviewers have been assigned yet" until a full page reload.
+  function onReviewerAssigned() {
+    void mutate();
+    void mutateKey(`/api/editorial/${trackingCode}/assignments`);
+    void mutateKey(`/api/editorial/${trackingCode}/reviewer-candidates`);
+  }
 
   if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
   if (error)
@@ -66,7 +78,7 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
             Candidates who share an affiliation with an author, or who are already at capacity, are shown greyed out
             with the reason — a conflict of interest is visible here, not just silently prevented.
           </p>
-          <ReviewerPicker trackingCode={trackingCode} onAssigned={mutate} />
+          <ReviewerPicker trackingCode={trackingCode} onAssigned={onReviewerAssigned} />
         </div>
       )}
 
