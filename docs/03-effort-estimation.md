@@ -1,6 +1,7 @@
 # Effort Estimation
 
-**Project:** UGJCS — University of Ghana Journal of Computing Science
+**Project:** SDJ Editorial Portal — an editorial portal for the Science and Development
+Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana
 **Document:** 03 — Effort estimation
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Date:** 2026-08-12
@@ -12,7 +13,7 @@ Plans 2–6.
 ## 1. Method
 
 Per the design specification's estimation approach (§14), **Use Case Points (UCP)**
-is the primary technique: UGJCS is defined by actor interactions with a stable
+is the primary technique: the portal is defined by actor interactions with a stable
 use-case boundary — the situation UCP was designed for — and the unadjusted actor
 and use-case weights can be read directly off the functional requirements table
 (§5.1) rather than guessed. **COCOMO II Early Design** serves as an independent
@@ -339,7 +340,7 @@ Four things follow from that:
 - Managed AWS services (ECS, RDS, S3, CloudFront) are used rather than
   self-hosted equivalents, which is why the COCOMO II `FCIL` (facilities)
   multiplier is favourable at 0.87.
-- Seed data is synthetic; no real departmental submissions or reviewer data
+- Seed data is synthetic; no real SDJ submissions or reviewer data
   are used.
 
 ### 10.2 Constraints

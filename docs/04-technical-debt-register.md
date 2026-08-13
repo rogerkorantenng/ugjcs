@@ -1,6 +1,7 @@
-# UGJCS — Technical Debt Register
+# SDJ Editorial Portal — Technical Debt Register
 
-**Project:** UGJCS — University of Ghana Journal of Computing Science
+**Project:** SDJ Editorial Portal — an editorial portal for the Science and Development
+Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana
 **Author:** Roger Koranteng Obeng (22424140)
 **Opened:** 2026-08-12
 **Status:** Live. Entries are added at the moment debt is incurred, not reconstructed afterwards.

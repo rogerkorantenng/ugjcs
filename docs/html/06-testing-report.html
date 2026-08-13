@@ -51,7 +51,7 @@
 </head>
 <body>
 <header class="site">
-  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
   <div class="title">06 · Testing Report</div>
 </header>
 <main>
@@ -59,27 +59,29 @@
 <header id="title-block-header">
 <h1 class="title">06 · Testing Report</h1>
 </header>
-<h1 id="ugjcs--testing-report">UGJCS — Testing Report</h1>
-<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
-Computing Science <strong>Document:</strong> 06 — Testing report
-<strong>Author:</strong> Roger Koranteng Obeng, student ID 22424140
-<strong>Assessor:</strong> Prof. Solomon Mensah <strong>Date:</strong>
-2026-08-12 <strong>Status:</strong> Authoritative. Every figure in this
-document was produced by running the commands it cites —
-<code>make check</code>, <code>make integration</code>, and a live
-session against the deployed frontend — on 2026-08-12, and is
-reproducible by running the same commands against the same commit. Where
-a figure could not be produced this way, that is stated rather than
-estimated.</p>
+<h1 id="sdj-editorial-portal--testing-report">SDJ Editorial Portal —
+Testing Report</h1>
+<p><strong>Project:</strong> SDJ Editorial Portal — an editorial portal
+for the Science and Development Journal (SDJ), published by the College
+of Basic and Applied Sciences, University of Ghana
+<strong>Document:</strong> 06 — Testing report <strong>Author:</strong>
+Roger Koranteng Obeng, student ID 22424140 <strong>Assessor:</strong>
+Prof. Solomon Mensah <strong>Date:</strong> 2026-08-12
+<strong>Status:</strong> Authoritative. Every figure in this document
+was produced by running the commands it cites — <code>make check</code>,
+<code>make integration</code>, and a live session against the deployed
+frontend — on 2026-08-12, and is reproducible by running the same
+commands against the same commit. Where a figure could not be produced
+this way, that is stated rather than estimated.</p>
 <p><strong>System under test</strong> Frontend:
 <code>https://ugjcs-frontend.vercel.app</code> · API:
 <code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code></p>
 <hr />
 <h2 id="1-testing-strategy">1. Testing strategy</h2>
-<p>UGJCS is built as a hexagonal architecture: a framework-free domain
-at the centre, an application layer orchestrating use cases against
-ports, and infrastructure adapters (PostgreSQL, S3, JWT, Argon2) at the
-edge, fronted by a FastAPI HTTP boundary and a Next.js
+<p>The portal is built as a hexagonal architecture: a framework-free
+domain at the centre, an application layer orchestrating use cases
+against ports, and infrastructure adapters (PostgreSQL, S3, JWT, Argon2)
+at the edge, fronted by a FastAPI HTTP boundary and a Next.js
 Backend-For-Frontend. The test strategy is layered to match, because
 each layer fails in a different way and needs a different kind of test
 to catch it.</p>
@@ -432,7 +434,7 @@ status × status matrix
 <td>Tracking code formatting and round-trip parsing
 (<code>test_tracking_code_formats_year_and_zero_padded_sequence</code>,
 <code>test_tracking_code_parses_its_own_output</code>)</td>
-<td><code>UGJCS-YYYY-NNNN</code>, and
+<td><code>SDJ-YYYY-NNNN</code>, and
 <code>parse(format(x)) == x</code></td>
 <td>Confirmed</td>
 <td>Pass</td>
@@ -1257,28 +1259,28 @@ judge accounts:</p>
 <tbody>
 <tr>
 <td>Author</td>
-<td><code>author@ugjcs.test</code></td>
-<td><code>Ugjcs-Author-2026!</code></td>
+<td><code>author@sdj.test</code></td>
+<td><code>Sdj-Author-2026!</code></td>
 </tr>
 <tr>
 <td>Reviewer</td>
-<td><code>reviewer@ugjcs.test</code></td>
-<td><code>Ugjcs-Reviewer-2026!</code></td>
+<td><code>reviewer@sdj.test</code></td>
+<td><code>Sdj-Reviewer-2026!</code></td>
 </tr>
 <tr>
 <td>Editor</td>
-<td><code>editor@ugjcs.test</code></td>
-<td><code>Ugjcs-Editor-2026!</code></td>
+<td><code>editor@sdj.test</code></td>
+<td><code>Sdj-Editor-2026!</code></td>
 </tr>
 <tr>
 <td>Editor-in-Chief</td>
-<td><code>eic@ugjcs.test</code></td>
-<td><code>Ugjcs-Eic-2026!</code></td>
+<td><code>eic@sdj.test</code></td>
+<td><code>Sdj-EditorChief-2026!</code></td>
 </tr>
 <tr>
 <td>Administrator</td>
-<td><code>admin@ugjcs.test</code></td>
-<td><code>Ugjcs-Admin-2026!</code></td>
+<td><code>admin@sdj.test</code></td>
+<td><code>Sdj-Admin-2026!</code></td>
 </tr>
 </tbody>
 </table>
@@ -1298,8 +1300,8 @@ actually exercised for this report (live, browser-driven)</h3>
 <tbody>
 <tr>
 <td>Author login and dashboard</td>
-<td>Navigate to <code>/login</code>, submit
-<code>author@ugjcs.test</code> / <code>Ugjcs-Author-2026!</code></td>
+<td>Navigate to <code>/login</code>, submit <code>author@sdj.test</code>
+/ <code>Sdj-Author-2026!</code></td>
 <td>Redirected to <code>/author</code>, listing this author's
 submissions with status</td>
 <td>Redirected to <code>/author</code>; ten submissions listed with
@@ -1312,7 +1314,7 @@ correct tracking codes and statuses (<code>Published</code>,
 <td>Public archive reachable without authentication</td>
 <td>Navigate to <code>/search</code> with no session</td>
 <td>Search page renders, no login redirect</td>
-<td>Page rendered directly, titled "Search · UGJCS"</td>
+<td>Page rendered directly, titled "Search · SDJ Editorial Portal"</td>
 <td>Pass</td>
 </tr>
 <tr>
@@ -1555,6 +1557,6 @@ asking whether the code was still true to what it claimed — and, twice
 in this project, whether the <em>deployed system</em> still did what the
 code claimed once it left the test suite entirely.</p>
 </main>
-<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+<footer class="site">SDJ Editorial Portal — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
 </body>
 </html>

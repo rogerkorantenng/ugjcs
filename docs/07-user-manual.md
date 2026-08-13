@@ -1,6 +1,7 @@
-# UGJCS — User Manual
+# SDJ Editorial Portal — User Manual
 
-**Project:** UGJCS — University of Ghana Journal of Computing Science
+**Project:** SDJ Editorial Portal — an editorial portal for the Science and Development
+Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana
 **Author:** Roger Koranteng Obeng (22424140)
 **Assessor:** Prof. Solomon Mensah
 **Date:** 2026-08-12
@@ -17,15 +18,18 @@ rather than describing one that would be convenient.
 
 ## 1. Introduction
 
-UGJCS (the University of Ghana Journal of Computing Science) is a web application for running
-a small academic journal end to end: an author submits a manuscript, an editor screens it and
-sends it for review, one or more reviewers assess it without knowing who wrote it, an editor
-records a decision, and — once a manuscript is accepted — the Editor-in-Chief schedules it into
-a numbered issue and publishes it to the public archive.
+The SDJ Editorial Portal is a web application for running the editorial process of the
+Science and Development Journal (SDJ), published by the College of Basic and Applied
+Sciences, University of Ghana, end to end: an author submits a manuscript, an editor screens
+it and sends it for review, one or more reviewers assess it without knowing who wrote it, an
+editor records a decision, and — once a manuscript is accepted — the Editor-in-Chief
+schedules it into a numbered issue and publishes it to the public archive. The deployed
+system described in this manual is a prototype built for an Advanced Software Engineering
+exam, not SDJ's official production system.
 
 The system recognises five kinds of user, and a person may hold more than one role at once:
 
-| Role | What they do in UGJCS |
+| Role | What they do in the portal |
 |---|---|
 | **Reader** | Anyone with a web browser. No account is needed to browse or search published papers. |
 | **Author** | Submits manuscripts, tracks their progress, downloads their own submitted files, and responds when a revision is requested. |
@@ -103,7 +107,7 @@ you wanted attached so you return to it after signing in again.
 
 1. Go to `https://ugjcs-frontend.vercel.app`.
 2. Under the heading **Recently published**, you will see a list of published papers. Each
-   entry shows its tracking code (for example `UGJCS-2026-0005`), its title, its author or
+   entry shows its tracking code (for example `SDJ-2026-0005`), its title, its author or
    authors, a short abstract, and its keywords.
 3. Click any paper's title to open it.
 
@@ -150,17 +154,17 @@ Sign in with an author account (or any account that also carries author rights) 
    - **Abstract**
    - **Keywords (comma-separated)** — for example `edge computing, rural connectivity`
    - **Co-author account ids (comma-separated, optional)** — leave this blank unless a
-     co-author already has a UGJCS account and its account id.
+     co-author already has a portal account and its account id.
 3. Under **Manuscript PDF (max 10 MB)**, either drag your PDF onto the box that reads "Drag a
    PDF here, or click to browse", or click it to open a file picker. Once a file is chosen,
    its name and size (in MB) replace that text.
 4. Click **Submit manuscript**.
 5. If the submission succeeds, you are taken straight to the manuscript's own page, which now
    shows a **Submitted** badge and a newly minted tracking code (for example
-   `UGJCS-2026-939860`). If it fails, an alert appears above the form explaining why — see §9
+   `SDJ-2026-939860`). If it fails, an alert appears above the form explaining why — see §9
    for the two most common reasons (wrong file type, file too large).
 
-**Preparing your file for double-blind review is your responsibility.** UGJCS strips the PDF's
+**Preparing your file for double-blind review is your responsibility.** The portal strips the PDF's
 embedded metadata (author name, document title, etc.) automatically before a reviewer ever
 sees it — but it has no way to read the words printed on the page. If your name, your
 institution, or an obvious self-citation ("as we showed in our earlier work…") appears in the
@@ -402,7 +406,7 @@ is accepted, the only paths forward are scheduling and publishing.
 
 **"UnsupportedDocumentTypeError — document does not begin with the PDF magic number"**
 The file you attached is not actually a PDF (or is empty/corrupted), regardless of its file
-extension. UGJCS checks the file's own contents, not its name, so renaming a Word document to
+extension. The portal checks the file's own contents, not its name, so renaming a Word document to
 `.pdf` will not get past this check. Export or print your document to a genuine PDF and try
 again.
 
@@ -425,7 +429,7 @@ Check for typing mistakes, particularly trailing spaces or the Caps Lock key, an
 **A button or form you expect to see is missing (for example, no "Begin screening" button, or
 the Decision section shows only its heading and nothing else)**
 This almost always means the manuscript is not currently in the status that action requires.
-UGJCS only offers an action when the manuscript's status allows it — for example, the Decision
+The portal only offers an action when the manuscript's status allows it — for example, the Decision
 form's "accept/reject/request revision" choices only appear once every assigned review is in
 (status "Reviews complete"); while reviews are still outstanding, that section is empty on
 purpose. Check the status badge at the top of the page against §8 to see what is expected

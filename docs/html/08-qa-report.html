@@ -51,7 +51,7 @@
 </head>
 <body>
 <header class="site">
-  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
   <div class="title">08 · QA Report</div>
 </header>
 <main>
@@ -59,8 +59,8 @@
 <header id="title-block-header">
 <h1 class="title">08 · QA Report</h1>
 </header>
-<h1 id="qa-report--ugjcs-journal-platform">QA Report — UGJCS Journal
-Platform</h1>
+<h1 id="qa-report--sdj-editorial-portal">QA Report — SDJ Editorial
+Portal</h1>
 <ul>
 <li><strong>Target:</strong> <a
 href="https://ugjcs-frontend.vercel.app">https://ugjcs-frontend.vercel.app</a>
@@ -79,13 +79,13 @@ instruction: fix without asking)</li>
 access, unknown-paper URL, sitemap, login. Zero console errors on every
 public page.</p>
 <p><strong>Author</strong> (<a
-href="mailto:author@ugjcs.test">author@ugjcs.test</a>): sign-in,
-role-aware landing, onboarding tour (4 steps, advance/close verified),
-manuscript list and statuses, <strong>full submission with a real PDF
-upload (201, redirect to detail with confirmation banner)</strong>,
-co-author lookup, withdrawal, back links, session persistence (public
-header shows "My dashboard" while signed in; /login bounces a signed-in
-visitor to their desk).</p>
+href="mailto:author@sdj.test">author@sdj.test</a>): sign-in, role-aware
+landing, onboarding tour (4 steps, advance/close verified), manuscript
+list and statuses, <strong>full submission with a real PDF upload (201,
+redirect to detail with confirmation banner)</strong>, co-author lookup,
+withdrawal, back links, session persistence (public header shows "My
+dashboard" while signed in; /login bounces a signed-in visitor to their
+desk).</p>
 <p><strong>Reviewer</strong> (reviewer, reviewer2, reviewer3,
 reviewer6): sign-in lands on /reviewer (role-aware redirect),
 assignments list, double-blind check on the assignment page (<strong>no
@@ -100,9 +100,9 @@ reason</strong>), two assignments, send-to-review decision, quorum
 auto-close after the second review (REVIEWS COMPLETE, 2 of 2), reject
 decision with its confirm step.</p>
 <p>The full editorial lifecycle was exercised on a disposable manuscript
-(UGJCS-2026-746109, itself QA junk scheduled for pruning): submit →
-screen → assign ×2 → send to review → review ×2 → quorum close →
-confirmed reject.</p>
+(SDJ-2026-746109, itself QA junk scheduled for pruning): submit → screen
+→ assign ×2 → send to review → review ×2 → quorum close → confirmed
+reject.</p>
 <h2 id="issues-found-and-fixed">Issues found and fixed</h2>
 <table>
 <thead>
@@ -196,7 +196,7 @@ and the author dashboard.</li>
 stays 200 — the streaming shell (loading.tsx) commits the status before
 the archive lookup resolves. A soft-404; crawlers handle these, readers
 never see the difference.</li>
-<li>The withdrawn QA manuscript (UGJCS-2026-174588) demonstrates the
+<li>The withdrawn QA manuscript (SDJ-2026-174588) demonstrates the
 WITHDRAWN state in the author dashboard until the next prune removes
 it.</li>
 <li>Inline PDF preview falls back to an "Open PDF" button in browsers
@@ -210,6 +210,6 @@ nested-form and 500 defects) · UX 92 · Content 100 · Accessibility 95
 tour respects reduced-motion) · Performance 90.</p>
 <p><strong>Weighted: 97/100</strong> (baseline at sweep start: ~78).</p>
 </main>
-<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+<footer class="site">SDJ Editorial Portal — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
 </body>
 </html>

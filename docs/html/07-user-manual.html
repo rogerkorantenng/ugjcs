@@ -51,7 +51,7 @@
 </head>
 <body>
 <header class="site">
-  <div class="eyebrow">University of Ghana Journal of Computing Science — Submission Documentation</div>
+  <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
   <div class="title">07 · User Manual</div>
 </header>
 <main>
@@ -59,36 +59,42 @@
 <header id="title-block-header">
 <h1 class="title">07 · User Manual</h1>
 </header>
-<h1 id="ugjcs--user-manual">UGJCS — User Manual</h1>
-<p><strong>Project:</strong> UGJCS — University of Ghana Journal of
-Computing Science <strong>Author:</strong> Roger Koranteng Obeng
-(22424140) <strong>Assessor:</strong> Prof. Solomon Mensah
-<strong>Date:</strong> 2026-08-12 <strong>Status:</strong> Written from
-the live, deployed system, not from the source code. Every screen,
-label, button caption and error message described below was observed by
-signing in as each role in turn — author, reviewer, editor,
-Editor-in-Chief and administrator — and operating the real application
-at the addresses below. Where a screen does not exist, this manual says
-so rather than describing one that would be convenient.</p>
+<h1 id="sdj-editorial-portal--user-manual">SDJ Editorial Portal — User
+Manual</h1>
+<p><strong>Project:</strong> SDJ Editorial Portal — an editorial portal
+for the Science and Development Journal (SDJ), published by the College
+of Basic and Applied Sciences, University of Ghana
+<strong>Author:</strong> Roger Koranteng Obeng (22424140)
+<strong>Assessor:</strong> Prof. Solomon Mensah <strong>Date:</strong>
+2026-08-12 <strong>Status:</strong> Written from the live, deployed
+system, not from the source code. Every screen, label, button caption
+and error message described below was observed by signing in as each
+role in turn — author, reviewer, editor, Editor-in-Chief and
+administrator — and operating the real application at the addresses
+below. Where a screen does not exist, this manual says so rather than
+describing one that would be convenient.</p>
 <p><strong>Application:</strong>
 <code>https://ugjcs-frontend.vercel.app</code> <strong>API:</strong>
 <code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code></p>
 <hr />
 <h2 id="1-introduction">1. Introduction</h2>
-<p>UGJCS (the University of Ghana Journal of Computing Science) is a web
-application for running a small academic journal end to end: an author
-submits a manuscript, an editor screens it and sends it for review, one
-or more reviewers assess it without knowing who wrote it, an editor
-records a decision, and — once a manuscript is accepted — the
-Editor-in-Chief schedules it into a numbered issue and publishes it to
-the public archive.</p>
+<p>The SDJ Editorial Portal is a web application for running the
+editorial process of the Science and Development Journal (SDJ),
+published by the College of Basic and Applied Sciences, University of
+Ghana, end to end: an author submits a manuscript, an editor screens it
+and sends it for review, one or more reviewers assess it without knowing
+who wrote it, an editor records a decision, and — once a manuscript is
+accepted — the Editor-in-Chief schedules it into a numbered issue and
+publishes it to the public archive. The deployed system described in
+this manual is a prototype built for an Advanced Software Engineering
+exam, not SDJ's official production system.</p>
 <p>The system recognises five kinds of user, and a person may hold more
 than one role at once:</p>
 <table>
 <thead>
 <tr>
 <th>Role</th>
-<th>What they do in UGJCS</th>
+<th>What they do in the portal</th>
 </tr>
 </thead>
 <tbody>
@@ -214,8 +220,8 @@ needed)</h2>
 <li>Go to <code>https://ugjcs-frontend.vercel.app</code>.</li>
 <li>Under the heading <strong>Recently published</strong>, you will see
 a list of published papers. Each entry shows its tracking code (for
-example <code>UGJCS-2026-0005</code>), its title, its author or authors,
-a short abstract, and its keywords.</li>
+example <code>SDJ-2026-0005</code>), its title, its author or authors, a
+short abstract, and its keywords.</li>
 <li>Click any paper's title to open it.</li>
 </ol>
 <h3 id="32-opening-a-paper">3.2 Opening a paper</h3>
@@ -265,7 +271,7 @@ should see a page headed <strong>Submit a manuscript</strong>.</li>
 <li><strong>Keywords (comma-separated)</strong> — for example
 <code>edge computing, rural connectivity</code></li>
 <li><strong>Co-author account ids (comma-separated, optional)</strong> —
-leave this blank unless a co-author already has a UGJCS account and its
+leave this blank unless a co-author already has a portal account and its
 account id.</li>
 </ul></li>
 <li>Under <strong>Manuscript PDF (max 10 MB)</strong>, either drag your
@@ -276,12 +282,12 @@ click it to open a file picker. Once a file is chosen, its name and size
 <li>If the submission succeeds, you are taken straight to the
 manuscript's own page, which now shows a <strong>Submitted</strong>
 badge and a newly minted tracking code (for example
-<code>UGJCS-2026-939860</code>). If it fails, an alert appears above the
+<code>SDJ-2026-939860</code>). If it fails, an alert appears above the
 form explaining why — see §9 for the two most common reasons (wrong file
 type, file too large).</li>
 </ol>
 <p><strong>Preparing your file for double-blind review is your
-responsibility.</strong> UGJCS strips the PDF's embedded metadata
+responsibility.</strong> The portal strips the PDF's embedded metadata
 (author name, document title, etc.) automatically before a reviewer ever
 sees it — but it has no way to read the words printed on the page. If
 your name, your institution, or an obvious self-citation ("as we showed
@@ -642,8 +648,8 @@ forward are scheduling and publishing.</p>
 <h2 id="9-troubleshooting">9. Troubleshooting</h2>
 <p><strong>"UnsupportedDocumentTypeError — document does not begin with
 the PDF magic number"</strong> The file you attached is not actually a
-PDF (or is empty/corrupted), regardless of its file extension. UGJCS
-checks the file's own contents, not its name, so renaming a Word
+PDF (or is empty/corrupted), regardless of its file extension. The
+portal checks the file's own contents, not its name, so renaming a Word
 document to <code>.pdf</code> will not get past this check. Export or
 print your document to a genuine PDF and try again.</p>
 <p><strong>"That file is too large — the limit is 10 MB"</strong>
@@ -665,10 +671,10 @@ particularly trailing spaces or the Caps Lock key, and try again.</p>
 <p><strong>A button or form you expect to see is missing (for example,
 no "Begin screening" button, or the Decision section shows only its
 heading and nothing else)</strong> This almost always means the
-manuscript is not currently in the status that action requires. UGJCS
-only offers an action when the manuscript's status allows it — for
-example, the Decision form's "accept/reject/request revision" choices
-only appear once every assigned review is in (status "Reviews
+manuscript is not currently in the status that action requires. The
+portal only offers an action when the manuscript's status allows it —
+for example, the Decision form's "accept/reject/request revision"
+choices only appear once every assigned review is in (status "Reviews
 complete"); while reviews are still outstanding, that section is empty
 on purpose. Check the status badge at the top of the page against §8 to
 see what is expected before the action you want becomes available.</p>
@@ -704,6 +710,6 @@ back to the public home page, and none of the <code>/author</code>,
 There is nothing further for this role to do in the browser at the time
 of writing.</p>
 </main>
-<footer class="site">UGJCS — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+<footer class="site">SDJ Editorial Portal — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
 </body>
 </html>
