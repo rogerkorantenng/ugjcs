@@ -31,6 +31,22 @@ class S3DocumentStore:
             ContentType=content_type,
         )
 
+    async def get(self, key: str) -> bytes:
+        """Read an object's bytes back — used only by full-text extraction at publish
+        time and the entrypoint backfill, never to proxy a download to a reader (that
+        stays `presigned_url`'s job). Raises `LookupError` for a missing key, per the
+        `DocumentStore` port, so callers never learn this adapter speaks boto3."""
+
+        def _read() -> bytes:
+            try:
+                response = self._client.get_object(Bucket=self._bucket, Key=key)
+            except self._client.exceptions.NoSuchKey as error:
+                raise LookupError(f"no stored document under key {key!r}") from error
+            body: bytes = response["Body"].read()
+            return body
+
+        return await asyncio.to_thread(_read)
+
     async def presigned_url(self, key: str, *, expires_in: timedelta) -> str:
         url: str = await asyncio.to_thread(
             self._client.generate_presigned_url,

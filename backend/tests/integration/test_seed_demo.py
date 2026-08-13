@@ -41,6 +41,11 @@ class FakeDocumentStore:
         self.objects[key] = data
         self.put_calls.append(key)
 
+    async def get(self, key: str) -> bytes:
+        if key not in self.objects:
+            raise LookupError(f"no stored document under key {key!r}")
+        return self.objects[key]
+
     async def presigned_url(self, key: str, *, expires_in: timedelta) -> str:
         return f"https://fake-s3.test/{key}"
 

@@ -7,7 +7,7 @@ Postgres in `tests/integration`; this package tests routing, authorisation and
 serialisation only.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from io import BytesIO
 from uuid import UUID, uuid4
@@ -15,7 +15,12 @@ from uuid import UUID, uuid4
 from pypdf import PdfWriter
 
 from ugjcs.application.identity import AuthenticationError
-from ugjcs.application.ports import REVIEW_PERIOD, ReviewAssignmentRecord
+from ugjcs.application.ports import (
+    REVIEW_PERIOD,
+    ApcInvoiceRecord,
+    PublishedSearchHit,
+    ReviewAssignmentRecord,
+)
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.enums import Role
 from ugjcs.domain.hashchain import ChainedEvent
@@ -57,15 +62,23 @@ class FakeAccountRepository:
         )
 
     async def add(self, account: object) -> None:
-        self.accounts[account.id] = account  # type: ignore[index,assignment]
+        self.accounts[account.id] = account  # type: ignore[attr-defined,assignment]
 
     async def save(self, account: object) -> None:
-        self.accounts[account.id] = account  # type: ignore[index,assignment]
+        self.accounts[account.id] = account  # type: ignore[attr-defined,assignment]
 
     async def list_by_role(self, role: Role) -> list[FakeAccount]:
         return [
             a for a in self.accounts.values() if role in a.roles and a.is_active and a.is_verified
         ]
+
+    async def list_all(self) -> list[FakeAccount]:
+        """Everything, whatever its state, email-ordered — mirroring the real adapter's
+        contract (the admin console must see the accounts it exists to fix). The
+        `getattr` dance matches `get_by_email`'s: admin tests plant real domain
+        `Account`s (whose email is an `EmailAddress`), most others plant `FakeAccount`s
+        (whose email is a plain string)."""
+        return sorted(self.accounts.values(), key=lambda a: getattr(a.email, "value", a.email))
 
 
 class FakeIdentityService:
@@ -142,6 +155,9 @@ class FakeManuscriptRepository:
 
     store: dict[ManuscriptId, Manuscript] = field(default_factory=dict)
     chains: dict[ManuscriptId, list[ChainedEvent]] = field(default_factory=dict)
+    # Extracted full text per manuscript, mirroring `manuscripts.fulltext` — kept out of
+    # the aggregate for the same reason the real column is (see the port's docstring).
+    fulltext: dict[ManuscriptId, str] = field(default_factory=dict)
 
     def ingest(self, manuscript: Manuscript) -> None:
         """Store the manuscript and link its pending events onto its chain, the way a
@@ -183,6 +199,30 @@ class FakeManuscriptRepository:
         published = await self.list_published()
         needle = query.lower()
         return [m for m in published if needle in m.title.lower() or needle in m.abstract.lower()]
+
+    async def store_fulltext(self, manuscript_id: ManuscriptId, text: str) -> None:
+        self.fulltext[manuscript_id] = text
+
+    async def search_published_with_snippets(self, query: str) -> list[PublishedSearchHit]:
+        """Substring matching all round, with a crude context-window snippet standing in
+        for `ts_headline`. Faithful to the contract that matters to routes: metadata
+        matches carry `snippet=None`, full-text matches carry surrounding context; the
+        real stemming/headline behaviour is proven against Postgres in
+        `tests/integration/test_fulltext_search.py`."""
+        needle = query.lower()
+        hits: list[PublishedSearchHit] = []
+        for manuscript in await self.list_published():
+            metadata_haystack = " ".join(
+                (manuscript.title, manuscript.abstract, *manuscript.keywords)
+            ).lower()
+            body = self.fulltext.get(manuscript.id, "")
+            at = body.lower().find(needle)
+            if at >= 0:
+                window = body[max(0, at - 40) : at + len(needle) + 40].strip()
+                hits.append(PublishedSearchHit(manuscript=manuscript, snippet=f"...{window}..."))
+            elif needle in metadata_haystack:
+                hits.append(PublishedSearchHit(manuscript=manuscript, snippet=None))
+        return hits
 
 
 @dataclass
@@ -304,8 +344,76 @@ class FakeDocumentStore:
     async def put(self, key: str, data: bytes, *, content_type: str) -> None:
         self.objects[key] = data
 
+    async def get(self, key: str) -> bytes:
+        if key not in self.objects:
+            raise LookupError(f"no stored document under key {key!r}")
+        return self.objects[key]
+
     async def presigned_url(self, key: str, *, expires_in: timedelta) -> str:
         return f"https://fake-s3.test/{key}?ttl={int(expires_in.total_seconds())}"
+
+
+@dataclass
+class FakeInvoiceRepository:
+    """Enough of `ApcInvoiceRepository` for router tests: one dict, keyed the way the
+    real table's UNIQUE constraint keys it — by manuscript."""
+
+    invoices: dict[ManuscriptId, ApcInvoiceRecord] = field(default_factory=dict)
+
+    async def create_if_absent(
+        self, manuscript_id: ManuscriptId, *, amount_pesewas: int, created_at: datetime
+    ) -> None:
+        if manuscript_id in self.invoices:
+            return
+        self.invoices[manuscript_id] = ApcInvoiceRecord(
+            id=uuid4(),
+            manuscript_id=manuscript_id,
+            amount_pesewas=amount_pesewas,
+            status="pending",
+            paystack_reference=None,
+            created_at=created_at,
+            settled_at=None,
+        )
+
+    async def get_for_manuscript(self, manuscript_id: ManuscriptId) -> ApcInvoiceRecord | None:
+        return self.invoices.get(manuscript_id)
+
+    async def set_reference(self, manuscript_id: ManuscriptId, reference: str) -> None:
+        self.invoices[manuscript_id] = replace(
+            self.invoices[manuscript_id], paystack_reference=reference
+        )
+
+    async def mark_paid(self, manuscript_id: ManuscriptId, *, settled_at: datetime) -> None:
+        self.invoices[manuscript_id] = replace(
+            self.invoices[manuscript_id], status="paid", settled_at=settled_at
+        )
+
+    async def mark_waived(self, manuscript_id: ManuscriptId, *, settled_at: datetime) -> None:
+        self.invoices[manuscript_id] = replace(
+            self.invoices[manuscript_id], status="waived", settled_at=settled_at
+        )
+
+
+@dataclass
+class FakePaymentGateway:
+    """Stands in for the Paystack adapter behind the `PaymentGateway` port: records what
+    the billing router asked for, answers a canned URL, verifies to order. The real
+    adapter's HTTP translation is proven separately with `httpx.MockTransport` in
+    `tests/unit/infrastructure/test_paystack_gateway.py`."""
+
+    verify_result: bool = True
+    initialized: list[tuple[str, int, str]] = field(default_factory=list)
+    verified_references: list[str] = field(default_factory=list)
+
+    async def initialize_transaction(
+        self, *, email: str, amount_minor_units: int, reference: str
+    ) -> str:
+        self.initialized.append((email, amount_minor_units, reference))
+        return f"https://checkout.paystack.test/{reference}"
+
+    async def verify_transaction(self, reference: str) -> bool:
+        self.verified_references.append(reference)
+        return self.verify_result
 
 
 @dataclass
@@ -313,6 +421,7 @@ class FakeUnitOfWork:
     manuscripts: FakeManuscriptRepository = field(default_factory=FakeManuscriptRepository)
     accounts: FakeAccountRepository = field(default_factory=FakeAccountRepository)
     assignments: FakeAssignmentRepository = field(default_factory=FakeAssignmentRepository)
+    invoices: FakeInvoiceRepository = field(default_factory=FakeInvoiceRepository)
 
     async def __aenter__(self) -> "FakeUnitOfWork":
         return self

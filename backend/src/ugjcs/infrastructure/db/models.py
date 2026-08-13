@@ -19,6 +19,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -42,6 +43,11 @@ class ManuscriptRow(Base):
     issue_id: Mapped[UUID | None] = mapped_column(postgresql.UUID(as_uuid=True), nullable=True)
     original_document_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     anonymised_document_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    fulltext: Mapped[str | None] = mapped_column(Text, nullable=True)
+    """Text extracted from the published PDF at publish time (or by the entrypoint
+    backfill), for the archive's full-text search. NULL means "not extracted" — the
+    manuscript is unpublished, pre-dates the feature, or its PDF yielded no text —
+    and search treats it as an empty document, never as an error."""
 
     authors: Mapped[list["ManuscriptAuthorRow"]] = relationship(
         back_populates="manuscript",
@@ -53,6 +59,16 @@ class ManuscriptRow(Base):
     __table_args__ = (
         CheckConstraint("version >= 1", name="version_positive"),
         CheckConstraint("submitted_reviews >= 0", name="reviews_non_negative"),
+        # A GIN index over the same expression `search_published_with_snippets` queries
+        # with — the expression must match the query's textually for the planner to use
+        # it. Declared here as well as in migration 0008 so the metadata-built schema the
+        # integration fixtures create agrees with the Alembic-built one, the parity
+        # `test_migration_parity.py` exists to keep.
+        Index(
+            "ix_manuscripts_fulltext_tsv",
+            text("to_tsvector('english', coalesce(fulltext, ''))"),
+            postgresql_using="gin",
+        ),
     )
 
 
@@ -153,6 +169,37 @@ class ReviewAssignmentRow(Base):
             "significance_score IS NULL OR significance_score BETWEEN 1 AND 5",
             name="significance_score_range",
         ),
+    )
+
+
+class ApcInvoiceRow(Base):
+    """One article processing charge per accepted manuscript.
+
+    Created by the accept-decision path (`ugjcs.api.routers.editorial.record_decision`),
+    settled by the billing routes. `manuscript_id` is UNIQUE — a manuscript is accepted
+    once and owes one APC, and the constraint makes a double-billing bug loud rather
+    than silently invoicing twice. `status` is a text enum checked in the schema, not a
+    Postgres ENUM type, matching how every other closed vocabulary in this schema is
+    stored (`manuscripts.status`, `review_assignments.status`).
+    """
+
+    __tablename__ = "apc_invoices"
+
+    id: Mapped[UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True)
+    manuscript_id: Mapped[UUID] = mapped_column(
+        postgresql.UUID(as_uuid=True),
+        ForeignKey("manuscripts.id", ondelete="CASCADE"),
+        unique=True,
+    )
+    amount_pesewas: Mapped[int] = mapped_column(Integer, default=15000)
+    status: Mapped[str] = mapped_column(String(16), default="pending")
+    paystack_reference: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    settled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    __table_args__ = (
+        CheckConstraint("amount_pesewas > 0", name="apc_amount_positive"),
+        CheckConstraint("status IN ('pending', 'paid', 'waived')", name="apc_status_vocabulary"),
     )
 
 

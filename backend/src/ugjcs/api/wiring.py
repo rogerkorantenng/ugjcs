@@ -13,11 +13,12 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from ugjcs.application.identity import IdentityService, RegistrationService, SessionService
-from ugjcs.application.ports import DocumentStore, UnitOfWork
+from ugjcs.application.ports import DocumentStore, PaymentGateway, UnitOfWork
 from ugjcs.infrastructure.config import get_settings
 from ugjcs.infrastructure.db.engine import create_engine, session_factory
 from ugjcs.infrastructure.db.uow import SqlAlchemyUnitOfWork
 from ugjcs.infrastructure.email.logging_sender import LoggingEmailSender
+from ugjcs.infrastructure.payments.paystack import PaystackGateway
 from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
 from ugjcs.infrastructure.security.tokens import JwtTokenService, SystemClock
 from ugjcs.infrastructure.storage.s3_store import S3DocumentStore
@@ -100,3 +101,21 @@ async def get_document_store() -> DocumentStore:
 # See `UowDep`'s note: routes depend on this alias, not a bare `Depends(...)` default,
 # because ruff's B008 forbids a function call as a default argument value.
 DocumentStoreDep = Annotated[DocumentStore, Depends(get_document_store)]
+
+
+async def get_payment_gateway() -> PaymentGateway | None:
+    """The Paystack adapter, or `None` when no secret key is configured.
+
+    `None` — not a stub gateway — is deliberately the mock-mode signal: the billing
+    router settles invoices immediately and says `"mock": true` on the wire, and a
+    fake that silently pretended to be a processor would hide exactly the fact the
+    demo response is required to disclose. The secret key never leaves this function
+    except inside the adapter it constructs.
+    """
+    settings = get_settings()
+    if not settings.paystack_secret_key:
+        return None
+    return PaystackGateway(settings.paystack_secret_key)
+
+
+PaymentGatewayDep = Annotated[PaymentGateway | None, Depends(get_payment_gateway)]

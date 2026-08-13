@@ -8,6 +8,7 @@ from fastapi.responses import PlainTextResponse
 from ugjcs.api.routers.manuscripts import _presigned
 from ugjcs.api.schemas import ArchivePaperOut, DocumentUrlOut
 from ugjcs.api.schemas_scholarly import ProvenanceEventOut, ProvenanceOut
+from ugjcs.api.schemas_wave2 import ArchiveSearchResultOut
 from ugjcs.api.wiring import DocumentStoreDep, UowDep
 from ugjcs.application.ports import UnitOfWork
 from ugjcs.application.scholarly import bibtex_citation, ris_citation
@@ -30,10 +31,14 @@ async def list_published(uow: UowDep) -> list[ArchivePaperOut]:
     return [await ArchivePaperOut.from_domain(m, uow.accounts) for m in manuscripts]
 
 
-@router.get("/search", response_model=list[ArchivePaperOut])
-async def search(q: SearchQuery, uow: UowDep) -> list[ArchivePaperOut]:
-    manuscripts = await uow.manuscripts.search_published(q)
-    return [await ArchivePaperOut.from_domain(m, uow.accounts) for m in manuscripts]
+@router.get("/search", response_model=list[ArchiveSearchResultOut])
+async def search(q: SearchQuery, uow: UowDep) -> list[ArchiveSearchResultOut]:
+    """Title, abstract and keyword matching as before, now unioned with full-text
+    search over the published PDFs' extracted body text. A result whose match came
+    from the body carries a `snippet` of the surrounding context; a metadata match
+    carries `snippet: null` — see `PublishedSearchHit` for the contract."""
+    hits = await uow.manuscripts.search_published_with_snippets(q)
+    return [await ArchiveSearchResultOut.from_hit(hit, uow.accounts) for hit in hits]
 
 
 @router.get("/{tracking_code}", response_model=ArchivePaperOut)
