@@ -18,6 +18,7 @@ from ugjcs.application.identity import AuthenticationError
 from ugjcs.application.ports import ReviewAssignmentRecord
 from ugjcs.domain.enums import ManuscriptStatus as S
 from ugjcs.domain.enums import Role
+from ugjcs.domain.hashchain import ChainedEvent
 from ugjcs.domain.ids import ManuscriptId, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Actor
@@ -120,9 +121,12 @@ class FakeSessionService:
 
 @dataclass
 class FakeManuscriptRepository:
-    """Enough of `ManuscriptRepository` for router tests: an in-memory dict, no chain."""
+    """Enough of `ManuscriptRepository` for router tests: an in-memory dict, plus an
+    optional per-manuscript chain for the provenance/certificate routes (empty by
+    default, so tests that never touch the chain are unaffected)."""
 
     store: dict[ManuscriptId, Manuscript] = field(default_factory=dict)
+    chains: dict[ManuscriptId, list[ChainedEvent]] = field(default_factory=dict)
 
     async def add(self, manuscript: Manuscript) -> None:
         self.store[manuscript.id] = manuscript
@@ -139,8 +143,8 @@ class FakeManuscriptRepository:
         self.store[manuscript.id] = manuscript
         manuscript.pull_events()
 
-    async def chain_for(self, manuscript_id: ManuscriptId) -> list[object]:
-        return []
+    async def chain_for(self, manuscript_id: ManuscriptId) -> list[ChainedEvent]:
+        return self.chains.get(manuscript_id, [])
 
     async def list_by_author(self, author_id: UserId) -> list[Manuscript]:
         return [m for m in self.store.values() if author_id in m.author_ids]

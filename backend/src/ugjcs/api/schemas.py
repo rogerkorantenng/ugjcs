@@ -7,6 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 from ugjcs.application.ports import AccountRepository, ReviewAssignmentRecord
+from ugjcs.application.scholarly import fake_doi
 from ugjcs.domain.account import Account
 from ugjcs.domain.blinding import BlindedManuscript
 from ugjcs.domain.enums import DecisionType
@@ -216,6 +217,11 @@ class ArchivePaperOut(BaseModel):
     has_document: bool
     """Whether the published PDF can be downloaded — see FR-18 and
     `GET /archive/{tracking_code}/document`. Mirrors `ManuscriptOut.has_document`."""
+    doi: str
+    """DOI-*shaped*, NOT registered: `10.55555` is a documented fake registrant prefix
+    (SRS §4.2 — real Crossref registration is out of scope), and the suffix is derived
+    from the tracking code by `ugjcs.application.scholarly.fake_doi`, never stored.
+    Resolving this at doi.org fails by design."""
 
     @classmethod
     async def from_domain(
@@ -234,4 +240,5 @@ class ArchivePaperOut(BaseModel):
             status=manuscript.status.value,
             version=manuscript.version,
             has_document=manuscript.original_document_key is not None,
+            doi=fake_doi(manuscript.tracking_code.value),
         )
