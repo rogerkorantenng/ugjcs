@@ -8,8 +8,11 @@ import { ProblemAlert } from "@/components/ui/alert";
 import { PdfDropzone } from "@/components/ui/file-drop";
 import { BackLink } from "@/components/ui/back-link";
 import { CoAuthorPicker } from "@/components/co-author-picker";
+import { SubmissionPreflight } from "@/components/anonymisation-report-card";
 import { uploadFormData } from "@/lib/upload";
-import type { Manuscript, PersonLookup, ProblemDetails } from "@/types/api";
+import { buildManuscriptFormData } from "@/lib/manuscript-form";
+import type { PersonLookup, ProblemDetails } from "@/types/api";
+import type { AnonymisationReport, SubmittedManuscript } from "@/types/scholarly";
 
 /**
  * Multipart: `title`, `abstract`, `keywords`, `co_author_ids` and a required `file` PDF.
@@ -26,6 +29,7 @@ export default function SubmitPage() {
   const [coAuthors, setCoAuthors] = useState<PersonLookup[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [preflight, setPreflight] = useState<{ report: AnonymisationReport; trackingCode: string } | null>(null);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,13 +37,7 @@ export default function SubmitPage() {
       setFileError((current) => current ?? "Attach the manuscript PDF before submitting.");
       return;
     }
-    const form = new FormData(event.currentTarget);
-    const body = new FormData();
-    body.set("title", String(form.get("title") ?? ""));
-    body.set("abstract", String(form.get("abstract") ?? ""));
-    body.set("keywords", String(form.get("keywords") ?? ""));
-    body.set("co_author_ids", coAuthors.map((person) => person.id).join(","));
-    body.set("file", file);
+    const body = buildManuscriptFormData(new FormData(event.currentTarget), coAuthors, file);
 
     setSubmitting(true);
     setProgress(0);
@@ -52,16 +50,28 @@ export default function SubmitPage() {
         setProblem(failure);
         return;
       }
-      const manuscript = outcome.data as Manuscript;
-      // Land on the manuscript's own record, not the bare dashboard list — "what happens
-      // next" (`submitted=1` tells that page to open with a confirmation banner) matters
-      // more the moment after submitting than it does on every later visit.
+      const manuscript = outcome.data as SubmittedManuscript;
+      // Pause on the anonymisation report (when the backend attached one) before the
+      // redirect; an older backend without the field redirects immediately, as before.
+      if (manuscript.anonymisation_report) {
+        setPreflight({ report: manuscript.anonymisation_report, trackingCode: manuscript.tracking_code });
+        return;
+      }
       router.push(`/author/${manuscript.tracking_code}?submitted=1`);
     } catch {
       setProblem({ type: "about:blank", title: "Could not reach the server", status: 0 });
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (preflight) {
+    return (
+      <SubmissionPreflight
+        report={preflight.report}
+        onContinue={() => router.push(`/author/${preflight.trackingCode}?submitted=1`)}
+      />
+    );
   }
 
   return (
@@ -85,17 +95,10 @@ export default function SubmitPage() {
         <PdfDropzone
           label="Manuscript PDF (max 10 MB)"
           file={file}
-          onSelect={(selected, error) => {
-            setFile(selected);
-            setFileError(error);
-          }}
+          onSelect={(selected, error) => { setFile(selected); setFileError(error); }}
           disabled={submitting}
         />
-        {fileError && (
-          <p role="alert" className="text-sm text-seal">
-            {fileError}
-          </p>
-        )}
+        {fileError && <p role="alert" className="text-sm text-seal">{fileError}</p>}
         <Button type="submit" isLoading={submitting}>
           {submitting ? `Uploading… ${progress}%` : "Submit manuscript"}
         </Button>
