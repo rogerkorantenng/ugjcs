@@ -31,15 +31,15 @@ export default async function HomePage() {
         <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
           <div className="animate-rise-in max-w-2xl">
             <p className="font-mono text-xs uppercase tracking-[0.2em] text-stamp">
-              A double-blind peer-reviewed journal
+              Editorial portal · Double-blind peer review
             </p>
             <h1 className="font-display-cover mt-4 text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:text-5xl">
-              University of Ghana Journal of Computing Science
+              Science and Development Journal
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/70">
-              Original research in computing and information systems, from Legon and beyond. Every manuscript is
-              screened, reviewed twice under strict double-blind conditions, and decided on by an editor before it
-              reaches this archive.
+              The editorial desk of SDJ, the journal of the College of Basic and Applied Sciences at the
+              University of Ghana — moved out of inboxes and shared drives into one portal. Every manuscript is
+              screened, reviewed twice under strict double-blind conditions, and decided on by an editor here.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link href="/search" className={buttonClasses("primary")}>

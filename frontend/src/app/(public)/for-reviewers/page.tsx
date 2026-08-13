@@ -6,7 +6,7 @@ import { ReviewParts } from "@/components/content/review-parts";
 export const metadata: Metadata = {
   title: "For reviewers",
   description:
-    "Reviewer guidance for UGJCS: the double-blind rules, what a review contains, how the conflict-of-interest check works, and what timeliness the journal expects.",
+    "Reviewing for the Science and Development Journal through the portal: the double-blind rules, what a review contains, how the conflict-of-interest check works, and what timeliness the journal expects.",
 };
 
 const link = "font-medium text-stamp underline decoration-stamp/40 underline-offset-4 hover:decoration-stamp";
@@ -20,8 +20,8 @@ export default function ForReviewersPage() {
     >
       <ProseSection title="Double-blind, in both directions">
         <p>
-          UGJCS reviews are double-blind. You never see the authors&rsquo; names: the copy you receive has the
-          byline withheld and author-identifying metadata stripped from the file automatically. The authors, in
+          SDJ reviews are double-blind, and the portal enforces it. You never see the authors&rsquo; names: the
+          copy you receive has the byline withheld and identifying metadata stripped automatically. The authors, in
           turn, never learn who reviewed them — your identity is known only to the editors.
         </p>
         <p>
@@ -73,7 +73,7 @@ export default function ForReviewersPage() {
         <p className="text-ink/60">
           Assigned a manuscript? <Link href="/login" className={link}>Sign in</Link> to see it on your reviewer
           dashboard. For the editorial process end to end, see{" "}
-          <Link href="/about" className={link}>how the journal works</Link>.
+          <Link href="/about" className={link}>how the portal works</Link>.
         </p>
       </div>
     </ProsePage>

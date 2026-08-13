@@ -18,11 +18,11 @@ export function DemoBanner() {
         </span>
         <span aria-hidden="true" className="h-3 w-px bg-ink/20" />
         <span>
-          <strong className="font-semibold">Demo project, not a real journal.</strong>{" "}
+          <strong className="font-semibold">Capstone prototype, not an official system.</strong>{" "}
           <span className="text-ink/70">
-            UGJCS is a fictional publication built to demonstrate a software application for an
-            Advanced Software Engineering exam — nothing submitted here is peer-reviewed or
-            published for real.
+            This is a student-built editorial portal for the Science and Development Journal
+            (CBAS, University of Ghana) — not the journal&rsquo;s or the University&rsquo;s official
+            system. Nothing submitted here is really peer-reviewed or published.
           </span>
         </span>
       </p>

@@ -25,7 +25,7 @@ describe("PdfViewer", () => {
     Object.defineProperty(window.navigator, "pdfViewerEnabled", { value: true, configurable: true });
     stubDocumentFetch();
 
-    render(<PdfViewer trackingCode="UGJCS-2026-0001" documentEndpoint="/api/manuscripts/UGJCS-2026-0001/document" title="A Paper" variant="original" />);
+    render(<PdfViewer trackingCode="SDJ-2026-0001" documentEndpoint="/api/manuscripts/SDJ-2026-0001/document" title="A Paper" variant="original" />);
 
     const frame = await waitFor(() => screen.getByTitle("A Paper — PDF preview") as HTMLIFrameElement);
     expect(frame).toHaveAttribute("src", DOCUMENT_URL);
@@ -35,7 +35,7 @@ describe("PdfViewer", () => {
     Object.defineProperty(window.navigator, "pdfViewerEnabled", { value: false, configurable: true });
     stubDocumentFetch();
 
-    render(<PdfViewer trackingCode="UGJCS-2026-0001" documentEndpoint="/api/manuscripts/UGJCS-2026-0001/document" title="A Paper" variant="original" />);
+    render(<PdfViewer trackingCode="SDJ-2026-0001" documentEndpoint="/api/manuscripts/SDJ-2026-0001/document" title="A Paper" variant="original" />);
 
     await waitFor(() => expect(screen.getByRole("link", { name: /open pdf/i })).toHaveAttribute("href", DOCUMENT_URL));
     expect(screen.queryByTitle("A Paper — PDF preview")).not.toBeInTheDocument();
@@ -45,7 +45,7 @@ describe("PdfViewer", () => {
     Object.defineProperty(window.navigator, "pdfViewerEnabled", { value: true, configurable: true });
     stubDocumentFetch();
 
-    render(<PdfViewer trackingCode="UGJCS-2026-0003" documentEndpoint="/api/reviews/UGJCS-2026-0003/document" title="Blinded Paper" variant="anonymised" />);
+    render(<PdfViewer trackingCode="SDJ-2026-0003" documentEndpoint="/api/reviews/SDJ-2026-0003/document" title="Blinded Paper" variant="anonymised" />);
 
     expect(await screen.findByText(/author withheld/i)).toBeInTheDocument();
   });
@@ -62,7 +62,7 @@ describe("PdfViewer", () => {
       }),
     );
 
-    render(<PdfViewer trackingCode="UGJCS-2026-0001" documentEndpoint="/api/manuscripts/UGJCS-2026-0001/document" title="A Paper" variant="original" />);
+    render(<PdfViewer trackingCode="SDJ-2026-0001" documentEndpoint="/api/manuscripts/SDJ-2026-0001/document" title="A Paper" variant="original" />);
     await vi.waitFor(() => expect(screen.getByTitle("A Paper — PDF preview")).toBeInTheDocument());
 
     await act(async () => {

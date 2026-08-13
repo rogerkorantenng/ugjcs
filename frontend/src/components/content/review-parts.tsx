@@ -1,6 +1,6 @@
 import { TermRow, TermList } from "./prose-page";
 
-/** The three parts of a complete UGJCS review, matching the fields of the review form the
+/** The three parts of a complete SDJ review, matching the fields of the review form the
  * assigned reviewer actually fills in — recommendation plus the two comment channels. */
 const PARTS = [
   {

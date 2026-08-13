@@ -29,7 +29,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 /** The dashboard's masthead. Same UG-blue chrome and closing double rule as `SiteHeader`, so
  * a reader moving from the public archive into a signed-in workspace never loses the sense
- * they are still inside the same journal — just past its front cover. */
+ * they are still inside the same portal — just past its front cover. */
 export function AppNav({ user }: { user: SessionUser }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -57,7 +57,7 @@ export function AppNav({ user }: { user: SessionUser }) {
             href="/"
             className="font-display-heading text-sm font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2"
           >
-            UGJCS
+            SDJ
           </Link>
           {links.map((link) => {
             const active = link.href === activeHref;

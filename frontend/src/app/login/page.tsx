@@ -54,7 +54,7 @@ function LoginForm() {
 
   return (
     <div className="animate-rise-in w-full max-w-sm border-2 border-stamp bg-paper p-8 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-stamp">UGJCS registry</p>
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-stamp">SDJ editorial portal</p>
       <h1 className="font-display-heading mt-2 text-2xl font-semibold text-ink">Sign in</h1>
       <p className="mt-1 text-sm text-ink/60">Enter your account credentials to continue.</p>
       {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
@@ -77,7 +77,7 @@ export default function LoginPage() {
           href="/"
           className="font-display-heading text-sm font-semibold tracking-tight text-paper focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          UGJCS
+          SDJ
         </Link>
       </div>
       <DemoBanner />

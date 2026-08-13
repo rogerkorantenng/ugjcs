@@ -6,7 +6,7 @@ import { SubmissionChecklist, StatusGlossary } from "@/components/content/author
 export const metadata: Metadata = {
   title: "For authors",
   description:
-    "Submission guidelines for UGJCS: what to prepare, how anonymisation works, what your tracking code means, how to follow your manuscript's status, and how revision and withdrawal work.",
+    "Submitting to the Science and Development Journal through the portal: what to prepare, how anonymisation works, what your tracking code means, how to follow your manuscript's status, and how revision and withdrawal work.",
 };
 
 const link = "font-medium text-stamp underline decoration-stamp/40 underline-offset-4 hover:decoration-stamp";
@@ -16,7 +16,7 @@ export default function ForAuthorsPage() {
     <ProsePage
       eyebrow="Author guidelines"
       title="For authors"
-      lede="Submitting to UGJCS takes one form and one PDF. This page tells you what to prepare, what happens after you press submit, and how to read every status your manuscript can be in."
+      lede="Submitting to the Science and Development Journal through this portal takes one form and one PDF — no email thread, no attachments. This page tells you what to prepare, what happens after you press submit, and how to read every status your manuscript can be in."
     >
       <ProseSection title="What to prepare">
         <p>A submission consists of four things, entered in a single form:</p>
@@ -46,7 +46,7 @@ export default function ForAuthorsPage() {
       <ProseSection title="Your tracking code">
         <p>
           On submission your manuscript receives a tracking code such as{" "}
-          <span className="font-mono text-sm text-ink">UGJCS-2026-0012</span> — the journal&rsquo;s initials, the
+          <span className="font-mono text-sm text-ink">SDJ-2026-0012</span> — the journal&rsquo;s initials, the
           year of submission, and a running number. It is the manuscript&rsquo;s permanent identity: it appears
           on your dashboard, on the manuscript&rsquo;s page, survives every revision, and becomes the
           paper&rsquo;s public address in the archive once published. Quote it in any correspondence about the
@@ -96,7 +96,7 @@ export default function ForAuthorsPage() {
         <p className="text-ink/60">
           Ready to submit? <Link href="/login" className={link}>Sign in</Link> and start from your author
           dashboard. For the process end to end, see{" "}
-          <Link href="/about" className={link}>how the journal works</Link>.
+          <Link href="/about" className={link}>how the portal works</Link>.
         </p>
       </div>
     </ProsePage>

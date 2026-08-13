@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { PaperCard } from "./manuscript-card";
 
 const PAPER = {
-  tracking_code: "UGJCS-2026-0012",
+  tracking_code: "SDJ-2026-0012",
   title: "Sparse Retrieval for Low-Resource Languages",
   abstract: "An abstract.",
   keywords: ["ir"],
@@ -16,7 +16,7 @@ const PAPER = {
 describe("PaperCard", () => {
   it("links to the paper's detail page by tracking code", () => {
     render(<PaperCard paper={PAPER} />);
-    expect(screen.getByRole("link")).toHaveAttribute("href", "/papers/UGJCS-2026-0012");
+    expect(screen.getByRole("link")).toHaveAttribute("href", "/papers/SDJ-2026-0012");
   });
 
   it("collapses three or more authors to 'et al.'", () => {

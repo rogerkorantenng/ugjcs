@@ -12,7 +12,7 @@ describe("POST /api/manuscripts", () => {
     const fetchSpy = vi.fn().mockResolvedValue({
       status: 201,
       ok: true,
-      json: async () => ({ tracking_code: "UGJCS-2026-0099", status: "submitted" }),
+      json: async () => ({ tracking_code: "SDJ-2026-0099", status: "submitted" }),
     });
     vi.stubGlobal("fetch", fetchSpy);
 

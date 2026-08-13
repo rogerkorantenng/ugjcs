@@ -3,7 +3,7 @@ import { getPublishedPapers } from "@/lib/archive";
 
 const SITE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : "https://ugjcs.example";
+  : "https://sdj.example";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const papers = await getPublishedPapers();
