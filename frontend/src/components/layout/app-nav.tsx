@@ -13,6 +13,7 @@ const LINKS: Record<string, { href: string; label: string; tour?: string }[]> = 
   reviewer: [{ href: "/reviewer", label: "My assignments" }],
   editor: [{ href: "/editor", label: "Screening queue" }],
   editor_in_chief: [{ href: "/editor", label: "Screening queue" }],
+  administrator: [{ href: "/admin", label: "Accounts" }],
 };
 
 // Exactly the routes that mount a `<Tour>`; the "Show me around" trigger only renders

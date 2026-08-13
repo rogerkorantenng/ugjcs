@@ -10,9 +10,13 @@ import { PdfViewer } from "@/components/ui/pdf-viewer";
 import { BackLink } from "@/components/ui/back-link";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ResubmitForm } from "@/components/resubmit-form";
+import { ApcPanel } from "@/components/apc-panel";
 import type { Manuscript, ProblemDetails } from "@/types/api";
 
 const WITHDRAWABLE = new Set(["submitted", "under_screening", "under_review", "reviews_complete", "revision_requested"]);
+// An APC invoice can only exist once acceptance is on the record — earlier statuses have
+// nothing to bill, so the panel (and its billing fetch) never appears before then.
+const BILLABLE = new Set(["accepted", "scheduled", "published"]);
 
 /** Isolated so `useSearchParams()` — which Next 15 requires to sit inside a Suspense
  * boundary during the build's static shell — doesn't force the whole detail page (and its
@@ -83,6 +87,12 @@ export default function ManuscriptDetailPage({ params }: { params: Promise<{ tra
           variant="original"
           className="mt-4"
         />
+      )}
+
+      {BILLABLE.has(data.status) && (
+        <div className="mt-6 border-t border-rule pt-6">
+          <ApcPanel trackingCode={trackingCode} variant="author" />
+        </div>
       )}
 
       {withdrawProblem && (

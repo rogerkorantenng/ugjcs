@@ -12,9 +12,14 @@ import { ReviewerPicker } from "@/components/reviewer-picker";
 import { DecisionForm } from "@/components/decision-form";
 import { PublicationPanel } from "@/components/publication-panel";
 import { ReviewsPanel } from "@/components/reviews-panel";
+import { ApcPanel } from "@/components/apc-panel";
 import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
 
 const PUBLICATION_STATUSES = new Set(["accepted", "scheduled"]);
+// An APC invoice can only exist once acceptance is on the record; the summary sits beside
+// the decision/publication area because settling (or waiving) it is part of the same
+// path to print.
+const BILLABLE_STATUSES = new Set(["accepted", "scheduled", "published"]);
 // `begin_screening` is legal from both SUBMITTED and RESUBMITTED (`domain/transitions.py`)
 // — a resubmission goes through screening again, the same way a first submission does.
 const SCREENABLE_STATUSES = new Set(["submitted", "resubmitted"]);
@@ -118,6 +123,12 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         <h2 className="font-display-heading text-lg font-semibold text-ink">Decision</h2>
         <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
       </div>
+
+      {BILLABLE_STATUSES.has(data.status) && (
+        <div className="mt-6 border-t border-rule pt-6">
+          <ApcPanel trackingCode={trackingCode} variant="editor" canWaive={isEditorInChief} />
+        </div>
+      )}
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">
