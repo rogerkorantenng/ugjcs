@@ -9,6 +9,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const papers = await getPublishedPapers();
   return [
     { url: `${SITE_URL}/` },
+    { url: `${SITE_URL}/about` },
+    { url: `${SITE_URL}/for-authors` },
+    { url: `${SITE_URL}/for-reviewers` },
     { url: `${SITE_URL}/search` },
     ...papers.map((paper) => ({ url: `${SITE_URL}/papers/${paper.tracking_code}` })),
   ];
