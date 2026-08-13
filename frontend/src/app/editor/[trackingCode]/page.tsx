@@ -1,38 +1,20 @@
 "use client";
-import { use, useState } from "react";
+import { use } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { StatusBadge, StatusExplanation } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { PdfViewer } from "@/components/ui/pdf-viewer";
 import { BackLink } from "@/components/ui/back-link";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerPicker } from "@/components/reviewer-picker";
 import { AssignmentsPanel } from "@/components/assignments-panel";
-import { DecisionForm } from "@/components/decision-form";
+import { DecisionSection } from "@/components/decision-section";
 import { PublicationPanel } from "@/components/publication-panel";
 import { ReviewsPanel } from "@/components/reviews-panel";
-import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
-
-const PUBLICATION_STATUSES = new Set(["accepted", "scheduled"]);
-// A decision certificate only exists once a decision has been recorded — the backend
-// answers 409 before that, so the link renders only from these statuses onward.
-const DECIDED_STATUSES = new Set(["accepted", "rejected", "scheduled", "published"]);
-// `begin_screening` is legal from both SUBMITTED and RESUBMITTED (`domain/transitions.py`)
-// — a resubmission goes through screening again, the same way a first submission does.
-const SCREENABLE_STATUSES = new Set(["submitted", "resubmitted"]);
-// Reviews only ever exist once a manuscript has left screening for the first time.
-const REVIEWABLE_STATUSES = new Set([
-  "under_review",
-  "reviews_complete",
-  "revision_requested",
-  "resubmitted",
-  "accepted",
-  "scheduled",
-  "published",
-  "rejected",
-]);
+import { ScreenAction } from "@/components/screen-action";
+import { PUBLICATION_STATUSES, REVIEWABLE_STATUSES, SCREENABLE_STATUSES } from "@/lib/editorial-statuses";
+import type { Manuscript, SessionUser } from "@/types/api";
 
 export default function EditorialManuscriptPage({ params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = use(params);
@@ -42,8 +24,6 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
   // client learns the signed-in actor's roles.
   const { data: session } = useApi<{ user: SessionUser | null }>("/api/auth/me");
   const isEditorInChief = session?.user?.roles.includes("editor_in_chief") ?? false;
-  const [screening, setScreening] = useState(false);
-  const [screenProblem, setScreenProblem] = useState<ProblemDetails | null>(null);
 
   if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
   if (error)
@@ -53,19 +33,6 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
       />
     );
   if (!data) return null;
-
-  async function screen() {
-    setScreening(true);
-    setScreenProblem(null);
-    const response = await fetch(`/api/editorial/${trackingCode}/screen`, { method: "POST" });
-    setScreening(false);
-    if (!response.ok) {
-      const detail = await response.json().catch(() => null);
-      setScreenProblem(detail ?? { type: "about:blank", title: "Could not begin screening", status: response.status });
-      return;
-    }
-    mutate();
-  }
 
   return (
     <>
@@ -89,16 +56,7 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         />
       )}
 
-      {SCREENABLE_STATUSES.has(data.status) && (
-        <div className="mt-6 border-t border-rule pt-6">
-          {screenProblem && (
-            <div className="mb-4">
-              <ProblemAlert problem={screenProblem} />
-            </div>
-          )}
-          <Button isLoading={screening} onClick={screen}>{screening ? "Starting…" : "Begin screening"}</Button>
-        </div>
-      )}
+      {SCREENABLE_STATUSES.has(data.status) && <ScreenAction trackingCode={trackingCode} onScreened={mutate} />}
 
       {data.status === "under_screening" && (
         <div className="mt-6 border-t border-rule pt-6">
@@ -125,19 +83,7 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         </div>
       )}
 
-      <div className="mt-6 border-t border-rule pt-6">
-        <h2 className="font-display-heading text-lg font-semibold text-ink">Decision</h2>
-        <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
-        {DECIDED_STATUSES.has(data.status) && (
-          <a
-            href={`/api/editorial-certificate/${trackingCode}`}
-            className="mt-4 inline-flex items-center gap-1.5 rounded-[3px] text-sm font-medium text-stamp underline decoration-stamp/40 underline-offset-2 hover:decoration-stamp focus-visible:outline-2 focus-visible:outline-offset-2"
-          >
-            Download decision certificate
-            <span aria-hidden="true" className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/45">PDF</span>
-          </a>
-        )}
-      </div>
+      <DecisionSection trackingCode={trackingCode} status={data.status} onDecided={mutate} />
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">

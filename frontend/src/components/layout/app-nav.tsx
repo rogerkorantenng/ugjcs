@@ -11,14 +11,8 @@ import type { SessionUser } from "@/types/api";
 const LINKS: Record<string, { href: string; label: string; tour?: string }[]> = {
   author: [{ href: "/author", label: "My submissions" }, { href: "/author/submit", label: "Submit", tour: "author-submit" }],
   reviewer: [{ href: "/reviewer", label: "My assignments" }],
-  editor: [
-    { href: "/editor", label: "Screening queue" },
-    { href: "/editor/analytics", label: "Analytics" },
-  ],
-  editor_in_chief: [
-    { href: "/editor", label: "Screening queue" },
-    { href: "/editor/analytics", label: "Analytics" },
-  ],
+  editor: [{ href: "/editor", label: "Screening queue" }, { href: "/editor/analytics", label: "Analytics" }],
+  editor_in_chief: [{ href: "/editor", label: "Screening queue" }, { href: "/editor/analytics", label: "Analytics" }],
 };
 
 // Exactly the routes that mount a `<Tour>`; the "Show me around" trigger only renders
