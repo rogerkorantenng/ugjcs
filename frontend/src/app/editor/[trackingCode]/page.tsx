@@ -2,11 +2,12 @@
 import { use, useState } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
-import { StatusBadge } from "@/components/ui/badge";
-import { Button, buttonClasses } from "@/components/ui/button";
+import { StatusBadge, StatusExplanation } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
+import { PdfViewer } from "@/components/ui/pdf-viewer";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
-import { ReviewerAssignForm } from "@/components/reviewer-assign-form";
+import { ReviewerPicker } from "@/components/reviewer-picker";
 import { DecisionForm } from "@/components/decision-form";
 import { PublicationPanel } from "@/components/publication-panel";
 import { ReviewsPanel } from "@/components/reviews-panel";
@@ -64,16 +65,22 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
   return (
     <>
       <div className="flex items-center justify-between">
-        <h1 className="font-serif text-2xl font-semibold text-ink">{data.title}</h1>
+        <h1 className="font-display-heading text-2xl font-semibold text-ink">{data.title}</h1>
         <StatusBadge status={data.status} />
       </div>
       <TrackingChip code={data.tracking_code} className="mt-1" />
+      <StatusExplanation status={data.status} className="mt-2" />
       <p className="mt-4 leading-relaxed text-ink/80">{data.abstract}</p>
       <p className="mt-4 text-sm text-ink/60">{data.submitted_reviews} of {data.minimum_reviews} reviews submitted</p>
+
       {data.has_document && (
-        <a href={`/api/manuscripts/${trackingCode}/document`} className={buttonClasses("secondary", "mt-4")}>
-          Download manuscript
-        </a>
+        <PdfViewer
+          trackingCode={data.tracking_code}
+          documentEndpoint={`/api/manuscripts/${trackingCode}/document`}
+          title={data.title}
+          variant="original"
+          className="mt-4"
+        />
       )}
 
       {SCREENABLE_STATUSES.has(data.status) && (
@@ -89,26 +96,30 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
 
       {data.status === "under_screening" && (
         <div className="mt-6 border-t border-rule pt-6">
-          <h2 className="font-serif text-lg font-semibold text-ink">Assign a reviewer</h2>
-          <ReviewerAssignForm trackingCode={trackingCode} onAssigned={mutate} />
+          <h2 className="font-display-heading text-lg font-semibold text-ink">Assign a reviewer</h2>
+          <p className="mt-1 text-sm text-ink/60">
+            Candidates who share an affiliation with an author, or who are already at capacity, are shown greyed out
+            with the reason — a conflict of interest is visible here, not just silently prevented.
+          </p>
+          <ReviewerPicker trackingCode={trackingCode} onAssigned={mutate} />
         </div>
       )}
 
       {REVIEWABLE_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">
-          <h2 className="font-serif text-lg font-semibold text-ink">Reviews</h2>
+          <h2 className="font-display-heading text-lg font-semibold text-ink">Reviews</h2>
           <ReviewsPanel trackingCode={trackingCode} />
         </div>
       )}
 
       <div className="mt-6 border-t border-rule pt-6">
-        <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
+        <h2 className="font-display-heading text-lg font-semibold text-ink">Decision</h2>
         <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
       </div>
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">
-          <h2 className="font-serif text-lg font-semibold text-ink">Publication</h2>
+          <h2 className="font-display-heading text-lg font-semibold text-ink">Publication</h2>
           <PublicationPanel trackingCode={trackingCode} status={data.status} onChanged={mutate} />
         </div>
       )}

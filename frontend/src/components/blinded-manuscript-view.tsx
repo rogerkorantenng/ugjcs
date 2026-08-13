@@ -1,4 +1,6 @@
 import { TrackingChip } from "@/components/ui/tracking-chip";
+import { StatusBadge, StatusExplanation } from "@/components/ui/badge";
+import { RedactedAuthorSlot } from "@/components/ui/redaction-bar";
 import type { BlindedManuscript } from "@/types/api";
 
 /**
@@ -6,13 +8,20 @@ import type { BlindedManuscript } from "@/types/api";
  * and (per docs/05-api-contract.md's reconciled shape) no `id` and no `document_url`
  * either: Plan 4 stores no document of any kind. Do not widen this component's prop type
  * to `Manuscript` or anything with an author field "just to reuse it": the type boundary
- * here is the control, not a formality.
+ * here is the control, not a formality. `RedactedAuthorSlot` below takes no name prop at
+ * all — the signature device this app uses to make that boundary visible, not just enforced
+ * silently.
  */
 export function BlindedManuscriptView({ manuscript }: { manuscript: BlindedManuscript }) {
   return (
     <article>
-      <TrackingChip code={manuscript.tracking_code} />
-      <h1 className="mt-1 font-serif text-2xl font-semibold text-ink">{manuscript.title}</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <TrackingChip code={manuscript.tracking_code} />
+        <StatusBadge status={manuscript.status} />
+      </div>
+      <h1 className="font-display-heading mt-2 text-2xl font-semibold text-ink">{manuscript.title}</h1>
+      <StatusExplanation status={manuscript.status} className="mt-1" />
+      <RedactedAuthorSlot className="mt-4" />
       <p className="mt-4 leading-relaxed text-ink/80">{manuscript.abstract}</p>
       <ul className="mt-4 flex flex-wrap gap-2">
         {manuscript.keywords.map((keyword) => (
@@ -21,11 +30,6 @@ export function BlindedManuscriptView({ manuscript }: { manuscript: BlindedManus
           </li>
         ))}
       </ul>
-      {/*
-        No "Open manuscript" link: Plan 4 stores no document of any kind — no `document_url`
-        field exists on `BlindedManuscript` (docs/05-api-contract.md §7). Re-add once a
-        document-storage capability exists.
-      */}
     </article>
   );
 }

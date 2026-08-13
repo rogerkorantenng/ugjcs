@@ -1,4 +1,5 @@
 import type { ManuscriptStatus } from "@/types/api";
+import { NEGATIVE_STATUSES, POSITIVE_STATUSES, STATUS_EXPLANATIONS } from "@/lib/status";
 
 const LABELS: Record<ManuscriptStatus, string> = {
   draft: "Draft",
@@ -16,35 +17,32 @@ const LABELS: Record<ManuscriptStatus, string> = {
   withdrawn: "Withdrawn",
 };
 
-// A tinted pill with a coloured dot, not a solid fill block — a screening queue of a
-// dozen badges should read as a calm list, not a wall of colour. `text-*` carries the
-// tone (>= 4.5:1 against `bg-paper`, WCAG 2.1 AA, checked against the rendered palette);
-// `before:bg-*` colours the 6px dot; `border-*`/`bg-*` add just enough tint to separate
-// one status from the next at a glance, without competing with the dot for attention.
-const TONES: Record<ManuscriptStatus, string> = {
-  draft: "text-ink/60 before:bg-ink/30 border-rule bg-ink/[0.03]",
-  submitted: "text-teal-dark before:bg-teal border-teal/25 bg-teal/[0.06]",
-  under_screening: "text-teal-dark before:bg-teal border-teal/25 bg-teal/[0.06]",
-  desk_rejected: "text-brick before:bg-brick border-brick/25 bg-brick/[0.06]",
-  under_review: "text-teal-dark before:bg-teal border-teal/25 bg-teal/[0.06]",
-  reviews_complete: "text-teal-dark before:bg-teal border-teal/25 bg-teal/[0.06]",
-  revision_requested: "text-amber before:bg-amber border-amber/30 bg-amber/[0.08]",
-  resubmitted: "text-amber before:bg-amber border-amber/30 bg-amber/[0.08]",
-  accepted: "text-moss before:bg-moss border-moss/25 bg-moss/[0.06]",
-  rejected: "text-brick before:bg-brick border-brick/25 bg-brick/[0.06]",
-  scheduled: "text-amber before:bg-amber border-amber/30 bg-amber/[0.08]",
-  published: "text-moss before:bg-moss border-moss/25 bg-moss/[0.06]",
-  withdrawn: "text-ink/60 before:bg-ink/30 border-rule bg-ink/[0.03]",
-};
+// Three tones only, matching the palette contract — `seal` for a negative/terminal outcome,
+// `verified` for a positive/settled one, `stamp` for anything still moving through the
+// process. Nothing in between reaches for a fourth hue; a status that needs more nuance than
+// three tones explains itself in words via `STATUS_EXPLANATIONS`, not via a new colour.
+function toneClasses(status: ManuscriptStatus): string {
+  if (NEGATIVE_STATUSES.has(status)) return "text-seal before:bg-seal border-seal/25 bg-seal/[0.06]";
+  if (POSITIVE_STATUSES.has(status)) return "text-verified before:bg-verified border-verified/25 bg-verified/[0.06]";
+  if (status === "draft") return "text-ink/55 before:bg-ink/30 border-rule bg-ink/[0.03]";
+  return "text-stamp before:bg-stamp border-stamp/25 bg-stamp/[0.06]";
+}
 
-export function StatusBadge({ status }: { status: ManuscriptStatus }) {
+export function StatusBadge({ status, className = "" }: { status: ManuscriptStatus; className?: string }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5
         text-xs font-semibold uppercase tracking-wide before:h-1.5 before:w-1.5 before:rounded-full
-        before:content-[''] ${TONES[status]}`}
+        before:content-[''] ${toneClasses(status)} ${className}`}
     >
       {LABELS[status]}
     </span>
   );
+}
+
+/** The sentence every `StatusBadge` should be paired with — "statuses should explain
+ * themselves rather than name themselves". A plain caption, not a tooltip: it must be
+ * visible without a hover, on a touchscreen included. */
+export function StatusExplanation({ status, className = "" }: { status: ManuscriptStatus; className?: string }) {
+  return <p className={`text-sm text-ink/60 ${className}`}>{STATUS_EXPLANATIONS[status]}</p>;
 }

@@ -21,9 +21,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, FieldProps>(function Tex
         name={name}
         rows={4}
         aria-describedby={hintId}
-        className={`w-full rounded-[3px] border border-rule bg-white px-3 py-2 text-sm text-ink shadow-[inset_0_1px_2px_rgba(18,32,58,0.04)]
-          transition-colors duration-150 placeholder:text-ink/35 hover:border-teal/40
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:border-amber/60 ${className}`}
+        className={`w-full rounded-[3px] border border-rule bg-surface px-3 py-2 text-sm text-ink shadow-[inset_0_1px_2px_rgba(18,21,26,0.04)]
+          transition-colors duration-150 placeholder:text-ink/35 hover:border-stamp/40
+          focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:border-stamp/60 ${className}`}
         {...props}
       />
     </div>

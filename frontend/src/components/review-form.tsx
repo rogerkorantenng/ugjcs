@@ -47,6 +47,9 @@ export function ReviewForm({ trackingCode, onSubmitted }: { trackingCode: string
   return (
     <form onSubmit={onSubmit} className="mt-6 space-y-4" aria-label="Submit review" aria-busy={submitting}>
       {problem && <ProblemAlert problem={problem} />}
+      <p className="text-sm text-ink/60">
+        A submitted review cannot be edited afterwards — every field below is required before this form will submit.
+      </p>
       <div className="grid gap-4 sm:grid-cols-2">
         <ScoreSelect name="originality_score" label="Originality" />
         <ScoreSelect name="rigour_score" label="Rigour" />
@@ -63,13 +66,14 @@ export function ReviewForm({ trackingCode, onSubmitted }: { trackingCode: string
         name="comments_to_author"
         required
         minLength={20}
+        hint="At least 20 characters. Seen by the author once a decision is recorded."
       />
       <Textarea
         label="Confidential comments to the editor"
         name="confidential_comments_to_editor"
         required
         minLength={10}
-        hint="Seen only by the handling editor — the author never sees this field."
+        hint="At least 10 characters. Seen only by the handling editor — the author never sees this field."
       />
       <Button type="submit" isLoading={submitting}>{submitting ? "Submitting…" : "Submit review"}</Button>
     </form>

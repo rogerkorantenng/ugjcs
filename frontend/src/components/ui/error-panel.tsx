@@ -17,8 +17,8 @@ export function ErrorPanel({
   onRetry?: () => void;
 }) {
   return (
-    <div role="alert" className="mx-auto max-w-md border-l-2 border-brick bg-brick/5 px-6 py-8 text-center">
-      <p className="font-serif text-lg font-semibold text-brick">{title}</p>
+    <div role="alert" className="mx-auto max-w-md border-l-2 border-seal bg-seal/5 px-6 py-8 text-center">
+      <p className="font-display-heading text-lg font-semibold text-seal">{title}</p>
       {message && <p className="mt-2 text-sm text-ink/70">{message}</p>}
       {onRetry && (
         <Button variant="secondary" className="mt-4" onClick={onRetry}>

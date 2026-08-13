@@ -64,11 +64,17 @@ export function ResubmitForm({ trackingCode, onResubmitted }: { trackingCode: st
         disabled={submitting}
       />
       {fileError && (
-        <p role="alert" className="text-sm text-brick">
+        <p role="alert" className="text-sm text-seal">
           {fileError}
         </p>
       )}
-      <Textarea label="Response to reviewers" name="response_to_reviewers" required minLength={20} />
+      <Textarea
+        label="Response to reviewers"
+        name="response_to_reviewers"
+        required
+        minLength={20}
+        hint="At least 20 characters — describe how the revision addresses the reviewers' comments."
+      />
       <Button type="submit" isLoading={submitting}>
         {submitting ? `Uploading… ${progress}%` : "Resubmit manuscript"}
       </Button>

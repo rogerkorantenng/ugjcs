@@ -54,7 +54,7 @@ export default function EditorialQueue() {
 
   return (
     <>
-      <h1 className="font-serif text-2xl font-semibold text-ink">Editorial queue</h1>
+      <h1 className="font-display-heading text-2xl font-semibold text-ink">Editorial queue</h1>
 
       {isLoading && <QueueTableSkeleton label="Loading the queue…" />}
 
@@ -80,33 +80,45 @@ export default function EditorialQueue() {
             if (manuscripts.length === 0) return null;
             return (
               <section key={section.status}>
-                <h2 className="font-serif text-lg font-semibold text-ink">
-                  {section.title} <span className="ml-1 text-sm font-normal text-ink/50">({manuscripts.length})</span>
+                <h2 className="font-display-heading text-lg font-semibold text-ink">
+                  {section.title} <span className="ml-1 font-sans text-sm font-normal text-ink/50">({manuscripts.length})</span>
                 </h2>
                 <p className="mt-0.5 text-sm text-ink/60">{section.hint}</p>
                 <div className="mt-3 overflow-x-auto">
-                  <table className="w-full min-w-[36rem] text-left text-sm">
+                  <table className="w-full min-w-[40rem] table-fixed text-left text-sm">
                     <caption className="sr-only">Manuscripts {section.title.toLowerCase()}</caption>
+                    <colgroup>
+                      <col className="w-44" />
+                      <col />
+                      <col className="w-40" />
+                    </colgroup>
                     <thead>
                       <tr className="border-b border-rule text-ink/60">
                         <th scope="col" className="py-2 pr-4 font-medium">Tracking code</th>
                         <th scope="col" className="pr-4 font-medium">Title</th>
-                        <th scope="col" className="font-medium">Status</th>
+                        <th scope="col" className="text-right font-medium">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {manuscripts.map((manuscript) => (
-                        <tr key={manuscript.tracking_code} className="border-b border-rule transition-colors hover:bg-teal/5">
+                        <tr key={manuscript.tracking_code} className="border-b border-rule transition-colors hover:bg-stamp/5">
                           <td className="py-2.5 pr-4">
                             <Link
                               href={`/editor/${manuscript.tracking_code}`}
-                              className="rounded-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+                              className="rounded-[3px] focus-visible:outline-2 focus-visible:outline-offset-2"
                             >
                               <TrackingChip code={manuscript.tracking_code} />
                             </Link>
                           </td>
-                          <td className="pr-4 text-ink">{manuscript.title}</td>
-                          <td><StatusBadge status={manuscript.status} /></td>
+                          <td className="truncate pr-4 text-ink">
+                            <Link
+                              href={`/editor/${manuscript.tracking_code}`}
+                              className="rounded-[3px] hover:text-stamp focus-visible:outline-2 focus-visible:outline-offset-2"
+                            >
+                              {manuscript.title}
+                            </Link>
+                          </td>
+                          <td className="text-right"><StatusBadge status={manuscript.status} /></td>
                         </tr>
                       ))}
                     </tbody>

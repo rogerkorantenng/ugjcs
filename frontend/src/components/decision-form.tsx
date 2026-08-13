@@ -20,6 +20,11 @@ const AVAILABLE_BY_STATUS: Record<ManuscriptStatus, DecisionType[]> = {
   accepted: [], rejected: [], scheduled: [], published: [], withdrawn: [],
 };
 
+// A decision that ends a manuscript's chances is rendered with the `danger` button —
+// "destructive actions should look different from routine ones" — a `send_to_review` or
+// `request_revision` stays the routine `primary` look.
+const IRREVERSIBLE: Set<DecisionType> = new Set(["desk_reject", "reject"]);
+
 /** Whether `DecisionForm` would render anything for this status — the caller
  * (`editor/[trackingCode]/page.tsx`) uses this to decide whether to render the "Decision"
  * section heading at all, so a terminal-state manuscript doesn't show an empty heading
@@ -32,7 +37,9 @@ export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode
   const [submitting, setSubmitting] = useState(false);
   const [problem, setProblem] = useState<ProblemDetails | null>(null);
   const available = AVAILABLE_BY_STATUS[status];
+  const [decision, setDecision] = useState<DecisionType | "">(available[0] ?? "");
   if (available.length === 0) return null;
+  const isDestructive = IRREVERSIBLE.has(decision as DecisionType);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,13 +63,32 @@ export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode
   return (
     <form onSubmit={onSubmit} className="mt-4 space-y-4" aria-label="Record decision" aria-busy={submitting}>
       {problem && <ProblemAlert problem={problem} />}
-      <Select label="Decision" name="decision" required>
-        {available.map((decision) => (
-          <option key={decision} value={decision}>{decision.replaceAll("_", " ")}</option>
+      <Select
+        label="Decision"
+        name="decision"
+        required
+        value={decision}
+        onChange={(event) => setDecision(event.target.value as DecisionType)}
+      >
+        {available.map((value) => (
+          <option key={value} value={value}>{value.replaceAll("_", " ")}</option>
         ))}
       </Select>
-      <Textarea label="Rationale" name="rationale" required minLength={20} />
-      <Button type="submit" isLoading={submitting}>{submitting ? "Recording…" : "Record decision"}</Button>
+      <Textarea
+        label="Rationale"
+        name="rationale"
+        required
+        minLength={20}
+        hint="At least 20 characters — this is recorded against the manuscript's record."
+      />
+      {isDestructive && (
+        <p className="text-sm text-seal">
+          This decision ends this manuscript&apos;s path through review and cannot be undone.
+        </p>
+      )}
+      <Button type="submit" variant={isDestructive ? "danger" : "primary"} isLoading={submitting}>
+        {submitting ? "Recording…" : isDestructive ? `Confirm ${decision.replaceAll("_", " ")}` : "Record decision"}
+      </Button>
     </form>
   );
 }

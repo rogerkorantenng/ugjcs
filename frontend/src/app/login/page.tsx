@@ -34,9 +34,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="animate-rise-in w-full max-w-sm border border-amber/30 bg-paper p-8 shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
-      <p className="font-mono text-xs uppercase tracking-[0.2em] text-teal-dark">UGJCS</p>
-      <h1 className="mt-2 font-serif text-2xl font-semibold text-ink">Sign in</h1>
+    <div className="animate-rise-in w-full max-w-sm border-2 border-stamp bg-paper p-8 shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+      <p className="font-mono text-xs uppercase tracking-[0.2em] text-stamp">UGJCS registry</p>
+      <h1 className="font-display-heading mt-2 text-2xl font-semibold text-ink">Sign in</h1>
       <p className="mt-1 text-sm text-ink/60">Enter your account credentials to continue.</p>
       {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate aria-busy={submitting}>
@@ -56,7 +56,7 @@ export default function LoginPage() {
       <div className="mx-auto w-full max-w-5xl px-4 pt-8">
         <Link
           href="/"
-          className="font-serif text-sm font-semibold tracking-tight text-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+          className="font-display-heading text-sm font-semibold tracking-tight text-paper focus-visible:outline-2 focus-visible:outline-offset-2"
         >
           UGJCS
         </Link>

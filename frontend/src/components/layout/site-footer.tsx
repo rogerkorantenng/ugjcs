@@ -4,11 +4,11 @@
  * rather than inventing a new footer style, so the two ends of the page read as one cover. */
 export function SiteFooter() {
   return (
-    <footer className="border-t border-rule bg-white/50">
+    <footer className="border-t border-rule bg-surface/60">
       <div className="mx-auto max-w-5xl px-4 py-12">
         <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr]">
           <div>
-            <p className="font-serif text-base font-semibold text-ink">
+            <p className="font-display-heading text-base font-semibold text-ink">
               University of Ghana Journal of Computing Science
             </p>
             <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink/60">

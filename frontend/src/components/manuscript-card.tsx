@@ -8,7 +8,7 @@ export function PaperCard({ paper }: { paper: ArchivePaperOut }) {
   return (
     <Link href={`/papers/${paper.tracking_code}`} className={cardLinkClasses("group", "p-5")}>
       <TrackingChip code={paper.tracking_code} />
-      <h3 className="mt-2 font-serif text-lg font-semibold text-ink group-hover:text-teal-dark">{paper.title}</h3>
+      <h3 className="font-display-heading mt-2 text-lg font-semibold text-ink group-hover:text-stamp">{paper.title}</h3>
       <p className="mt-1 text-sm text-ink/60">{formatAuthors(paper.author_names)}</p>
       <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink/70">{paper.abstract}</p>
       {paper.keywords.length > 0 && (
