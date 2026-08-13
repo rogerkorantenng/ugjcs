@@ -6,6 +6,8 @@ import { ProblemAlert } from "@/components/ui/alert";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { EmptyState } from "@/components/ui/empty-state";
 import { QueueTableSkeleton } from "@/components/skeletons";
+import { Tour } from "@/components/tour/tour";
+import { EDITOR_TOUR } from "@/components/tour/steps";
 import type { Manuscript, ManuscriptStatus } from "@/types/api";
 
 /**
@@ -54,7 +56,8 @@ export default function EditorialQueue() {
 
   return (
     <>
-      <h1 className="font-display-heading text-2xl font-semibold text-ink">Editorial queue</h1>
+      <Tour steps={EDITOR_TOUR.steps} storageKey={EDITOR_TOUR.storageKey} />
+      <h1 data-tour="editor-welcome" className="font-display-heading text-2xl font-semibold text-ink">Editorial queue</h1>
 
       {isLoading && <QueueTableSkeleton label="Loading the queue…" />}
 
@@ -74,7 +77,7 @@ export default function EditorialQueue() {
       )}
 
       {data && data.length > 0 && (
-        <div className="mt-4 space-y-8">
+        <div data-tour="editor-queue" className="mt-4 space-y-8">
           {QUEUE_SECTIONS.map((section) => {
             const manuscripts = data.filter((m) => m.status === section.status);
             if (manuscripts.length === 0) return null;

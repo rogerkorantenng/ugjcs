@@ -8,6 +8,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { buttonClasses } from "@/components/ui/button";
 import { cardLinkClasses } from "@/components/ui/card";
 import { ManuscriptListSkeleton } from "@/components/skeletons";
+import { Tour } from "@/components/tour/tour";
+import { AUTHOR_TOUR } from "@/components/tour/steps";
 import type { Manuscript } from "@/types/api";
 
 export default function AuthorDashboard() {
@@ -15,7 +17,8 @@ export default function AuthorDashboard() {
 
   return (
     <>
-      <h1 className="font-display-heading text-2xl font-semibold text-ink">My submissions</h1>
+      <Tour steps={AUTHOR_TOUR.steps} storageKey={AUTHOR_TOUR.storageKey} />
+      <h1 data-tour="author-welcome" className="font-display-heading text-2xl font-semibold text-ink">My submissions</h1>
 
       {isLoading && <ManuscriptListSkeleton label="Loading your submissions…" />}
 
@@ -36,13 +39,16 @@ export default function AuthorDashboard() {
       )}
 
       {data && data.length > 0 && (
-        <ul className="mt-4 space-y-3">
-          {data.map((manuscript) => (
+        <ul data-tour="author-list" className="mt-4 space-y-3">
+          {data.map((manuscript, index) => (
             <li key={manuscript.tracking_code}>
               <Link href={`/author/${manuscript.tracking_code}`} className={cardLinkClasses("flex items-center justify-between")}>
                 <div>
                   <p className="font-medium text-ink">{manuscript.title}</p>
-                  <TrackingChip code={manuscript.tracking_code} className="mt-1" />
+                  {/* The first chip doubles as the tour's "tracking codes" anchor. */}
+                  <span data-tour={index === 0 ? "author-tracking" : undefined} className="mt-1 inline-block">
+                    <TrackingChip code={manuscript.tracking_code} />
+                  </span>
                 </div>
                 <StatusBadge status={manuscript.status} />
               </Link>

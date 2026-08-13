@@ -3,14 +3,21 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
+import { TOUR_START_EVENT } from "@/components/tour/tour";
 import type { SessionUser } from "@/types/api";
 
-const LINKS: Record<string, { href: string; label: string }[]> = {
-  author: [{ href: "/author", label: "My submissions" }, { href: "/author/submit", label: "Submit" }],
+// `tour` marks a link as an onboarding-tour anchor (`data-tour`): the author tour points
+// at "Submit" from the dashboard, where the page itself has no submit button to spotlight.
+const LINKS: Record<string, { href: string; label: string; tour?: string }[]> = {
+  author: [{ href: "/author", label: "My submissions" }, { href: "/author/submit", label: "Submit", tour: "author-submit" }],
   reviewer: [{ href: "/reviewer", label: "My assignments" }],
   editor: [{ href: "/editor", label: "Screening queue" }],
   editor_in_chief: [{ href: "/editor", label: "Screening queue" }],
 };
+
+// Exactly the routes that mount a `<Tour>`; the "Show me around" trigger only renders
+// where dispatching the start event will actually reach a listener.
+const TOUR_ROOTS = new Set(["/author", "/reviewer", "/editor"]);
 
 const ROLE_LABELS: Record<string, string> = {
   author: "Author",
@@ -58,6 +65,7 @@ export function AppNav({ user }: { user: SessionUser }) {
               <Link
                 key={link.href}
                 href={link.href}
+                data-tour={link.tour}
                 aria-current={active ? "page" : undefined}
                 className={`group relative py-1 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 ${
                   active ? "text-stamp" : "text-paper/75 hover:text-paper"
@@ -75,6 +83,14 @@ export function AppNav({ user }: { user: SessionUser }) {
           })}
         </div>
         <div className="flex items-center gap-4 text-sm text-paper/75">
+          {TOUR_ROOTS.has(pathname) && (
+            <button
+              onClick={() => window.dispatchEvent(new Event(TOUR_START_EVENT))}
+              className="font-medium text-paper/60 transition-colors hover:text-paper focus-visible:outline-2 focus-visible:outline-offset-2"
+            >
+              Show me around
+            </button>
+          )}
           <span className="hidden items-center gap-2 sm:flex">
             {primaryRole && (
               <span className="rounded-full border border-stamp/50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-stamp">
