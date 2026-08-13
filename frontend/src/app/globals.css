@@ -8,11 +8,17 @@
  * retraction, withdrawal. `verified` marks what has settled — accepted, published. There is
  * no fourth accent: a "pending" status explains itself in words (see src/lib/status.ts)
  * rather than reaching for a new hue.
+ *
+ * The masthead alone wears the University of Ghana's own colours — deep blue and gold —
+ * because the publisher's identity belongs on the cover; inside, the registry palette
+ * (stamp violet, seal red) keeps doing the editorial work.
  */
 @theme {
   --color-paper: #f6f7f5;
   --color-surface: #ffffff;
   --color-ink: #12151a;
+  --color-ug-blue: #002855;
+  --color-ug-gold: #fdb515;
   --color-stamp: #4b3f9e;
   --color-stamp-dark: #3a317b;
   --color-seal: #8c2f2f;

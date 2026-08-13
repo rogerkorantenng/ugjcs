@@ -27,7 +27,7 @@ const ROLE_LABELS: Record<string, string> = {
   administrator: "Administrator",
 };
 
-/** The dashboard's masthead. Same `ink` chrome and closing double rule as `SiteHeader`, so
+/** The dashboard's masthead. Same UG-blue chrome and closing double rule as `SiteHeader`, so
  * a reader moving from the public archive into a signed-in workspace never loses the sense
  * they are still inside the same journal — just past its front cover. */
 export function AppNav({ user }: { user: SessionUser }) {
@@ -50,7 +50,7 @@ export function AppNav({ user }: { user: SessionUser }) {
   }
 
   return (
-    <header className="bg-ink text-paper">
+    <header className="bg-ug-blue text-paper">
       <nav aria-label="Account navigation" className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <div className="flex items-center gap-7">
           <Link
@@ -68,13 +68,13 @@ export function AppNav({ user }: { user: SessionUser }) {
                 data-tour={link.tour}
                 aria-current={active ? "page" : undefined}
                 className={`group relative py-1 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 ${
-                  active ? "text-stamp" : "text-paper/75 hover:text-paper"
+                  active ? "text-ug-gold" : "text-paper/75 hover:text-paper"
                 }`}
               >
                 {link.label}
                 <span
                   aria-hidden="true"
-                  className={`absolute -bottom-0.5 left-0 h-px w-full origin-left bg-stamp transition-transform duration-300 ease-out ${
+                  className={`absolute -bottom-0.5 left-0 h-px w-full origin-left bg-ug-gold transition-transform duration-300 ease-out ${
                     active ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                   }`}
                 />
@@ -93,7 +93,7 @@ export function AppNav({ user }: { user: SessionUser }) {
           )}
           <span className="hidden items-center gap-2 sm:flex">
             {primaryRole && (
-              <span className="rounded-full border border-stamp/50 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-stamp">
+              <span className="rounded-full border border-ug-gold/60 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ug-gold">
                 {ROLE_LABELS[primaryRole] ?? primaryRole}
               </span>
             )}
@@ -110,7 +110,7 @@ export function AppNav({ user }: { user: SessionUser }) {
           </button>
         </div>
       </nav>
-      <div aria-hidden="true" className="h-[3px] bg-stamp" />
+      <div aria-hidden="true" className="h-[3px] bg-ug-gold" />
       <div aria-hidden="true" className="h-px bg-paper/20" />
     </header>
   );
