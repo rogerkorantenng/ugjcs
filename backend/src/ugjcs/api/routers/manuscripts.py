@@ -10,6 +10,7 @@ from pypdf.errors import PdfReadError
 
 from ugjcs.api.deps import ActorDep, require
 from ugjcs.api.schemas import DocumentUrlOut, ManuscriptOut
+from ugjcs.api.schemas_scholarly import AnonymisationReport, ManuscriptSubmissionOut
 from ugjcs.api.wiring import DocumentStoreDep, UowDep
 from ugjcs.application.documents import (
     PRESIGNED_URL_TTL,
@@ -23,6 +24,7 @@ from ugjcs.domain.ids import ManuscriptId, TrackingCode, UserId
 from ugjcs.domain.manuscript import Manuscript
 from ugjcs.domain.policies import Action, Actor, authorize
 from ugjcs.infrastructure.storage.anonymize import strip_pdf_metadata
+from ugjcs.infrastructure.storage.preflight import PdfInspection, inspect_pdf, names_in_text
 
 router = APIRouter()
 
@@ -36,7 +38,7 @@ SubmitDep = Annotated[Actor, Depends(require(Action.SUBMIT))]
 _EDITORIAL_ROLES = frozenset({Role.EDITOR, Role.EDITOR_IN_CHIEF, Role.ADMINISTRATOR})
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=ManuscriptOut)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=ManuscriptSubmissionOut)
 async def submit_manuscript(
     actor: SubmitDep,
     uow: UowDep,
@@ -46,9 +48,10 @@ async def submit_manuscript(
     file: UploadFile,
     keywords: Annotated[str, Form()] = "",
     co_author_ids: Annotated[str, Form()] = "",
-) -> ManuscriptOut:
+) -> ManuscriptSubmissionOut:
     """Multipart only: FR-04/05/06 require a manuscript to carry a document from the
-    moment it exists, so there is no submission path that skips `file`."""
+    moment it exists, so there is no submission path that skips `file`. The response is
+    `ManuscriptOut` plus `anonymisation_report` — see `_submission_response`."""
     data = await file.read()
     validate_document(data)
     author_ids = (UserId(actor.id), *(UserId(cid) for cid in _parse_uuids(co_author_ids)))
@@ -61,7 +64,9 @@ async def submit_manuscript(
         author_ids=author_ids,
         corresponding_author_id=UserId(actor.id),
     )
-    o_key, a_key = await _store_document(documents, manuscript.id, manuscript.version, data)
+    o_key, a_key, inspection = await _store_document(
+        documents, manuscript.id, manuscript.version, data
+    )
     manuscript.submit(
         actor_id=UserId(actor.id),
         occurred_at=datetime.now(UTC),
@@ -70,7 +75,7 @@ async def submit_manuscript(
     )
     await uow.manuscripts.add(manuscript)
     await uow.commit()
-    return ManuscriptOut.from_domain(manuscript)
+    return await _submission_response(uow, manuscript, inspection)
 
 
 @router.get("/mine", response_model=list[ManuscriptOut])
@@ -96,7 +101,7 @@ async def withdraw(tracking_code: str, actor: ActorDep, uow: UowDep) -> Manuscri
     return ManuscriptOut.from_domain(manuscript)
 
 
-@router.post("/{tracking_code}/resubmit", response_model=ManuscriptOut)
+@router.post("/{tracking_code}/resubmit", response_model=ManuscriptSubmissionOut)
 async def resubmit(
     tracking_code: str,
     actor: ActorDep,
@@ -104,7 +109,7 @@ async def resubmit(
     documents: DocumentStoreDep,
     file: UploadFile,
     response_to_reviewers: Annotated[str, Form()],
-) -> ManuscriptOut:
+) -> ManuscriptSubmissionOut:
     """The corresponding author's only route back into the workflow from
     `REVISION_REQUESTED` — see `Manuscript.resubmit`. Ownership-checked the same way
     `withdraw` is: `Action.RESUBMIT` is granted by `policies.can()` only to the
@@ -115,7 +120,9 @@ async def resubmit(
     data = await file.read()
     validate_document(data)
     next_version = manuscript.version + 1
-    o_key, a_key = await _store_document(documents, manuscript.id, next_version, data)
+    o_key, a_key, inspection = await _store_document(
+        documents, manuscript.id, next_version, data
+    )
     manuscript.resubmit(
         actor_id=UserId(actor.id),
         occurred_at=datetime.now(UTC),
@@ -125,7 +132,7 @@ async def resubmit(
     )
     await uow.manuscripts.save(manuscript)
     await uow.commit()
-    return ManuscriptOut.from_domain(manuscript)
+    return await _submission_response(uow, manuscript, inspection)
 
 
 @router.get("/{tracking_code}/document", response_model=DocumentUrlOut)
@@ -158,13 +165,15 @@ async def get_document(
 
 async def _store_document(
     documents: DocumentStoreDep, manuscript_id: ManuscriptId, version: int, data: bytes
-) -> tuple[str, str]:
-    # Anonymise before storing anything: a file that opens with `%PDF` but cannot be
-    # parsed used to crash here AFTER the original was already written, leaving an
-    # orphaned object in storage and handing the author a bare 500. Producing the
-    # derivative first means an unreadable file rejects cleanly and stores nothing.
+) -> tuple[str, str, PdfInspection]:
+    # Anonymise (and inspect, for the preflight report) before storing anything: a file
+    # that opens with `%PDF` but cannot be parsed used to crash here AFTER the original
+    # was already written, leaving an orphaned object in storage and handing the author
+    # a bare 500. Producing the derivative first means an unreadable file rejects
+    # cleanly and stores nothing.
     try:
         anonymised = strip_pdf_metadata(data)
+        inspection = inspect_pdf(data)
     except (PdfReadError, ValueError, KeyError) as error:
         raise HTTPException(
             status_code=422,
@@ -174,7 +183,32 @@ async def _store_document(
     a_key = anonymised_key(manuscript_id, version=version)
     await documents.put(o_key, data, content_type="application/pdf")
     await documents.put(a_key, anonymised, content_type="application/pdf")
-    return o_key, a_key
+    return o_key, a_key, inspection
+
+
+async def _submission_response(
+    uow: UnitOfWork, manuscript: Manuscript, inspection: PdfInspection
+) -> ManuscriptSubmissionOut:
+    """The 201/200 body for submit and resubmit: `ManuscriptOut` fields plus the
+    anonymisation preflight report.
+
+    `author_names_in_body` is an honest partial detector for TD-05 (a name printed in
+    the visible body text survives metadata stripping): the full names of the
+    manuscript's authors, looked up from their accounts, that appear as
+    case-insensitive substrings of the PDF's extracted text. Empty means "nothing
+    found", never "proven clean" — see `infrastructure.storage.preflight`.
+    """
+    names: list[str] = []
+    for author_id in manuscript.author_ids:
+        account = await uow.accounts.get(author_id)
+        if account is not None:
+            names.append(account.full_name)
+    report = AnonymisationReport(
+        removed_docinfo_keys=list(inspection.docinfo_keys),
+        xmp_removed=inspection.had_xmp,
+        author_names_in_body=names_in_text(names, inspection.body_text),
+    )
+    return ManuscriptSubmissionOut.from_submission(manuscript, report)
 
 
 async def _presigned(documents: DocumentStoreDep, key: str) -> DocumentUrlOut:
