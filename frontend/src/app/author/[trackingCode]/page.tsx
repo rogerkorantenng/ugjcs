@@ -35,6 +35,7 @@ export default function ManuscriptDetailPage({ params }: { params: Promise<{ tra
   const { trackingCode } = use(params);
   const { data, error, isLoading, mutate } = useApi<Manuscript>(`/api/manuscripts/${trackingCode}`);
   const [withdrawing, setWithdrawing] = useState(false);
+  const [confirmingWithdraw, setConfirmingWithdraw] = useState(false);
   const [withdrawProblem, setWithdrawProblem] = useState<ProblemDetails | null>(null);
 
   if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
@@ -89,10 +90,28 @@ export default function ManuscriptDetailPage({ params }: { params: Promise<{ tra
           <ProblemAlert problem={withdrawProblem} />
         </div>
       )}
-      {WITHDRAWABLE.has(data.status) && (
-        <Button variant="danger" isLoading={withdrawing} className="mt-4" onClick={withdraw}>
-          {withdrawing ? "Withdrawing…" : "Withdraw submission"}
+      {WITHDRAWABLE.has(data.status) && !confirmingWithdraw && (
+        <Button variant="danger" className="mt-4" onClick={() => setConfirmingWithdraw(true)}>
+          Withdraw submission
         </Button>
+      )}
+      {/* Withdrawal is terminal — the same two-step confirmation the editor's destructive
+          decisions already require, not a single click on an irreversible action. */}
+      {WITHDRAWABLE.has(data.status) && confirmingWithdraw && (
+        <div className="mt-4 rounded-[3px] border-l-2 border-seal bg-seal/[0.05] px-4 py-3">
+          <p className="text-sm font-medium text-ink">
+            Withdrawing is permanent. The manuscript leaves the editorial process and cannot be
+            reinstated — a new submission would receive a new tracking code.
+          </p>
+          <div className="mt-3 flex gap-3">
+            <Button variant="danger" isLoading={withdrawing} onClick={withdraw}>
+              {withdrawing ? "Withdrawing…" : "Confirm withdrawal"}
+            </Button>
+            <Button variant="secondary" disabled={withdrawing} onClick={() => setConfirmingWithdraw(false)}>
+              Keep the submission
+            </Button>
+          </div>
+        </div>
       )}
       {data.status === "revision_requested" && (
         <div className="mt-6 border-t border-rule pt-6">
