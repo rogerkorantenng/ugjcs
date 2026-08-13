@@ -18,7 +18,7 @@ export function DemoBanner() {
         </span>
         <span aria-hidden="true" className="h-3 w-px bg-ink/20" />
         <span>
-          <strong className="font-semibold">Capstone prototype, not an official system.</strong>{" "}
+          <strong className="font-semibold text-seal">Capstone prototype, not an official system.</strong>{" "}
           <span className="text-ink/70">
             This is a student-built editorial portal for the Science and Development Journal
             (CBAS, University of Ghana) — not the journal&rsquo;s or the University&rsquo;s official
