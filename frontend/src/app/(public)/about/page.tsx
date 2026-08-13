@@ -57,7 +57,7 @@ export default function AboutPage() {
 
       <ProseSection title="A note on this site">
         <p>
-          This portal is a student capstone project, built as coursework for an Advanced Software Engineering
+          This portal is a student final project, built as coursework for an Advanced Software Engineering
           exam. The editorial workflow described on this page — submission, screening, double-blind review,
           decisions, resubmission and publication — is real and fully working in this system, but the portal is
           not the Science and Development Journal&rsquo;s official system and not an official University of

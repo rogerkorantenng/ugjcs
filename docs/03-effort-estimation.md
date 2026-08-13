@@ -141,7 +141,7 @@ TCF = 0.6 + (0.01 × 50.5) = 0.6 + 0.505 = 1.105
 | E2 | Application experience | 0.5 | 3 | 1.5 | Scholarly publishing newly studied |
 | E3 | Object-oriented experience | 1 | 4 | 4.0 | Strong |
 | E4 | Lead analyst capability | 0.5 | 4 | 2.0 | Sole analyst |
-| E5 | Motivation | 1 | 5 | 5.0 | Assessed capstone |
+| E5 | Motivation | 1 | 5 | 5.0 | Assessed final project |
 | E6 | Stable requirements | 2 | 5 | 10.0 | Self-defined and frozen at spec sign-off |
 | E7 | Part-time staff | −1 | 0 | 0.0 | None |
 | E8 | Difficult programming language | −1 | 2 | −2.0 | Python and TypeScript are familiar |
@@ -222,7 +222,7 @@ not a computational error).
 2.20). This is not a failure of either method; it is explained by what each one
 is built to measure. COCOMO II is calibrated on projects that carry formal
 verification, configuration management and management overhead that this
-project does not incur — a solo, ungoverned capstone has none of the process
+project does not incur — a solo, ungoverned final project has none of the process
 weight the model's historical dataset assumes as baseline. Its `SCED = 1.43`
 penalty for extreme schedule compression compounds multiplicatively with the
 already-high `RCPX` (1.33, reliability and complexity) and `PDIF` (1.29,
@@ -418,7 +418,7 @@ analysis is not free to cherry-pick after the fact:
   subsystems consumed relative to the rest of the system.
 - **PMAT (process maturity, COCOMO II, rated 4.68).** This scale factor
   ordinarily reflects an organisation's measured process maturity; here it
-  was rated for a solo, ungoverned capstone process, which is a judgement
+  was rated for a solo, ungoverned final project process, which is a judgement
   call revisited once the build's actual defect and rework rate — visible in
   the commit history as revert or fix-up commits following a feature commit
   — is known.

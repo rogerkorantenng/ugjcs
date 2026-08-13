@@ -3,7 +3,7 @@
 **Document:** 01 — Consolidated project documentation (main submission document)
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Assessor:** Prof. Solomon Mensah
-**Course:** Advanced Software Engineering — individual capstone
+**Course:** Advanced Software Engineering — individual final project
 **Date:** 2026-08-12
 **Live system:** `https://ugjcs-frontend.vercel.app` · API `https://tsxsbf9rzp.us-east-1.awsapprunner.com`
 **Repository:** `github.com/rogerkorantenng/ugjcs`
@@ -44,7 +44,7 @@ rather than silently resolved in one direction (see §10.4).
 
 **SDJ Editorial Portal** — a double-blind peer-review and editorial management platform built
 for the Science and Development Journal (SDJ), published by the College of Basic and Applied
-Sciences (CBAS), University of Ghana, as an individual Advanced Software Engineering capstone
+Sciences (CBAS), University of Ghana, as an individual Advanced Software Engineering final project
 within a 48-hour development window.
 
 ---
@@ -1268,7 +1268,7 @@ convention as SRS §7 and the technical debt register.
 Use Case Points sized the Must-have subset of this system (UC1–UC18) at 2,514 person-hours, and
 the full specified system at 3,262 person-hours; COCOMO II's independent cross-check placed the
 full system at approximately 7,170 person-hours (§7.2). The 48-hour window available for this
-capstone is roughly 1.5–1.9% of either figure. The delivery — a working domain layer with 812
+final project is roughly 1.5–1.9% of either figure. The delivery — a working domain layer with 812
 lines of framework-free, fully tested code; a complete API and frontend; a deployed, HTTPS-reachable
 system; and six supporting documents including this one — took a small fraction of the classically
 estimated effort. §7.5 explains why this does not invalidate the method: UCP measured the
@@ -1280,7 +1280,7 @@ estimation §10.3, to be computed from commit history rather than asserted here.
 ### 18.2 What that trade bought, and what it cost
 
 It bought a system that meets its three sharpest objectives (§3) more convincingly than most
-capstones reach in the available time: **O1** (no illegal transition reachable through any
+final projects reach in the available time: **O1** (no illegal transition reachable through any
 interface) is enforced by an exhaustively tested state machine (§8.2, §11.2); **O2** (structural
 double-blind integrity) is enforced by a projection type with nowhere to put an author field
 (§8.4); **O3** (a tamper-evident audit trail) is enforced by a hash chain and two database
@@ -1312,7 +1312,7 @@ passing every automated gate available to this project — linting, strict typin
 contract, and a full test suite at 100% coverage — was necessary and not sufficient, and that the
 defects and gaps that mattered most were found by a human, or an agent acting as one, reading code
 against what it claimed to do, or by using the deployed system as an actual actor would. That
-finding, not the deployment URL, is this capstone's most transferable result.
+finding, not the deployment URL, is this final project's most transferable result.
 
 ---
 

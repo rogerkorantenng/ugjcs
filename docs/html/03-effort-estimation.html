@@ -547,7 +547,7 @@ complexity factor (ECF)</h2>
 <td>1</td>
 <td>5</td>
 <td>5.0</td>
-<td>Assessed capstone</td>
+<td>Assessed final project</td>
 </tr>
 <tr>
 <td>E6</td>
@@ -645,25 +645,25 @@ third significant figure, not a computational error).</p>
 is explained by what each one is built to measure. COCOMO II is
 calibrated on projects that carry formal verification, configuration
 management and management overhead that this project does not incur — a
-solo, ungoverned capstone has none of the process weight the model's
-historical dataset assumes as baseline. Its <code>SCED = 1.43</code>
-penalty for extreme schedule compression compounds multiplicatively with
-the already-high <code>RCPX</code> (1.33, reliability and complexity)
-and <code>PDIF</code> (1.29, platform difficulty), so the compressed
-timeline is charged three times over in the effort-multiplier product.
-UCP, by contrast, counts only externally visible actor transactions; it
-is structurally blind to platform work — Terraform, CI/CD, the hash
-chain, the anonymisation pipeline's internals — of which this project
-has a great deal relative to its use-case count. Each method
-under-weights what the other over-weights. They do not converge on a
-single number, and are not expected to; what they do is <strong>bound
-the answer from the same side</strong>: both estimates exceed the
-48-hour window by roughly two orders of magnitude, and <strong>the full
-system is a roughly two-to-four person-year effort</strong> by either
-reckoning (1.8 person-years from UCP on the full scope, up to 47.2 ÷ 12
-≈ 3.9 person-years from COCOMO II). That agreement — on the scale of the
-problem, not its exact magnitude — is what governs the scope decision in
-§8.</p>
+solo, ungoverned final project has none of the process weight the
+model's historical dataset assumes as baseline. Its
+<code>SCED = 1.43</code> penalty for extreme schedule compression
+compounds multiplicatively with the already-high <code>RCPX</code>
+(1.33, reliability and complexity) and <code>PDIF</code> (1.29, platform
+difficulty), so the compressed timeline is charged three times over in
+the effort-multiplier product. UCP, by contrast, counts only externally
+visible actor transactions; it is structurally blind to platform work —
+Terraform, CI/CD, the hash chain, the anonymisation pipeline's internals
+— of which this project has a great deal relative to its use-case count.
+Each method under-weights what the other over-weights. They do not
+converge on a single number, and are not expected to; what they do is
+<strong>bound the answer from the same side</strong>: both estimates
+exceed the 48-hour window by roughly two orders of magnitude, and
+<strong>the full system is a roughly two-to-four person-year
+effort</strong> by either reckoning (1.8 person-years from UCP on the
+full scope, up to 47.2 ÷ 12 ≈ 3.9 person-years from COCOMO II). That
+agreement — on the scale of the problem, not its exact magnitude — is
+what governs the scope decision in §8.</p>
 <hr />
 <h2 id="8-scope-decision">8. Scope decision</h2>
 <p>48 hours is 1.5% of the lower (UCP, full-scope) estimate of 3,262
@@ -866,10 +866,10 @@ accurate is checked against how much of the build's actual effort those
 three subsystems consumed relative to the rest of the system.</li>
 <li><strong>PMAT (process maturity, COCOMO II, rated 4.68).</strong>
 This scale factor ordinarily reflects an organisation's measured process
-maturity; here it was rated for a solo, ungoverned capstone process,
-which is a judgement call revisited once the build's actual defect and
-rework rate — visible in the commit history as revert or fix-up commits
-following a feature commit — is known.</li>
+maturity; here it was rated for a solo, ungoverned final project
+process, which is a judgement call revisited once the build's actual
+defect and rework rate — visible in the commit history as revert or
+fix-up commits following a feature commit — is known.</li>
 </ul>
 <hr />
 <h2 id="11-references-and-acknowledgements">11. References and
@@ -903,6 +903,6 @@ consequence of that method is analysed rather than merely
 disclosed.</li>
 </ul>
 </main>
-<footer class="site">SDJ Editorial Portal — Advanced Software Engineering capstone · Roger Koranteng Obeng · 22424140</footer>
+<footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>
 </body>
 </html>

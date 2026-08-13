@@ -51,7 +51,7 @@ export function SiteFooter() {
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-6">
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-ink/40">SDJ</p>
           <p className="text-xs text-ink/45">
-            Capstone prototype for an Advanced Software Engineering exam — not an official CBAS or
+            Final-project prototype for an Advanced Software Engineering exam — not an official CBAS or
             University of Ghana system.
           </p>
         </div>

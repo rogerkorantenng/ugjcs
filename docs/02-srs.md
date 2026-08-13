@@ -39,7 +39,7 @@ This document specifies the functional and non-functional requirements of the SD
 Portal, a double-blind peer-review and editorial management platform built for the Science
 and Development Journal (SDJ), published by the College of Basic and Applied Sciences,
 University of Ghana. It is written for three audiences: the assessor judging
-requirements-engineering competence against this capstone's rubric, a future maintainer
+requirements-engineering competence against this final project's rubric, a future maintainer
 who needs to know what the system is contracted to do, and the author's own
 implementation, which this document constrains. Requirements are stated so that each is
 individually testable; no requirement is expressed as an unmeasurable quality goal.
