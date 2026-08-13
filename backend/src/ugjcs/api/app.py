@@ -15,7 +15,15 @@ from ugjcs.infrastructure.config import get_settings
 
 def create_app() -> FastAPI:
     settings = get_settings()
-    app = FastAPI(title="UGJCS Editorial API", version="0.1.0")
+    app = FastAPI(
+        title="Science and Development Journal (SDJ) — Editorial Portal (pilot codename UGJCS)",
+        description=(
+            "Submission and peer-review portal for the Science and Development Journal, "
+            "published by the College of Basic and Applied Sciences (CBAS), University of "
+            "Ghana — moving the journal's editorial process off its manual email workflow."
+        ),
+        version="0.1.0",
+    )
 
     app.add_middleware(
         CORSMiddleware,

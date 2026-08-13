@@ -34,7 +34,7 @@ def test_row_carries_every_scalar_field() -> None:
     manuscript = make_manuscript()
     row = to_row(manuscript)
     assert row.id == manuscript.id
-    assert row.tracking_code == "UGJCS-2026-0012"
+    assert row.tracking_code == "SDJ-2026-0012"
     assert row.title == manuscript.title
     assert row.abstract == manuscript.abstract
     assert row.keywords == ["information retrieval", "low-resource"]

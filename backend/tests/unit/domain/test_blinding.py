@@ -22,7 +22,7 @@ def manuscript() -> Manuscript:
 
 def test_blinded_view_preserves_every_reviewable_field() -> None:
     blinded = blind(manuscript())
-    assert blinded.tracking_code == "UGJCS-2026-0009"
+    assert blinded.tracking_code == "SDJ-2026-0009"
     assert blinded.title == "Low-Bandwidth Telemedicine Protocols"
     assert blinded.abstract == "A protocol for clinical consultation over intermittent links."
     assert blinded.keywords == ("telemedicine", "protocols")

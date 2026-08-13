@@ -15,7 +15,7 @@ _ABSTRACT = (
 
 def _build(author_name: str = "Ama Serwaa") -> bytes:
     return build_demo_pdf(
-        tracking_code="UGJCS-2026-000001",
+        tracking_code="SDJ-2026-000001",
         title=_TITLE,
         abstract=_ABSTRACT,
         keywords=("information retrieval", "low-resource NLP"),
@@ -41,7 +41,7 @@ def test_the_first_page_carries_the_title_and_abstract_as_visible_text() -> None
 def test_the_tracking_code_appears_on_the_first_page() -> None:
     data = _build()
     text = PdfReader(BytesIO(data)).pages[0].extract_text()
-    assert "UGJCS-2026-000001" in text
+    assert "SDJ-2026-000001" in text
 
 
 def test_author_and_creator_docinfo_carry_the_authors_real_name() -> None:
@@ -73,7 +73,7 @@ def test_the_anonymised_derivative_still_shows_the_title_and_abstract() -> None:
 
 def test_a_manuscript_with_no_keywords_still_builds_cleanly() -> None:
     data = build_demo_pdf(
-        tracking_code="UGJCS-2026-000002",
+        tracking_code="SDJ-2026-000002",
         title=_TITLE,
         abstract=_ABSTRACT,
         keywords=(),
@@ -86,7 +86,7 @@ def test_a_very_long_title_and_abstract_still_produce_a_valid_document() -> None
     long_title = "A " + "Very " * 40 + "Long Title"
     long_abstract = "Sentence about the study. " * 60
     data = build_demo_pdf(
-        tracking_code="UGJCS-2026-000003",
+        tracking_code="SDJ-2026-000003",
         title=long_title,
         abstract=long_abstract,
         keywords=("a", "b", "c"),

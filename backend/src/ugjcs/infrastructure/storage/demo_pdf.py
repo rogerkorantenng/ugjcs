@@ -109,7 +109,7 @@ def _title_page_lines(
 ) -> list[tuple[str, float, float, str]]:
     lines: list[tuple[str, float, float, str]] = []
     y = _PAGE_HEIGHT - _MARGIN
-    header = f"University of Ghana Journal of Computer Science  -  {tracking_code}"
+    header = f"Science and Development Journal (CBAS, University of Ghana)  -  {tracking_code}"
     lines.append(("F1", 10.0, y, header))
     y -= _TITLE_LINE_HEIGHT
     for wrapped in textwrap.wrap(title, _TITLE_WIDTH_CHARS) or [title]:

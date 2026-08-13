@@ -192,7 +192,7 @@ def test_an_editor_can_begin_screening() -> None:
 def test_screening_a_missing_manuscript_is_404() -> None:
     actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
     client = make_client(actor)
-    response = client.post("/api/v1/editorial/UGJCS-2026-9999/screen")
+    response = client.post("/api/v1/editorial/SDJ-2026-9999/screen")
     assert response.status_code == 404
 
 
@@ -237,7 +237,7 @@ def test_assigning_a_reviewer_to_a_missing_manuscript_is_404() -> None:
     actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
     client = make_client(actor)
     response = client.post(
-        "/api/v1/editorial/UGJCS-2026-9999/reviewers",
+        "/api/v1/editorial/SDJ-2026-9999/reviewers",
         json={"reviewer_id": str(REVIEWER)},
     )
     assert response.status_code == 404
@@ -334,7 +334,7 @@ def test_scheduling_a_missing_manuscript_is_404() -> None:
     actor = Actor(id=EIC, roles=frozenset({Role.EDITOR_IN_CHIEF}))
     client = make_client(actor)
     response = client.post(
-        "/api/v1/editorial/UGJCS-2026-9999/schedule", json={"volume": 1, "number": 1}
+        "/api/v1/editorial/SDJ-2026-9999/schedule", json={"volume": 1, "number": 1}
     )
     assert response.status_code == 404
 
@@ -350,7 +350,7 @@ def test_a_reviewer_cannot_see_reviewer_candidates() -> None:
 def test_reviewer_candidates_for_a_missing_manuscript_is_404() -> None:
     actor = Actor(id=EDITOR, roles=frozenset({Role.EDITOR}))
     client = make_client(actor)
-    response = client.get("/api/v1/editorial/UGJCS-2026-9999/reviewer-candidates")
+    response = client.get("/api/v1/editorial/SDJ-2026-9999/reviewer-candidates")
     assert response.status_code == 404
 
 
@@ -374,18 +374,18 @@ def test_reviewer_candidates_omits_unverified_inactive_and_non_reviewer_accounts
     uow.manuscripts.store[manuscript.id] = manuscript
     uow.accounts.accounts[inactive_reviewer] = FakeAccount(
         id=inactive_reviewer,
-        email="inactive@ugjcs.test",
+        email="inactive@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         is_active=False,
     )
     uow.accounts.accounts[unverified_reviewer] = FakeAccount(
         id=unverified_reviewer,
-        email="unverified@ugjcs.test",
+        email="unverified@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         is_verified=False,
     )
     uow.accounts.accounts[non_reviewer] = FakeAccount(
-        id=non_reviewer, email="noreviewer@ugjcs.test", roles=frozenset({Role.EDITOR})
+        id=non_reviewer, email="noreviewer@sdj.test", roles=frozenset({Role.EDITOR})
     )
 
     async def _uow() -> AsyncIterator[FakeUnitOfWork]:
@@ -429,44 +429,44 @@ def test_reviewer_candidates_lists_eligible_and_excluded_with_their_reasons() ->
     uow.manuscripts.store[manuscript.id] = manuscript
     uow.accounts.accounts[AUTHOR] = FakeAccount(
         id=AUTHOR,
-        email="author@ugjcs.test",
+        email="author@sdj.test",
         roles=frozenset({Role.AUTHOR}),
         affiliation="University of Ghana",
     )
     uow.accounts.accounts[conflicted_author_reviewer] = FakeAccount(
         id=conflicted_author_reviewer,
-        email="conflicted@ugjcs.test",
+        email="conflicted@sdj.test",
         roles=frozenset({Role.AUTHOR, Role.REVIEWER}),
         affiliation="Independent",
     )
     uow.accounts.accounts[same_affiliation] = FakeAccount(
         id=same_affiliation,
-        email="same-affiliation@ugjcs.test",
+        email="same-affiliation@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         affiliation="university of ghana",
     )
     uow.accounts.accounts[already_assigned] = FakeAccount(
         id=already_assigned,
-        email="already-assigned@ugjcs.test",
+        email="already-assigned@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         affiliation="Elsewhere University",
     )
     uow.accounts.accounts[at_capacity] = FakeAccount(
         id=at_capacity,
-        email="at-capacity@ugjcs.test",
+        email="at-capacity@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         affiliation="Elsewhere University",
         reviewer_capacity=1,
     )
     uow.accounts.accounts[eligible_low_load] = FakeAccount(
         id=eligible_low_load,
-        email="low-load@ugjcs.test",
+        email="low-load@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         affiliation="Elsewhere University",
     )
     uow.accounts.accounts[eligible_high_load] = FakeAccount(
         id=eligible_high_load,
-        email="high-load@ugjcs.test",
+        email="high-load@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         affiliation="Elsewhere University",
     )

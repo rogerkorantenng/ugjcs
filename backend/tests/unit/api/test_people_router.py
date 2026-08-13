@@ -31,7 +31,7 @@ def make_client(actor: Actor, accounts: Iterable[FakeAccount] = ()) -> TestClien
 def test_looking_up_a_known_email_returns_the_person() -> None:
     person = FakeAccount(
         id=new_user_id(),
-        email="colleague@ugjcs.test",
+        email="colleague@sdj.test",
         roles=frozenset({Role.AUTHOR}),
         full_name="Ada Boateng",
         affiliation="University of Ghana",
@@ -39,7 +39,7 @@ def test_looking_up_a_known_email_returns_the_person() -> None:
     actor = Actor(id=ANY_ACTOR, roles=frozenset({Role.AUTHOR}))
     client = make_client(actor, [person])
 
-    response = client.get("/api/v1/people/lookup", params={"email": "COLLEAGUE@UGJCS.TEST"})
+    response = client.get("/api/v1/people/lookup", params={"email": "COLLEAGUE@SDJ.TEST"})
 
     assert response.status_code == 200
     body = response.json()
@@ -55,7 +55,7 @@ def test_looking_up_an_unknown_email_is_404() -> None:
     actor = Actor(id=ANY_ACTOR, roles=frozenset({Role.AUTHOR}))
     client = make_client(actor)
 
-    response = client.get("/api/v1/people/lookup", params={"email": "nobody@ugjcs.test"})
+    response = client.get("/api/v1/people/lookup", params={"email": "nobody@sdj.test"})
 
     assert response.status_code == 404
 
@@ -74,7 +74,7 @@ def test_a_malformed_email_is_also_404_not_a_validation_error() -> None:
 def test_any_authenticated_role_may_look_someone_up() -> None:
     person = FakeAccount(
         id=new_user_id(),
-        email="reviewer-target@ugjcs.test",
+        email="reviewer-target@sdj.test",
         roles=frozenset({Role.REVIEWER}),
         full_name="Kojo Mensah",
         affiliation="KNUST",
@@ -82,6 +82,6 @@ def test_any_authenticated_role_may_look_someone_up() -> None:
     actor = Actor(id=ANY_ACTOR, roles=frozenset({Role.REVIEWER}))
     client = make_client(actor, [person])
 
-    response = client.get("/api/v1/people/lookup", params={"email": "reviewer-target@ugjcs.test"})
+    response = client.get("/api/v1/people/lookup", params={"email": "reviewer-target@sdj.test"})
 
     assert response.status_code == 200
