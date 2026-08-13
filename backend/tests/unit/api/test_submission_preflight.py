@@ -40,16 +40,15 @@ def make_client() -> tuple[TestClient, FakeUnitOfWork]:
 
     app.dependency_overrides[get_uow] = _uow
     app.dependency_overrides[get_document_store] = lambda: FakeDocumentStore()
-    app.dependency_overrides[get_current_actor] = lambda: Actor(
-        id=AUTHOR, roles=frozenset({Role.AUTHOR})
-    )
+    actor = Actor(id=AUTHOR, roles=frozenset({Role.AUTHOR}))
+    app.dependency_overrides[get_current_actor] = lambda: actor
     return TestClient(app), uow
 
 
 def submit(client: TestClient, file_bytes: bytes) -> Response:
     response: Response = client.post(
         "/api/v1/manuscripts",
-        data={"title": "T", "abstract": "A.", "keywords": "", "co_author_ids": ""},
+        data={"title": "T", "abstract": "A."},
         files={"file": ("manuscript.pdf", file_bytes, "application/pdf")},
     )
     return response
@@ -80,9 +79,9 @@ def test_the_submission_response_reports_the_stripped_docinfo_keys() -> None:
 def test_the_response_still_carries_every_manuscript_out_field() -> None:
     client, _ = make_client()
     body = submit(client, minimal_pdf_bytes()).json()
-    for field in ("tracking_code", "title", "status", "version", "has_document", "author_ids"):
-        assert field in body
     assert body["status"] == "submitted"
+    for field in ("tracking_code", "title", "version", "has_document", "author_ids"):
+        assert field in body
 
 
 def test_an_author_name_in_the_body_text_is_flagged() -> None:

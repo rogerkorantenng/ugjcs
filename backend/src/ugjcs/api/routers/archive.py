@@ -19,8 +19,7 @@ from ugjcs.domain.manuscript import Manuscript
 router = APIRouter()
 
 SearchQuery = Annotated[str, Query(min_length=1)]
-# `format` would shadow the builtin (ruff A002) as a parameter name, so the handler
-# parameter is `citation_format` and the wire name comes from the alias. An unknown
+# Aliased because a `format` parameter would shadow the builtin (ruff A002); an unknown
 # value fails the `Literal` and FastAPI returns 422, exactly the contract.
 CitationFormat = Annotated[Literal["bibtex", "ris"], Query(alias="format")]
 
@@ -61,21 +60,18 @@ async def download_published_document(
 @router.get("/{tracking_code}/provenance", response_model=ProvenanceOut)
 async def provenance(tracking_code: str, uow: UowDep) -> ProvenanceOut:
     """Recompute the paper's editorial event hash chain and publish a summary of it.
-
     Published manuscripts only — anything still in the workflow is a 404 here, the same
     gate every other `/archive` route applies.
 
-    `intact` means exactly what `ugjcs.domain.hashchain.verify` proves and no more:
-    every stored link reconciles against a recomputation from the genesis hash, so no
-    interior event was altered, reordered or removed. Stated plainly, as that module's
-    docstring does, what `intact` does NOT prove: it cannot detect truncation of the
-    tail (any prefix of a valid chain is itself a valid chain), a forged event appended
-    through the normal path, or a wholly fabricated history rebuilt from genesis —
-    those need an externally published checkpoint, which is out of scope (TD register).
-
-    Each event exposes only its type, timestamp and an 8-character hash prefix. Never
-    the payload or actor: payloads can reference reviewer identifiers.
-    """
+    `intact` means exactly what `ugjcs.domain.hashchain.verify` proves and no more: every
+    stored link reconciles against a recomputation from the genesis hash, so no interior
+    event was altered, reordered or removed. Stated plainly, as that module's docstring
+    does, what `intact` does NOT prove: it cannot detect truncation of the tail (any
+    prefix of a valid chain is itself a valid chain), a forged event appended through the
+    normal path, or a wholly fabricated history rebuilt from genesis — those need an
+    externally published checkpoint, out of scope per the technical-debt register.
+    Each event exposes only its type, timestamp and an 8-character hash prefix — never
+    the payload or actor, because payloads can reference reviewer identifiers."""
     manuscript = await _published_or_404(uow, tracking_code)
     chain = await uow.manuscripts.chain_for(manuscript.id)
     try:
@@ -104,11 +100,8 @@ async def citation(
     tracking_code: str, citation_format: CitationFormat, uow: UowDep
 ) -> PlainTextResponse:
     """A ready-to-paste citation for a published paper, as BibTeX or RIS plain text.
-
     Carries the DOI-shaped identifier (`ArchivePaperOut.doi` — fake registrant
-    `10.55555`, unregistered by documented scope) and the portal URL. Any format other
-    than `bibtex` or `ris` fails validation with 422.
-    """
+    `10.55555`, unregistered by documented scope) and the portal URL."""
     manuscript = await _published_or_404(uow, tracking_code)
     paper = await ArchivePaperOut.from_domain(manuscript, uow.accounts)
     render = bibtex_citation if citation_format == "bibtex" else ris_citation

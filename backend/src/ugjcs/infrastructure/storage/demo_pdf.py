@@ -1,16 +1,10 @@
 """Build a plausible, multi-page PDF for a seeded demonstration manuscript.
 
-Exists for exactly one caller, `ugjcs.scripts.seed_demo`: the seed script predates file
-upload, so every manuscript it drives through the editorial lifecycle needs a real
-document to attach, not a blank sheet. The byte-level page assembly (content streams,
-base-14 fonts) lives in `pdf_text.py`, shared with `certificate_pdf.py`; this module
-only decides *what* a demonstration manuscript's pages say.
-
-Deliberately placed beside `anonymize.py`, not in `ugjcs.scripts`: both modules do
-byte-level PDF surgery with `pypdf` and nothing else, so they belong to the same
-"PDF-authoring" corner of the storage package rather than to the seed script's own
-business logic (which orchestrates *what* gets built and *when*, not *how* a PDF is
-assembled).
+Exists for exactly one caller, `ugjcs.scripts.seed_demo`: every manuscript the seed
+drives through the editorial lifecycle needs a real document, not a blank sheet. The
+byte-level page assembly lives in `pdf_text.py`, shared with `certificate_pdf.py`;
+this module only decides *what* a demonstration manuscript's pages say. Placed beside
+`anonymize.py` because both do byte-level PDF surgery with `pypdf` and nothing else.
 """
 
 from collections.abc import Sequence
@@ -32,12 +26,9 @@ from ugjcs.infrastructure.storage.pdf_text import (
     wrap,
 )
 
-# Placeholder body-section text for the filler pages that follow the title page, so a
-# reviewer sees a document that looks like a manuscript in progress rather than an
-# abstract stapled to blank paper. Content-free by design: this is a demonstration
-# artefact, not a real submission, and its wording is irrelevant to what it needs to
-# prove (that a document exists, carries the right title/abstract, and can be
-# anonymised).
+# Placeholder body text for the filler pages after the title page, so a reviewer sees
+# something manuscript-shaped rather than an abstract stapled to blank paper.
+# Content-free by design: this is a demonstration artefact, not a real submission.
 _FILLER_SECTIONS: tuple[tuple[str, str], ...] = (
     (
         "1. Introduction",
@@ -99,16 +90,12 @@ def build_demo_pdf(
     keywords: Sequence[str],
     author_name: str,
 ) -> bytes:
-    """Return a small multi-page PDF: a title page carrying `title`/`abstract`, followed
-    by placeholder section pages, with `/Author` and `/Creator` DocInfo set to
-    `author_name`.
+    """Return a small multi-page PDF: a title page carrying `title`/`abstract`, filler
+    section pages, and `/Author`/`/Creator` DocInfo set to `author_name`.
 
-    That DocInfo assignment is the point of this function's second half, not an
-    afterthought: `infrastructure.storage.anonymize.strip_pdf_metadata` produces the
-    reviewer-facing derivative by removing exactly these fields, so a demonstration
-    corpus whose source PDFs never carried an author name in the first place would make
-    the anonymisation feature invisible — there would be nothing in the original for the
-    derivative to visibly differ from.
+    The DocInfo assignment is the point, not an afterthought: `strip_pdf_metadata`
+    removes exactly these fields, and a demonstration corpus whose PDFs never carried
+    an author name would make the anonymisation feature invisible.
     """
     writer = PdfWriter()
     regular = writer._add_object(font("Helvetica"))
@@ -125,13 +112,7 @@ def build_demo_pdf(
     for heading, body in _FILLER_SECTIONS:
         add_text_page(writer, regular, bold, _filler_page_lines(heading=heading, body=body))
 
-    writer.add_metadata(
-        {
-            "/Title": title,
-            "/Author": author_name,
-            "/Creator": author_name,
-        }
-    )
+    writer.add_metadata({"/Title": title, "/Author": author_name, "/Creator": author_name})
     buffer = BytesIO()
     writer.write(buffer)
     return buffer.getvalue()
