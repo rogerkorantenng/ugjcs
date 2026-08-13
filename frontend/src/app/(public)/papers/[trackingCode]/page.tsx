@@ -2,20 +2,21 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPaper } from "@/lib/archive";
 import { ProblemDetailsError } from "@/lib/backend";
-import type { ArchivePaperOut } from "@/types/api";
+import type { ScholarlyPaper } from "@/types/scholarly";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { BackLink } from "@/components/ui/back-link";
 import { RevealedAuthorSlot } from "@/components/ui/redaction-bar";
 import { PdfViewer } from "@/components/ui/pdf-viewer";
+import { CitationRow, ProvenanceSection } from "@/components/paper-scholarly";
 
-interface Params { trackingCode: string }
+type Params = Promise<{ trackingCode: string }>;
 
 export const revalidate = 300;
 
 /** A 404 from the archive becomes Next's not-found page; anything else keeps throwing.
  * Without this, an unknown tracking code returned HTTP 200 and left the reader staring
  * at the loading skeleton forever. */
-async function getPaperOr404(trackingCode: string): Promise<ArchivePaperOut> {
+async function getPaperOr404(trackingCode: string): Promise<ScholarlyPaper> {
   try {
     return await getPaper(trackingCode);
   } catch (error) {
@@ -24,7 +25,7 @@ async function getPaperOr404(trackingCode: string): Promise<ArchivePaperOut> {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { trackingCode } = await params;
   const paper = await getPaperOr404(trackingCode);
   return {
@@ -34,18 +35,19 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
-export default async function PaperPage({ params }: { params: Promise<Params> }) {
+export default async function PaperPage({ params }: { params: Params }) {
   const { trackingCode } = await params;
   const paper = await getPaperOr404(trackingCode);
 
-  // No `datePublished`/`identifier` (DOI): Plan 4 mints no DOI and exposes no publication
-  // timestamp anywhere on the wire. Both are entered in the technical debt register rather
-  // than filled with a placeholder value a search engine would index as real.
+  // No `datePublished`: the wire still exposes no publication timestamp (technical debt
+  // register). `identifier` is the minted DOI when the backend serialises one — the field
+  // is optional so this page keeps working against the pre-DOI API.
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ScholarlyArticle",
     headline: paper.title,
     author: paper.author_names.map((name) => ({ "@type": "Person", name })),
+    ...(paper.doi ? { identifier: paper.doi } : {}),
   };
 
   return (
@@ -55,6 +57,7 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
       {paper.author_names.map((name) => (
         <meta key={name} name="citation_author" content={name} />
       ))}
+      {paper.doi && <meta name="citation_doi" content={paper.doi} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       <BackLink href="/" label="All papers" />
@@ -74,6 +77,7 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
           ))}
         </ul>
       )}
+      <CitationRow paper={paper} />
       <p className="mt-8 border-t border-rule pt-8 leading-relaxed text-ink/80">{paper.abstract}</p>
       {paper.has_document && (
         <PdfViewer
@@ -84,6 +88,7 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
           className="mt-8"
         />
       )}
+      <ProvenanceSection trackingCode={paper.tracking_code} />
     </main>
   );
 }

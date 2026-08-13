@@ -30,3 +30,14 @@ export async function backendFetch<T>(path: string, init: RequestInit = {}): Pro
   if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
+
+/**
+ * `backendFetch` for text/plain bodies — the citation export endpoint answers with raw
+ * BibTeX/RIS, not JSON. Same public posture: no token, no session; errors still arrive
+ * as JSON problem details and are relayed as `ProblemDetailsError` exactly like above.
+ */
+export async function backendFetchText(path: string, init: RequestInit = {}): Promise<string> {
+  const response = await fetch(`${env.API_BASE_URL}${path}`, init);
+  if (!response.ok) throw new ProblemDetailsError(await toProblem(response), response.status);
+  return response.text();
+}
