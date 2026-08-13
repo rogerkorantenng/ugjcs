@@ -1,5 +1,5 @@
 "use client";
-import { useId, useState, type FormEvent } from "react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { PersonLookup } from "@/types/api";
 
@@ -22,8 +22,7 @@ export function CoAuthorPicker({ people, onChange }: { people: PersonLookup[]; o
   const [email, setEmail] = useState("");
   const [lookup, setLookup] = useState<LookupState>({ status: "idle" });
 
-  async function onLookup(event: FormEvent) {
-    event.preventDefault();
+  async function onLookup() {
     const trimmed = email.trim();
     if (!trimmed) return;
     setLookup({ status: "loading" });
@@ -62,7 +61,10 @@ export function CoAuthorPicker({ people, onChange }: { people: PersonLookup[]; o
       <p className="mb-1.5 text-xs text-ink/60">
         Enter a co-author&apos;s account email to look them up, then confirm and add them.
       </p>
-      <form onSubmit={onLookup} className="flex gap-2">
+      {/* Not a <form>: this component lives inside the manuscript form, and nested forms
+          are dropped by the HTML parser — a submit-typed button here would submit the
+          whole page instead of running the lookup. Enter is wired by hand instead. */}
+      <div className="flex gap-2">
         <input
           id={inputId}
           type="email"
@@ -71,15 +73,27 @@ export function CoAuthorPicker({ people, onChange }: { people: PersonLookup[]; o
             setEmail(event.target.value);
             if (lookup.status !== "idle") setLookup({ status: "idle" });
           }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              void onLookup();
+            }
+          }}
           placeholder="co-author@example.com"
           className="w-full flex-1 rounded-[3px] border border-rule bg-surface px-3 py-2 text-sm text-ink shadow-[inset_0_1px_2px_rgba(18,21,26,0.04)]
             transition-colors duration-150 placeholder:text-ink/35 hover:border-stamp/40
             focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:border-stamp/60"
         />
-        <Button type="submit" variant="secondary" isLoading={lookup.status === "loading"} className="shrink-0">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => void onLookup()}
+          isLoading={lookup.status === "loading"}
+          className="shrink-0"
+        >
           {lookup.status === "loading" ? "Looking up…" : "Look up"}
         </Button>
-      </form>
+      </div>
 
       {lookup.status === "found" && (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-[3px] border border-stamp/30 bg-stamp/[0.04] px-3 py-2">
