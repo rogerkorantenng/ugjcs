@@ -11,3 +11,4 @@ htmlcov/
 .claude/
 .playwright-mcp/
 *.png
+.gstack/
