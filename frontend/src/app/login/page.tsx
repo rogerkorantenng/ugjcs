@@ -1,17 +1,35 @@
 "use client";
-import { Suspense, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProblemAlert } from "@/components/ui/alert";
 import { DemoBanner } from "@/components/layout/demo-banner";
-import type { ProblemDetails } from "@/types/api";
+import { roleHome } from "@/lib/role-home";
+import type { ProblemDetails, SessionUser } from "@/types/api";
 
 function LoginForm() {
   const router = useRouter();
-  const next = useSearchParams().get("next") ?? "/author";
+  // No explicit destination means "take me to my desk" — which desk depends on the
+  // roles the login response reveals, so the fallback is resolved after sign-in.
+  const next = useSearchParams().get("next");
   const [problem, setProblem] = useState<ProblemDetails | null>(null);
+
+  // Someone with a live session has no business at the sign-in form: send them straight
+  // to their desk instead of asking for credentials they've already presented.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/me")
+      .then((response) => (response.ok ? response.json() : { user: null }))
+      .then((data: { user: SessionUser | null }) => {
+        if (!cancelled && data.user) router.replace(next ?? roleHome(data.user.roles));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [router, next]);
   const [submitting, setSubmitting] = useState(false);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -29,7 +47,8 @@ function LoginForm() {
       setProblem((await response.json()) as ProblemDetails);
       return;
     }
-    router.push(next);
+    const { user } = (await response.json()) as { user: SessionUser };
+    router.push(next ?? roleHome(user.roles));
     router.refresh();
   }
 

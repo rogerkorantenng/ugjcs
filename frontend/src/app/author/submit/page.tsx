@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ProblemAlert } from "@/components/ui/alert";
 import { PdfDropzone } from "@/components/ui/file-drop";
+import { BackLink } from "@/components/ui/back-link";
 import { CoAuthorPicker } from "@/components/co-author-picker";
 import { uploadFormData } from "@/lib/upload";
 import type { Manuscript, PersonLookup, ProblemDetails } from "@/types/api";
@@ -65,6 +66,7 @@ export default function SubmitPage() {
 
   return (
     <>
+      <BackLink href="/author" label="My submissions" />
       <h1 className="font-display-heading text-2xl font-semibold text-ink">Submit a manuscript</h1>
       <p className="mt-1 text-sm text-ink/60">
         Once submitted, the manuscript is accession-stamped and enters editorial screening. You can withdraw it any

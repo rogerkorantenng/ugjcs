@@ -6,6 +6,7 @@ import { StatusBadge, StatusExplanation } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { PdfViewer } from "@/components/ui/pdf-viewer";
+import { BackLink } from "@/components/ui/back-link";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerPicker } from "@/components/reviewer-picker";
 import { DecisionForm } from "@/components/decision-form";
@@ -64,6 +65,7 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
 
   return (
     <>
+      <BackLink href="/editor" label="Screening queue" />
       <div className="flex items-center justify-between">
         <h1 className="font-display-heading text-2xl font-semibold text-ink">{data.title}</h1>
         <StatusBadge status={data.status} />

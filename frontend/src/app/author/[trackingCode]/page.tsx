@@ -7,6 +7,7 @@ import { ProblemAlert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
 import { PdfViewer } from "@/components/ui/pdf-viewer";
+import { BackLink } from "@/components/ui/back-link";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ResubmitForm } from "@/components/resubmit-form";
 import type { Manuscript, ProblemDetails } from "@/types/api";
@@ -60,6 +61,7 @@ export default function ManuscriptDetailPage({ params }: { params: Promise<{ tra
 
   return (
     <>
+      <BackLink href="/author" label="My submissions" />
       <Suspense fallback={null}>
         <SubmittedBanner />
       </Suspense>

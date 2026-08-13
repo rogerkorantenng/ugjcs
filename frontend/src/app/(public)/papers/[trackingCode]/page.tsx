@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPaper } from "@/lib/archive";
 import { TrackingChip } from "@/components/ui/tracking-chip";
+import { BackLink } from "@/components/ui/back-link";
 import { RevealedAuthorSlot } from "@/components/ui/redaction-bar";
 import { PdfViewer } from "@/components/ui/pdf-viewer";
 
@@ -41,7 +42,10 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
       ))}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <TrackingChip code={paper.tracking_code} />
+      <BackLink href="/" label="All papers" />
+      <div>
+        <TrackingChip code={paper.tracking_code} />
+      </div>
       <h1 className="font-display-heading mt-3 text-2xl font-semibold leading-tight text-ink">{paper.title}</h1>
       {/* The public half of the redaction/reveal rhyme: the same slot shape a reviewer sees
           rendered as a solid ink block (`RedactedAuthorSlot`) shows the real byline here. */}

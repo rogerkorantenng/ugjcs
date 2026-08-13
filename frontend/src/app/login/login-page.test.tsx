@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import LoginPage from "./page";
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }),
   useSearchParams: () => new URLSearchParams(),
 }));
 
@@ -32,7 +32,8 @@ describe("LoginPage", () => {
   });
 
   it("is fully keyboard-operable: Tab reaches email, password, then the submit button in order", async () => {
-    vi.stubGlobal("fetch", vi.fn());
+    // The page probes `/api/auth/me` on mount; answer "signed out" so it stays put.
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ user: null }) }));
     render(<LoginPage />);
     // The masthead's home link is the page's first focusable element, ahead of the form —
     // the same order a sighted user's eye meets them in, top to bottom.

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { PdfViewer } from "@/components/ui/pdf-viewer";
+import { BackLink } from "@/components/ui/back-link";
 import { BlindedManuscriptView } from "@/components/blinded-manuscript-view";
 import { ReviewForm } from "@/components/review-form";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
@@ -36,6 +37,7 @@ export default function ReviewAssignmentPage({ params }: { params: Promise<{ tra
 
   return (
     <>
+      <BackLink href="/reviewer" label="My assignments" />
       <BlindedManuscriptView manuscript={manuscript} />
       {/*
         The anonymised copy only, ever — `/api/reviews/{trackingCode}/document` is the one

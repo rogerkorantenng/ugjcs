@@ -1,6 +1,9 @@
 "use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { roleHome } from "@/lib/role-home";
+import type { SessionUser } from "@/types/api";
 
 /**
  * The masthead: a registry cover rebuilt for the web — a small utility line (the
@@ -12,6 +15,22 @@ import { usePathname } from "next/navigation";
  */
 export function SiteHeader() {
   const pathname = usePathname();
+  // The public pages stay statically rendered (the session cookie is httpOnly and never
+  // read at build time), so the header asks the BFF who is signed in after mount. Until
+  // the answer arrives it shows "Sign in" — the pre-session state — rather than nothing.
+  const [user, setUser] = useState<SessionUser | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/me")
+      .then((response) => (response.ok ? response.json() : { user: null }))
+      .then((data: { user: SessionUser | null }) => {
+        if (!cancelled) setUser(data.user);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function navLink(href: string, label: string) {
     const active = pathname === href;
@@ -54,7 +73,7 @@ export function SiteHeader() {
           {navLink("/for-authors", "For authors")}
           {navLink("/for-reviewers", "For reviewers")}
           {navLink("/search", "Search")}
-          {navLink("/login", "Sign in")}
+          {user ? navLink(roleHome(user.roles), "My dashboard") : navLink("/login", "Sign in")}
         </nav>
       </div>
       <div aria-hidden="true" className="h-[3px] bg-ug-gold" />
