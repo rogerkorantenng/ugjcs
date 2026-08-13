@@ -14,8 +14,12 @@ type Params = Promise<{ trackingCode: string }>;
 export const revalidate = 300;
 
 /** A 404 from the archive becomes Next's not-found page; anything else keeps throwing.
- * Without this, an unknown tracking code returned HTTP 200 and left the reader staring
- * at the loading skeleton forever. */
+ *
+ * This segment deliberately has no `loading.tsx`, and the group-level skeleton lives in
+ * `(home)/` rather than `(public)/`: a loading boundary above this page makes Next flush
+ * an HTTP 200 status line before `notFound()` runs, so unknown tracking codes returned
+ * 200 instead of 404. With no boundary the render blocks (one archive fetch) and the
+ * status code is honest for readers and crawlers alike. */
 async function getPaperOr404(trackingCode: string): Promise<ScholarlyPaper> {
   try {
     return await getPaper(trackingCode);
@@ -27,12 +31,22 @@ async function getPaperOr404(trackingCode: string): Promise<ScholarlyPaper> {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { trackingCode } = await params;
-  const paper = await getPaperOr404(trackingCode);
-  return {
-    title: paper.title,
-    description: paper.abstract.slice(0, 160),
-    openGraph: { title: paper.title, description: paper.abstract.slice(0, 160), type: "article" },
-  };
+  // Deliberately NOT `getPaperOr404`: Next streams metadata (15.2+), so a `notFound()`
+  // thrown here fires inside the metadata Suspense boundary *after* the 200 status line
+  // has gone out — the reader gets the branded not-found panel but crawlers get HTTP
+  // 200. Returning fallback metadata instead leaves the page component's blocking
+  // `notFound()` to set a genuine 404 status.
+  try {
+    const paper = await getPaper(trackingCode);
+    return {
+      title: paper.title,
+      description: paper.abstract.slice(0, 160),
+      openGraph: { title: paper.title, description: paper.abstract.slice(0, 160), type: "article" },
+    };
+  } catch (error) {
+    if (error instanceof ProblemDetailsError && error.status === 404) return { title: "Not in the archive" };
+    throw error;
+  }
 }
 
 export default async function PaperPage({ params }: { params: Params }) {
