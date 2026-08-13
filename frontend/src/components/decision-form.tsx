@@ -61,7 +61,7 @@ export function DecisionForm({ trackingCode, status, onDecided }: { trackingCode
           <option key={decision} value={decision}>{decision.replaceAll("_", " ")}</option>
         ))}
       </Select>
-      <Textarea label="Rationale" name="rationale" required minLength={20} />
+      <Textarea label="Rationale" name="rationale" required minLength={20} hint="At least 20 characters — this is recorded against the manuscript." />
       <Button type="submit" isLoading={submitting}>{submitting ? "Recording…" : "Record decision"}</Button>
     </form>
   );

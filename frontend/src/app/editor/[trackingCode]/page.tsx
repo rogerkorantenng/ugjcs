@@ -2,12 +2,13 @@
 import { use, useState } from "react";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
-import { StatusBadge } from "@/components/ui/badge";
+import { StatusBadge, STATUS_DESCRIPTIONS } from "@/components/ui/badge";
 import { Button, buttonClasses } from "@/components/ui/button";
 import { TrackingChip } from "@/components/ui/tracking-chip";
+import { RedactionBar } from "@/components/ui/redaction-bar";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
 import { ReviewerAssignForm } from "@/components/reviewer-assign-form";
-import { DecisionForm } from "@/components/decision-form";
+import { DecisionForm, hasAvailableDecision } from "@/components/decision-form";
 import { PublicationPanel } from "@/components/publication-panel";
 import { ReviewsPanel } from "@/components/reviews-panel";
 import type { Manuscript, ProblemDetails, SessionUser } from "@/types/api";
@@ -63,12 +64,16 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between gap-4">
         <h1 className="font-serif text-2xl font-semibold text-ink">{data.title}</h1>
-        <StatusBadge status={data.status} />
+        <StatusBadge status={data.status} className="shrink-0" />
       </div>
-      <TrackingChip code={data.tracking_code} className="mt-1" />
-      <p className="mt-4 leading-relaxed text-ink/80">{data.abstract}</p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <TrackingChip code={data.tracking_code} />
+        <RedactionBar compact />
+      </div>
+      <p className="mt-2 max-w-prose text-sm leading-relaxed text-ink/65">{STATUS_DESCRIPTIONS[data.status]}</p>
+      <p className="mt-6 leading-relaxed text-ink/80">{data.abstract}</p>
       <p className="mt-4 text-sm text-ink/60">{data.submitted_reviews} of {data.minimum_reviews} reviews submitted</p>
       {data.has_document && (
         <a href={`/api/manuscripts/${trackingCode}/document`} className={buttonClasses("secondary", "mt-4")}>
@@ -101,10 +106,12 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
         </div>
       )}
 
-      <div className="mt-6 border-t border-rule pt-6">
-        <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
-        <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
-      </div>
+      {hasAvailableDecision(data.status) && (
+        <div className="mt-6 border-t border-rule pt-6">
+          <h2 className="font-serif text-lg font-semibold text-ink">Decision</h2>
+          <DecisionForm trackingCode={trackingCode} status={data.status} onDecided={mutate} />
+        </div>
+      )}
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">

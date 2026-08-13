@@ -60,16 +60,20 @@ export default function SubmitPage() {
   return (
     <>
       <h1 className="font-serif text-2xl font-semibold text-ink">Submit a manuscript</h1>
+      <p className="mt-1.5 max-w-prose text-sm text-ink/60">
+        Every field below is required unless marked optional. Once submitted, the manuscript
+        moves to editorial screening — you can withdraw it any time before a decision is made.
+      </p>
       {problem && (
         <div className="mt-4">
           <ProblemAlert problem={problem} />
         </div>
       )}
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate aria-busy={submitting}>
-        <Input label="Title" name="title" required minLength={5} />
-        <Textarea label="Abstract" name="abstract" required minLength={100} rows={6} />
-        <Input label="Keywords (comma-separated)" name="keywords" required />
-        <Input label="Co-author account ids (comma-separated, optional)" name="co_author_ids" />
+        <Input label="Title" name="title" required minLength={5} hint="At least 5 characters." />
+        <Textarea label="Abstract" name="abstract" required minLength={100} rows={6} hint="At least 100 characters." />
+        <Input label="Keywords (comma-separated)" name="keywords" required hint="e.g. distributed systems, fairness, scheduling" />
+        <Input label="Co-author account ids (comma-separated, optional)" name="co_author_ids" hint="Leave blank if you are the sole author." />
         <PdfDropzone
           label="Manuscript PDF (max 10 MB)"
           file={file}
@@ -80,7 +84,7 @@ export default function SubmitPage() {
           disabled={submitting}
         />
         {fileError && (
-          <p role="alert" className="text-sm text-brick">
+          <p role="alert" className="text-sm text-seal">
             {fileError}
           </p>
         )}

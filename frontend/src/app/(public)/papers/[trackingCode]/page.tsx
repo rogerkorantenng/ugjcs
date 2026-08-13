@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getPaper } from "@/lib/archive";
-import { formatAuthors } from "@/lib/format";
 import { TrackingChip } from "@/components/ui/tracking-chip";
+import { RedactionBar } from "@/components/ui/redaction-bar";
 import { buttonClasses } from "@/components/ui/button";
 
 interface Params { trackingCode: string }
@@ -43,7 +43,9 @@ export default async function PaperPage({ params }: { params: Promise<Params> })
 
       <TrackingChip code={paper.tracking_code} />
       <h1 className="mt-3 font-serif text-2xl font-semibold leading-tight text-ink">{paper.title}</h1>
-      <p className="mt-2 text-sm text-ink/60">{formatAuthors(paper.author_names)}</p>
+      <div className="mt-3">
+        <RedactionBar names={paper.author_names} />
+      </div>
       {paper.keywords.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2">
           {paper.keywords.map((keyword) => (

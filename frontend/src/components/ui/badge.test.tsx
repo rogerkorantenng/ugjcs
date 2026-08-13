@@ -10,8 +10,8 @@ describe("StatusBadge", () => {
 
   it("distinguishes rejection tones from acceptance tones", () => {
     const { rerender } = render(<StatusBadge status="rejected" />);
-    expect(screen.getByText("Rejected")).toHaveClass("text-brick");
+    expect(screen.getByText("Rejected")).toHaveClass("text-seal");
     rerender(<StatusBadge status="accepted" />);
-    expect(screen.getByText("Accepted")).toHaveClass("text-moss");
+    expect(screen.getByText("Accepted")).toHaveClass("text-verified");
   });
 });

@@ -96,11 +96,11 @@ export default function EditorialQueue() {
                     </thead>
                     <tbody>
                       {manuscripts.map((manuscript) => (
-                        <tr key={manuscript.tracking_code} className="border-b border-rule transition-colors hover:bg-teal/5">
+                        <tr key={manuscript.tracking_code} className="border-b border-rule transition-colors hover:bg-stamp/5">
                           <td className="py-2.5 pr-4">
                             <Link
                               href={`/editor/${manuscript.tracking_code}`}
-                              className="rounded-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber"
+                              className="rounded-[3px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stamp"
                             >
                               <TrackingChip code={manuscript.tracking_code} />
                             </Link>

@@ -1,11 +1,12 @@
 "use client";
-import { use } from "react";
-import { useRouter } from "next/navigation";
+import { use, useState } from "react";
+import Link from "next/link";
 import { useApi, ClientApiError } from "@/lib/use-api";
 import { ProblemAlert } from "@/components/ui/alert";
 import { BlindedManuscriptView } from "@/components/blinded-manuscript-view";
 import { ReviewForm } from "@/components/review-form";
 import { ManuscriptDetailSkeleton } from "@/components/skeletons";
+import { buttonClasses } from "@/components/ui/button";
 import type { BlindedManuscript } from "@/types/api";
 
 /**
@@ -17,8 +18,8 @@ import type { BlindedManuscript } from "@/types/api";
  */
 export default function ReviewAssignmentPage({ params }: { params: Promise<{ trackingCode: string }> }) {
   const { trackingCode } = use(params);
-  const router = useRouter();
   const { data, error, isLoading } = useApi<BlindedManuscript[]>("/api/reviews");
+  const [submitted, setSubmitted] = useState(false);
 
   if (isLoading) return <ManuscriptDetailSkeleton label="Loading manuscript…" />;
   if (error)
@@ -33,6 +34,24 @@ export default function ReviewAssignmentPage({ params }: { params: Promise<{ tra
       <ProblemAlert problem={{ type: "about:blank", title: "Assignment not found", status: 404 }} />
     );
 
+  // Confirms the outcome and says what happens next, in place, instead of silently routing
+  // back to the list — the reviewer just did something they cannot undo (see `ReviewForm`),
+  // so the app tells them plainly it landed before it takes them anywhere.
+  if (submitted) {
+    return (
+      <div role="status" className="rounded-[3px] border border-verified/30 bg-verified/[0.06] px-6 py-10 text-center">
+        <p className="font-serif text-lg font-semibold text-verified">Review submitted</p>
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink/70">
+          Thank you — your assessment has been recorded and sent to the handling editor. This
+          assignment no longer needs anything from you.
+        </p>
+        <Link href="/reviewer" className={buttonClasses("secondary", "mt-5")}>
+          Back to my assignments
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <>
       <BlindedManuscriptView manuscript={manuscript} />
@@ -44,13 +63,13 @@ export default function ReviewAssignmentPage({ params }: { params: Promise<{ tra
       */}
       <a
         href={`/api/reviews/${trackingCode}/document`}
-        className="mt-4 inline-block text-sm font-medium text-teal-dark underline underline-offset-2"
+        className="mt-4 inline-block text-sm font-medium text-stamp-dark underline underline-offset-2"
       >
         Download anonymised manuscript
       </a>
       <div className="mt-6 border-t border-rule pt-6">
         <h2 className="font-serif text-lg font-semibold text-ink">Submit your review</h2>
-        <ReviewForm trackingCode={trackingCode} onSubmitted={() => router.push("/reviewer")} />
+        <ReviewForm trackingCode={trackingCode} onSubmitted={() => setSubmitted(true)} />
       </div>
     </>
   );

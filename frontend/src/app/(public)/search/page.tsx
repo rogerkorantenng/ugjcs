@@ -23,8 +23,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
             defaultValue={q}
             placeholder="Title, abstract or keyword"
             className="w-full rounded-[3px] border border-rule bg-white px-3 py-2 text-sm text-ink shadow-[inset_0_1px_2px_rgba(18,32,58,0.04)]
-              transition-colors duration-150 placeholder:text-ink/35 hover:border-teal/40
-              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber focus-visible:border-amber/60"
+              transition-colors duration-150 placeholder:text-ink/35 hover:border-stamp/40
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stamp focus-visible:border-stamp/60"
           />
         </div>
         <button type="submit" className={buttonClasses("primary", "shrink-0")}>Search</button>
@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         <p className="mt-8 text-sm text-ink/60">Enter a title, abstract or keyword to search the archive.</p>
       )}
       {results.length > 0 && (
-        <div className="mt-8 grid gap-4">
+        <div className="mt-8 border-t border-rule">
           {results.map((paper) => (
             <PaperCard key={paper.tracking_code} paper={paper} />
           ))}

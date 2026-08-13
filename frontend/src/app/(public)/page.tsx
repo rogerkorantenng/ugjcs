@@ -6,78 +6,81 @@ import { buttonClasses } from "@/components/ui/button";
 
 export const revalidate = 300;
 
-/** Counts real, derived facts only — never a placeholder number. `/archive` carries no
- * `published_at`/volume/DOI (docs/05-api-contract.md §7), so the strip states what the
- * data actually supports: how many papers, and how many distinct bylines behind them. */
-function journalStats(papers: { author_names: string[] }[]) {
+/** Real, derived facts only — never a placeholder number. `/archive` carries no
+ * `published_at`/volume/DOI (docs/05-api-contract.md §7): there is no true "Vol. N No. N"
+ * to print on the cover, so the cover states what the data actually supports — how many
+ * papers are in the current issue and how many distinct bylines stand behind them —
+ * instead of inventing a volume/issue number nothing on the wire backs up. */
+function issueFacts(papers: { author_names: string[] }[]) {
   const authors = new Set(papers.flatMap((paper) => paper.author_names));
-  return [
-    { label: "Published papers", value: papers.length },
-    { label: "Contributing authors", value: authors.size },
-    { label: "Reviewers per manuscript", value: 2 },
-  ];
+  return { count: papers.length, authors: authors.size };
 }
 
 export default async function HomePage() {
   const papers = await getPublishedPapers();
-  const recent = papers.slice(0, 6);
-  const stats = journalStats(papers);
+  const facts = issueFacts(papers);
 
   return (
     <main>
-      <section className="border-b border-rule bg-white/40">
-        <div className="mx-auto max-w-5xl px-4 py-16 sm:py-20">
-          <div className="animate-rise-in max-w-2xl">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-teal-dark">
-              A double-blind peer-reviewed journal
-            </p>
-            <h1 className="mt-4 font-serif text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-5xl">
+      {/* The issue cover. A rule under the masthead, then the current-issue line standing
+          in for the volume/number a print cover would carry — honestly, since no volume or
+          issue number exists anywhere on the wire; see `issueFacts`. Contents follow as a
+          numbered list below, not a grid of equal cards: papers in an issue genuinely have
+          an order, the way entries in a table of contents do. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-5xl px-4 pb-10 pt-14 sm:pt-20">
+          <div className="animate-rise-in">
+            <div aria-hidden="true" className="h-px w-16 bg-stamp" />
+            <p className="mt-4 font-mono text-xs uppercase tracking-[0.22em] text-stamp">Current issue</p>
+            <h1 className="font-display-wonk mt-3 max-w-3xl font-serif text-display font-semibold text-ink sm:text-5xl">
               Rigorously reviewed computing research, from Legon and beyond.
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink/70">
-              <span className="float-left mr-2 mt-1 font-serif text-5xl font-semibold leading-none text-teal-dark">U</span>
-              GJCS publishes original research in computing and information systems. Every
-              manuscript is screened, reviewed twice under strict double-blind conditions, and
-              decided on by an editor before it reaches this archive.
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-ink/65 sm:text-lg">
+              Every manuscript is screened, reviewed twice under strict double-blind conditions,
+              and decided on by an editor before it reaches this archive
+              {facts.count > 0 ? (
+                <>
+                  {" — "}
+                  {facts.count} {facts.count === 1 ? "paper" : "papers"} so far, from {facts.authors}{" "}
+                  {facts.authors === 1 ? "author" : "authors"}.
+                </>
+              ) : (
+                "."
+              )}
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
+            <div className="mt-7 flex flex-wrap items-center gap-5">
               <Link href="/search" className={buttonClasses("primary")}>
                 Search the archive
               </Link>
               <Link
                 href="/login"
-                className="text-sm font-medium text-teal-dark underline decoration-teal/40 underline-offset-4 hover:decoration-amber hover:text-amber"
+                className="text-sm font-medium text-stamp underline decoration-stamp/40 underline-offset-4 hover:decoration-stamp"
               >
                 Sign in to submit a manuscript
               </Link>
             </div>
           </div>
-          <dl className="mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-[3px] border border-rule bg-rule sm:grid-cols-3">
-            {stats.map((stat) => (
-              <div key={stat.label} className="bg-paper px-6 py-5">
-                <dt className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/50">{stat.label}</dt>
-                <dd className="mt-1 font-serif text-3xl font-semibold text-ink">{stat.value}</dd>
-              </div>
-            ))}
-          </dl>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 py-14">
-        <div className="flex items-baseline justify-between border-b border-rule pb-3">
-          <h2 className="font-serif text-lg font-semibold text-ink">Recently published</h2>
-          <Link href="/search" className="text-sm font-medium text-teal-dark hover:text-amber">
+      <section className="mx-auto max-w-5xl px-4 py-12 sm:py-14">
+        <div className="flex items-baseline justify-between gap-4 border-b border-rule pb-3">
+          <h2 className="font-serif text-lg font-semibold text-ink">Contents</h2>
+          <Link href="/search" className="text-sm font-medium text-stamp hover:text-stamp-dark">
             Browse all →
           </Link>
         </div>
-        {recent.length > 0 ? (
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            {recent.map((paper) => (
-              <PaperCard key={paper.tracking_code} paper={paper} />
+        {papers.length > 0 ? (
+          <div>
+            {papers.slice(0, 8).map((paper, i) => (
+              <PaperCard key={paper.tracking_code} paper={paper} index={i + 1} />
             ))}
           </div>
         ) : (
-          <EmptyState title="No papers have been published yet" hint="Check back soon — new issues appear here as they clear review." />
+          <EmptyState
+            title="No papers have been published yet"
+            hint="Check back soon — new issues appear here as they clear review."
+          />
         )}
       </section>
     </main>
