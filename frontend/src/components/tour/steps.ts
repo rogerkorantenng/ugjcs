@@ -15,7 +15,7 @@ interface TourDefinition {
 }
 
 export const AUTHOR_TOUR: TourDefinition = {
-  storageKey: "ugjcs-tour-author-v1",
+  storageKey: "ugjcs-tour-author-v2",
   steps: [
     {
       target: "author-welcome",
@@ -41,7 +41,7 @@ export const AUTHOR_TOUR: TourDefinition = {
 };
 
 export const REVIEWER_TOUR: TourDefinition = {
-  storageKey: "ugjcs-tour-reviewer-v1",
+  storageKey: "ugjcs-tour-reviewer-v2",
   steps: [
     {
       target: "reviewer-welcome",
@@ -66,7 +66,7 @@ export const REVIEWER_TOUR: TourDefinition = {
 };
 
 export const EDITOR_TOUR: TourDefinition = {
-  storageKey: "ugjcs-tour-editor-v1",
+  storageKey: "ugjcs-tour-editor-v2",
   steps: [
     {
       target: "editor-welcome",
