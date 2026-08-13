@@ -5,9 +5,7 @@ import { buttonClasses } from "@/components/ui/button";
 
 export const metadata = { title: "Search" };
 
-interface SearchParams { q?: string }
-
-export default async function SearchPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
   const results = q ? await searchArchive(q) : [];
 
@@ -35,7 +33,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       {results.length > 0 && (
         <div className="mt-8 grid gap-4">
           {results.map((paper) => (
-            <PaperCard key={paper.tracking_code} paper={paper} />
+            <PaperCard key={paper.tracking_code} paper={paper} snippet={paper.snippet} />
           ))}
         </div>
       )}

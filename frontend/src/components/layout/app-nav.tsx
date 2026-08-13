@@ -11,6 +11,7 @@ const LINKS: Record<string, { href: string; label: string; tour?: string }[]> = 
   reviewer: [{ href: "/reviewer", label: "My assignments" }],
   editor: [{ href: "/editor", label: "Screening queue" }, { href: "/editor/analytics", label: "Analytics" }],
   editor_in_chief: [{ href: "/editor", label: "Screening queue" }, { href: "/editor/analytics", label: "Analytics" }],
+  administrator: [{ href: "/admin", label: "Accounts" }],
 };
 
 /** The dashboard's masthead. Same UG-blue chrome and closing double rule as `SiteHeader`, so

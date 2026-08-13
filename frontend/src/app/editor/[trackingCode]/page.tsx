@@ -13,7 +13,8 @@ import { DecisionSection } from "@/components/decision-section";
 import { PublicationPanel } from "@/components/publication-panel";
 import { ReviewsPanel } from "@/components/reviews-panel";
 import { ScreenAction } from "@/components/screen-action";
-import { PUBLICATION_STATUSES, REVIEWABLE_STATUSES, SCREENABLE_STATUSES } from "@/lib/editorial-statuses";
+import { ApcPanel } from "@/components/apc-panel";
+import { BILLABLE_STATUSES, PUBLICATION_STATUSES, REVIEWABLE_STATUSES, SCREENABLE_STATUSES } from "@/lib/editorial-statuses";
 import type { Manuscript, SessionUser } from "@/types/api";
 
 export default function EditorialManuscriptPage({ params }: { params: Promise<{ trackingCode: string }> }) {
@@ -84,6 +85,12 @@ export default function EditorialManuscriptPage({ params }: { params: Promise<{ 
       )}
 
       <DecisionSection trackingCode={trackingCode} status={data.status} onDecided={mutate} />
+
+      {BILLABLE_STATUSES.has(data.status) && (
+        <div className="mt-6 border-t border-rule pt-6">
+          <ApcPanel trackingCode={trackingCode} variant="editor" canWaive={isEditorInChief} />
+        </div>
+      )}
 
       {isEditorInChief && PUBLICATION_STATUSES.has(data.status) && (
         <div className="mt-6 border-t border-rule pt-6">

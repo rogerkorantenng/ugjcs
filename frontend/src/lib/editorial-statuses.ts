@@ -26,3 +26,7 @@ export const PUBLICATION_STATUSES = new Set<ManuscriptStatus>(["accepted", "sche
 // A decision certificate only exists once a decision has been recorded — the backend
 // answers 409 before that, so the download link renders only from these statuses onward.
 export const DECIDED_STATUSES = new Set<ManuscriptStatus>(["accepted", "rejected", "scheduled", "published"]);
+
+/** An APC invoice can only exist once acceptance is on the record — earlier statuses have
+ * nothing to bill, so the APC panel (and its billing fetch) never appears before then. */
+export const BILLABLE_STATUSES = new Set<ManuscriptStatus>(["accepted", "scheduled", "published"]);
