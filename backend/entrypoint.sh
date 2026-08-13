@@ -16,5 +16,8 @@ alembic upgrade head
 echo "Seeding demo corpus and judge accounts if the database is empty..."
 python -m ugjcs.scripts.seed_demo --if-empty
 
+echo "Pruning manuscripts left behind by live verification runs..."
+python -m ugjcs.scripts.prune_junk
+
 echo "Starting API server..."
 exec uvicorn ugjcs.api.main:app --host 0.0.0.0 --port 8000
