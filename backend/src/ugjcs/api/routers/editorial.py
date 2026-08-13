@@ -11,11 +11,16 @@ from ugjcs.api.schemas import (
     AssignReviewerRequest,
     ManuscriptOut,
     RecordDecisionRequest,
+    ReviewerCandidateOut,
     ReviewOut,
     ScheduleManuscriptRequest,
 )
 from ugjcs.api.wiring import UowDep
+from ugjcs.application.ports import UnitOfWork
+from ugjcs.domain.account import Account
+from ugjcs.domain.conflicts import exclusion_reason
 from ugjcs.domain.enums import ManuscriptStatus as S
+from ugjcs.domain.enums import Role
 from ugjcs.domain.ids import UserId, mint_issue_id
 from ugjcs.domain.policies import Action, Actor
 
@@ -100,6 +105,59 @@ async def assign_reviewer(
         manuscript.id, UserId(body.reviewer_id), occurred_at=datetime.now(UTC)
     )
     await uow.commit()
+
+
+@router.get("/{tracking_code}/reviewer-candidates", response_model=list[ReviewerCandidateOut])
+async def reviewer_candidates(
+    tracking_code: str, actor: AssignReviewerDep, uow: UowDep
+) -> list[ReviewerCandidateOut]:
+    """Every verified, active `REVIEWER`, conflict-of-interest verdict included.
+
+    Excluded candidates are returned in the list with their reason rather than filtered
+    out — see `ugjcs.domain.conflicts.exclusion_reason`, the pure function that decides
+    it; this handler only gathers the data it needs. An account that is not verified,
+    not active, or lacks the `REVIEWER` role is never fetched in the first place (see
+    `AccountRepository.list_by_role`), so it never appears here at all.
+    """
+    manuscript = await _get_or_404(uow, tracking_code)
+    authors = [a for a in await _authors_for(uow, manuscript.author_ids) if a is not None]
+    author_affiliations = frozenset(a.affiliation for a in authors)
+    author_ids = frozenset(manuscript.author_ids)
+    assigned_here = frozenset(
+        UserId(record.reviewer_id)
+        for record in await uow.assignments.list_for_manuscript(manuscript.id)
+    )
+    candidates: list[ReviewerCandidateOut] = []
+    for account in await uow.accounts.list_by_role(Role.REVIEWER):
+        active = await _active_assignment_count(uow, account.id)
+        reason = exclusion_reason(
+            candidate_id=account.id,
+            candidate_affiliation=account.affiliation,
+            author_ids=author_ids,
+            author_affiliations=author_affiliations,
+            already_assigned_reviewer_ids=assigned_here,
+            active_assignments=active,
+            reviewer_capacity=account.reviewer_capacity,
+        )
+        candidates.append(
+            ReviewerCandidateOut.from_domain(
+                account, active_assignments=active, excluded_reason=reason
+            )
+        )
+    # Eligible before excluded (`False < True`), then by lowest current load, so
+    # assignment naturally spreads work — see the route's docstring.
+    candidates.sort(key=lambda c: (c.excluded_reason is not None, c.active_assignments))
+    return candidates
+
+
+async def _authors_for(uow: UnitOfWork, author_ids: tuple[UserId, ...]) -> list[Account | None]:
+    return [await uow.accounts.get(author_id) for author_id in author_ids]
+
+
+async def _active_assignment_count(uow: UnitOfWork, reviewer_id: UserId) -> int:
+    """Assignments not yet submitted — the reviewer's current outstanding workload."""
+    records = await uow.assignments.list_for_reviewer(reviewer_id)
+    return sum(1 for record in records if record.status == "assigned")
 
 
 @router.get("/{tracking_code}/reviews", response_model=list[ReviewOut])

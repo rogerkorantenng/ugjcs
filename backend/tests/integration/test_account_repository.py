@@ -119,3 +119,32 @@ async def test_a_duplicate_email_raises_an_integrity_error(session: AsyncSession
     with pytest.raises(IntegrityError):
         await repository.add(make_account(id=UserId(uuid4()), email=EmailAddress("DUP@ug.edu.GH")))
         await session.commit()
+
+
+async def test_list_by_role_returns_only_verified_active_holders_of_that_role(
+    session: AsyncSession,
+) -> None:
+    repository = SqlAlchemyAccountRepository(session)
+
+    eligible = make_account(email=EmailAddress("eligible@ug.edu.gh"))
+    eligible.grant(Role.REVIEWER)
+    eligible.verify(occurred_at=NOW)
+
+    unverified = make_account(id=UserId(uuid4()), email=EmailAddress("unverified@ug.edu.gh"))
+    unverified.grant(Role.REVIEWER)
+
+    inactive = make_account(id=UserId(uuid4()), email=EmailAddress("inactive@ug.edu.gh"))
+    inactive.grant(Role.REVIEWER)
+    inactive.verify(occurred_at=NOW)
+    inactive.deactivate()
+
+    wrong_role = make_account(id=UserId(uuid4()), email=EmailAddress("editor@ug.edu.gh"))
+    wrong_role.grant(Role.EDITOR)
+    wrong_role.verify(occurred_at=NOW)
+
+    for account in (eligible, unverified, inactive, wrong_role):
+        await repository.add(account)
+    await session.commit()
+
+    reviewers = await repository.list_by_role(Role.REVIEWER)
+    assert {r.id for r in reviewers} == {eligible.id}

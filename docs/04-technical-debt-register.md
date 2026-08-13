@@ -44,6 +44,16 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 | **Priority** | **Critical before real users.** |
 | **Resolution** | Introduce reviewer assignment as a first-class entity; make `REVIEW` an ownership-style action predicated on an accepted assignment, and exclude actors appearing in `author_ids`. Documented in `policies.py`'s module docstring so it cannot be forgotten. |
 
+### TD-15 — `GET /api/v1/people/lookup` has no rate limiting
+
+| | |
+|---|---|
+| **Debt** | The exact-email person lookup (`ugjcs.api.routers.people.lookup`) requires only an authenticated caller — any role — and no request throttling sits in front of it. |
+| **Cause** | Deliberate scope limitation. The endpoint exists to let an author find a co-author's account id and an editor find a reviewer's, both of which need only an exact-match lookup; building it was in scope, building a rate limiter was not. |
+| **Impact** | An authenticated caller can distinguish "an account exists for this address" from "no account exists" one exact guess at a time, and nothing currently bounds how many guesses per minute. Over a large-enough guessed address list this becomes account enumeration by any registered user, not merely by an anonymous attacker. |
+| **Priority** | **Critical before real users.** Exact-match-only (no fuzzy/partial search) already narrows the exposure to confirming addresses the caller already suspects, but that is a mitigation, not a fix. |
+| **Resolution** | Put this endpoint behind a per-caller rate limiter (e.g. a fixed-window or token-bucket check keyed on the authenticated user id, enforced at the ASGI/middleware layer or an API gateway in front of App Runner) before onboarding real users. Noted in the endpoint's own docstring so it cannot be forgotten. |
+
 ### TD-03 — Submitted reviews are counted, not identified
 
 | | |
@@ -179,7 +189,7 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 
 | Priority | Count | Entries |
 |---|---|---|
-| Critical | 3 | TD-01, TD-02, TD-03 |
+| Critical | 4 | TD-01, TD-02, TD-03, TD-15 |
 | Scheduled | 6 | TD-04 … TD-08, TD-14 |
 | Acceptable | 3 | TD-09, TD-10, TD-11 |
 | Resolved, retained as a record | 2 | TD-12, TD-13 |
@@ -188,7 +198,7 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 piece of work — they are all consequences of reviewer assignment not existing yet — and should be repaid
 together in the release that introduces it. TD-04 follows deployment. TD-05, TD-06 and TD-08 are
 independent and may be scheduled by convenience. TD-14 is repayable only after submission; it is not on
-the pre-viva critical path.
+the pre-viva critical path. TD-15 should be repaid before real users are admitted, alongside TD-01.
 
 **How this register was produced.** Ten of these eleven entries were found by independent review of
 work that had already passed every automated gate: linting, strict type checking, an architecture

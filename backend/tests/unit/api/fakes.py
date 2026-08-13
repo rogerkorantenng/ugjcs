@@ -29,6 +29,8 @@ class FakeAccount:
     email: str
     roles: frozenset[Role]
     full_name: str = "Test Author"
+    affiliation: str = "Test University"
+    reviewer_capacity: int = 3
     is_active: bool = True
     is_verified: bool = True
 
@@ -39,6 +41,15 @@ class FakeAccountRepository:
 
     async def get(self, user_id: UserId) -> FakeAccount | None:
         return self.accounts.get(user_id)
+
+    async def get_by_email(self, email: object) -> FakeAccount | None:
+        value = getattr(email, "value", email)
+        return next((a for a in self.accounts.values() if a.email == value), None)
+
+    async def list_by_role(self, role: Role) -> list[FakeAccount]:
+        return [
+            a for a in self.accounts.values() if role in a.roles and a.is_active and a.is_verified
+        ]
 
 
 class FakeIdentityService:
