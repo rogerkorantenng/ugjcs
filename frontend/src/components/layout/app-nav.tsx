@@ -31,7 +31,7 @@ export function AppNav({ user }: { user: SessionUser }) {
       <nav aria-label="Account navigation" className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <div className="flex items-center gap-7">
           <Link
-            href="/"
+            href="/search"
             className="font-display-heading text-sm font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2"
           >
             SDJ

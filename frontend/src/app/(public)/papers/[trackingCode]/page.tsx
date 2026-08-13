@@ -74,7 +74,7 @@ export default async function PaperPage({ params }: { params: Params }) {
       {paper.doi && <meta name="citation_doi" content={paper.doi} />}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <BackLink href="/" label="All papers" />
+      <BackLink href="/search" label="All papers" />
       <div>
         <TrackingChip code={paper.tracking_code} />
       </div>

@@ -159,13 +159,13 @@ export default function LoginPage() {
         <div className="flex flex-col">
           <div className="flex items-center justify-between px-6 pt-6 lg:px-10">
             <Link
-              href="/"
+              href="/search"
               className="font-display-heading text-sm font-semibold tracking-tight text-ink focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               SDJ
             </Link>
-            <Link href="/" className="text-sm font-medium text-ink/60 hover:text-stamp">
-              ← Back to the journal
+            <Link href="/search" className="text-sm font-medium text-ink/60 hover:text-stamp">
+              ← Browse the archive
             </Link>
           </div>
           <main className="flex flex-1 items-center justify-center px-6 py-10 lg:px-10">

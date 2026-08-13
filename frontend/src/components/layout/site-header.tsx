@@ -62,7 +62,7 @@ export function SiteHeader() {
         </div>
       </div>
       <div className="mx-auto flex max-w-5xl flex-wrap items-end justify-between gap-x-6 gap-y-4 px-4 py-6">
-        <Link href="/" className="rounded-[3px] focus-visible:outline-2 focus-visible:outline-offset-2">
+        <Link href="/search" className="rounded-[3px] focus-visible:outline-2 focus-visible:outline-offset-2">
           <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-ug-gold">Editorial portal · Double-blind peer review</p>
           <p className="font-display-heading mt-1 max-w-lg text-2xl font-semibold leading-tight tracking-tight sm:text-[1.75rem]">
             Science and Development Journal
