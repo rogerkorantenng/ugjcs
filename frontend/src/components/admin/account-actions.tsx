@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import type { AccountActionKind } from "@/components/admin/actions";
 import type { AdminAccount } from "@/types/wave2";
 
 /**
@@ -15,8 +14,8 @@ export function AccountActions({
   onRun,
 }: {
   account: AdminAccount;
-  busy: AccountActionKind | null;
-  onRun: (kind: AccountActionKind, path: string, body: unknown) => Promise<void>;
+  busy: "capacity" | "role" | "active" | null;
+  onRun: (kind: "capacity" | "role" | "active", path: string, body: unknown) => Promise<void>;
 }) {
   const [confirmingDeactivate, setConfirmingDeactivate] = useState(false);
   const isReviewer = account.roles.includes("reviewer");

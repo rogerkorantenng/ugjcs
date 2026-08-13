@@ -1,8 +1,5 @@
 import type { ProblemDetails } from "@/types/api";
 
-/** Which of a row's three mutations is in flight — one at a time, never concurrently. */
-export type AccountActionKind = "capacity" | "role" | "active";
-
 /**
  * One shape for every admin console mutation — `POST /api/admin/accounts/{id}/{path}`.
  * Returns `null` on success, or the `ProblemDetails` to show beside the row on failure.

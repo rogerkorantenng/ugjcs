@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { ProblemAlert } from "@/components/ui/alert";
-import { postAccountAction, type AccountActionKind } from "@/components/admin/actions";
+import { postAccountAction } from "@/components/admin/actions";
 import { AccountActions } from "@/components/admin/account-actions";
 import type { ProblemDetails } from "@/types/api";
 import type { AdminAccount } from "@/types/wave2";
@@ -10,10 +10,11 @@ import type { AdminAccount } from "@/types/wave2";
 const CAPACITIES = Array.from({ length: 10 }, (_, i) => i + 1);
 
 export function AccountRow({ account, onChanged }: { account: AdminAccount; onChanged: () => void }) {
-  const [busy, setBusy] = useState<AccountActionKind | null>(null);
+  // Which of the row's three mutations is in flight — one at a time, never concurrently.
+  const [busy, setBusy] = useState<"capacity" | "role" | "active" | null>(null);
   const [problem, setProblem] = useState<ProblemDetails | null>(null);
 
-  async function run(kind: AccountActionKind, path: string, body: unknown) {
+  async function run(kind: "capacity" | "role" | "active", path: string, body: unknown) {
     setBusy(kind);
     setProblem(null);
     const failure = await postAccountAction(account.id, path, body);
