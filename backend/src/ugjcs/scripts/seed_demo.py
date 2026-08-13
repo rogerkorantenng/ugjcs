@@ -1,4 +1,4 @@
-"""Seed a demo corpus and seven pre-verified judge accounts.
+"""Seed a demo corpus and twelve pre-verified judge accounts.
 
 Runs inside the container on every boot (`backend/entrypoint.sh`), after migrations and
 before the server starts accepting traffic. Idempotent by construction, not merely by a
@@ -77,6 +77,16 @@ AUTHOR_PASSWORD = "Ugjcs-Author-2026!"
 AUTHOR2_PASSWORD = "Ugjcs-Author2-2026!"
 REVIEWER_PASSWORD = "Ugjcs-Reviewer-2026!"
 REVIEWER2_PASSWORD = "Ugjcs-Reviewer2-2026!"
+# Reviewer3..7 are the external reviewer pool (see `REVIEWER_PROFILES` below): every
+# seeded author and the first two reviewers share "University of Ghana", so without these
+# five, `exclusion_reason`'s affiliation rule (correctly) excludes every candidate the
+# reviewer picker could ever show. Real departmental journals recruit externally for
+# exactly this reason; these five accounts make that reachable in the demo corpus too.
+REVIEWER3_PASSWORD = "Ugjcs-Reviewer3-2026!"
+REVIEWER4_PASSWORD = "Ugjcs-Reviewer4-2026!"
+REVIEWER5_PASSWORD = "Ugjcs-Reviewer5-2026!"
+REVIEWER6_PASSWORD = "Ugjcs-Reviewer6-2026!"
+REVIEWER7_PASSWORD = "Ugjcs-Reviewer7-2026!"
 EDITOR_PASSWORD = "Ugjcs-Editor-2026!"
 EDITOR_IN_CHIEF_PASSWORD = "Ugjcs-EditorChief-2026!"
 ADMINISTRATOR_PASSWORD = "Ugjcs-Admin-2026!"
@@ -86,21 +96,83 @@ AUTHOR_EMAIL = "author@ugjcs.test"
 AUTHOR2_EMAIL = "author2@ugjcs.test"
 REVIEWER_EMAIL = "reviewer@ugjcs.test"
 REVIEWER2_EMAIL = "reviewer2@ugjcs.test"
+REVIEWER3_EMAIL = "reviewer3@ugjcs.test"
+REVIEWER4_EMAIL = "reviewer4@ugjcs.test"
+REVIEWER5_EMAIL = "reviewer5@ugjcs.test"
+REVIEWER6_EMAIL = "reviewer6@ugjcs.test"
+REVIEWER7_EMAIL = "reviewer7@ugjcs.test"
 EDITOR_EMAIL = "editor@ugjcs.test"
 EIC_EMAIL = "eic@ugjcs.test"
 
-# (email, password, role, full name) — one row per judge account. Two author accounts and
-# two reviewer accounts so the demo corpus can vary its bylines and give each review round
-# two distinct reviewers, exactly as `record_review`'s quorum expects in a real newsroom.
-JUDGE_ACCOUNTS: list[tuple[str, str, Role, str]] = [
-    (AUTHOR_EMAIL, AUTHOR_PASSWORD, Role.AUTHOR, "Ama Serwaa"),
-    (AUTHOR2_EMAIL, AUTHOR2_PASSWORD, Role.AUTHOR, "Kojo Antwi"),
-    (REVIEWER_EMAIL, REVIEWER_PASSWORD, Role.REVIEWER, "Kwabena Owusu"),
-    (REVIEWER2_EMAIL, REVIEWER2_PASSWORD, Role.REVIEWER, "Adjoa Boadi"),
-    (EDITOR_EMAIL, EDITOR_PASSWORD, Role.EDITOR, "Efua Mensah"),
-    (EIC_EMAIL, EDITOR_IN_CHIEF_PASSWORD, Role.EDITOR_IN_CHIEF, "Kofi Boateng"),
-    (ADMIN_EMAIL, ADMINISTRATOR_PASSWORD, Role.ADMINISTRATOR, "Abena Osei"),
+_UG = "University of Ghana"
+
+# (email, password, role, full name, affiliation) — one row per judge account. Two author
+# accounts and seven reviewer accounts: two internal (also "University of Ghana", same as
+# every author) so the reviewer picker can actually show an affiliation exclusion and its
+# reason, and five external, at five different institutions, so it can also show eligible
+# candidates — see the module docstring and `REVIEWER_PROFILES`.
+JUDGE_ACCOUNTS: list[tuple[str, str, Role, str, str]] = [
+    (AUTHOR_EMAIL, AUTHOR_PASSWORD, Role.AUTHOR, "Ama Serwaa", _UG),
+    (AUTHOR2_EMAIL, AUTHOR2_PASSWORD, Role.AUTHOR, "Kojo Antwi", _UG),
+    (REVIEWER_EMAIL, REVIEWER_PASSWORD, Role.REVIEWER, "Kwabena Owusu", _UG),
+    (REVIEWER2_EMAIL, REVIEWER2_PASSWORD, Role.REVIEWER, "Adjoa Boadi", _UG),
+    (
+        REVIEWER3_EMAIL,
+        REVIEWER3_PASSWORD,
+        Role.REVIEWER,
+        "Ifeoma Chukwu",
+        "University of Lagos",
+    ),
+    (
+        REVIEWER4_EMAIL,
+        REVIEWER4_PASSWORD,
+        Role.REVIEWER,
+        "Yaw Adjei-Mensah",
+        "Kwame Nkrumah University of Science and Technology",
+    ),
+    (
+        REVIEWER5_EMAIL,
+        REVIEWER5_PASSWORD,
+        Role.REVIEWER,
+        "Efua Danso",
+        "University of Cape Coast",
+    ),
+    (
+        REVIEWER6_EMAIL,
+        REVIEWER6_PASSWORD,
+        Role.REVIEWER,
+        "Nana Yaw Boateng",
+        "Ashesi University",
+    ),
+    (
+        REVIEWER7_EMAIL,
+        REVIEWER7_PASSWORD,
+        Role.REVIEWER,
+        "Grace Nakato",
+        "Makerere University",
+    ),
+    (EDITOR_EMAIL, EDITOR_PASSWORD, Role.EDITOR, "Efua Mensah", _UG),
+    (EIC_EMAIL, EDITOR_IN_CHIEF_PASSWORD, Role.EDITOR_IN_CHIEF, "Kofi Boateng", _UG),
+    (ADMIN_EMAIL, ADMINISTRATOR_PASSWORD, Role.ADMINISTRATOR, "Abena Osei", _UG),
 ]
+
+# email -> (expertise keywords, reviewer_capacity) for each external reviewer, applied on
+# top of the account `RegistrationService.register` creates (which has no expertise/capacity
+# parameters of its own — see `_ensure_accounts`). Keywords echo the seeded manuscripts'
+# own `keywords` so the picker's "who would plausibly review this" story holds up, and
+# capacities are deliberately uneven — together with the extra assignments
+# `MANUSCRIPT_SPECS` hands three of these five (see below), that makes both "at capacity"
+# exclusion and lowest-load sorting demonstrable, not just theoretically possible.
+# REVIEWER4's capacity of 1, combined with the one extra assignment spec 2 gives it below,
+# means it is *always* excluded (either "already assigned" on manuscript 2 itself, or "at
+# capacity" everywhere else) — the deliberate at-capacity case the picker should show.
+REVIEWER_PROFILES: dict[str, tuple[tuple[str, ...], int]] = {
+    REVIEWER3_EMAIL: (("mobile money", "fraud detection", "graph neural networks"), 2),
+    REVIEWER4_EMAIL: (("systems", "scheduling", "GPU clusters"), 1),
+    REVIEWER5_EMAIL: (("edge computing", "rural connectivity", "renewable energy"), 4),
+    REVIEWER6_EMAIL: (("blockchain", "credential verification", "higher education"), 2),
+    REVIEWER7_EMAIL: (("named entity recognition", "code-switching", "Akan"), 2),
+}
 
 # The tracking-code year is fixed, not derived from the wall clock at boot time: minting
 # by `datetime.now().year` would mean a container that happens to start after a New Year
@@ -123,9 +195,17 @@ class ManuscriptSpec:
     """One demo manuscript: its content, byline, and how far it should travel.
 
     `reviewer_emails` is empty for a manuscript that never leaves screening (nothing to
-    assign yet) and holds exactly two emails otherwise — the quorum `record_review`
-    enforces. For `UNDER_REVIEW`, only the first of the two ever submits, which is what
-    leaves the round open for the reviewer dashboard to show.
+    assign yet) and holds at least two emails otherwise — the quorum `record_review`
+    enforces is exactly two, and only the first two entries are ever asked to submit (see
+    `_advance_manuscript`). A third (or later) entry is still assigned — through the same
+    `_ensure_reviewers_assigned` call as the first two — but, because the quorum is already
+    met by the first two, its assignment is simply never touched again: it stays "assigned"
+    (not "submitted") for the lifetime of the manuscript. That is deliberately used on a
+    handful of specs below to give three of the external reviewer pool's accounts a
+    standing, non-zero workload, entirely through the same aggregate methods every other
+    assignment in this file goes through — see `REVIEWER_PROFILES`. For `UNDER_REVIEW`,
+    only the first of the two ever-submitting reviewers submits, which is what leaves the
+    round open for the reviewer dashboard to show.
     """
 
     sequence: int
@@ -168,7 +248,12 @@ MANUSCRIPT_SPECS: tuple[ManuscriptSpec, ...] = (
         corresponding_author_email=AUTHOR2_EMAIL,
         co_author_emails=(AUTHOR_EMAIL,),
         target=S.UNDER_REVIEW,
-        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL),
+        # REVIEWER4 (Yaw Adjei-Mensah, KNUST, capacity 1) is the third entry: its
+        # expertise matches this manuscript, and because the round never closes (target
+        # stops at UNDER_REVIEW) its assignment here is never touched again — a standing
+        # active assignment that alone puts it at capacity everywhere else. See the
+        # `ManuscriptSpec.reviewer_emails` docstring.
+        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL, REVIEWER4_EMAIL),
     ),
     ManuscriptSpec(
         sequence=3,
@@ -196,7 +281,9 @@ MANUSCRIPT_SPECS: tuple[ManuscriptSpec, ...] = (
         corresponding_author_email=AUTHOR2_EMAIL,
         co_author_emails=(AUTHOR_EMAIL,),
         target=S.PUBLISHED,
-        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL),
+        # REVIEWER3 (Ifeoma Chukwu, University of Lagos) is the third entry, giving her a
+        # standing active assignment once the quorum below is met by the first two.
+        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL, REVIEWER3_EMAIL),
     ),
     ManuscriptSpec(
         sequence=5,
@@ -211,7 +298,9 @@ MANUSCRIPT_SPECS: tuple[ManuscriptSpec, ...] = (
         corresponding_author_email=AUTHOR_EMAIL,
         co_author_emails=(),
         target=S.PUBLISHED,
-        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL),
+        # REVIEWER5 (Efua Danso, University of Cape Coast) is the third entry, giving her
+        # a standing active assignment once the quorum below is met by the first two.
+        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL, REVIEWER5_EMAIL),
     ),
     ManuscriptSpec(
         sequence=6,
@@ -226,7 +315,9 @@ MANUSCRIPT_SPECS: tuple[ManuscriptSpec, ...] = (
         corresponding_author_email=AUTHOR2_EMAIL,
         co_author_emails=(AUTHOR_EMAIL,),
         target=S.PUBLISHED,
-        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL),
+        # REVIEWER7 (Grace Nakato, Makerere University) is the third entry, giving her a
+        # standing active assignment once the quorum below is met by the first two.
+        reviewer_emails=(REVIEWER_EMAIL, REVIEWER2_EMAIL, REVIEWER7_EMAIL),
     ),
     ManuscriptSpec(
         sequence=7,
@@ -261,7 +352,7 @@ _LAST_SEQUENCE = max(spec.sequence for spec in MANUSCRIPT_SPECS)
 # contrast (author's copy carries their name; reviewer's copy does not) would not line up
 # with who is actually looking at it.
 _AUTHOR_NAME_BY_EMAIL: dict[str, str] = {
-    email: full_name for email, _, _, full_name in JUDGE_ACCOUNTS
+    email: full_name for email, _, _, full_name, _ in JUDGE_ACCOUNTS
 }
 
 
@@ -307,13 +398,14 @@ async def _fully_seeded(uow: SqlAlchemyUnitOfWork) -> bool:
 async def _ensure_accounts(
     uow: SqlAlchemyUnitOfWork, registration: RegistrationService
 ) -> dict[str, UserId]:
-    """Create or reuse each judge account, granting its role and verifying it.
+    """Create or reuse each judge account, granting its role, verifying it, and — for the
+    external reviewer pool — applying its `REVIEWER_PROFILES` entry.
 
     `RegistrationService.register` itself raises `AccountError` for an email already on
     file, so a lookup-then-register race is caught rather than crashing the boot.
     """
     ids: dict[str, UserId] = {}
-    for email, password, role, full_name in JUDGE_ACCOUNTS:
+    for email, password, role, full_name, affiliation in JUDGE_ACCOUNTS:
         normalised = EmailAddress(email)
         account = await uow.accounts.get_by_email(normalised)
         if account is None:
@@ -322,7 +414,7 @@ async def _ensure_accounts(
                     email=email,
                     password=password,
                     full_name=full_name,
-                    affiliation="University of Ghana",
+                    affiliation=affiliation,
                 )
             except AccountError:
                 existing = await uow.accounts.get_by_email(normalised)
@@ -337,6 +429,15 @@ async def _ensure_accounts(
         if not account.is_verified:
             account.verify(occurred_at=NOW)
             changed = True
+        profile = REVIEWER_PROFILES.get(email)
+        if profile is not None:
+            expertise, capacity = profile
+            if account.expertise != expertise:
+                account.expertise = expertise
+                changed = True
+            if account.reviewer_capacity != capacity:
+                account.reviewer_capacity = capacity
+                changed = True
         if changed:
             await uow.accounts.save(account)
 

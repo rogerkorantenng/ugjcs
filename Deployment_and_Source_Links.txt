@@ -28,13 +28,26 @@ TEST CREDENTIALS
 All accounts are pre-verified and were created through the application's own
 registration service, so they behave exactly as a self-registered user would.
 
-Role              Email                     Password
-----------------  ------------------------  ------------------------
-Author            author@ugjcs.test         Ugjcs-Author-2026!
-Reviewer          reviewer@ugjcs.test       Ugjcs-Reviewer-2026!
-Editor            editor@ugjcs.test         Ugjcs-Editor-2026!
-Editor-in-Chief   eic@ugjcs.test            Ugjcs-EditorChief-2026!
-Administrator     admin@ugjcs.test          Ugjcs-Admin-2026!
+Role                       Email                     Password
+-------------------------  ------------------------  ------------------------
+Author                     author@ugjcs.test         Ugjcs-Author-2026!
+Author (2nd byline)        author2@ugjcs.test        Ugjcs-Author2-2026!
+Reviewer (internal, UG)    reviewer@ugjcs.test       Ugjcs-Reviewer-2026!
+Reviewer (internal, UG)    reviewer2@ugjcs.test      Ugjcs-Reviewer2-2026!
+Reviewer (Univ. of Lagos)  reviewer3@ugjcs.test      Ugjcs-Reviewer3-2026!
+Reviewer (KNUST)           reviewer4@ugjcs.test      Ugjcs-Reviewer4-2026!
+Reviewer (Univ. Cape Coast) reviewer5@ugjcs.test     Ugjcs-Reviewer5-2026!
+Reviewer (Ashesi Univ.)    reviewer6@ugjcs.test      Ugjcs-Reviewer6-2026!
+Reviewer (Makerere Univ.)  reviewer7@ugjcs.test      Ugjcs-Reviewer7-2026!
+Editor                     editor@ugjcs.test         Ugjcs-Editor-2026!
+Editor-in-Chief            eic@ugjcs.test            Ugjcs-EditorChief-2026!
+Administrator              admin@ugjcs.test          Ugjcs-Admin-2026!
+
+The two "internal" reviewers share every author's affiliation (University of Ghana), on
+purpose: they demonstrate the conflict-of-interest picker's affiliation exclusion. The
+five numbered 3-7 are external, at five different institutions, and are what make the
+picker (GET /api/v1/editorial/{code}/reviewer-candidates) actually show eligible
+candidates alongside the excluded ones.
 
 Test Username:    editor@ugjcs.test
 Test Password:    Ugjcs-Editor-2026!
