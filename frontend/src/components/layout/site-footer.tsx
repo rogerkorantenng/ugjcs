@@ -1,3 +1,13 @@
+import Link from "next/link";
+
+const FOOTER_LINKS = [
+  { href: "/about", label: "About the journal" },
+  { href: "/for-authors", label: "For authors" },
+  { href: "/for-reviewers", label: "For reviewers" },
+  { href: "/search", label: "Search the archive" },
+  { href: "/login", label: "Sign in" },
+];
+
 /** The colophon: the one place a scholarly journal states who publishes it. Without this,
  * the archive is a bare list of cards; with it, the list sits inside a masthead-to-footer
  * frame the way a print journal issue does. Mirrors the masthead's rule-and-mono language
@@ -6,7 +16,7 @@ export function SiteFooter() {
   return (
     <footer className="border-t border-rule bg-surface/60">
       <div className="mx-auto max-w-5xl px-4 py-12">
-        <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <p className="font-display-heading text-base font-semibold text-ink">
               University of Ghana Journal of Computing Science
@@ -15,6 +25,18 @@ export function SiteFooter() {
               A double-blind peer-reviewed journal publishing original research in computing and
               information systems, from the Department of Computer Science, University of Ghana.
             </p>
+          </div>
+          <div className="text-sm">
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink/40">The journal</p>
+            <ul className="mt-2 space-y-1.5">
+              {FOOTER_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="text-ink/60 underline decoration-transparent underline-offset-4 transition-colors hover:text-stamp hover:decoration-stamp/40">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
           <div className="text-sm text-ink/60">
             <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-ink/40">Editorial process</p>
