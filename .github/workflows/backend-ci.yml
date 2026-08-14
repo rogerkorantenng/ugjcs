@@ -60,9 +60,14 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked
 
+      # `alembic/env.py` builds the full `Settings` object, which has no default for
+      # `jwt_secret`, so the migration steps need it even though no migration signs a
+      # token. It is a throwaway value for a throwaway database; the real secret lives in
+      # AWS Secrets Manager and is never held in CI.
       - name: Verify the migration applies and reverses
         env:
           UGJCS_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ugjcs
+          UGJCS_JWT_SECRET: ci-only-not-a-real-secret-0123456789abcdef
         run: |
           uv run alembic upgrade head
           uv run alembic downgrade base
@@ -71,4 +76,5 @@ jobs:
       - name: Integration tests
         env:
           UGJCS_DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/ugjcs
+          UGJCS_JWT_SECRET: ci-only-not-a-real-secret-0123456789abcdef
         run: make integration
