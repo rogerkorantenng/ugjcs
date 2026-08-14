@@ -5,7 +5,7 @@ Journal (SDJ), published by the College of Basic and Applied Sciences (CBAS), Un
 **Document:** 02 — Software Requirements Specification
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Assessor:** Prof. Solomon Mensah
-**Date:** 2026-08-12
+**Date:** 2026-08-12, revised 2026-08-14 against the running system
 **Conformance:** Adapted from IEEE 830-1998 and ISO/IEC/IEEE 29148:2018
 **Status:** Authoritative. Where this document and the implementation disagree, the
 implementation governs and the disagreement is recorded (section 4.1, section 7).
@@ -28,10 +28,11 @@ implemented-and-tested, refined six to "partially implemented" with a named gap,
 eleven genuinely not implemented.
 
 A second revision on 2026-08-14 reconciled the document against two feature waves that
-landed after the original build. It moved eight further lines to implemented-and-tested,
-added six new requirements (FR-29 to FR-34) for capabilities the original set never
-anticipated, and corrected several rows that had begun to understate the system rather
-than overstate it. The current totals are in section 5. Requirement identifiers, MoSCoW
+landed after the original build. It moved seven further lines to implemented-and-tested
+(FR-03, FR-08, FR-11, FR-18, FR-19, FR-21, FR-24), upgraded FR-17 from a substring match
+to ranked full-text search and FR-28 from unbuilt to partial, added six new requirements
+(FR-29 to FR-34) for capabilities the original set never anticipated, and corrected
+several rows that had begun to understate the system rather than overstate it. The current totals are in section 5. Requirement identifiers, MoSCoW
 priorities and the sections neither revision touched are unchanged from the original.
 
 ---
@@ -133,7 +134,7 @@ built with a named gap, and which are not built at all.
 Four things named in the original design remain unbuilt: OAI-PMH harvesting (FR-22),
 similarity screening (FR-20), notifications of any kind, and asynchronous post-upload
 processing. Redis and an ARQ worker were designed for that last one (design specification
-Section 7) but are absent from the delivered codebase, and nothing in the current system depends
+section 7) but are absent from the delivered codebase, and nothing in the current system depends
 on them; FR-20 is the requirement that would have used them. Terraform-managed
 ECS/ALB/CloudFront was the original deployment design, and the actual deployment target
 differs (section 2.4, TD-14).
@@ -159,7 +160,6 @@ deadlines, and self-service author registration.
 - Serve the archive to anonymous readers with full-text search, citation export and
   OAI-PMH harvesting.
 - Record every editorial event in a tamper-evident, append-only log.
-
 - Bill and settle an article processing charge once a paper is accepted.
 - Administer accounts, roles, reviewer capacity and activation from a console.
 - Let anyone verify a published paper's editorial history against a tamper-evident chain.
@@ -184,7 +184,7 @@ harvesting (FR-22) are the two that are not built.*
 
 A single account may hold multiple roles simultaneously (design specification section 3); this
 is a deliberate design choice with a direct security consequence recorded in section 4.3 and
-Section 7 (an Author–Reviewer dual-role holder is not currently prevented from reviewing their
+section 7 (an Author–Reviewer dual-role holder is not currently prevented from reviewing their
 own manuscript).
 
 ### 2.4 Operating environment
@@ -224,9 +224,9 @@ Assumptions (stated as assumptions — the project had no access to real SDJ ope
 data): a single journal instance, SDJ itself, suffices; reviewers participate without
 incentive mechanisms; SDJ's corpus scale is hundreds, not millions, of papers, justifying Postgres
 full-text search over a dedicated search engine; authors submit PDFs; a single
-transactional email provider is available. Dependencies: AWS managed services (ECS, RDS,
-S3, CloudFront), Vercel, and a transactional email provider must remain available and
-within free/low-cost tier limits for the system to operate as specified.
+transactional email provider is available. Dependencies: AWS managed services (App Runner,
+RDS, S3, Secrets Manager), Vercel, and a transactional email provider must remain available
+and within free/low-cost tier limits for the system to operate as specified.
 
 ---
 
@@ -364,7 +364,7 @@ Each non-functional requirement carries a stated **verification method** so that
 
 | ID | Requirement | Verification |
 |---|---|---|
-| NFR-11 | The service exposes liveness and readiness probes; unhealthy tasks are replaced automatically. | Deployment verification against the ECS service's health-check configuration |
+| NFR-11 | The service exposes liveness and readiness probes; unhealthy tasks are replaced automatically. | Deployment verification against App Runner's health-check configuration, which polls `/health` and replaces an unresponsive instance |
 
 #### Usability
 
@@ -509,7 +509,7 @@ for the one action (`REVIEW`) that is deliberately under-specified today.
 | `RESUBMIT` | Corresponding author only | — | — | — | — |
 | `PUBLISH` | — | — | — | Yes | — |
 | `MANAGE_USERS` | — | — | — | — | Yes |
-| `VIEW_AUDIT` | — | — | Yes | Yes | — *(role grant exists; no route reaches it — section 5, FR-19)* |
+| `VIEW_AUDIT` | — | — | Yes | Yes | — *(gates `GET /editorial/analytics` and `GET /editorial/reviewer-performance`; the audit chain itself is additionally surfaced publicly via `GET /archive/{code}/provenance` — FR-19, FR-24)* |
 | `WITHDRAW` *(FR-25a)* | Corresponding author only — **implemented & tested** | — | — | — | — |
 
 **FR-25a is closed.** `Action.WITHDRAW` now exists in `_OWNERSHIP_ACTIONS` alongside
@@ -565,9 +565,9 @@ exists for this requirement's behaviour, stated as such rather than described eu
 
 | FR | Use case | Module / endpoint | Test | Status |
 |---|---|---|---|---|
-| FR-01 | UC1 | `application/identity.py` (`RegistrationService`) — account creation, email verification token issue and redemption | `test_identity.py`: `test_registering_creates_an_unverified_account_and_sends_one_message`, `test_a_valid_verification_token_verifies_the_account`, `test_a_verification_token_cannot_be_replayed`, `test_registering_an_existing_email_raises_and_sends_no_second_message` | **Partially implemented.** The service layer is fully built and tested, including duplicate-email and replay handling. But no `/auth/register` route exists (absent from the live `/openapi.json`) and the frontend has no registration screen — only `/login`. Accounts in the deployed system are provisioned by seed data (the judge accounts in Testing_Report.pdf section 5), not self-registration. Missing: the API route and the frontend form that would call it. |
+| FR-01 | UC1 | `application/identity.py` (`RegistrationService`); `api/routers/auth.py` (`POST /auth/register`); frontend `app/login/page.tsx` (sign-up tab) | `test_identity.py`: `test_registering_creates_an_unverified_account_and_sends_one_message`, `test_a_valid_verification_token_verifies_the_account`, `test_a_verification_token_cannot_be_replayed`, `test_registering_an_existing_email_raises_and_sends_no_second_message`; `test_auth_router.py`: `test_registering_creates_a_verified_author_and_signs_in` | **Partially implemented.** Self-service registration now exists end to end — route, sign-up form, duplicate-email and replay handling all tested (see also FR-34). The named remainder is the verify-before-usable clause: because email delivery is mocked (`LoggingEmailSender` logs the link rather than sending it), the deployed configuration verifies an account immediately at registration. The token issue/redemption machinery is built and tested, but no deployed account has ever had to follow a verification link before signing in. |
 | FR-02 | UC2 | `api/routers/auth.py` (`/auth/login`, `/auth/refresh`, `/auth/logout`, `/auth/me`); `application/identity.py` (`SessionService`) | `test_auth_router.py` (unit, all four routes); integration `test_refresh_rotation.py`: `test_replaying_a_rotated_refresh_token_revokes_the_entire_family`, `test_roles_revoked_after_a_token_was_issued_take_effect_immediately`, `test_an_expired_refresh_token_is_refused` | **Implemented & tested.** Session issuance, explicit revocation (`/logout`), and expiry are all live and covered, including the security-sensitive case (stolen-refresh-token family revocation) against a real database. |
-| FR-03 | UC3 | `domain/policies.py` (`Action.MANAGE_USERS`, granted to `Administrator`); `infrastructure/db/account_repository.py` (role grant/revoke persistence) | `test_policies.py` (grant); integration `test_account_repository.py`: `test_granting_a_role_and_saving_persists_it`, `test_revoking_a_role_and_saving_removes_it` | **Partially implemented.** The authorisation grant and the persistence of a role change are both implemented and tested against a real database. No `/admin` API route or frontend screen exists to let an Administrator invoke this — confirmed absent from `/openapi.json` and from `frontend/src/app/`, and stated explicitly in Testing_Report.pdf section 5: "no UI surface exists for this yet." |
+| FR-03 | UC3 | `domain/policies.py` (`Action.MANAGE_USERS`); `api/routers/admin.py` (`POST /admin/accounts/{id}/roles`); `infrastructure/db/account_repository.py` (role grant/revoke persistence); frontend `app/admin/page.tsx` | `test_admin_router.py`: `test_granting_the_reviewer_role_adds_it`, `test_revoking_a_held_role_removes_it`, `test_every_admin_route_is_forbidden_to_non_administrators`; integration `test_account_repository.py`: `test_granting_a_role_and_saving_persists_it`, `test_revoking_a_role_and_saving_removes_it`; integration `test_refresh_rotation.py`: `test_roles_revoked_after_a_token_was_issued_take_effect_immediately` | **Implemented & tested.** This row previously recorded that no `/admin` route or screen existed; the administrator console (FR-30) closed that. Roles are granted and revoked through the API and the console, an account may hold several concurrently, and a revocation takes effect on the next request even for tokens issued before it — the acceptance criterion's hardest clause, proven against a real database. |
 | FR-04 | UC4 | `api/routers/manuscripts.py` (`POST /manuscripts`, multipart with `file`); `domain/manuscript.py`; `domain/transitions.py` (`DRAFT→SUBMITTED`); frontend `app/author/submit/page.tsx` | `test_manuscripts_router.py`: `test_an_author_can_submit_a_manuscript_with_a_pdf`; `test_transitions.py`, `test_manuscript.py` | **Implemented & tested**, end to end: route, upload, lifecycle guard and the author's submission form all exist and are exercised by the cited tests plus the live UAT pass in section 5 of the testing report. |
 | FR-05 | UC4 | `application/documents.py` (`validate_document` — magic-byte check, independent of client-supplied `Content-Type`) | `test_documents.py`: `test_a_client_supplied_content_type_cannot_substitute_for_the_magic_number`, `test_content_exceeding_the_size_cap_is_rejected`; `test_manuscripts_router.py`: `test_a_non_pdf_upload_is_rejected_with_415`, `test_an_oversized_upload_is_rejected_with_413` | **Implemented & tested**, at the unit level (validation logic) and the API level (`415`/`413` responses). |
 | FR-06 | UC5 | `infrastructure/storage/anonymize.py` (`strip_pdf_metadata`); wired into `manuscripts.py`'s `_store_document`, which writes both an original and an anonymised S3 key on every submit/resubmit | `test_anonymize.py`; `test_documents.py`: `test_original_and_anonymised_keys_differ_for_the_same_manuscript_and_version`, `test_keys_carry_no_title_or_author_identifying_text` | **Implemented & tested.** Every submitted document produces a metadata-stripped derivative, distinct from the original, before either reaches storage. **Note the scope of what "anonymised" means here** — see section 7: XMP/DocInfo metadata is stripped; visible body text (a title or abstract that names the author) is not touched, which is FR-06 as designed, not a shortfall against it. |
@@ -581,7 +581,7 @@ exists for this requirement's behaviour, stated as such rather than described eu
 | FR-14 | UC13 | `api/routers/manuscripts.py` (`GET /manuscripts/mine`); `domain/policies.py` (`Action.VIEW`, `_can_view`); frontend `app/author/page.tsx`, `app/author/[trackingCode]/page.tsx` | `test_manuscripts_router.py`: `test_mine_lists_only_the_callers_manuscripts`, `test_retrieving_someone_elses_manuscript_is_forbidden`; live UAT (Testing_Report.pdf section 5): ten submissions listed with correct tracking codes and statuses | **Partially implemented.** An author's own-manuscripts list, correctly scoped and rendered, is implemented, tested and confirmed live. The **status timeline** clause is not met literally: `ManuscriptOut` carries only the manuscript's *current* `status`, not a history of transitions — the same underlying gap as FR-19 (no event/audit data is exposed on the wire at all, by the deliberate design recorded in `schemas.py`'s `ManuscriptOut` docstring). An author sees where a manuscript is now, not the sequence of states it passed through. |
 | FR-15 | UC14 | `api/routers/editorial.py` (`POST /editorial/{tracking_code}/schedule`, `POST /editorial/{tracking_code}/publish`); `domain/transitions.py` (`ACCEPTED→SCHEDULED→PUBLISHED`); `domain/policies.py` (`Action.PUBLISH`, EiC-only) | `test_editorial_router.py`: `test_the_editor_in_chief_can_schedule_an_accepted_manuscript`, `test_the_editor_in_chief_can_publish_a_scheduled_manuscript`, `test_a_plain_editor_cannot_schedule`, `test_a_plain_editor_cannot_publish`, `test_publishing_without_scheduling_first_is_a_conflict`, `test_scheduling_the_same_volume_and_number_twice_yields_the_same_issue_id` | **Implemented & tested.** `Issue` is not a persisted aggregate — an `IssueId` is derived deterministically from `(volume, number)` (`domain/ids.py`, `mint_issue_id`) rather than looked up — a documented simplification, not a gap against this requirement's testable behaviour. Testing_Report.pdf section 4.5 records that these two routes, plus resubmission, were at one point fully domain-tested but reachable by no route at all; that gap is closed and is exactly what the cited tests now pin. |
 | FR-16 | UC15 | `api/routers/archive.py` (`GET /archive`, `GET /archive/{tracking_code}` — no auth dependency); frontend `app/(public)/papers/[trackingCode]/page.tsx` | `test_archive_router.py`: `test_the_archive_requires_no_authentication`, `test_retrieving_a_published_paper_by_tracking_code`, `test_an_unpublished_manuscript_is_not_found_via_the_archive`; route audit `test_the_archive_prefix_genuinely_has_no_authorization_dependency` | **Implemented & tested**, including the negative case (an unpublished manuscript is not reachable through this path) and the route-audit proof that the entire `/archive` prefix is genuinely, not accidentally, public. |
-| FR-17 | UC16 | `infrastructure/storage/fulltext.py` (PDF text extraction); `infrastructure/db/models.py` (stored `tsvector` column); `infrastructure/db/repository.py` (`search_published`, `websearch_to_tsquery` ranked by `ts_rank`, `ts_headline` snippets); `api/routers/archive.py` (`GET /archive/search`); `api/schemas_wave2.py` (`ArchiveSearchResultOut`); frontend `app/(public)/search/page.tsx` | `test_archive_search_fulltext.py`: `test_a_fulltext_match_carries_a_snippet_of_context`, `test_a_title_match_carries_a_null_snippet`, `test_a_keyword_match_is_found_with_a_null_snippet`, `test_no_match_anywhere_returns_an_empty_list`, `test_publishing_extracts_the_pdf_text_into_the_search_column`, `test_a_missing_or_unreadable_document_never_blocks_publishing`; integration `test_fulltext_search.py`, `test_archive_queries.py` | **Implemented & tested.** Search is PostgreSQL full-text over a stored `tsvector` covering title, abstract, keywords and the extracted body text of the published PDF, ranked by `ts_rank`, with `ts_headline` snippets returned when the match landed in the body. Body text is extracted at publication and a failed extraction never blocks the publish. Still not met: the "with filters" clause, since no keyword or date filter exists. NFR-09's 800 ms p95 bound remains unverified, because no load or performance test exists in this project (Testing_Report.pdf section 6). |
+| FR-17 | UC16 | `infrastructure/storage/fulltext.py` (PDF text extraction); `infrastructure/db/models.py` (stored `tsvector` column); `infrastructure/db/repository.py` (`search_published`, `websearch_to_tsquery` ranked by `ts_rank`, `ts_headline` snippets); `api/routers/archive.py` (`GET /archive/search`); `api/schemas_wave2.py` (`ArchiveSearchResultOut`); frontend `app/(public)/search/page.tsx` | `test_archive_search_fulltext.py`: `test_a_fulltext_match_carries_a_snippet_of_context`, `test_a_title_match_carries_a_null_snippet`, `test_a_keyword_match_is_found_with_a_null_snippet`, `test_no_match_anywhere_returns_an_empty_list`, `test_publishing_extracts_the_pdf_text_into_the_search_column`, `test_a_missing_or_unreadable_document_never_blocks_publishing`; integration `test_fulltext_search.py`, `test_archive_queries.py` | **Partially implemented.** Search is PostgreSQL full-text over a stored `tsvector` covering title, abstract, keywords and the extracted body text of the published PDF, ranked by `ts_rank`, with `ts_headline` snippets returned when the match landed in the body. Body text is extracted at publication and a failed extraction never blocks the publish. Still not met: the "with filters" clause, since no keyword or date filter exists. NFR-09's 800 ms p95 bound remains unverified, because no load or performance test exists in this project (Testing_Report.pdf section 6). |
 | FR-18 | UC17 | `api/routers/archive.py` (`GET /archive/{tracking_code}/document`, no auth dependency); `api/schemas.py` (`ArchivePaperOut.has_document`, `DocumentUrlOut`); frontend `app/(public)/papers/[trackingCode]/page.tsx` (inline PDF viewer) | `test_archive_router.py`: `test_a_published_papers_document_is_downloadable_without_authentication`, `test_archive_entries_report_whether_a_document_is_attached`, `test_downloading_a_missing_papers_document_is_404`, `test_downloading_when_no_document_was_ever_attached_is_404`; route audit `test_the_archive_prefix_genuinely_has_no_authorization_dependency` | **Implemented & tested.** A public, unauthenticated route serves a pre-signed URL for the original document of a published manuscript only. `has_document` on the archive shape lets a reader's page decide whether to render a viewer without first attempting a download. The route sits inside the `/archive` prefix, which the route audit proves carries no authorisation dependency anywhere. |
 | FR-19 | UC18 | `domain/hashchain.py`; PostgreSQL append-only triggers (Alembic migration); `api/routers/archive.py` (`GET /archive/{tracking_code}/provenance`); `api/schemas_scholarly.py` (`ProvenanceOut`, `ProvenanceEventOut`); `api/routers/certificate.py` (decision certificate carrying the chain head) | `test_hashchain.py`; `test_provenance_router.py`: `test_an_intact_chain_verifies_and_reports_its_head_hash`, `test_a_tampered_interior_event_is_reported_as_not_intact`, `test_event_payloads_and_actor_ids_are_never_exposed`, `test_provenance_for_an_unpublished_manuscript_is_404`; integration `test_append_only.py`: `test_updating_an_event_is_rejected_by_the_database`, `test_truncating_the_event_log_is_rejected`; `test_chain_persistence.py` | **Implemented & tested.** The chain was already enforced at the database boundary; `GET /archive/{code}/provenance` now surfaces it, and goes further than the requirement asked by making verification public rather than editor-only: anyone can recompute a published paper's chain from genesis and see `intact`, the head hash, and each event's type, timestamp and 8-character hash prefix. Payloads and `actor_id` are deliberately withheld, because a `REVIEW_SUBMITTED` payload names its reviewer and a public endpoint must not hand out even a pseudonymous handle. What `intact` does **not** prove (tail truncation, a forged event appended through the normal path, a history rebuilt wholesale from genesis) is stated in TD-04 and in the endpoint's own contract. |
 | FR-20 | UC5 | *(none)* | *(none)* | **Not implemented.** No similarity-screening, MinHash, or LSH code exists anywhere in the delivered backend. |
@@ -599,14 +599,13 @@ exists for this requirement's behaviour, stated as such rather than described eu
 | FR-33 | *(no dedicated UC — added after the original use-case set)* | `api/routers/editorial.py` (`GET /editorial/{tracking_code}/assignments`); `api/schemas_analytics.py` (`AssignmentDeadlineOut`); Alembic `due_at` migration; frontend editor assignments panel | `test_editorial_analytics.py`: `test_assignments_lists_deadlines_names_and_the_overdue_flag`, `test_an_assignment_before_its_deadline_is_not_overdue`, `test_assignments_for_a_missing_manuscript_is_404`; integration `test_due_at_migration.py` | **Implemented & tested.** `overdue` is computed server-side so every consumer agrees on one rule: not yet submitted, and `due_at` in the past. A review submitted late is never flagged overdue, and a null deadline never is either. The model carries `reviewer_name`, which is correct rather than a leak: the blind is author to reviewer, not editor to reviewer, and the route is gated on `Action.ASSIGN_REVIEWER`, which no author-reachable route carries. |
 | FR-34 | *(no dedicated UC — added after the original use-case set)* | `api/routers/auth.py` (`POST /auth/register`, `RegisterRequest`); `application/registration.py` (`RegistrationService`); frontend `app/login/page.tsx` (sign-up tab) | `test_auth_router.py`: `test_registering_creates_a_verified_author_and_signs_in`, `test_registering_never_grants_an_editorial_role` | **Implemented & tested.** The route grants exactly `Role.AUTHOR` and ignores any role the request body might carry, which is asserted directly. Email delivery is mocked (`LoggingEmailSender` logs the verification link rather than sending it), so the account is verified immediately and signed in; that shortcut is honest about itself and is the same stub FR-23 records as unbuilt. Password policy is length-based, enforced in `RegistrationService`. |
 | FR-27 | UC25 | *(none)* | *(none)* | **Not implemented.** Deferred (Could-have) — no persistent-identifier resolution route exists. |
-| FR-28 | *(no dedicated UC — reporting over UC10/UC22 data, effort estimation section 3)* | `api/routers/editorial.py` (`GET /editorial/reviewer-performance`, gated on `Action.VIEW_AUDIT`); `api/schemas_analytics.py` (`ReviewerPerformanceOut`) | `test_editorial_analytics.py`: `test_reviewer_performance_reports_workload_and_turnaround_per_reviewer`, `test_a_reviewer_may_not_read_reviewer_performance` | **Implemented & tested.** Per reviewer: active assignments against capacity, reviews completed, average turnaround in days, and last activity. Turnaround and last activity are `null` until a first review completes, for the same reason the analytics aggregates are: an editor has to tell "new to the pool" apart from "turns reviews around instantly". The requirement's "acceptance rate" clause is not met, and cannot be, because FR-10's invitation lifecycle does not exist, so no reviewer has ever declined anything to compute a rate from. |
+| FR-28 | *(no dedicated UC — reporting over UC10/UC22 data, effort estimation section 3)* | `api/routers/editorial.py` (`GET /editorial/reviewer-performance`, gated on `Action.VIEW_AUDIT`); `api/schemas_analytics.py` (`ReviewerPerformanceOut`) | `test_editorial_analytics.py`: `test_reviewer_performance_reports_workload_and_turnaround_per_reviewer`, `test_a_reviewer_may_not_read_reviewer_performance` | **Partially implemented.** Per reviewer: active assignments against capacity, reviews completed, average turnaround in days, and last activity. Turnaround and last activity are `null` until a first review completes, for the same reason the analytics aggregates are: an editor has to tell "new to the pool" apart from "turns reviews around instantly". The requirement's "acceptance rate" clause is not met, and cannot be, because FR-10's invitation lifecycle does not exist, so no reviewer has ever declined anything to compute a rate from. |
 
 **Reading this matrix honestly.** Of the 35 requirement lines (FR-01 to FR-34 plus
-FR-25a), **24 are implemented and tested end to end** (FR-02, FR-04, FR-05, FR-06, FR-07,
-FR-08, FR-09, FR-11, FR-12, FR-13, FR-15, FR-16, FR-18, FR-19, FR-21, FR-24, FR-25,
-FR-25a, FR-29 to FR-34), **5 are partially implemented with a specifically named
-remainder** (FR-01, FR-03, FR-14, FR-17, FR-28), and **6 are genuinely not implemented**
-(FR-10, FR-20, FR-22, FR-23, FR-26, FR-27).
+FR-25a), **25 are implemented and tested end to end** (FR-02 to FR-09, FR-11, FR-12,
+FR-13, FR-15, FR-16, FR-18, FR-19, FR-21, FR-24, FR-25, FR-25a, FR-29 to FR-34), **4 are
+partially implemented with a specifically named remainder** (FR-01, FR-14, FR-17, FR-28),
+and **6 are genuinely not implemented** (FR-10, FR-20, FR-22, FR-23, FR-26, FR-27).
 
 FR-10, the reviewer invitation lifecycle, is the absence that propagates furthest: because
 no reviewer can decline, FR-28 cannot report an acceptance rate, and an assignment takes
@@ -644,13 +643,11 @@ domain layer was complete while the application, API and frontend layers were st
 planned — consistent with, not contrary to, the MoSCoW cut: the cut governs *what* is
 built, not the *order* in which layers within a use case are built, and a hexagonal
 architecture's domain core is the natural first layer to complete and verify in isolation
-(design specification section 7.1). That sequencing has since played out as intended: section 5's
-revised traceability matrix shows the API and frontend layers have caught up for most of
-the Must-have set (12 of 29 requirement lines implemented and tested end to end, domain
-through frontend). Where a gap remains within the Must-have set — FR-08's reviewer
-matching and FR-19's audit-trail route being the clearest examples — it is a gap in a
-specific layer or route, not evidence that an entire layer was skipped; section 5 states each
-one by name rather than folding them back into a single "still catching up" claim.
+(design specification section 7.1). That sequencing has since played out as intended:
+section 5's matrix now shows 25 of 35 requirement lines implemented and tested end to
+end, domain through frontend, with every Must-have gap that remains (FR-10's invitation
+lifecycle being the clearest) named individually rather than folded into a single "still
+catching up" claim.
 
 ---
 
@@ -679,9 +676,10 @@ limitations are stated plainly, each cross-referenced to Technical_Debt_Plan.pdf
   through the legitimate API, or a wholly fabricated history rebuilt from the genesis
   hash, are **undetectable by the application alone** — there is no periodically
   published, independently held checkpoint to compare against (**TD-04**, scheduled).
-  Deployment did not change this: no checkpoint-publishing mechanism was added, and — see
-  FR-19 above — there is currently no API route at all through which anyone could view
-  the chain to notice tampering even if the chain itself remained sound.
+  The chain is, however, now publicly inspectable: `GET /archive/{code}/provenance`
+  (FR-19) lets anyone recompute a published paper's chain and check its head hash, which
+  is the precondition for the external checkpointing TD-04 calls for — the route exists;
+  the independently held checkpoint does not.
 - **A reviewer's conflict of interest is not checked by the authorisation layer — and
   this is now a live gap, not a theoretical one.** `Action.REVIEW` is granted to any
   actor holding the `REVIEWER` role, with no per-manuscript predicate excluding authors
@@ -722,11 +720,6 @@ limitations are stated plainly, each cross-referenced to Technical_Debt_Plan.pdf
   reviewer immediately on creation; the `AssignmentStatus` vocabulary declares
   `INVITED`/`ACCEPTED`/`DECLINED`, but nothing in the delivered code writes or reads
   those states, and no route lets a reviewer decline. See section 5, FR-10.
-- **A published paper cannot be downloaded by an anonymous reader (FR-18).** Document
-  storage, upload, and authenticated download all exist (FR-04/FR-06), but no public,
-  unauthenticated route serves a published manuscript's PDF, and the public paper page
-  has no download link. This is the one gap this revision found that was not previously
-  recorded anywhere in this project's documentation — see section 5, FR-18.
 - **AWS access currently uses root credentials.** The toolchain authenticates as the AWS
   account root user rather than a least-privilege IAM principal (**TD-01**, critical).
   Deployment to App Runner, S3 and the rest of the live infrastructure has already
@@ -753,7 +746,7 @@ limitations are stated plainly, each cross-referenced to Technical_Debt_Plan.pdf
   initialisation rather than inferred.
 - **Requirements traceability reflects the finished system, not the pre-implementation
   build.** section 5 of this document, re-reconciled against the running code on 2026-08-14,
-  shows 24 of 35 requirement lines implemented and tested end to end, 5 partially
+  shows 25 of 35 requirement lines implemented and tested end to end, 4 partially
   implemented with a named remainder, and 6 genuinely not implemented. The matrix has now
   been revised twice against the code rather than against intent, and both revisions moved
   lines in both directions: the second one had to correct rows that understated the system

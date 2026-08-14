@@ -5,11 +5,11 @@ Journal (SDJ), published by the College of Basic and Applied Sciences, Universit
 **Author:** Roger Koranteng Obeng (22424140)
 **Established:** 2026-08-12
 **Last reconciled against the running code:** 2026-08-14
-**Status:** Authoritative. This document is the single source of truth for the HTTP boundary between the FastAPI backend and the Next.js frontend. Where a plan's prose disagrees with this document, this document wins; the disagreement is a defect in the plan, to be corrected there, not here.
+**Status:** Authoritative. This document is the single source of truth for the HTTP boundary between the FastAPI backend and the Next.js frontend. Where any other document's prose disagrees with this one, this document wins; the disagreement is a defect there, to be corrected there, not here.
 
 ## How this document came to exist
 
-Plan 4 (the editorial API) and Plan 5 (the frontend) were drafted concurrently, each against an assumed shape for the other. Plan 4 was written directly against the executed domain, persistence and authentication code from Plans 1 to 3, and is therefore authoritative on wire format. Plan 5's assumptions were reconciled against it, and this document records the settled contract both plans point at.
+The API and the frontend were built concurrently, each against an assumed shape for the other. The API side was written directly against the already-executed domain, persistence and authentication code, and is therefore authoritative on wire format; the frontend's assumptions were reconciled against it, and this document records the settled contract both sides point at.
 
 It has since been re-reconciled against the two feature waves that followed the original build. Every route table below was regenerated from the router modules rather than edited by hand.
 

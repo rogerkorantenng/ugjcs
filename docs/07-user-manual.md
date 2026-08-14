@@ -4,7 +4,7 @@
 Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana
 **Author:** Roger Koranteng Obeng (22424140)
 **Assessor:** Prof. Solomon Mensah
-**Date:** 2026-08-12
+**Date:** 2026-08-12, revised 2026-08-14 against the running system
 **Status:** Written from the live, deployed system, not from the source code. Every screen,
 label, button caption and error message described below was observed by signing in as each
 role in turn — author, reviewer, editor, Editor-in-Chief and administrator — and operating the
@@ -147,21 +147,27 @@ you wanted attached so you return to it after signing in again.
 
 ### 3.1 Browsing the archive
 
-1. Go to `https://ugjcs-frontend.vercel.app`.
-2. Under the heading **Recently published**, you will see a list of published papers. Each
-   entry shows its tracking code (for example `SDJ-2026-0005`), its title, its author or
-   authors, a short abstract, and its keywords.
+1. Go to `https://ugjcs-frontend.vercel.app` and follow **Browse the archive**, or go
+   directly to `/search`.
+2. Published papers are listed with their tracking code (for example `SDJ-2026-0005`),
+   title, author(s), a short abstract and keywords.
 3. Click any paper's title to open it.
 
 ### 3.2 Opening a paper
 
 A paper's page (`/papers/<tracking-code>`) shows its tracking code, title, author(s),
-keywords and abstract.
+keywords and abstract, followed by:
 
-**Limitation to be aware of:** the paper page does not currently offer a way to download the
-manuscript's PDF, and it does not show a publication date, volume or issue number. Only the
-title, authors, keywords and abstract are shown. If you need the full text, there is currently
-no public download link for it.
+- **The full PDF**, previewed inline on the page, with a **Download PDF** link beneath it.
+- **A DOI-shaped identifier and citation export** — copy the identifier, or download the
+  citation as **BibTeX** or **RIS**. (The identifier is DOI-shaped but not registered, so
+  resolving it at doi.org will not work — a documented limit of this prototype.)
+- **An editorial provenance panel**, which verifies the paper's editorial history against
+  the tamper-evident audit chain and reports whether the chain is intact, its head hash,
+  and each event's type and timestamp.
+
+**Limitation to be aware of:** the page shows no publication date, volume or issue number —
+the system does not store one.
 
 ### 3.3 Searching
 
@@ -174,11 +180,13 @@ no public download link for it.
 5. If nothing matches, the page reads "No papers matched "your search term"" with the
    suggestion "Try a different title, keyword or author name."
 
-**Limitation to be aware of:** despite that suggestion, searching by an author's name did not
-return that author's papers when tested against the live archive (searching "Ama Serwaa", an
-author of five published papers, returned no results). In practice, search reliably matches
-words that appear in a paper's **title**, **abstract** or **keywords** — do not rely on it to
-find a particular author's work.
+Search covers each paper's **title**, **abstract**, **keywords** and the **full text of
+the PDF itself** — a distinctive phrase from inside a paper finds it, with the matching
+passage shown as a highlighted snippet under the result.
+
+**Limitation to be aware of:** author names are not part of the search index. Searching
+"Ama Serwaa", an author of several published papers, returns no results (re-verified
+against the live archive on 2026-08-14). Search by topic words, not by author name.
 
 ---
 
@@ -225,11 +233,11 @@ That detail page shows:
 - The tracking code.
 - The abstract.
 - A line reading "*N* of *M* reviews submitted" — how many of the required reviews are in.
-- A **Download my submitted document** button/link, which downloads the exact PDF you
-  uploaded.
+- An inline preview of your submitted PDF, with a download link.
 - A red **Withdraw submission** button, present at every stage up to and including
-  "Revision requested" — click it to pull the manuscript out of consideration. Withdrawal
-  cannot be undone.
+  "Revision requested". Withdrawal is terminal, so it asks twice: the first click arms a
+  confirmation, and only the second, explicit confirm actually withdraws.
+- Once the manuscript is **Accepted**, an **Article processing charge** panel (section 9).
 
 See section 10 for what each status means and what happens next.
 
@@ -271,8 +279,8 @@ manuscript currently assigned to you, showing each one's title and tracking code
 ### 5.1 Opening an assignment
 
 Click any assignment to open it. You will see the manuscript's tracking code, title, a short
-abstract, and its keywords, followed by a **Download anonymised manuscript** link and a
-**Submit your review** form.
+abstract, and its keywords, followed by an inline preview of the **anonymised** PDF (with a
+**Download anonymised PDF** link) and a **Submit your review** form.
 
 ### 5.2 What "anonymised" means here — read this before you review
 
@@ -299,20 +307,22 @@ prevent.
 
 ### 5.3 Submitting your review
 
-The **Submit your review** form has two fields:
+The **Submit your review** form asks for:
 
+- **Four criterion scores**, each from 1 to 5: **Originality**, **Rigour**, **Clarity** and
+  **Significance**.
 - **Recommendation** — a dropdown with four options: `accept`, `minor revision`,
   `major revision`, `reject`.
-- **Comments** — a free-text box for your written assessment.
-
-There is no separate numeric scoring by criterion (originality, methodology, clarity, etc.) —
-the review consists solely of your chosen recommendation and your written comments.
+- **Comments to the author** — your written assessment as the author will read it.
+- **Confidential comments to the editor** — remarks only the editor can see. Nothing you
+  write here is ever shown to the author, and no reviewer- or author-reachable screen can
+  display it.
 
 To submit:
 
-1. Choose the option from **Recommendation** that best reflects your judgement.
-2. Write your comments in the **Comments** box. This is what the editor — and, indirectly, the
-   author — will read, so be specific.
+1. Score each criterion and choose the recommendation that reflects your judgement.
+2. Write both comment fields — be specific in the author-facing one, and candid in the
+   confidential one.
 3. Click **Submit review**.
 4. On success you are returned to **My assignments**; the manuscript no longer requires
    further action from you. Once every reviewer assigned to a manuscript has submitted, its
@@ -337,27 +347,28 @@ a decision.
 
 ### 6.2 Screening a submission
 
-1. From the queue, click a manuscript's tracking code to open it. You should see its title, a
-   **Submitted** status badge, its abstract, the reviews-submitted count, a **Download
-   manuscript** link, and a **Begin screening** button.
-2. Read the manuscript (download it if needed) and click **Begin screening**.
-3. The page updates in place: the status badge changes to **Under screening**, and two new
-   sections appear — **Assign a reviewer** and **Decision**.
+1. From the queue, click a manuscript's tracking code to open it. You should see its title,
+   a **Submitted** status badge, its abstract, the reviews-submitted count, an inline
+   preview of the PDF, and a **Begin screening** button.
+2. Read the manuscript and click **Begin screening**.
+3. The page updates in place: the status badge changes to **Under screening**, and the
+   reviewer-assignment and **Decision** sections appear.
 
 ### 6.3 Assigning reviewers
 
-Under **Assign a reviewer**, you will see a single field, **Reviewer account id**, and an
-**Assign** button.
+The assignment section lists **every reviewer in the pool as a candidate, ranked by how
+well their declared expertise matches the manuscript's keywords**, with their current
+workload shown against their capacity. Candidates who must not be assigned are not hidden
+— they appear marked **"Excluded"** with the reason stated (they share an author's
+affiliation, are already assigned to this manuscript, or are at capacity), so you can see
+why an obvious name is unavailable. The ranking is advice, not authority: you remain free
+to assign any eligible candidate regardless of their position in it.
 
-**This expects the reviewer's account id, not their name or email address.** There is no
-picker or search box to choose a reviewer from — you must already know the id of the account
-you want to assign, obtained separately (for example from your own records or from the
-reviewer directly).
-
-1. Enter the reviewer's account id.
-2. Click **Assign**.
-3. The field clears on success. Repeat for each reviewer you want assigned; two are normally
-   expected before a decision on the reviews becomes possible (section 10).
+1. Select a candidate from the list.
+2. Click **Assign selected reviewer**.
+3. The assignment appears in the assignments panel with its **due date** and, once the date
+   passes without a review, an **overdue** flag. Repeat for the second reviewer; two are
+   normally expected before a decision becomes possible (section 10).
 
 ### 6.4 Recording a decision
 
@@ -378,13 +389,15 @@ To record a decision:
 1. Choose the option that reflects your editorial judgement.
 2. Write your reasoning in **Rationale** (this is required and must be at least 20 characters
    — a one-word rationale will be rejected).
-3. Click **Record decision**.
-4. The manuscript's status badge updates immediately to reflect the outcome (see section 10 for what
-   each decision leads to).
-
-*A small labelling quirk you may notice:* the "send to review" option is occasionally rendered
-by the interface as **"send to_review"**, with the underscore left in. This is a cosmetic
-formatting slip, not a different option — it is still the same "send to review" decision.
+3. Click **Record decision**. For a final decision (accept, reject, desk reject) the button
+   re-labels to **Confirm …** beside a **Go back** escape, and only the second, explicit
+   click records it — a deliberate guard against recording an irreversible decision by
+   accident.
+4. The manuscript's status badge updates immediately (see section 10 for what each decision
+   leads to). Once reviews are in, this page also shows both of each review's channels —
+   including the confidential comments only editors can read — and, after a final decision,
+   a **Decision certificate** download: a PDF stating the decision, the tracking code and
+   the audit chain's head hash.
 
 ---
 
@@ -558,15 +571,11 @@ The moment you begin screening one, it moves to "Under screening" and drops out 
 table. Keep a note of its tracking code, or navigate directly to
 `/editor/<tracking-code>`, to return to it.
 
-**"Could not assign that reviewer — Check the account id and try again."**
-The reviewer assignment field expects an account id, not an email address or name, and there
-is no directory or search box built into the form to look one up. Confirm you have the
-correct account id for the reviewer before retrying.
-
-**As a reader, you cannot find a way to download a paper's PDF**
-This is a genuine gap in the current system, not a mistake on your part — the public paper
-page shows only the title, authors, keywords and abstract; no PDF download link is offered to
-readers at the time of writing.
+**A reviewer you expected to assign shows as "Excluded" in the candidate list**
+That is the conflict-of-interest and workload screen working as designed: the stated reason
+(shared affiliation with an author, already assigned to this manuscript, or at capacity)
+explains why. An excluded candidate is shown rather than hidden precisely so you know the
+exclusion happened. If capacity is the reason, an administrator can raise it (section 8).
 
 **The Administrator account lands on Accounts and nothing else**
 That is the whole of the administrator's workspace, and it is deliberate. The role manages

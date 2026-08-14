@@ -373,7 +373,8 @@ href="https://ugjcs-frontend.vercel.app">https://ugjcs-frontend.vercel.app</a>
 (frontend, Vercel) + <a
 href="https://tsxsbf9rzp.us-east-1.awsapprunner.com">https://tsxsbf9rzp.us-east-1.awsapprunner.com</a>
 (API, App Runner)</li>
-<li><strong>Date:</strong> 2026-08-13 (overnight autonomous sweep)</li>
+<li><strong>Date:</strong> 2026-08-13 (overnight autonomous sweep);
+follow-ups re-verified 2026-08-14</li>
 <li><strong>Tier:</strong> Exhaustive — all four roles tested end to end
 through the real UI</li>
 <li><strong>Mode:</strong> Full browse + deep QA with fixes (per user
@@ -489,8 +490,9 @@ real form now returns 422 with "could not be read as one — re-export it"
 shown in the form; the author stays on the page and nothing is
 stored.</li>
 <li>Junk prune: after the backend rollout the public archive holds
-exactly the five published corpus papers, and the author dashboard
-exactly the seven corpus manuscripts — every live-verification leftover
+exactly the four published corpus papers (re-verified 2026-08-14:
+<code>GET /archive</code> returns 4), and the author dashboard exactly
+the seeded corpus manuscripts — every live-verification leftover
 (including the published one) is gone.</li>
 <li>Final regression browse: zero console errors on every public page
 and the author dashboard.</li>
@@ -498,10 +500,11 @@ and the author dashboard.</li>
 <h2 id="known-limitations-documented-not-fixed">Known limitations
 (documented, not fixed)</h2>
 <ul>
-<li>Unknown-paper URLs render the not-found page but the HTTP status
-stays 200 — the streaming shell (loading.tsx) commits the status before
-the archive lookup resolves. A soft-404; crawlers handle these, readers
-never see the difference.</li>
+<li><del>Unknown-paper URLs render the not-found page but the HTTP
+status stays 200</del> — <strong>fixed after this sweep</strong>: the
+loading boundary was removed from the paper segment so the render blocks
+on the archive lookup and an unknown tracking code now returns a genuine
+HTTP 404 (re-verified 2026-08-14).</li>
 <li>The withdrawn QA manuscript (SDJ-2026-174588) demonstrates the
 WITHDRAWN state in the author dashboard until the next prune removes
 it.</li>

@@ -5,11 +5,12 @@ Journal (SDJ), published by the College of Basic and Applied Sciences, Universit
 **Document:** 06 — Testing report
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Assessor:** Prof. Solomon Mensah
-**Date:** 2026-08-12
+**Date:** 2026-08-12, revised 2026-08-14 against the running system
 **Status:** Authoritative. Every figure in this document was produced by running the commands
-it cites — `make check`, `make integration`, and a live session against the deployed
-frontend — on 2026-08-12, and is reproducible by running the same commands against the same
-commit. Where a figure could not be produced this way, that is stated rather than estimated.
+it cites — `make check`, `make integration`, `npx vitest run`, and a live session against the
+deployed frontend — and is reproducible by running the same commands against the same commit;
+the suite counts are from the CI run named in section 3. Where a figure could not be produced
+this way, that is stated rather than estimated.
 
 **System under test**
 Frontend: `https://ugjcs-frontend.vercel.app` · API: `https://tsxsbf9rzp.us-east-1.awsapprunner.com`
@@ -48,7 +49,7 @@ different way and needs a different kind of test to catch it.
 | Static typing | mypy 2.3.0, strict mode | `[tool.mypy] strict = true`, `files = ["src","tests"]` — tests are type-checked, not only source. |
 | Architecture contracts | import-linter ≥2.13 | `.importlinter` — `domain-purity` (forbids `fastapi`, `sqlalchemy`, `pydantic`, `boto3`, `os`, `io`, `socket`, `logging`, `asyncio`, and thirteen other framework/I/O modules from `ugjcs.domain`) and `layers` (`api → infrastructure → application → domain`, dependencies point inward only). |
 | Coverage | coverage.py via `pytest-cov`, branch mode on (`[tool.coverage.run] branch = true`) | Gate at `--cov-fail-under=85`, scoped to `src/ugjcs/domain` and `src/ugjcs/application` only. |
-| Frontend unit/component tests | Vitest 4.1.10, Testing Library, jsdom | `frontend/vitest.config.ts`; 10 test files under `src/**/*.test.{ts,tsx}` covering session-cookie sealing, Route Handler validation, and component rendering (blinding, status badges, forms, keyboard operability). |
+| Frontend unit/component tests | Vitest 4.1.10, Testing Library, jsdom | `frontend/vitest.config.ts`; 20 test files under `src/**/*.test.{ts,tsx}` covering session-cookie sealing, Route Handler validation, and component rendering (blinding, status badges, forms, keyboard operability). |
 | Frontend e2e (declared, not committed) | `@playwright/test` 1.62.1, `@axe-core/playwright` 4.13.0 | Present in `package.json` as `npm run test:e2e`; no config or spec files exist yet (section 6). |
 | CI | GitHub Actions, `.github/workflows/backend-ci.yml` | Two jobs, `check` and `integration`, both gating on `push`/`pull_request` to `main`/`master`. |
 
@@ -218,7 +219,6 @@ reproducing all 486. The full set is in `backend/tests/`, one file per module un
 | Login page surfaces the RFC 9457 problem detail returned by the login Route Handler on failure (`login-page.test.tsx`) | Problem `title`/`detail` shown to the user | Confirmed | Pass |
 | Login form is fully keyboard-operable — Tab order reaches email, password, submit (`login-page.test.tsx`) | Confirmed | Confirmed | Pass |
 | `POST /api/manuscripts` Route Handler rejects an invalid body before ever calling upstream (`route.test.ts`) | Upstream not called | Not called | Pass |
-
 | Clicking a demo-account chip fills the email and leaves the password empty and focused (`login-page.test.tsx`) | Email set, password empty and focused | Confirmed | Pass |
 | A seeded address never carries across a switch to the sign-up form (`login-page.test.tsx`) | Email cleared | Cleared | Pass |
 | The prototype notice precedes the form in document order (`login-page.test.tsx`) | Notice first | Confirmed | Pass |
@@ -457,13 +457,12 @@ UAT was run as scripted, role-scoped scenarios against the **live deployment**
 |---|---|---|---|---|
 | Author login and dashboard | Navigate to `/login`, submit `author@sdj.test` / `Sdj-Author-2026!` | Redirected to `/author`, listing this author's submissions with status | Redirected to `/author`; ten submissions listed with correct tracking codes and statuses (`Published`, `Revision requested`, `Submitted`, `Under review`) | Pass |
 | Public archive reachable without authentication | Navigate to `/search` with no session | Search page renders, no login redirect | Page rendered directly, titled "Search · SDJ Editorial Portal" | Pass |
-| Cross-role access denied at the routing layer | While authenticated as `author`, navigate directly to `/editor` | Access refused, not the editor queue | Redirected to `/` (public homepage); no editor content rendered, no session state exposed on that page | Pass — matches `frontend/middleware.ts`: a session present without the required role redirects to `/`, distinct from the no-session case (section 5, next row), which redirects to `/login` |
+| Cross-role access denied at the routing layer | While authenticated as `author`, navigate directly to `/editor` | Access refused, not the editor queue | Redirected to `/`; no editor content rendered | Pass — matches `frontend/middleware.ts`: a session present without the required role redirects to `/`, distinct from the no-session case, which redirects to `/login` with the intended destination attached |
 
-The redirect-to-home behaviour on a denied role check is a deliberate design choice, not a
-UAT defect: `middleware.ts` distinguishes "no session" (→ `/login`, so the user can
-authenticate and retry) from "session present, wrong role" (→ `/`, so a legitimately
-authenticated user with insufficient privilege lands somewhere useful rather than at a bare
-error). The backend's own authorization check — exercised in section 3.4 and section 3.5 — is what is
+The redirect on a denied role check is a deliberate design choice, not a UAT defect:
+`middleware.ts` distinguishes "no session" (→ `/login`, so the user can authenticate and
+retry) from "session present, wrong role" (→ `/`, which now forwards a signed-in user to
+their own workspace — somewhere useful rather than a bare error). The backend's own authorization check — exercised in section 3.4 and section 3.5 — is what is
 actually authoritative for every state-changing action regardless of what the frontend route
 guard does; the middleware is a routing-level convenience, not the security boundary.
 
@@ -489,7 +488,7 @@ revision is not repeated for this report beyond the live checks above.
 | Editor | Attempt to schedule or publish (denied — EiC only) | `test_a_plain_editor_cannot_schedule`, `test_a_plain_editor_cannot_publish` |
 | Editor-in-Chief | Schedule an accepted manuscript into a volume/issue | `test_the_editor_in_chief_can_schedule_an_accepted_manuscript` |
 | Editor-in-Chief | Publish a scheduled manuscript | `test_the_editor_in_chief_can_publish_a_scheduled_manuscript` |
-| Administrator | (Role management — see section 6: no UI surface exists for this yet; verified only via `test_policies.py`'s `test_administrator_may_manage_users` at the policy layer) | `test_administrator_may_manage_users` |
+| Administrator | Open the accounts console at `/admin`; grant and revoke a role; set a reviewer's capacity; deactivate and reactivate an account | `test_granting_the_reviewer_role_adds_it`, `test_capacity_can_be_set_within_one_to_ten`, `test_an_administrator_can_deactivate_and_reactivate_another_account` |
 | Reader (unauthenticated) | Browse the public archive, search, download a published paper | `test_the_archive_requires_no_authentication`, `test_search_finds_a_matching_paper` |
 
 ---
@@ -529,9 +528,6 @@ revision is not repeated for this report beyond the live checks above.
   Reliable automated redaction was judged a research problem in its own right, where a bad
   redaction that leaks a name would undermine the guarantee more than not attempting
   redaction at all.
-- **Administrator role management has no UI.** The policy layer grants and denies this
-  correctly (`test_administrator_may_manage_users`), but no frontend surface exercises it, so
-  section 5's administrator row is verified only at the policy-test level, not end to end.
 
 ---
 
@@ -578,9 +574,9 @@ against a real database, 79 frontend tests, two architecture contracts, and a st
 checker catch an enormous amount of regression cheaply and continuously — exactly what section 1 claims for them, and
 exactly the floor Technical_Debt_Plan.pdf describes them as. But the register's
 own closing observation, produced independently of this report, states the same conclusion
-this section reaches from the test evidence directly: ten of its eleven entries were found by
-review of work that had already passed every automated gate — linting, strict typing, an
-architecture contract, and a full test suite at 100% coverage. Passing every gate available in
+this section reaches from the test evidence directly: every inadvertent entry in the register
+was found by review of work that had already passed every automated gate — linting, strict
+typing, an architecture contract, and a full test suite at 100% coverage. Passing every gate available in
 this project is necessary and was, in every one of these cases, not sufficient. What found the
 defects that mattered was a human, or an agent acting as one, asking whether the code was
 still true to what it claimed — and, twice in this project, whether the *deployed system*

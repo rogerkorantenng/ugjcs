@@ -4,9 +4,9 @@
 Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana
 **Document:** 03 — Effort estimation
 **Author:** Roger Koranteng Obeng, student ID 22424140
-**Date:** 2026-08-12
-**Status:** Authoritative. This document's MoSCoW cut (section 8) governs the scope of
-Plans 2–6.
+**Date:** 2026-08-12, revised 2026-08-14 against the running system
+**Status:** Authoritative. This document's MoSCoW cut (section 8) governed the scope of
+the implementation.
 
 ---
 
@@ -252,15 +252,15 @@ full system requires. The estimate therefore governs scope in two ways: it force
 MoSCoW cut (below), and it forces an explicit reckoning with the fact that the
 build method itself — not just the schedule — has to absorb that gap (section 9).
 
-### 8.1 MoSCoW cut — authoritative scope for Plans 2–6
+### 8.1 MoSCoW cut — the authoritative scope
 
 | Priority | Use cases | Decision |
 |---|---|---|
 | Must | UC1–UC18 | Implemented to production quality |
-| Should | UC19–UC23 | Implemented only if Plans 2–5 complete early |
+| Should | UC19–UC23 | Implemented only if Must-have work completes early |
 | Could | UC24, UC25 | Deferred; entered in the technical debt register |
 
-This table is authoritative: Plans 2–6 treat it as the ranked scope contract.
+This table is authoritative: the implementation treats it as the ranked scope contract.
 Should-have items are attempted only after every Must-have item is complete to
 production quality and time remains; Could-have items are not attempted within
 the 48-hour window under any circumstance and are recorded as deferred
@@ -339,7 +339,9 @@ Four things follow from that:
   infrastructure ~1), used only as the COCOMO II sizing input.
 - Managed AWS services (ECS, RDS, S3, CloudFront) are used rather than
   self-hosted equivalents, which is why the COCOMO II `FCIL` (facilities)
-  multiplier is favourable at 0.87.
+  multiplier is favourable at 0.87. (The deployed topology later substituted
+  App Runner for ECS/CloudFront — recorded as TD-14; the multiplier's premise,
+  managed rather than self-hosted, held.)
 - Seed data is synthetic; no real SDJ submissions or reviewer data
   are used.
 
@@ -355,73 +357,67 @@ Four things follow from that:
   cross-team coordination overhead to pay for — and why Karner's `E7`
   (part-time staff) is rated 0: there is no part-time staff to discount for.
 
-### 10.3 Estimated versus actual
+### 10.3 Estimated versus actual — computed from the final commit history
 
-This section states the method now; the figures it produces are filled in at
-project close, once the build is complete and the commit history is final.
-Filling them in is a mechanical application of the method below, not a matter
-of judgement, so that the comparison is reproducible by a reader who was not
-present for the build.
+The method was pre-registered before the build (extract commit timestamps with
+`git log --all --format='%H %ad %s' --date=iso-strict`; partition into working
+sessions wherever consecutive commits are more than 45 minutes apart; credit
+each session `last_commit − first_commit`, floored at 15 minutes so a
+single-commit session is not counted as zero; sum). The figures below are its
+mechanical output, reproducible by any reader with the repository.
 
-**Actual hours per phase, from commit history.**
+**Actual effort.** 208 commits, from 2026-08-12 11:56 UTC to 2026-08-14 11:00
+UTC — 47 hours elapsed, inside the 48-hour window. The commits partition into
+6 working sessions totalling **16.9 session-hours**. This is time evidenced by
+commit activity; thinking and reading time between sessions is genuinely
+uncounted, so it is a floor on real effort, not an exact measure.
 
-1. Extract every commit's timestamp and message: `git log --all --format='%H
-   %ad %s' --date=iso-strict`.
-2. Partition the ordered commits into working sessions: a gap of more than 45
-   minutes between two consecutive commit timestamps starts a new session. A
-   session's duration is `last_commit_ts − first_commit_ts` within that
-   session, floored at 15 minutes so that a session containing a single
-   commit — which still represents real drafting, review and verification
-   time not evidenced by a second commit — is not credited as zero.
-3. Tag each commit to a phase (Plan 1–6, and within Plan 1 to a task) using
-   its Conventional Commit type and message, which this project's
-   implementation plans specify verbatim, task by task. Where a session
-   spans commits from more than one phase, apportion that session's
-   duration across the phases in proportion to the commit count each phase
-   contributes to the session.
-4. Sum apportioned session-hours by phase to give actual hours per phase, and
-   sum all phases to give total actual hours.
+**UCP of the delivered scope.** Recomputed by section 3's method over the use
+cases actually delivered: 19 of the 25 (all of UC1–UC18 except UC5, whose
+asynchronous-processing half was never built, and UC9, the invitation
+lifecycle; plus UC19, UC22 and UC23 from the Should set). Their weights sum to
+UUCW = 170; all six GUI actors shipped and the indexing service did not, so
+UAW = 18; `UUCP = 188`, and `UCP = 188 × 1.105 × 0.605 = 125.7` — coincidentally
+identical to the Must-have figure, because the two undelivered Must-have use
+cases (20 points) are exactly offset by the three delivered Should-have ones
+(20 points). The delivered system also carries capabilities the inventory
+never priced (article processing charges, the administrator console, decision
+certificates, anonymisation preflight, review deadlines, public provenance
+verification), so 125.7 understates delivered scope and the figure below is
+conservative.
 
-**Realised productivity factor.** `PF_actual = total actual hours ÷ UCP of the
-scope actually delivered at project close` — UCP taken from section 6's Must-have
-figure (125.7) if only Must-have use cases ship, or recomputed by the same
-method as section 3 over whichever Should-have use cases from section 8.1 are also
-delivered, if any are. This is the single figure section 9 describes as "a local
-calibration, not a general claim."
+**Realised productivity factor.** `PF_actual = 16.9 ÷ 125.7 = 0.13 h/UCP`,
+against Karner's 20 h/UCP — roughly 150× the calibrated manual rate. This is
+the figure section 9 describes as a local calibration, not a general claim: one
+project, one developer, one tool.
 
-**Variance percentage.** `Variance % = (actual hours − estimated hours) ÷
-estimated hours × 100`, computed against the Must-have UCP estimate (2,514
-hours) as the primary comparison, since that is the estimate the MoSCoW cut in
-Section 8 was built against. A secondary variance figure against the COCOMO II
-estimate (7,170 hours) is reported alongside it, since section 7 established that the
-two methods bound the same answer from different sides and a large variance
-against one without checking the other would be misleading.
+**Variance.** Against the Must-have estimate: `(16.9 − 2,514) ÷ 2,514 =
+−99.3%`. Against COCOMO II's full-system figure: −99.8%. Both variances say
+the same thing section 9 predicted in advance: the estimates correctly sized the
+problem for the method they are calibrated on, and the method changed.
 
-**Hindsight re-rating of factors.** At project close, each Technical (section 4) and
-Environmental (section 5) factor rating, and each COCOMO II scale factor and effort
-multiplier (section 7), is re-examined against what was actually observed during the
-build, and any rating that the build's evidence contradicts is flagged with
-what it should have been rated and why. Three ratings are already flagged here
-as pre-registered candidates for revision, precisely so that the hindsight
-analysis is not free to cherry-pick after the fact:
-- **`SCED` (schedule compression, COCOMO II, rated 1.43).** This penalty
-  models compression of a *manual* schedule. Whether the same penalty
-  structure applies to an AI-assisted schedule compressed to the same degree
-  is exactly the open question this project's realised PF speaks to, and is
-  revisited directly.
-- **T4 and T11 (complex internal processing and special security
-  objectives, both rated 5).** These were rated from the design
-  specification's description of the Hungarian assignment algorithm, MinHash
-  LSH similarity screening and the hash-chained audit log before any of the
-  three was implemented. Whether 5 (the maximum rating) was accurate is
-  checked against how much of the build's actual effort those three
-  subsystems consumed relative to the rest of the system.
-- **PMAT (process maturity, COCOMO II, rated 4.68).** This scale factor
-  ordinarily reflects an organisation's measured process maturity; here it
-  was rated for a solo, ungoverned final project process, which is a judgement
-  call revisited once the build's actual defect and rework rate — visible in
-  the commit history as revert or fix-up commits following a feature commit
-  — is known.
+**Hindsight re-rating of factors.** Three ratings were pre-registered before
+the build as candidates for revision, precisely so this analysis could not
+cherry-pick after the fact. The verdicts, from the final history:
+
+- **`SCED` (schedule compression, rated 1.43).** The penalty models
+  compression of a *manual* schedule, and it did not manifest here: the
+  realised build fitted the window with no compression-induced defect spike
+  (9% of commits are fixes or reverts — see PMAT below). For an AI-assisted
+  build this multiplier over-charges; a re-rating toward nominal (1.00)
+  would have moved COCOMO II meaningfully closer to the UCP figure.
+- **T4 and T11 (complex internal processing and special security objectives,
+  both rated 5).** Half borne out. The hash chain and the blinding guarantee
+  consumed real, disproportionate verification effort — the mutation-testing
+  and trigger findings in the testing report are exactly that cost being
+  paid. But the Hungarian assignment and MinHash screening the T4 rating
+  also priced were never built, so against delivered scope T4 was one notch
+  too high; 4 would have been accurate.
+- **`PMAT` (process maturity, rated 4.68).** Reasonable in hindsight: 19 of
+  208 commits (9%) are fix- or revert-typed, a low rework rate for a
+  compressed solo build, consistent with the gates (lint, strict typing,
+  architecture contracts, the test suite) doing the process work a mature
+  organisation's process would.
 
 ---
 
@@ -434,8 +430,8 @@ analysis is not free to cherry-pick after the fact:
   (section 6) follow this method.
 - Boehm, B. et al. (2000). *Software Cost Estimation with COCOMO II* — Early
   Design model, scale factors and effort multipliers (section 7) follow this method.
-- the design specification — the
-  design specification this estimate is derived from: section 5.1 supplies the
+- The design specification (repository working document) — the source this
+  estimate is derived from: section 5.1 supplies the
   functional-requirement inventory behind section 3's use cases; section 14 sets the
   estimation approach this document follows; section 15 sets the technical debt
   policy referenced in section 9; section 16 supplies the assumptions and constraints

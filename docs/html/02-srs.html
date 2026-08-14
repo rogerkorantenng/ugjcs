@@ -377,7 +377,7 @@ Specification</h1>
   <dt>Assessor</dt>
   <dd>Prof. Solomon Mensah</dd>
   <dt>Date</dt>
-  <dd>2026-08-12</dd>
+  <dd>2026-08-12, revised 2026-08-14 against the running system</dd>
   <dt>Conformance</dt>
   <dd>Adapted from IEEE 830-1998 and ISO/IEC/IEEE 29148:2018</dd>
   <dt>Status</dt>
@@ -407,11 +407,13 @@ moved twelve requirements from planned to implemented-and-tested,
 refined six to "partially implemented" with a named gap, and left eleven
 genuinely not implemented.</p>
 <p>A second revision on 2026-08-14 reconciled the document against two
-feature waves that landed after the original build. It moved eight
-further lines to implemented-and-tested, added six new requirements
-(FR-29 to FR-34) for capabilities the original set never anticipated,
-and corrected several rows that had begun to understate the system
-rather than overstate it. The current totals are in section 5.
+feature waves that landed after the original build. It moved seven
+further lines to implemented-and-tested (FR-03, FR-08, FR-11, FR-18,
+FR-19, FR-21, FR-24), upgraded FR-17 from a substring match to ranked
+full-text search and FR-28 from unbuilt to partial, added six new
+requirements (FR-29 to FR-34) for capabilities the original set never
+anticipated, and corrected several rows that had begun to understate the
+system rather than overstate it. The current totals are in section 5.
 Requirement identifiers, MoSCoW priorities and the sections neither
 revision touched are unchanged from the original.</p>
 <hr />
@@ -598,7 +600,7 @@ which are not built at all.</p>
 <p>Four things named in the original design remain unbuilt: OAI-PMH
 harvesting (FR-22), similarity screening (FR-20), notifications of any
 kind, and asynchronous post-upload processing. Redis and an ARQ worker
-were designed for that last one (design specification Section 7) but are
+were designed for that last one (design specification section 7) but are
 absent from the delivered codebase, and nothing in the current system
 depends on them; FR-20 is the requirement that would have used them.
 Terraform-managed ECS/ALB/CloudFront was the original deployment design,
@@ -611,31 +613,30 @@ self-service author registration.</p>
 <h3 id="22-product-functions--summary">2.2 Product functions —
 summary</h3>
 <ul>
-<li><p>Register, authenticate and authorise users under five roles,
-several of which one account may hold concurrently.</p></li>
-<li><p>Accept manuscript submissions, validate and process them
-asynchronously, and produce an anonymised derivative for
-reviewers.</p></li>
-<li><p>Screen submissions and route them to review, revision, or desk
-rejection.</p></li>
-<li><p>Recommend reviewers by expertise match, exclude conflicts,
-balance workload, and let the editor accept, reject or override every
-recommendation.</p></li>
-<li><p>Collect structured, double-blind reviews and aggregate them into
-an editorial decision once a quorum is met.</p></li>
-<li><p>Support revision rounds between author and editor.</p></li>
-<li><p>Compose issues from accepted manuscripts and publish them to a
-public archive.</p></li>
-<li><p>Serve the archive to anonymous readers with full-text search,
-citation export and OAI-PMH harvesting.</p></li>
-<li><p>Record every editorial event in a tamper-evident, append-only
-log.</p></li>
-<li><p>Bill and settle an article processing charge once a paper is
-accepted.</p></li>
-<li><p>Administer accounts, roles, reviewer capacity and activation from
-a console.</p></li>
-<li><p>Let anyone verify a published paper's editorial history against a
-tamper-evident chain.</p></li>
+<li>Register, authenticate and authorise users under five roles, several
+of which one account may hold concurrently.</li>
+<li>Accept manuscript submissions, validate and process them
+asynchronously, and produce an anonymised derivative for reviewers.</li>
+<li>Screen submissions and route them to review, revision, or desk
+rejection.</li>
+<li>Recommend reviewers by expertise match, exclude conflicts, balance
+workload, and let the editor accept, reject or override every
+recommendation.</li>
+<li>Collect structured, double-blind reviews and aggregate them into an
+editorial decision once a quorum is met.</li>
+<li>Support revision rounds between author and editor.</li>
+<li>Compose issues from accepted manuscripts and publish them to a
+public archive.</li>
+<li>Serve the archive to anonymous readers with full-text search,
+citation export and OAI-PMH harvesting.</li>
+<li>Record every editorial event in a tamper-evident, append-only
+log.</li>
+<li>Bill and settle an article processing charge once a paper is
+accepted.</li>
+<li>Administer accounts, roles, reviewer capacity and activation from a
+console.</li>
+<li>Let anyone verify a published paper's editorial history against a
+tamper-evident chain.</li>
 </ul>
 <p><em>This list states intended product scope. It is not a claim that
 every bullet is built. Section 5's traceability matrix is the
@@ -707,7 +708,7 @@ configuration</td>
 </table></div>
 <p>A single account may hold multiple roles simultaneously (design
 specification section 3); this is a deliberate design choice with a
-direct security consequence recorded in section 4.3 and Section 7 (an
+direct security consequence recorded in section 4.3 and section 7 (an
 Author–Reviewer dual-role holder is not currently prevented from
 reviewing their own manuscript).</p>
 <h3 id="24-operating-environment">2.4 Operating environment</h3>
@@ -758,9 +759,9 @@ suffices; reviewers participate without incentive mechanisms; SDJ's
 corpus scale is hundreds, not millions, of papers, justifying Postgres
 full-text search over a dedicated search engine; authors submit PDFs; a
 single transactional email provider is available. Dependencies: AWS
-managed services (ECS, RDS, S3, CloudFront), Vercel, and a transactional
-email provider must remain available and within free/low-cost tier
-limits for the system to operate as specified.</p>
+managed services (App Runner, RDS, S3, Secrets Manager), Vercel, and a
+transactional email provider must remain available and within
+free/low-cost tier limits for the system to operate as specified.</p>
 <hr />
 <h2 id="3-specific-requirements">3. Specific requirements</h2>
 <p>Each functional requirement is stated as "the system shall …", is
@@ -1493,7 +1494,7 @@ content checksum and asserting no duplicate side effect</td>
 </tbody>
 </table></div>
 <h4 id="availability">Availability</h4>
-<div class="tablewrap"><table><colgroup><col style="width:12.6%" /><col style="width:45.63%" /><col style="width:41.77%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:11.32%" /><col style="width:41.0%" /><col style="width:47.68%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1506,8 +1507,9 @@ content checksum and asserting no duplicate side effect</td>
 <td>NFR-11</td>
 <td>The service exposes liveness and readiness probes; unhealthy tasks
 are replaced automatically.</td>
-<td>Deployment verification against the ECS service's health-check
-configuration</td>
+<td>Deployment verification against App Runner's health-check
+configuration, which polls <code>/health</code> and replaces an
+unresponsive instance</td>
 </tr>
 </tbody>
 </table></div>
@@ -1792,7 +1794,7 @@ Editor.</p>
 that also depend on the actor's relationship to a specific manuscript,
 and the policy module's own docstring for the one action
 (<code>REVIEW</code>) that is deliberately under-specified today.</p>
-<div class="tablewrap"><table><colgroup><col style="width:19.46%" /><col style="width:20.38%" /><col style="width:20.38%" /><col style="width:9.96%" /><col style="width:11.82%" /><col style="width:17.99%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:17.73%" /><col style="width:18.58%" /><col style="width:18.58%" /><col style="width:9.08%" /><col style="width:10.77%" /><col style="width:25.26%" /></colgroup>
 <thead>
 <tr>
 <th>Action</th>
@@ -1883,8 +1885,10 @@ TD-02)</em></td>
 <td>—</td>
 <td>Yes</td>
 <td>Yes</td>
-<td>— <em>(role grant exists; no route reaches it — section 5,
-FR-19)</em></td>
+<td>— <em>(gates <code>GET /editorial/analytics</code> and
+<code>GET /editorial/reviewer-performance</code>; the audit chain itself
+is additionally surfaced publicly via
+<code>GET /archive/{code}/provenance</code> — FR-19, FR-24)</em></td>
 </tr>
 <tr>
 <td><code>WITHDRAW</code> <em>(FR-25a)</em></td>
@@ -1966,7 +1970,7 @@ built and tested but a named, specific piece is missing — never "mostly
 done" without saying what the remainder is); <strong>Not
 implemented</strong> (no code exists for this requirement's behaviour,
 stated as such rather than described euphemistically).</p>
-<div class="tablewrap"><table><colgroup><col style="width:8.45%" /><col style="width:8.45%" /><col style="width:22.1%" /><col style="width:26.67%" /><col style="width:34.33%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:8.44%" /><col style="width:8.44%" /><col style="width:22.05%" /><col style="width:26.94%" /><col style="width:34.13%" /></colgroup>
 <thead>
 <tr>
 <th>FR</th>
@@ -1981,21 +1985,25 @@ stated as such rather than described euphemistically).</p>
 <td>FR-01</td>
 <td>UC1</td>
 <td><code>application/identity.py</code>
-(<code>RegistrationService</code>) — account creation, email
-verification token issue and redemption</td>
+(<code>RegistrationService</code>); <code>api/routers/auth.py</code>
+(<code>POST /auth/register</code>); frontend
+<code>app/login/page.tsx</code> (sign-up tab)</td>
 <td><code>test_identity.py</code>:
 <code>test_registering_creates_an_unverified_account_and_sends_one_message</code>,
 <code>test_a_valid_verification_token_verifies_the_account</code>,
 <code>test_a_verification_token_cannot_be_replayed</code>,
-<code>test_registering_an_existing_email_raises_and_sends_no_second_message</code></td>
-<td><strong>Partially implemented.</strong> The service layer is fully
-built and tested, including duplicate-email and replay handling. But no
-<code>/auth/register</code> route exists (absent from the live
-<code>/openapi.json</code>) and the frontend has no registration screen
-— only <code>/login</code>. Accounts in the deployed system are
-provisioned by seed data (the judge accounts in Testing_Report.pdf
-section 5), not self-registration. Missing: the API route and the
-frontend form that would call it.</td>
+<code>test_registering_an_existing_email_raises_and_sends_no_second_message</code>;
+<code>test_auth_router.py</code>:
+<code>test_registering_creates_a_verified_author_and_signs_in</code></td>
+<td><strong>Partially implemented.</strong> Self-service registration
+now exists end to end — route, sign-up form, duplicate-email and replay
+handling all tested (see also FR-34). The named remainder is the
+verify-before-usable clause: because email delivery is mocked
+(<code>LoggingEmailSender</code> logs the link rather than sending it),
+the deployed configuration verifies an account immediately at
+registration. The token issue/redemption machinery is built and tested,
+but no deployed account has ever had to follow a verification link
+before signing in.</td>
 </tr>
 <tr>
 <td>FR-02</td>
@@ -2017,21 +2025,27 @@ family revocation) against a real database.</td>
 <tr>
 <td>FR-03</td>
 <td>UC3</td>
-<td><code>domain/policies.py</code> (<code>Action.MANAGE_USERS</code>,
-granted to <code>Administrator</code>);
+<td><code>domain/policies.py</code> (<code>Action.MANAGE_USERS</code>);
+<code>api/routers/admin.py</code>
+(<code>POST /admin/accounts/{id}/roles</code>);
 <code>infrastructure/db/account_repository.py</code> (role grant/revoke
-persistence)</td>
-<td><code>test_policies.py</code> (grant); integration
-<code>test_account_repository.py</code>:
+persistence); frontend <code>app/admin/page.tsx</code></td>
+<td><code>test_admin_router.py</code>:
+<code>test_granting_the_reviewer_role_adds_it</code>,
+<code>test_revoking_a_held_role_removes_it</code>,
+<code>test_every_admin_route_is_forbidden_to_non_administrators</code>;
+integration <code>test_account_repository.py</code>:
 <code>test_granting_a_role_and_saving_persists_it</code>,
-<code>test_revoking_a_role_and_saving_removes_it</code></td>
-<td><strong>Partially implemented.</strong> The authorisation grant and
-the persistence of a role change are both implemented and tested against
-a real database. No <code>/admin</code> API route or frontend screen
-exists to let an Administrator invoke this — confirmed absent from
-<code>/openapi.json</code> and from <code>frontend/src/app/</code>, and
-stated explicitly in Testing_Report.pdf section 5: "no UI surface exists
-for this yet."</td>
+<code>test_revoking_a_role_and_saving_removes_it</code>; integration
+<code>test_refresh_rotation.py</code>:
+<code>test_roles_revoked_after_a_token_was_issued_take_effect_immediately</code></td>
+<td><strong>Implemented &amp; tested.</strong> This row previously
+recorded that no <code>/admin</code> route or screen existed; the
+administrator console (FR-30) closed that. Roles are granted and revoked
+through the API and the console, an account may hold several
+concurrently, and a revocation takes effect on the next request even for
+tokens issued before it — the acceptance criterion's hardest clause,
+proven against a real database.</td>
 </tr>
 <tr>
 <td>FR-04</td>
@@ -2330,7 +2344,7 @@ frontend <code>app/(public)/search/page.tsx</code></td>
 <code>test_a_missing_or_unreadable_document_never_blocks_publishing</code>;
 integration <code>test_fulltext_search.py</code>,
 <code>test_archive_queries.py</code></td>
-<td><strong>Implemented &amp; tested.</strong> Search is PostgreSQL
+<td><strong>Partially implemented.</strong> Search is PostgreSQL
 full-text over a stored <code>tsvector</code> covering title, abstract,
 keywords and the extracted body text of the published PDF, ranked by
 <code>ts_rank</code>, with <code>ts_headline</code> snippets returned
@@ -2695,7 +2709,7 @@ estimation section 3)</em></td>
 <td><code>test_editorial_analytics.py</code>:
 <code>test_reviewer_performance_reports_workload_and_turnaround_per_reviewer</code>,
 <code>test_a_reviewer_may_not_read_reviewer_performance</code></td>
-<td><strong>Implemented &amp; tested.</strong> Per reviewer: active
+<td><strong>Partially implemented.</strong> Per reviewer: active
 assignments against capacity, reviews completed, average turnaround in
 days, and last activity. Turnaround and last activity are
 <code>null</code> until a first review completes, for the same reason
@@ -2708,13 +2722,13 @@ anything to compute a rate from.</td>
 </tbody>
 </table></div>
 <p><strong>Reading this matrix honestly.</strong> Of the 35 requirement
-lines (FR-01 to FR-34 plus FR-25a), <strong>24 are implemented and
-tested end to end</strong> (FR-02, FR-04, FR-05, FR-06, FR-07, FR-08,
-FR-09, FR-11, FR-12, FR-13, FR-15, FR-16, FR-18, FR-19, FR-21, FR-24,
-FR-25, FR-25a, FR-29 to FR-34), <strong>5 are partially implemented with
-a specifically named remainder</strong> (FR-01, FR-03, FR-14, FR-17,
-FR-28), and <strong>6 are genuinely not implemented</strong> (FR-10,
-FR-20, FR-22, FR-23, FR-26, FR-27).</p>
+lines (FR-01 to FR-34 plus FR-25a), <strong>25 are implemented and
+tested end to end</strong> (FR-02 to FR-09, FR-11, FR-12, FR-13, FR-15,
+FR-16, FR-18, FR-19, FR-21, FR-24, FR-25, FR-25a, FR-29 to FR-34),
+<strong>4 are partially implemented with a specifically named
+remainder</strong> (FR-01, FR-14, FR-17, FR-28), and <strong>6 are
+genuinely not implemented</strong> (FR-10, FR-20, FR-22, FR-23, FR-26,
+FR-27).</p>
 <p>FR-10, the reviewer invitation lifecycle, is the absence that
 propagates furthest: because no reviewer can decline, FR-28 cannot
 report an acceptance rate, and an assignment takes effect the moment it
@@ -2777,14 +2791,10 @@ built, not the <em>order</em> in which layers within a use case are
 built, and a hexagonal architecture's domain core is the natural first
 layer to complete and verify in isolation (design specification section
 7.1). That sequencing has since played out as intended: section 5's
-revised traceability matrix shows the API and frontend layers have
-caught up for most of the Must-have set (12 of 29 requirement lines
-implemented and tested end to end, domain through frontend). Where a gap
-remains within the Must-have set — FR-08's reviewer matching and FR-19's
-audit-trail route being the clearest examples — it is a gap in a
-specific layer or route, not evidence that an entire layer was skipped;
-section 5 states each one by name rather than folding them back into a
-single "still catching up" claim.</p>
+matrix now shows 25 of 35 requirement lines implemented and tested end
+to end, domain through frontend, with every Must-have gap that remains
+(FR-10's invitation lifecycle being the clearest) named individually
+rather than folded into a single "still catching up" claim.</p>
 <hr />
 <h2 id="7-constraints-and-limitations">7. Constraints and
 limitations</h2>
@@ -2820,10 +2830,11 @@ forged event appended through the legitimate API, or a wholly fabricated
 history rebuilt from the genesis hash, are <strong>undetectable by the
 application alone</strong> — there is no periodically published,
 independently held checkpoint to compare against
-(<strong>TD-04</strong>, scheduled). Deployment did not change this: no
-checkpoint-publishing mechanism was added, and — see FR-19 above — there
-is currently no API route at all through which anyone could view the
-chain to notice tampering even if the chain itself remained sound.</li>
+(<strong>TD-04</strong>, scheduled). The chain is, however, now publicly
+inspectable: <code>GET /archive/{code}/provenance</code> (FR-19) lets
+anyone recompute a published paper's chain and check its head hash,
+which is the precondition for the external checkpointing TD-04 calls for
+— the route exists; the independently held checkpoint does not.</li>
 <li><strong>A reviewer's conflict of interest is not checked by the
 authorisation layer — and this is now a live gap, not a theoretical
 one.</strong> <code>Action.REVIEW</code> is granted to any actor holding
@@ -2880,13 +2891,6 @@ assignment is usable by the reviewer immediately on creation; the
 <code>INVITED</code>/<code>ACCEPTED</code>/<code>DECLINED</code>, but
 nothing in the delivered code writes or reads those states, and no route
 lets a reviewer decline. See section 5, FR-10.</li>
-<li><strong>A published paper cannot be downloaded by an anonymous
-reader (FR-18).</strong> Document storage, upload, and authenticated
-download all exist (FR-04/FR-06), but no public, unauthenticated route
-serves a published manuscript's PDF, and the public paper page has no
-download link. This is the one gap this revision found that was not
-previously recorded anywhere in this project's documentation — see
-section 5, FR-18.</li>
 <li><strong>AWS access currently uses root credentials.</strong> The
 toolchain authenticates as the AWS account root user rather than a
 least-privilege IAM principal (<strong>TD-01</strong>, critical).
@@ -2919,8 +2923,8 @@ reported to the caller on every initialisation rather than
 inferred.</li>
 <li><strong>Requirements traceability reflects the finished system, not
 the pre-implementation build.</strong> section 5 of this document,
-re-reconciled against the running code on 2026-08-14, shows 24 of 35
-requirement lines implemented and tested end to end, 5 partially
+re-reconciled against the running code on 2026-08-14, shows 25 of 35
+requirement lines implemented and tested end to end, 4 partially
 implemented with a named remainder, and 6 genuinely not implemented. The
 matrix has now been revised twice against the code rather than against
 intent, and both revisions moved lines in both directions: the second

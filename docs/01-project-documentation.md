@@ -4,7 +4,7 @@
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Assessor:** Prof. Solomon Mensah
 **Course:** Advanced Software Engineering — individual final project
-**Date:** 2026-08-12
+**Date:** 2026-08-12, revised 2026-08-14 against the running system
 **Live system:** `https://ugjcs-frontend.vercel.app` · API `https://tsxsbf9rzp.us-east-1.awsapprunner.com`
 **Repository:** `github.com/rogerkorantenng/ugjcs`
 **Submitted as:** `Project_Documentation.pdf`
@@ -92,10 +92,13 @@ integrity and editorial auditability enforced by the system rather than by conve
 - **O6.** Demonstrate disciplined engineering practice: estimation-driven scope, automated
   quality gates, infrastructure as code, and an explicit technical debt register.
 
-Objectives O1–O3 are demonstrably met by the delivered domain layer (section 8, section 10); O4 is partially
-met (reviewer assignment is a persistence record without matching or a conflict check — TD-02,
-TD-03); O5 is met for the archive read path; O6 is the subject of section 7, section 11 and section 12, and is, on
-the evidence in section 11.7, the objective this project delivers most convincingly.
+Objectives O1–O3 are demonstrably met by the delivered domain layer (section 8, section 10).
+O4 is largely met: candidates are ranked by expertise match, conflicts and capacity exclusions
+are shown to the editor with reasons, and the editor retains final authority — though the
+exclusion is advisory at the candidate list, not enforced at assignment (TD-02). O5 is met for
+search, download, citation export and provenance verification; OAI-PMH harvesting remains
+unbuilt. O6 is the subject of section 7, section 11 and section 12, and is, on the evidence in
+section 11.7, the objective this project delivers most convincingly.
 
 ---
 
@@ -176,7 +179,7 @@ the delivered system (section 10.4).
 
 | Category | Count | Priority split |
 |---|---|---|
-| Functional requirements | 34 (FR-01…FR-34) + FR-25a | 19 Must, 12 Should, 3 Could |
+| Functional requirements | 34 (FR-01…FR-34) + FR-25a | 19 Must, 11 Should, 4 Could |
 | Non-functional requirements | 17 (NFR-01…NFR-17) | Security (6), Integrity (1), Performance (2), Reliability (1), Availability (1), Usability (1), Maintainability (2), Observability (1), Portability (1), Compliance (1) |
 
 FR-29 to FR-34 cover capabilities the first requirement set never anticipated: article
@@ -211,7 +214,7 @@ structured reviews, public document download, audit-chain exposure, citation exp
 analytics as unbuilt when all six had shipped. A matrix that understates the system is as
 much a defect as one that overstates it.
 
-Current totals: 24 of 35 requirement lines implemented and tested end to end, 5 partially
+Current totals: 25 of 35 requirement lines implemented and tested end to end, 4 partially
 implemented with a named remainder, 6 unbuilt. API_Contract.pdf and
 Testing_Report.pdf are the authorities on what is reachable by route and proven by
 test; section 10.4 reconciles the three.
@@ -423,7 +426,7 @@ absent from the serialised projection for every generated title/abstract/keyword
 (testing report section 3.2), and by sentinel-based leak tests over every reviewer-facing endpoint
 (testing report section 3.5). The documented limit — `title`, `abstract` and `keywords` are copied
 **verbatim**, so self-identifying text in the body is not scrubbed — is TD-05 and is restated in
-Section 17.
+section 17.
 
 ### 8.5 The hash-chained audit log
 
@@ -452,10 +455,11 @@ this at the database layer for `UPDATE`/`DELETE`; a second, statement-level trig
 ### 8.6 Data model — entity-relationship diagram
 
 The tables below are the delivered PostgreSQL schema (`backend/src/ugjcs/infrastructure/db/models.py`),
-not the fuller schema sketched in the design specification (section 8 of that document) — `reviews`,
-`editorial_decisions`, `issues`, `issue_papers`, `similarity_reports`, `notifications` and a
-dedicated roles table are specified there but not present in the delivered database; roles are a
-`user_roles` join table, and the review outcome is folded into `review_assignments`.
+not the fuller schema sketched in the design specification (section 8 of that document) —
+`editorial_decisions`, `issues`, `issue_papers`, `similarity_reports` and `notifications` are
+specified there but not present in the delivered database; roles are a `user_roles` join
+table, and the review outcome (four criterion scores and two comment channels) is folded into
+`review_assignments` rather than a separate `reviews` table.
 
 ```mermaid
 erDiagram
@@ -464,6 +468,7 @@ erDiagram
     MANUSCRIPTS ||--o{ MANUSCRIPT_AUTHORS : "has"
     MANUSCRIPTS ||--o{ EDITORIAL_EVENTS : "audit trail"
     MANUSCRIPTS ||--o{ REVIEW_ASSIGNMENTS : "has"
+    MANUSCRIPTS ||--o| APC_INVOICES : "billed by"
 
     USERS {
         uuid id PK
@@ -504,6 +509,7 @@ erDiagram
         uuid issue_id
         string original_document_key
         string anonymised_document_key
+        text fulltext
     }
     MANUSCRIPT_AUTHORS {
         uuid manuscript_id PK, FK
@@ -516,9 +522,24 @@ erDiagram
         uuid reviewer_id
         string status
         string recommendation
-        text comments
+        int originality_score
+        int rigour_score
+        int clarity_score
+        int significance_score
+        text comments_to_author
+        text confidential_comments_to_editor
         timestamptz assigned_at
+        timestamptz due_at
         timestamptz submitted_at
+    }
+    APC_INVOICES {
+        uuid id PK
+        uuid manuscript_id FK
+        int amount_pesewas
+        string status
+        text paystack_reference
+        timestamptz created_at
+        timestamptz settled_at
     }
     EDITORIAL_EVENTS {
         uuid manuscript_id PK, FK
@@ -531,6 +552,10 @@ erDiagram
         string event_hash
     }
 ```
+
+`manuscripts.fulltext` holds the text extracted from the published PDF and is indexed by a
+stored `tsvector` for ranked full-text search; `apc_invoices` holds one article processing
+charge per accepted manuscript, in integer pesewas.
 
 **A design note worth stating rather than glossing over:** `manuscript_authors.author_id` and
 `review_assignments.reviewer_id` are plain `UUID` columns, not declared foreign keys to `users.id`
@@ -708,7 +733,7 @@ sequenceDiagram
 This flow is exercised end to end by the acceptance script in testing report section 5, and the
 `schedule`/`publish` steps are the specific ones that were, for a period, implemented and
 unit-tested but reachable by no route — the finding retold in section 11.4 and cross-referenced from
-Section 10.4.
+section 10.4.
 
 ### 9.5 Deployment topology
 
@@ -733,35 +758,31 @@ alongside its discrepancy from the design specification (TD-14) rather than twic
 
 ### 10.2 What is implemented, by layer
 
-**Domain** (`backend/src/ugjcs/domain/`, 812 lines across 11 modules) — complete: the manuscript
-lifecycle, RBAC policy, the double-blind projection, the hash chain, the account aggregate,
-typed identifiers. This is the layer with no external dependency and the highest test confidence
-(section 11).
+**Domain** (`backend/src/ugjcs/domain/`, 863 lines across 12 modules) — complete: the manuscript
+lifecycle, RBAC policy, the double-blind projection, the hash chain, conflict-of-interest
+reasoning, the account aggregate, typed identifiers. This is the layer with no external
+dependency and the highest test confidence (section 11).
 
-**Application** (`backend/src/ugjcs/application/`, 487 lines) — port protocols (`ports.py`, 236
-lines), identity-related use-case orchestration (`identity.py`, 186 lines) and document handling
-(`documents.py`, 65 lines).
+**Application** (`backend/src/ugjcs/application/`) — port protocols (`ports.py`), registration
+and identity orchestration, document validation, and citation/DOI derivation (`scholarly.py`).
 
 **Infrastructure** (`backend/src/ugjcs/infrastructure/`) — SQLAlchemy repositories and unit of
-work (`infrastructure/db/`), an S3-backed document store with a demo-PDF generator for seeding
-(`infrastructure/storage/`), Argon2 password hashing and JWT issuance
-(`infrastructure/security/`), and a logging-only email sender
-(`infrastructure/email/logging_sender.py` — no live transactional provider is wired in this
-build, a limitation restated in section 17).
+work (`db/`), an S3-backed document store with PDF anonymisation, preflight inspection,
+full-text extraction and certificate generation (`storage/`), Argon2 password hashing and JWT
+issuance (`security/`), and a logging-only email sender (`email/logging_sender.py` — no live
+transactional provider is wired in this build, a limitation restated in section 17).
 
-**API** (`backend/src/ugjcs/api/`, 966 lines) — five routers (`auth`, `manuscripts`, `editorial`,
-`reviews`, `archive`), RFC 9457 error mapping (`errors.py`), and the composition-root wiring
-(`wiring.py`) that binds concrete adapters to the application's port protocols. This layer, and
-the frontend below it, are what SRS section 5 (written earlier in the project) records as "Planned" —
-Section 10.4 reconciles that.
+**API** (`backend/src/ugjcs/api/`) — nine routers (`auth`, `manuscripts`, `editorial`,
+`certificate`, `reviews`, `archive`, `billing`, `admin`, `people`) serving 43 routes, RFC 9457
+error mapping (`errors.py`), and the composition-root wiring (`wiring.py`) that binds concrete
+adapters to the application's port protocols.
 
-**Frontend** (`frontend/src/app/`) — a public route group (`(public)/search`, `(public)/papers`)
-requiring no authentication, and role-scoped authenticated routes (`author/`, `author/submit/`,
-`author/[trackingCode]/`, `editor/`, `editor/[trackingCode]/`, `reviewer/`,
-`reviewer/[trackingCode]/`, `login/`), plus a `frontend/src/app/api/**` BFF layer mirroring the
-backend's resource groups. There is no dedicated Administrator UI — role management is verified
-only at the policy-test level (testing report section 5, section 6), consistent with FR-03's grant existing in
-`policies.py` without a corresponding administration screen.
+**Frontend** (`frontend/src/app/`) — the sign-in landing page with self-service author
+registration; a public route group (`search`, `papers`, `about`, `for-authors`,
+`for-reviewers`) requiring no authentication; role-scoped workspaces for author, reviewer,
+editor (including an analytics dashboard) and administrator (`admin/`, the accounts console);
+and a `frontend/src/app/api/**` BFF layer mirroring the backend's resource groups. A role-aware
+onboarding tour introduces each workspace on first sign-in.
 
 ### 10.3 Domain code, as evidence rather than assertion
 
@@ -771,35 +792,18 @@ names. The same discipline extends to the authorisation layer (section 8.3) and 
 (section 8.4): every mechanism described in this section has a named module, and every claim about its
 behaviour is backed by a named test in Testing_Report.pdf.
 
-### 10.4 Reconciling three documents that were written at different points in the build
+### 10.4 Keeping the documents true to the code
 
-This consolidation surfaced a genuine discrepancy between three of its own source documents,
-stated here rather than resolved silently in one direction, consistent with section 6.3's handling of
-the SRS-versus-specification lifecycle disagreement:
-
-- **SRS.pdf section 5** (earliest) records almost the entire functional requirement set as
-  "Planned," on the stated grounds that no `api/` directory and no frontend existed in the
-  repository at the time it was written.
-- **API_Contract.pdf** (written once the API and frontend existed) documents a working
-  `/auth`, `/manuscripts`, `/editorial`, `/reviews` and `/archive` surface — but explicitly states
-  that `Action.PUBLISH`/`Manuscript.schedule`/`Manuscript.publish` have **no corresponding
-  route**: "publication into the archive happens outside the HTTP boundary this plan builds."
-- **Testing_Report.pdf section 3.4 and section 4.5** (latest) records passing system tests named
-  `test_the_editor_in_chief_can_schedule_an_accepted_manuscript` and
-  `test_the_editor_in_chief_can_publish_a_scheduled_manuscript`, and states directly that these
-  two routes, along with manuscript resubmission, were **added after** being found reachable by no
-  route during manual use of the deployed system.
-
-Read together rather than in isolation, these three documents describe the same system at three
-successive points in its build, not three inconsistent descriptions of one static state: the SRS
-predates the API layer; the API contract predates the schedule/publish routes; the testing report
-postdates their addition and is the most current account of what the deployed system can do. This
-document treats the testing report as authoritative on current reachability, the API contract as
-authoritative on wire format for the routes it does describe, and the SRS as authoritative on
-requirement *content and traceability method* rather than current build status. A reader
-integrating all three should not conclude either that publication is unreachable (05, superseded)
-or that the majority of FRs remain unbuilt (02 section 5, superseded) — section 11.4's account of finding and
-closing that exact gap is the more current and more informative story.
+The SRS, the API contract and the testing report were each written at a different point in the
+build, and each drifted from the code in a different direction as the system grew: the SRS at
+one point recorded most requirements as "Planned" after the API already existed, and later
+recorded expertise matching and full-text search as unbuilt after both had shipped; the API
+contract once stated that publication had no route, days before that route was added. All
+three were reconciled against the running code before submission — the route tables were
+regenerated from the router modules, and the traceability matrix was re-verified row by row.
+Where any residual disagreement is found, the code governs, the testing report is
+authoritative on current behaviour, and the disagreement is recorded rather than silently
+resolved (the same rule section 6.3 applies to the lifecycle diagram).
 
 ---
 
@@ -873,7 +877,7 @@ both state it directly rather than let it sit implicit in a defect table.
 Run as scripted, role-scoped scenarios against the live deployment
 (`https://ugjcs-frontend.vercel.app`, backed by `https://tsxsbf9rzp.us-east-1.awsapprunner.com`),
 with five named judge accounts (author, reviewer, editor, editor-in-chief, administrator — see
-Section 14). Three scenarios were exercised live for the testing report (author login and dashboard,
+section 14). Three scenarios were exercised live for the testing report (author login and dashboard,
 unauthenticated archive access, cross-role access denial redirecting to `/` rather than `/login`
 — a deliberate distinction in `frontend/middleware.ts`); the remaining role-scoped scenarios are
 documented against their automated backstop test.
@@ -909,7 +913,7 @@ draws out its methodological finding.
 
 | Priority | Count | Entries |
 |---|---|---|
-| Critical | 3 | TD-01, TD-02, TD-03 |
+| Critical | 4 | TD-01, TD-02, TD-03, TD-15 |
 | Scheduled | 6 | TD-04, TD-05, TD-06, TD-07, TD-08, TD-14 |
 | Acceptable | 3 | TD-09, TD-10, TD-11 |
 | Resolved, retained as a record | 2 | TD-12, TD-13 |
@@ -921,6 +925,7 @@ draws out its methodological finding.
 | TD-01 | AWS access uses root account credentials | Cannot be scoped, rotated, or revoked without disrupting the whole account; compromise is unrecoverable within it. Mitigated: root keys are used only from the developer's workstation, never stored as a CI secret |
 | TD-02 | `Action.REVIEW` is granted on the `REVIEWER` role alone, with no per-manuscript predicate | An Author–Reviewer dual-role holder is not prevented from reviewing their own work — the central conflict-of-interest failure for a double-blind journal |
 | TD-03 | Submitted reviews are counted, not identity-checked against an accepted assignment | One reviewer calling submit twice reaches quorum alone and can close a review round unilaterally |
+| TD-15 | `GET /people/lookup` has no rate limiting | The endpoint confirms whether an email address holds an account, so an unthrottled caller can enumerate addresses |
 
 ### 12.3 Scheduled — accepted now, with a named repayment point
 
@@ -946,15 +951,19 @@ draws out its methodological finding.
 TD-12 (a UTC-offset timestamp representation would have produced a false tamper alert) and TD-13
 (`TRUNCATE` bypassed the row-level append-only trigger) are both closed, but kept in the register
 rather than deleted, because the *class* of defect — and how each was found — is the point (section 12.6,
-Section 11.4).
+section 11.4).
 
 ### 12.6 The register's own conclusion, and this document's central finding
 
-Technical_Debt_Plan.pdf closes with a statement worth repeating verbatim in spirit
-rather than only citing: **ten of its fifteen entries, and every serious defect in
-Testing_Report.pdf section 4, were found by independent review of code that had already passed
-every automated gate available in this project — linting, strict type checking, an architecture
-contract, and a full test suite at 100% coverage — or by a person using the running system.**
+Technical_Debt_Plan.pdf closes with a statement worth repeating in spirit rather than only
+citing: **every inadvertent entry in the register (six of its fifteen), and every serious
+defect in Testing_Report.pdf section 4, was found by independent review of code that had
+already passed every automated gate available in this project — linting, strict type checking,
+an architecture contract, and a full test suite at 100% coverage — or by a person using the
+running system.** Eight of the other nine entries are deliberate trade-offs, priced when they
+were taken — no gate was ever going to find those, because they were decisions, not oversights
+— and the ninth (TD-11) records the mutation-testing evidence for why the gates could not have
+found the rest.
 Mutation testing showed the hash chain was, for a period, unprotected by any test that would
 notice its defining property being deleted. `TRUNCATE` bypassed a trigger that had been "confirmed
 firing against a live database" against the two statement types someone thought to check.
@@ -969,9 +978,10 @@ than an inventory closed at submission.
 
 TD-01 before any further infrastructure is provisioned. TD-02, TD-03 and TD-07 are one piece of
 work — all three are consequences of reviewer assignment not existing as a first-class entity —
-and should be repaid together in the release that introduces it. TD-04 follows deployment. TD-05,
-TD-06 and TD-08 are independent and may be scheduled by convenience. TD-14 is repayable only after
-submission and is not on the pre-viva critical path.
+and should be repaid together in the release that introduces it. TD-15 is a small, independent
+fix (a rate limit on one endpoint) and can land in the same release. TD-04 follows deployment.
+TD-05, TD-06 and TD-08 are independent and may be scheduled by convenience. TD-14 is repayable
+only after submission and is not on the pre-viva critical path.
 
 ---
 
@@ -1019,7 +1029,7 @@ in the technical debt register as **TD-14**, deliberate and scheduled: provision
 ECS/ALB/CloudFront stack — a target group, listener rules, a CloudFront distribution, task
 definitions, and the IAM wiring between all of it — was measured at 4–6 hours against a 48-hour
 budget that, at the point the trade-off was made, still owed a working API, a working frontend,
-and five accompanying documents. No functional capability is lost by the substitution: App
+and the accompanying documents. No functional capability is lost by the substitution: App
 Runner supplies the identical trusted-TLS-without-a-registered-domain guarantee CloudFront was
 chosen for, over the same image, with less to operate and less to tear down. The absence of Redis
 and a worker service means the asynchronous submission-processing pipeline described in the
@@ -1039,7 +1049,7 @@ every push to the default branch.
 ### 13.5 Operating cost
 
 Targeted at USD 35–55/month against AWS and Vercel free/low-cost tiers (design specification section 13,
-Section 16). App Runner at the smallest instance size (0.25 vCPU / 0.5 GB) is a deliberate cost decision
+section 16). App Runner at the smallest instance size (0.25 vCPU / 0.5 GB) is a deliberate cost decision
 recorded directly in `infra/apprunner_service.tf`'s own comments: roughly USD 14/month against
 ~USD 57 for the next tier up, since App Runner bills provisioned capacity continuously while the
 health check keeps the instance active.
@@ -1048,70 +1058,23 @@ health check keeps the instance active.
 
 ## 14. User manual
 
-User_Manual.pdf is being written concurrently with this document and is the authoritative
-source once complete; this section summarises the system's user-facing surface directly from the
-implemented routes and roles (section 10.2, API_Contract.pdf) so that a reader has a usable
-account of "how to use the system" even before that document lands. Where the two disagree once
-User_Manual.pdf exists, that document governs.
+The authoritative, screen-by-screen manual is User_Manual.pdf, written from the live deployed
+system rather than from the source code. This section summarises the user-facing surface so
+this document is complete on its own; where the two differ, the manual governs.
 
-### 14.1 Accounts and roles
+Five roles exist, and one account may hold several at once (section 4). The demo accounts
+follow the pattern `<role>@sdj.test`; the full credential list is in
+`Deployment_and_Source_Links.txt`, and the sign-in page carries role chips that fill each
+address so an assessor types only the password.
 
-Five roles exist (`Role` enum, `domain/enums.py`): `author`, `reviewer`, `editor`,
-`editor_in_chief`, `administrator`. A single account may hold several roles at once (section 4). Judge
-accounts used for acceptance testing (testing report section 5):
-
-| Role | Account |
+| Role | What they do in the portal |
 |---|---|
-| Author | `author@sdj.test` |
-| Reviewer | `reviewer@sdj.test` |
-| Editor | `editor@sdj.test` |
-| Editor-in-Chief | `eic@sdj.test` |
-| Administrator | `admin@sdj.test` |
-
-### 14.2 As an author
-
-Log in at `/login`; the session lands on `/author`, listing your own submissions with status
-(never another author's). Submit a new manuscript at `/author/submit` with title, abstract,
-keywords and optional co-authors (JSON submission — there is no file-upload path in the delivered
-domain; see section 17). View a specific manuscript and its status at
-`/author/[trackingCode]`. If a manuscript is returned with `revision_requested`, resubmit from the
-same page; only the corresponding author may do so (`Action.RESUBMIT`, ownership-checked). A
-manuscript may be withdrawn from any of `submitted`, `under_screening`, `under_review`,
-`reviews_complete` or `revision_requested`, again corresponding-author-only.
-
-### 14.3 As a reviewer
-
-`GET /reviews/mine` (surfaced at `/reviewer/[trackingCode]`) lists only manuscripts you are
-assigned to review, in the **blinded** form: title, abstract, keywords, version and status — no
-author name, affiliation or identifier of any kind (section 8.4). Submit a recommendation and free-text
-comments; there are no per-criterion scores on the delivered wire format (a gap from the design
-specification's fuller `Review` model, noted in API_Contract.pdf section 8).
-
-### 14.4 As an editor
-
-`/editor` lists the screening queue (manuscripts in `submitted`). Screen a submission to move it
-into `under_screening`; from there, send to review, request pre-review changes, or desk-reject.
-Assign a reviewer directly by id — there is no candidate-recommendation UI in the delivered
-system (FR-08 is planned, not built; section 17). Record a decision once the review quorum is met.
-
-### 14.5 As Editor-in-Chief
-
-All Editor capability, plus scheduling an accepted manuscript into an issue and publishing it —
-both denied to a plain Editor (verified: `test_a_plain_editor_cannot_schedule`,
-`test_a_plain_editor_cannot_publish`, testing report section 3.4).
-
-### 14.6 As an Administrator
-
-Role management (`Action.MANAGE_USERS`) is granted and denied correctly at the policy layer, but
-has **no frontend surface** in this build — verified only by `test_administrator_may_manage_users`
-at the policy-test level (testing report section 5, section 6). There is no `/admin` route to walk through.
-
-### 14.7 As a reader (no account required)
-
-`/search` and `/(public)/papers` require no authentication. Browse and search published papers;
-download the original PDF of any published paper. Citation export (BibTeX/RIS) and OAI-PMH
-harvesting are specified (design specification section 10.3) but not present in the delivered API
-surface (API_Contract.pdf section 6 — no `/archive` citation-export or `/oai` route exists).
+| Reader (no account) | Browse and search the archive (full-text, ranked, with snippets), read papers, download PDFs, export BibTeX/RIS citations, verify a paper's editorial provenance against the audit chain |
+| Author | Register a new account, or sign in; submit a manuscript with a PDF (the response reports what the anonymiser removed and flags author names still in the body text); track status; resubmit on `revision_requested`; withdraw (corresponding author only); pay the article processing charge once accepted |
+| Reviewer | See only assigned manuscripts, in blinded form with no author field of any kind; read the anonymised PDF inline; submit a structured review — four 1–5 criterion scores, comments to the author, and confidential comments only an editor can read |
+| Editor | Screen the submission queue; open the expertise-ranked reviewer-candidate list, in which excluded candidates appear with their reason (shared affiliation, at capacity) rather than being hidden; assign reviewers and watch deadlines and overdue flags; read both review channels; record decisions; download the decision certificate; read the analytics dashboard |
+| Editor-in-Chief | Everything an editor can do, plus scheduling an accepted manuscript into an issue, publishing it to the archive, and waiving an article processing charge |
+| Administrator | The accounts console at `/admin`: grant and revoke roles, set reviewer capacity (1–10), deactivate accounts. The administrator role itself cannot be changed here, and self-deactivation is refused — both so the last administrator cannot lock everyone out |
 
 ---
 
@@ -1182,14 +1145,14 @@ never been exercised against a real incident.
 Drawn from the technical debt register's scheduled items and the design specification's own
 future-work section (section 17 of that document), organised by size rather than by document of origin:
 
-**Reviewer matching with expertise scoring.** The design specification (section 10.1) specifies a
-TF-IDF vocabulary over reviewer expertise and manuscript text, hard exclusions (author,
-affiliation match, prior decline, unavailability, capacity), and a Hungarian-algorithm
-(`scipy.optimize.linear_sum_assignment`) global assignment, editor-overridable. None of this is
-built; reviewer assignment today is a persistence-only record with no matching, no invitation
-lifecycle, and no conflict-of-interest check (API_Contract.pdf section 8). This is also the
-piece of work that retires TD-02, TD-03 and TD-07 together (section 12.7) — the highest-leverage single
-addition against the current debt register.
+**Reviewer assignment as a first-class entity.** The delivered candidate list already ranks by
+keyword-overlap expertise match and marks exclusions (shared affiliation, already assigned, at
+capacity) with reasons — but the exclusion is advisory, the assignment itself carries no
+invitation lifecycle (a reviewer cannot decline), and the design specification's fuller
+mechanism (TF-IDF scoring, Hungarian-algorithm global assignment) remains future work. Building
+assignment as a first-class entity is the piece of work that retires TD-02, TD-03 and TD-07
+together (section 12.7) — the highest-leverage single addition against the current debt
+register.
 
 **The asynchronous processing pipeline.** Text extraction, MinHash/LSH similarity screening
 against the internal corpus, and metadata-stripped anonymised-derivative generation, enqueued on
@@ -1197,9 +1160,9 @@ upload and keyed by content checksum for idempotency (design specification secti
 Redis/ARQ worker component that TD-14 also notes is absent from the current deployment (section 13.3) —
 these two gaps compound, and closing the deployment gap first is a precondition for this one.
 
-**OAI-PMH and citation export.** `Identify`/`ListMetadataFormats`/`ListIdentifiers`/`ListRecords`/
-`GetRecord` over Dublin Core with resumption tokens (FR-22), plus BibTeX/RIS export (FR-21) — both
-Should-have priority (section 7.4), specified, and absent from the delivered `/archive` surface.
+**OAI-PMH harvesting.** `Identify`/`ListMetadataFormats`/`ListIdentifiers`/`ListRecords`/
+`GetRecord` over Dublin Core with resumption tokens (FR-22) — specified, Should-have, and the
+one archive capability still absent. Citation export (FR-21), once on this list, is now built.
 
 **Full event sourcing.** TD-09 records the current hybrid (materialised status + append-only
 event log) as an acceptable, revisitable trade-off. The stated condition for revisiting it: if
@@ -1242,8 +1205,10 @@ convention as SRS section 7 and the technical debt register.
   truncation of the chain's tail, or a forged event appended through the legitimate API, is
   **undetectable by the application alone**, because there is no periodically published,
   independently held checkpoint of the latest `event_hash` to compare against (TD-04).
-- **A reviewer's conflict of interest is not checked by the authorisation layer**, and submitted
-  reviews are counted rather than identity-checked against an assignment (TD-02, TD-03, section 12.2) —
+- **A reviewer's conflict of interest is advisory, not enforced.** The candidate list marks a
+  conflicted or at-capacity reviewer as excluded, with the reason shown to the editor — but the
+  assignment endpoint itself accepts any `reviewer_id` regardless, and submitted reviews are
+  counted rather than identity-checked against an assignment (TD-02, TD-03, section 12.2) —
   both critical, both unresolved as of this document.
 - **Deployment runs on AWS root credentials.** Mitigated by never storing them as a CI secret, but
   not resolved (TD-01, section 12.2, section 13.4) — this is the single highest-priority open item in the
@@ -1261,17 +1226,17 @@ convention as SRS section 7 and the technical debt register.
   (section 11.6, section 15.4).
 - **No browser-matrix or committed end-to-end testing.** UAT was run in a single Chromium-based
   session; `@playwright/test` is a declared dependency with no committed spec files (section 11.6).
-- **No file upload exists in the delivered domain.** `POST /manuscripts` is JSON-only —
-  submission of an actual PDF, and the anonymisation/similarity pipeline that would process one,
-  are specified (design specification section 10.2) but not built (API_Contract.pdf section 8, section 16 of
-  this document).
+- **Payments are mocked by default.** The article processing charge flow is built end to end,
+  but the deployed configuration uses a mock gateway that settles an invoice without contacting
+  Paystack; the real integration is exercised only when a secret key is configured, and no key
+  is deployed. No money has moved through this system.
 - **Explicit, permanent out-of-scope items** (design specification section 4.2), restated as hard limits
-  rather than soft gaps: no payment or article-processing-charge handling; no copy-editing or
-  typesetting workflow; no multi-journal tenancy (though the seam for it exists, section 16); no ORCID
-  federation; identifiers are DOI-*shaped* but not registered with Crossref; similarity screening,
-  when built, will be against the internal corpus only, never the open web; email deliverability
-  is guaranteed through a single transactional provider only — and today, no live provider is
-  wired in at all (`infrastructure/email/logging_sender.py` logs rather than sends, section 10.2).
+  rather than soft gaps: no copy-editing or typesetting workflow; no multi-journal tenancy
+  (though the seam for it exists, section 16); no ORCID federation; identifiers are DOI-*shaped*
+  but not registered with Crossref; similarity screening, when built, will be against the
+  internal corpus only, never the open web; email deliverability is guaranteed through a single
+  transactional provider only — and today, no live provider is wired in at all
+  (`infrastructure/email/logging_sender.py` logs rather than sends, section 10.2).
 
 ---
 
@@ -1282,9 +1247,9 @@ convention as SRS section 7 and the technical debt register.
 Use Case Points sized the Must-have subset of this system (UC1–UC18) at 2,514 person-hours, and
 the full specified system at 3,262 person-hours; COCOMO II's independent cross-check placed the
 full system at approximately 7,170 person-hours (section 7.2). The 48-hour window available for this
-final project is roughly 1.5–1.9% of either figure. The delivery — a working domain layer with 812
-lines of framework-free, fully tested code; a complete API and frontend; a deployed, HTTPS-reachable
-system; and six supporting documents including this one — took a small fraction of the classically
+final project is roughly 1.5–1.9% of either figure. The delivery — a framework-free, fully
+tested domain layer; a 43-route API and full frontend; a deployed, HTTPS-reachable system;
+and the complete accompanying document set — took a small fraction of the classically
 estimated effort. Section 7.5 explains why this does not invalidate the method: UCP measured the
 *problem's* size correctly, and what changed was the *rate* at which AI-assisted development
 converts that size into elapsed hours — a change in method, not evidence the sizing was wrong. The
@@ -1307,7 +1272,7 @@ what automated rigour does and does not catch.
 
 It cost what section 7.5 named in advance rather than discovered afterward: test depth below what a
 fully-priced 2,514-hour effort would buy (partially offset by the mutation-testing pass that found
-what coverage alone missed, section 11.4); documentation formality reduced to what six documents and
+what coverage alone missed, section 11.4); documentation formality reduced to what the submitted document set and
 inline code comments provide, rather than a fuller set of architecture decision records; and
 security hardening that verifies the NFR-01–NFR-06 baseline without attempting threat modelling or
 penetration testing beyond it. It cost the three critical, currently-open items in section 12.2 — root AWS
@@ -1351,9 +1316,8 @@ finding, not the deployment URL, is this final project's most transferable resul
 - Technical_Debt_Plan.pdf — Technical debt register
 - API_Contract.pdf — API contract
 - Testing_Report.pdf — Testing report
-- User_Manual.pdf — User manual (in progress at the time of writing; section 14 stands in until
-  it is complete)
-- the design specification — Design specification
+- User_Manual.pdf — User manual, written from the live deployed system
+- The design specification (repository working document; problem, architecture, data model)
 
 **AI-assisted development acknowledgement.** Consistent with the acknowledgement recorded in
 Effort_Estimation.pdf section 9 and section 11, this document — and the code, tests and documents it

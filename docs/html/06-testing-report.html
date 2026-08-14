@@ -377,9 +377,9 @@ Testing Report</h1>
   <dt>Assessor</dt>
   <dd>Prof. Solomon Mensah</dd>
   <dt>Date</dt>
-  <dd>2026-08-12</dd>
+  <dd>2026-08-12, revised 2026-08-14 against the running system</dd>
   <dt>Status</dt>
-  <dd>Authoritative. Every figure in this document was produced by running the commands it cites — <code>make check</code>, <code>make integration</code>, and a live session against the deployed frontend — on 2026-08-12, and is reproducible by running the same commands against the same commit. Where a figure could not be produced this way, that is stated rather than estimated.</dd>
+  <dd>Authoritative. Every figure in this document was produced by running the commands it cites — <code>make check</code>, <code>make integration</code>, <code>npx vitest run</code>, and a live session against the deployed frontend — and is reproducible by running the same commands against the same commit; the suite counts are from the CI run named in section 3. Where a figure could not be produced this way, that is stated rather than estimated.</dd>
 </dl>
 
 <p><strong>System under test</strong> Frontend:
@@ -569,7 +569,7 @@ only.</td>
 <tr>
 <td>Frontend unit/component tests</td>
 <td>Vitest 4.1.10, Testing Library, jsdom</td>
-<td><code>frontend/vitest.config.ts</code>; 10 test files under
+<td><code>frontend/vitest.config.ts</code>; 20 test files under
 <code>src/**/*.test.{ts,tsx}</code> covering session-cookie sealing,
 Route Handler validation, and component rendering (blinding, status
 badges, forms, keyboard operability).</td>
@@ -1236,7 +1236,7 @@ audit log, and a manuscript delete with attached events</td>
 </table></div>
 <h3 id="36-frontend-unitcomponent-testing-vitest">3.6 Frontend
 unit/component testing (Vitest)</h3>
-<div class="tablewrap"><table><colgroup><col style="width:50.68%" /><col style="width:21.98%" /><col style="width:16.36%" /><col style="width:10.99%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:50.57%" /><col style="width:22.5%" /><col style="width:16.06%" /><col style="width:10.87%" /></colgroup>
 <thead>
 <tr>
 <th>Test case</th>
@@ -1298,16 +1298,29 @@ body before ever calling upstream (<code>route.test.ts</code>)</td>
 <td>Not called</td>
 <td>Pass</td>
 </tr>
+<tr>
+<td>Clicking a demo-account chip fills the email and leaves the password
+empty and focused (<code>login-page.test.tsx</code>)</td>
+<td>Email set, password empty and focused</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>A seeded address never carries across a switch to the sign-up form
+(<code>login-page.test.tsx</code>)</td>
+<td>Email cleared</td>
+<td>Cleared</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>The prototype notice precedes the form in document order
+(<code>login-page.test.tsx</code>)</td>
+<td>Notice first</td>
+<td>Confirmed</td>
+<td>Pass</td>
+</tr>
 </tbody>
 </table></div>
-<p>| Clicking a demo-account chip fills the email and leaves the
-password empty and focused (<code>login-page.test.tsx</code>) | Email
-set, password empty and focused | Confirmed | Pass | | A seeded address
-never carries across a switch to the sign-up form
-(<code>login-page.test.tsx</code>) | Email cleared | Cleared | Pass | |
-The prototype notice precedes the form in document order
-(<code>login-page.test.tsx</code>) | Notice first | Confirmed | Pass
-|</p>
 <p>Frontend suite: <strong>20 test files, 79 cases, all passing</strong>
 under <code>npx vitest run</code>.</p>
 <p>One environment note, since it caused a false alarm once. Two suites
@@ -1701,7 +1714,7 @@ judge accounts:</p>
 <h3
 id="scenarios-actually-exercised-for-this-report-live-browser-driven">Scenarios
 actually exercised for this report (live, browser-driven)</h3>
-<div class="tablewrap"><table><colgroup><col style="width:16.56%" /><col style="width:18.66%" /><col style="width:18.07%" /><col style="width:26.1%" /><col style="width:20.6%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:16.83%" /><col style="width:18.97%" /><col style="width:18.37%" /><col style="width:23.99%" /><col style="width:21.84%" /></colgroup>
 <thead>
 <tr>
 <th>Scenario</th>
@@ -1736,25 +1749,24 @@ correct tracking codes and statuses (<code>Published</code>,
 <td>While authenticated as <code>author</code>, navigate directly to
 <code>/editor</code></td>
 <td>Access refused, not the editor queue</td>
-<td>Redirected to <code>/</code> (public homepage); no editor content
-rendered, no session state exposed on that page</td>
+<td>Redirected to <code>/</code>; no editor content rendered</td>
 <td>Pass — matches <code>frontend/middleware.ts</code>: a session
 present without the required role redirects to <code>/</code>, distinct
-from the no-session case (section 5, next row), which redirects to
-<code>/login</code></td>
+from the no-session case, which redirects to <code>/login</code> with
+the intended destination attached</td>
 </tr>
 </tbody>
 </table></div>
-<p>The redirect-to-home behaviour on a denied role check is a deliberate
-design choice, not a UAT defect: <code>middleware.ts</code>
-distinguishes "no session" (→ <code>/login</code>, so the user can
-authenticate and retry) from "session present, wrong role" (→
-<code>/</code>, so a legitimately authenticated user with insufficient
-privilege lands somewhere useful rather than at a bare error). The
-backend's own authorization check — exercised in section 3.4 and section
-3.5 — is what is actually authoritative for every state-changing action
-regardless of what the frontend route guard does; the middleware is a
-routing-level convenience, not the security boundary.</p>
+<p>The redirect on a denied role check is a deliberate design choice,
+not a UAT defect: <code>middleware.ts</code> distinguishes "no session"
+(→ <code>/login</code>, so the user can authenticate and retry) from
+"session present, wrong role" (→ <code>/</code>, which now forwards a
+signed-in user to their own workspace — somewhere useful rather than a
+bare error). The backend's own authorization check — exercised in
+section 3.4 and section 3.5 — is what is actually authoritative for
+every state-changing action regardless of what the frontend route guard
+does; the middleware is a routing-level convenience, not the security
+boundary.</p>
 <h3 id="scripted-scenarios-per-role-full-acceptance-script">Scripted
 scenarios per role (full acceptance script)</h3>
 <p>The remaining scenarios below constitute the acceptance script run
@@ -1764,7 +1776,7 @@ to meet, cross-referenced to the automated test that pins the same
 behaviour where one exists, since re-running the full script for every
 role on every document revision is not repeated for this report beyond
 the live checks above.</p>
-<div class="tablewrap"><table><colgroup><col style="width:16.79%" /><col style="width:41.03%" /><col style="width:42.17%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:16.49%" /><col style="width:39.38%" /><col style="width:44.13%" /></colgroup>
 <thead>
 <tr>
 <th>Role</th>
@@ -1839,11 +1851,12 @@ submissions"</td>
 </tr>
 <tr>
 <td>Administrator</td>
-<td>(Role management — see section 6: no UI surface exists for this yet;
-verified only via <code>test_policies.py</code>'s
-<code>test_administrator_may_manage_users</code> at the policy
-layer)</td>
-<td><code>test_administrator_may_manage_users</code></td>
+<td>Open the accounts console at <code>/admin</code>; grant and revoke a
+role; set a reviewer's capacity; deactivate and reactivate an
+account</td>
+<td><code>test_granting_the_reviewer_role_adds_it</code>,
+<code>test_capacity_can_be_set_within_one_to_ten</code>,
+<code>test_an_administrator_can_deactivate_and_reactivate_another_account</code></td>
 </tr>
 <tr>
 <td>Reader (unauthenticated)</td>
@@ -1902,11 +1915,6 @@ compliance with submission guidance, not entirely on what the system
 enforces. Reliable automated redaction was judged a research problem in
 its own right, where a bad redaction that leaks a name would undermine
 the guarantee more than not attempting redaction at all.</li>
-<li><strong>Administrator role management has no UI.</strong> The policy
-layer grants and denies this correctly
-(<code>test_administrator_may_manage_users</code>), but no frontend
-surface exercises it, so section 5's administrator row is verified only
-at the policy-test level, not end to end.</li>
 </ul>
 <hr />
 <h2 id="7-evaluation-of-the-testing-strategy">7. Evaluation of the
@@ -1961,15 +1969,16 @@ amount of regression cheaply and continuously — exactly what section 1
 claims for them, and exactly the floor Technical_Debt_Plan.pdf describes
 them as. But the register's own closing observation, produced
 independently of this report, states the same conclusion this section
-reaches from the test evidence directly: ten of its eleven entries were
-found by review of work that had already passed every automated gate —
-linting, strict typing, an architecture contract, and a full test suite
-at 100% coverage. Passing every gate available in this project is
-necessary and was, in every one of these cases, not sufficient. What
-found the defects that mattered was a human, or an agent acting as one,
-asking whether the code was still true to what it claimed — and, twice
-in this project, whether the <em>deployed system</em> still did what the
-code claimed once it left the test suite entirely.</p>
+reaches from the test evidence directly: every inadvertent entry in the
+register was found by review of work that had already passed every
+automated gate — linting, strict typing, an architecture contract, and a
+full test suite at 100% coverage. Passing every gate available in this
+project is necessary and was, in every one of these cases, not
+sufficient. What found the defects that mattered was a human, or an
+agent acting as one, asking whether the code was still true to what it
+claimed — and, twice in this project, whether the <em>deployed
+system</em> still did what the code claimed once it left the test suite
+entirely.</p>
 </main>
 <footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>
 </body>

@@ -375,7 +375,7 @@ Manual</h1>
   <dt>Assessor</dt>
   <dd>Prof. Solomon Mensah</dd>
   <dt>Date</dt>
-  <dd>2026-08-12</dd>
+  <dd>2026-08-12, revised 2026-08-14 against the running system</dd>
   <dt>Status</dt>
   <dd>Written from the live, deployed system, not from the source code. Every screen, label, button caption and error message described below was observed by signing in as each role in turn — author, reviewer, editor, Editor-in-Chief and administrator — and operating the real application at the addresses below. Where a screen does not exist, this manual says so rather than describing one that would be convenient.</dd>
 </dl>
@@ -618,21 +618,33 @@ after signing in again.</p>
 needed)</h2>
 <h3 id="31-browsing-the-archive">3.1 Browsing the archive</h3>
 <ol type="1">
-<li>Go to <code>https://ugjcs-frontend.vercel.app</code>.</li>
-<li>Under the heading <strong>Recently published</strong>, you will see
-a list of published papers. Each entry shows its tracking code (for
-example <code>SDJ-2026-0005</code>), its title, its author or authors, a
-short abstract, and its keywords.</li>
+<li>Go to <code>https://ugjcs-frontend.vercel.app</code> and follow
+<strong>Browse the archive</strong>, or go directly to
+<code>/search</code>.</li>
+<li>Published papers are listed with their tracking code (for example
+<code>SDJ-2026-0005</code>), title, author(s), a short abstract and
+keywords.</li>
 <li>Click any paper's title to open it.</li>
 </ol>
 <h3 id="32-opening-a-paper">3.2 Opening a paper</h3>
 <p>A paper's page (<code>/papers/&lt;tracking-code&gt;</code>) shows its
-tracking code, title, author(s), keywords and abstract.</p>
-<p><strong>Limitation to be aware of:</strong> the paper page does not
-currently offer a way to download the manuscript's PDF, and it does not
-show a publication date, volume or issue number. Only the title,
-authors, keywords and abstract are shown. If you need the full text,
-there is currently no public download link for it.</p>
+tracking code, title, author(s), keywords and abstract, followed by:</p>
+<ul>
+<li><strong>The full PDF</strong>, previewed inline on the page, with a
+<strong>Download PDF</strong> link beneath it.</li>
+<li><strong>A DOI-shaped identifier and citation export</strong> — copy
+the identifier, or download the citation as <strong>BibTeX</strong> or
+<strong>RIS</strong>. (The identifier is DOI-shaped but not registered,
+so resolving it at doi.org will not work — a documented limit of this
+prototype.)</li>
+<li><strong>An editorial provenance panel</strong>, which verifies the
+paper's editorial history against the tamper-evident audit chain and
+reports whether the chain is intact, its head hash, and each event's
+type and timestamp.</li>
+</ul>
+<p><strong>Limitation to be aware of:</strong> the page shows no
+publication date, volume or issue number — the system does not store
+one.</p>
 <h3 id="33-searching">3.3 Searching</h3>
 <ol type="1">
 <li>Click <strong>Search</strong> in the top navigation bar, or go to
@@ -648,13 +660,15 @@ format as the home page's "Recently published" list.</li>
 term"" with the suggestion "Try a different title, keyword or author
 name."</li>
 </ol>
-<p><strong>Limitation to be aware of:</strong> despite that suggestion,
-searching by an author's name did not return that author's papers when
-tested against the live archive (searching "Ama Serwaa", an author of
-five published papers, returned no results). In practice, search
-reliably matches words that appear in a paper's <strong>title</strong>,
-<strong>abstract</strong> or <strong>keywords</strong> — do not rely on
-it to find a particular author's work.</p>
+<p>Search covers each paper's <strong>title</strong>,
+<strong>abstract</strong>, <strong>keywords</strong> and the
+<strong>full text of the PDF itself</strong> — a distinctive phrase from
+inside a paper finds it, with the matching passage shown as a
+highlighted snippet under the result.</p>
+<p><strong>Limitation to be aware of:</strong> author names are not part
+of the search index. Searching "Ama Serwaa", an author of several
+published papers, returns no results (re-verified against the live
+archive on 2026-08-14). Search by topic words, not by author name.</p>
 <hr />
 <h2 id="4-for-authors">4. For authors</h2>
 <p>Sign in with an author account (or any account that also carries
@@ -708,11 +722,13 @@ Click any entry to see its full detail page.</p>
 <li>The abstract.</li>
 <li>A line reading "<em>N</em> of <em>M</em> reviews submitted" — how
 many of the required reviews are in.</li>
-<li>A <strong>Download my submitted document</strong> button/link, which
-downloads the exact PDF you uploaded.</li>
+<li>An inline preview of your submitted PDF, with a download link.</li>
 <li>A red <strong>Withdraw submission</strong> button, present at every
-stage up to and including "Revision requested" — click it to pull the
-manuscript out of consideration. Withdrawal cannot be undone.</li>
+stage up to and including "Revision requested". Withdrawal is terminal,
+so it asks twice: the first click arms a confirmation, and only the
+second, explicit confirm actually withdraws.</li>
+<li>Once the manuscript is <strong>Accepted</strong>, an <strong>Article
+processing charge</strong> panel (section 9).</li>
 </ul>
 <p>See section 10 for what each status means and what happens next.</p>
 <h3 id="43-downloading-your-own-submission">4.3 Downloading your own
@@ -754,9 +770,10 @@ manuscript currently assigned to you, showing each one's title and
 tracking code.</p>
 <h3 id="51-opening-an-assignment">5.1 Opening an assignment</h3>
 <p>Click any assignment to open it. You will see the manuscript's
-tracking code, title, a short abstract, and its keywords, followed by a
-<strong>Download anonymised manuscript</strong> link and a
-<strong>Submit your review</strong> form.</p>
+tracking code, title, a short abstract, and its keywords, followed by an
+inline preview of the <strong>anonymised</strong> PDF (with a
+<strong>Download anonymised PDF</strong> link) and a <strong>Submit your
+review</strong> form.</p>
 <h3 id="52-what-anonymised-means-here--read-this-before-you-review">5.2
 What "anonymised" means here — read this before you review</h3>
 <p><strong>The copy you are given to review has had two layers of
@@ -787,24 +804,26 @@ or infer an author's identity from the text itself, treat that as you
 would in any double-blind process — it is not something the platform can
 prevent.</p>
 <h3 id="53-submitting-your-review">5.3 Submitting your review</h3>
-<p>The <strong>Submit your review</strong> form has two fields:</p>
+<p>The <strong>Submit your review</strong> form asks for:</p>
 <ul>
+<li><strong>Four criterion scores</strong>, each from 1 to 5:
+<strong>Originality</strong>, <strong>Rigour</strong>,
+<strong>Clarity</strong> and <strong>Significance</strong>.</li>
 <li><strong>Recommendation</strong> — a dropdown with four options:
 <code>accept</code>, <code>minor revision</code>,
 <code>major revision</code>, <code>reject</code>.</li>
-<li><strong>Comments</strong> — a free-text box for your written
-assessment.</li>
+<li><strong>Comments to the author</strong> — your written assessment as
+the author will read it.</li>
+<li><strong>Confidential comments to the editor</strong> — remarks only
+the editor can see. Nothing you write here is ever shown to the author,
+and no reviewer- or author-reachable screen can display it.</li>
 </ul>
-<p>There is no separate numeric scoring by criterion (originality,
-methodology, clarity, etc.) — the review consists solely of your chosen
-recommendation and your written comments.</p>
 <p>To submit:</p>
 <ol type="1">
-<li>Choose the option from <strong>Recommendation</strong> that best
-reflects your judgement.</li>
-<li>Write your comments in the <strong>Comments</strong> box. This is
-what the editor — and, indirectly, the author — will read, so be
-specific.</li>
+<li>Score each criterion and choose the recommendation that reflects
+your judgement.</li>
+<li>Write both comment fields — be specific in the author-facing one,
+and candid in the confidential one.</li>
 <li>Click <strong>Submit review</strong>.</li>
 <li>On success you are returned to <strong>My assignments</strong>; the
 manuscript no longer requires further action from you. Once every
@@ -832,30 +851,30 @@ second queue listing manuscripts waiting on a decision.</p>
 <ol type="1">
 <li>From the queue, click a manuscript's tracking code to open it. You
 should see its title, a <strong>Submitted</strong> status badge, its
-abstract, the reviews-submitted count, a <strong>Download
-manuscript</strong> link, and a <strong>Begin screening</strong>
-button.</li>
-<li>Read the manuscript (download it if needed) and click <strong>Begin
-screening</strong>.</li>
+abstract, the reviews-submitted count, an inline preview of the PDF, and
+a <strong>Begin screening</strong> button.</li>
+<li>Read the manuscript and click <strong>Begin screening</strong>.</li>
 <li>The page updates in place: the status badge changes to <strong>Under
-screening</strong>, and two new sections appear — <strong>Assign a
-reviewer</strong> and <strong>Decision</strong>.</li>
+screening</strong>, and the reviewer-assignment and
+<strong>Decision</strong> sections appear.</li>
 </ol>
 <h3 id="63-assigning-reviewers">6.3 Assigning reviewers</h3>
-<p>Under <strong>Assign a reviewer</strong>, you will see a single
-field, <strong>Reviewer account id</strong>, and an
-<strong>Assign</strong> button.</p>
-<p><strong>This expects the reviewer's account id, not their name or
-email address.</strong> There is no picker or search box to choose a
-reviewer from — you must already know the id of the account you want to
-assign, obtained separately (for example from your own records or from
-the reviewer directly).</p>
+<p>The assignment section lists <strong>every reviewer in the pool as a
+candidate, ranked by how well their declared expertise matches the
+manuscript's keywords</strong>, with their current workload shown
+against their capacity. Candidates who must not be assigned are not
+hidden — they appear marked <strong>"Excluded"</strong> with the reason
+stated (they share an author's affiliation, are already assigned to this
+manuscript, or are at capacity), so you can see why an obvious name is
+unavailable. The ranking is advice, not authority: you remain free to
+assign any eligible candidate regardless of their position in it.</p>
 <ol type="1">
-<li>Enter the reviewer's account id.</li>
-<li>Click <strong>Assign</strong>.</li>
-<li>The field clears on success. Repeat for each reviewer you want
-assigned; two are normally expected before a decision on the reviews
-becomes possible (section 10).</li>
+<li>Select a candidate from the list.</li>
+<li>Click <strong>Assign selected reviewer</strong>.</li>
+<li>The assignment appears in the assignments panel with its <strong>due
+date</strong> and, once the date passes without a review, an
+<strong>overdue</strong> flag. Repeat for the second reviewer; two are
+normally expected before a decision becomes possible (section 10).</li>
 </ol>
 <h3 id="64-recording-a-decision">6.4 Recording a decision</h3>
 <p>The <strong>Decision</strong> section shows a
@@ -880,15 +899,18 @@ section shows only its heading with no form under it.</li>
 <li>Write your reasoning in <strong>Rationale</strong> (this is required
 and must be at least 20 characters — a one-word rationale will be
 rejected).</li>
-<li>Click <strong>Record decision</strong>.</li>
-<li>The manuscript's status badge updates immediately to reflect the
-outcome (see section 10 for what each decision leads to).</li>
+<li>Click <strong>Record decision</strong>. For a final decision
+(accept, reject, desk reject) the button re-labels to <strong>Confirm
+…</strong> beside a <strong>Go back</strong> escape, and only the
+second, explicit click records it — a deliberate guard against recording
+an irreversible decision by accident.</li>
+<li>The manuscript's status badge updates immediately (see section 10
+for what each decision leads to). Once reviews are in, this page also
+shows both of each review's channels — including the confidential
+comments only editors can read — and, after a final decision, a
+<strong>Decision certificate</strong> download: a PDF stating the
+decision, the tracking code and the audit chain's head hash.</li>
 </ol>
-<p><em>A small labelling quirk you may notice:</em> the "send to review"
-option is occasionally rendered by the interface as <strong>"send
-to_review"</strong>, with the underscore left in. This is a cosmetic
-formatting slip, not a different option — it is still the same "send to
-review" decision.</p>
 <hr />
 <h2 id="7-for-the-editor-in-chief">7. For the Editor-in-Chief</h2>
 <p>Everything in section 6 is also available to the Editor-in-Chief
@@ -1182,16 +1204,13 @@ queue only lists manuscripts whose status is "Submitted". The moment you
 begin screening one, it moves to "Under screening" and drops out of the
 queue table. Keep a note of its tracking code, or navigate directly to
 <code>/editor/&lt;tracking-code&gt;</code>, to return to it.</p>
-<p><strong>"Could not assign that reviewer — Check the account id and
-try again."</strong> The reviewer assignment field expects an account
-id, not an email address or name, and there is no directory or search
-box built into the form to look one up. Confirm you have the correct
-account id for the reviewer before retrying.</p>
-<p><strong>As a reader, you cannot find a way to download a paper's
-PDF</strong> This is a genuine gap in the current system, not a mistake
-on your part — the public paper page shows only the title, authors,
-keywords and abstract; no PDF download link is offered to readers at the
-time of writing.</p>
+<p><strong>A reviewer you expected to assign shows as "Excluded" in the
+candidate list</strong> That is the conflict-of-interest and workload
+screen working as designed: the stated reason (shared affiliation with
+an author, already assigned to this manuscript, or at capacity) explains
+why. An excluded candidate is shown rather than hidden precisely so you
+know the exclusion happened. If capacity is the reason, an administrator
+can raise it (section 8).</p>
 <p><strong>The Administrator account lands on Accounts and nothing
 else</strong> That is the whole of the administrator's workspace, and it
 is deliberate. The role manages accounts (section 8); it does not screen

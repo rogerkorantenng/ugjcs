@@ -373,7 +373,7 @@ Portal — Technical Debt Register</h1>
   <dt>Author</dt>
   <dd>Roger Koranteng Obeng (22424140)</dd>
   <dt>Opened</dt>
-  <dd>2026-08-12</dd>
+  <dd>2026-08-12 · last revised 2026-08-14</dd>
   <dt>Status</dt>
   <dd>Live. Entries are added at the moment debt is incurred, not reconstructed afterwards.</dd>
 </dl>
@@ -448,7 +448,7 @@ hour.</td>
 <h3
 id="td-02--a-reviewer-may-be-authorised-to-review-their-own-manuscript">TD-02
 — A reviewer may be authorised to review their own manuscript</h3>
-<div class="tablewrap"><table><colgroup><col style="width:17.04%" /><col style="width:82.96%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:14.81%" /><col style="width:85.19%" /></colgroup>
 <tbody>
 <tr>
 <td><strong>Debt</strong></td>
@@ -465,9 +465,15 @@ same reasoning was not applied to <code>REVIEW</code>.</td>
 </tr>
 <tr>
 <td><strong>Impact</strong></td>
-<td>The central conflict-of-interest failure for a double-blind journal.
-No exploit exists today because no HTTP surface calls the action, but
-the gap is real the moment one does.</td>
+<td>The central conflict-of-interest failure for a double-blind journal
+— and a live gap, not a theoretical one:
+<code>POST /editorial/{code}/reviewers</code> creates an assignment
+without checking the reviewer against <code>author_ids</code>, and
+<code>POST /reviews/{code}/submit</code> accepts from any assigned
+reviewer. One partial mitigation exists: the reviewer-candidate list
+marks a conflicted reviewer as excluded, with the reason shown to the
+editor — but that is advisory at the list, not enforced at the
+assignment.</td>
 </tr>
 <tr>
 <td><strong>Priority</strong></td>
@@ -528,7 +534,7 @@ docstring so it cannot be forgotten.</td>
 </table></div>
 <h3 id="td-03--submitted-reviews-are-counted-not-identified">TD-03 —
 Submitted reviews are counted, not identified</h3>
-<div class="tablewrap"><table><colgroup><col style="width:17.96%" /><col style="width:82.04%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:16.84%" /><col style="width:83.16%" /></colgroup>
 <tbody>
 <tr>
 <td><strong>Debt</strong></td>
@@ -539,8 +545,10 @@ have already submitted.</td>
 </tr>
 <tr>
 <td><strong>Cause</strong></td>
-<td>Deliberate scope limitation — assignment tracking belongs with the
-reviewer-matching subsystem, which is not yet built.</td>
+<td>Deliberate scope limitation — identity-checked submission belongs
+with reviewer assignment as a first-class entity, which does not yet
+exist (the delivered candidate list ranks and excludes, but the
+assignment itself is a bare record).</td>
 </tr>
 <tr>
 <td><strong>Impact</strong></td>
@@ -744,7 +752,7 @@ full chain.</td>
 id="td-14--deployed-infrastructure-is-app-runner-not-the-specified-ecsalbcloudfront">TD-14
 — Deployed infrastructure is App Runner, not the specified
 ECS/ALB/CloudFront</h3>
-<div class="tablewrap"><table><colgroup><col style="width:12.62%" /><col style="width:87.38%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:12.63%" /><col style="width:87.37%" /></colgroup>
 <tbody>
 <tr>
 <td><strong>Debt</strong></td>
@@ -760,7 +768,7 @@ target group and listener rules, a CloudFront distribution, task
 definitions and a service, and the IAM wiring between all of it —
 measured at 4–6 hours against a 48-hour budget that, at the point this
 trade-off was made, still owed a working API, a working frontend, and
-five accompanying documents.</td>
+the accompanying documents.</td>
 </tr>
 <tr>
 <td><strong>Impact</strong></td>
@@ -828,14 +836,15 @@ event sourcing with rebuildable projections becomes worth its cost.</td>
 </tbody>
 </table></div>
 <h3
-id="td-10--the-coverage-gate-sits-at-85-while-the-code-delivers-100">TD-10
-— The coverage gate sits at 85% while the code delivers 100%</h3>
-<div class="tablewrap"><table><colgroup><col style="width:25.29%" /><col style="width:74.71%" /></colgroup>
+id="td-10--the-coverage-gate-sits-at-85-well-below-delivered-coverage">TD-10
+— The coverage gate sits at 85%, well below delivered coverage</h3>
+<div class="tablewrap"><table><colgroup><col style="width:23.83%" /><col style="width:76.17%" /></colgroup>
 <tbody>
 <tr>
 <td><strong>Debt</strong></td>
 <td>The CI gate fails below 85% line and branch coverage, well under
-what the branch actually achieves.</td>
+what the code actually achieves (90.03% across domain and application on
+the current commit; 100% in the domain layer).</td>
 </tr>
 <tr>
 <td><strong>Cause</strong></td>
@@ -844,7 +853,7 @@ target.</td>
 </tr>
 <tr>
 <td><strong>Impact</strong></td>
-<td>Coverage could fall by fifteen points without CI objecting.</td>
+<td>Coverage could fall by five points without CI objecting.</td>
 </tr>
 <tr>
 <td><strong>Priority</strong></td>
@@ -1028,13 +1037,17 @@ deployment. TD-05, TD-06 and TD-08 are independent and may be scheduled
 by convenience. TD-14 is repayable only after submission; it is not on
 the pre-viva critical path. TD-15 should be repaid before real users are
 admitted, alongside TD-01.</p>
-<p><strong>How this register was produced.</strong> Ten of these eleven
-entries were found by independent review of work that had already passed
-every automated gate: linting, strict type checking, an architecture
-contract, and a full test suite at 100% coverage. That is the register's
-most useful lesson, and it is recorded here rather than only in the
-retrospective: automated gates establish a floor, and reading code for
-what it <em>claims</em> is what finds the things above it.</p>
+<p><strong>How this register was produced.</strong> Six of these fifteen
+entries (TD-02, TD-06, TD-07, TD-08, TD-12, TD-13) record inadvertent
+debt found by independent review — or, for TD-12, by reasoning about the
+storage boundary — in code that had already passed every automated gate:
+linting, strict type checking, an architecture contract, and a full test
+suite at 100% coverage. TD-11 records the mutation-testing evidence for
+why those gates could not have found them. The remaining eight are
+deliberate trade-offs, priced and recorded at the moment each was taken.
+That split is the register's most useful lesson: automated gates
+establish a floor, and reading code for what it <em>claims</em> is what
+finds the things above it.</p>
 </main>
 <footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>
 </body>

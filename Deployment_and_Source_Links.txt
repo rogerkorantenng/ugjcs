@@ -143,9 +143,10 @@ NOTES FOR THE EXAMINER
   debt register.
 
 - The technical debt register carries fifteen entries across three categories:
-  critical, scheduled, and acceptable. Ten were found by review of code that had
-  already passed linting, strict type checking, an architecture contract and a
-  full test suite.
+  critical, scheduled, and acceptable. Every inadvertent entry was found by
+  review of code that had already passed linting, strict type checking, an
+  architecture contract and a full test suite; the rest are deliberate
+  trade-offs, priced when they were taken.
 
 - Payments are mocked by default. A real Paystack integration exists and is
   exercised only when a secret key is configured; no key is deployed, and no

@@ -1,7 +1,7 @@
 # QA Report — SDJ Editorial Portal
 
 - **Target:** https://ugjcs-frontend.vercel.app (frontend, Vercel) + https://tsxsbf9rzp.us-east-1.awsapprunner.com (API, App Runner)
-- **Date:** 2026-08-13 (overnight autonomous sweep)
+- **Date:** 2026-08-13 (overnight autonomous sweep); follow-ups re-verified 2026-08-14
 - **Tier:** Exhaustive — all four roles tested end to end through the real UI
 - **Mode:** Full browse + deep QA with fixes (per user instruction: fix without asking)
 
@@ -35,12 +35,12 @@ Fixed earlier the same night (same session, pre-sweep): missing back links on al
 - Withdraw: click → warning panel ("Withdrawing is permanent…") → "Keep the submission" backs out with nothing changed.
 - Unknown paper: proper not-found page renders.
 - Unreadable-PDF rejection: submitting the malformed file through the real form now returns 422 with "could not be read as one — re-export it" shown in the form; the author stays on the page and nothing is stored.
-- Junk prune: after the backend rollout the public archive holds exactly the five published corpus papers, and the author dashboard exactly the seven corpus manuscripts — every live-verification leftover (including the published one) is gone.
+- Junk prune: after the backend rollout the public archive holds exactly the four published corpus papers (re-verified 2026-08-14: `GET /archive` returns 4), and the author dashboard exactly the seeded corpus manuscripts — every live-verification leftover (including the published one) is gone.
 - Final regression browse: zero console errors on every public page and the author dashboard.
 
 ## Known limitations (documented, not fixed)
 
-- Unknown-paper URLs render the not-found page but the HTTP status stays 200 — the streaming shell (loading.tsx) commits the status before the archive lookup resolves. A soft-404; crawlers handle these, readers never see the difference.
+- ~~Unknown-paper URLs render the not-found page but the HTTP status stays 200~~ — **fixed after this sweep**: the loading boundary was removed from the paper segment so the render blocks on the archive lookup and an unknown tracking code now returns a genuine HTTP 404 (re-verified 2026-08-14).
 - The withdrawn QA manuscript (SDJ-2026-174588) demonstrates the WITHDRAWN state in the author dashboard until the next prune removes it.
 - Inline PDF preview falls back to an "Open PDF" button in browsers without a PDF plugin (by design; headless browsers exercise this fallback).
 
