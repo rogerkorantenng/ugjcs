@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { AppNav } from "@/components/layout/app-nav";
 import { DemoBanner } from "@/components/layout/demo-banner";
+import { CreditFooter } from "@/components/layout/credit-footer";
 
 /**
  * Same chrome as the editor layout, but gated on the administrator role in the layout
@@ -21,6 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <AppNav user={session.user} />
       <DemoBanner />
       <div className="mx-auto max-w-5xl px-4 py-8">{children}</div>
+      <CreditFooter />
     </>
   );
 }

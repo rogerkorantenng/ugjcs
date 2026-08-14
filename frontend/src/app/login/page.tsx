@@ -203,6 +203,9 @@ export default function LoginPage() {
               <AuthPanel />
             </Suspense>
           </main>
+          <p className="px-6 pb-5 text-center text-xs text-ink/45 lg:px-10">
+            Built by Roger Koranteng Obeng · 22424140 · Advanced Software Engineering final project
+          </p>
         </div>
       </div>
     </div>
