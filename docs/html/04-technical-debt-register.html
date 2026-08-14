@@ -744,16 +744,14 @@ full chain.</td>
 id="td-14--deployed-infrastructure-is-app-runner-not-the-specified-ecsalbcloudfront">TD-14
 — Deployed infrastructure is App Runner, not the specified
 ECS/ALB/CloudFront</h3>
-<div class="tablewrap"><table><colgroup><col style="width:12.34%" /><col style="width:87.66%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:12.62%" /><col style="width:87.38%" /></colgroup>
 <tbody>
 <tr>
 <td><strong>Debt</strong></td>
 <td>The live deployment runs the FastAPI backend on AWS App Runner
 behind its own <code>*.awsapprunner.com</code> TLS endpoint, rather than
 the ECS Fargate / Application Load Balancer / CloudFront topology
-designed in
-<code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code>
-section 7.3.</td>
+designed in the design specification section 7.3.</td>
 </tr>
 <tr>
 <td><strong>Cause</strong></td>
@@ -786,10 +784,9 @@ before.</td>
 already specified in section 7.3, migrate the container from an App
 Runner source to an ECS Fargate service behind a new target group, and
 decommission the App Runner service once the ALB responds on the same
-health check. Recorded in
-<code>docs/superpowers/plans/2026-08-12-ugjcs-plan-6-deployment.md</code>'s
-"Why this is smaller than the specification" section, so the gap is a
-documented, bounded decision rather than unnoticed drift.</td>
+health check. Recorded in the deployment plan's "Why this is smaller
+than the specification" section, so the gap is a documented, bounded
+decision rather than unnoticed drift.</td>
 </tr>
 </tbody>
 </table></div>

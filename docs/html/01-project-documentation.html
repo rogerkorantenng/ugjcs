@@ -463,67 +463,56 @@ wherever <code>ugjcs</code> appears in a path, URL or identifier in this
 document set, it is that codename, not a separate system. The deployed
 system is a prototype built for an Advanced Software Engineering exam —
 it is not SDJ's official production system.</p>
-<p><strong>Status of this document.</strong> This is a consolidating
-document. It summarises and cross-references six authoritative
-supporting documents and the codebase itself rather than duplicating
-them; where a figure, table, or claim has a fuller treatment elsewhere,
-that document is named and the reader is pointed to it. Nothing here
-should be taken to override what those documents say — where a
-discrepancy exists between two of them, it is recorded rather than
-silently resolved in one direction (see section 10.4).</p>
-<p><strong>Referenced source documents</strong></p>
-<div class="tablewrap"><table><colgroup><col style="width:9.39%" /><col style="width:38.0%" /><col style="width:52.61%" /></colgroup>
+<p><strong>Status of this document.</strong> This is the consolidating
+document. It covers the full lifecycle on its own and points to the
+other submitted documents where they carry a fuller treatment, rather
+than duplicating them. Where two documents disagree, the disagreement is
+recorded rather than quietly resolved (see section 10.4).</p>
+<p><strong>The other documents in this submission</strong></p>
+<div class="tablewrap"><table><colgroup><col style="width:39.63%" /><col style="width:60.37%" /></colgroup>
 <thead>
 <tr>
-<th>#</th>
 <th>Document</th>
 <th>Role</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>02</td>
-<td><code>docs/02-srs.md</code></td>
-<td>Software Requirements Specification, traceability matrix</td>
+<td>SRS.pdf</td>
+<td>Requirements, non-functional requirements, traceability matrix</td>
 </tr>
 <tr>
-<td>03</td>
-<td><code>docs/03-effort-estimation.md</code></td>
+<td>Testing_Report.pdf</td>
+<td>Test strategy, test cases, defects found, user acceptance
+testing</td>
+</tr>
+<tr>
+<td>Technical_Debt_Plan.pdf</td>
+<td>Fifteen debt entries, Debt → Cause → Impact → Priority →
+Resolution</td>
+</tr>
+<tr>
+<td>User_Manual.pdf</td>
+<td>Role-by-role operating guide for the deployed system</td>
+</tr>
+<tr>
+<td>Supporting_Files/Effort_Estimation.pdf</td>
 <td>Use Case Points, COCOMO II cross-check, MoSCoW cut</td>
 </tr>
 <tr>
-<td>04</td>
-<td><code>docs/04-technical-debt-register.md</code></td>
-<td>Fourteen debt entries, Debt→Cause→Impact→Priority→Resolution</td>
+<td>Supporting_Files/API_Contract.pdf</td>
+<td>The HTTP boundary between backend and frontend</td>
 </tr>
 <tr>
-<td>05</td>
-<td><code>docs/05-api-contract.md</code></td>
-<td>HTTP boundary contract between backend and frontend</td>
-</tr>
-<tr>
-<td>06</td>
-<td><code>docs/06-testing-report.md</code></td>
-<td>Test strategy, test cases, defects found, UAT</td>
-</tr>
-<tr>
-<td>—</td>
-<td><code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code></td>
-<td>Design specification (problem, architecture, data model)</td>
-</tr>
-<tr>
-<td>—</td>
-<td><code>backend/src/ugjcs/domain/</code></td>
-<td>The implemented domain — source of truth for lifecycle and
-rules</td>
-</tr>
-<tr>
-<td>—</td>
-<td><code>infra/</code></td>
-<td>Terraform — source of truth for the deployed topology</td>
+<td>Supporting_Files/QA_Report.pdf</td>
+<td>Click-through QA of the deployed system, role by role</td>
 </tr>
 </tbody>
 </table></div>
+<p>Two further sources of truth sit in the repository rather than in
+this bundle: <code>backend/src/ugjcs/domain/</code> for the manuscript
+lifecycle and authorisation rules, and <code>infra/</code> for the
+deployed topology.</p>
 <hr />
 <h2 id="1-project-title">1. Project title</h2>
 <p><strong>SDJ Editorial Portal</strong> — a double-blind peer-review
@@ -696,19 +685,18 @@ This was recorded as <strong>FR-25a</strong>, marked NEW, rather than
 silently patched — a demonstration that requirements analysis did not
 stop once the SRS was signed off (SRS section 3.1, Group E).</p>
 <p>The full requirement set, with preconditions, postconditions and
-acceptance criteria, is in <code>docs/02-srs.md</code> section 3; this
-section summarises the <em>process</em>, that document contains the
-<em>content</em>.</p>
+acceptance criteria, is in SRS.pdf section 3; this section summarises
+the <em>process</em>, that document contains the <em>content</em>.</p>
 <hr />
 <h2 id="6-software-requirements-specification-srs">6. Software
 Requirements Specification (SRS)</h2>
-<p>The authoritative SRS is <code>docs/02-srs.md</code>, conformant to
-IEEE 830-1998 and ISO/IEC/IEEE 29148:2018. It is structured in seven
-sections: introduction and scope (section 1), overall description and
-operating environment (section 2), specific functional and
-non-functional requirements (section 3), system models — lifecycle,
-actor mapping, authorisation matrix (section 4), the requirements
-traceability matrix (section 5), MoSCoW prioritisation (section 6), and
+<p>The authoritative SRS is SRS.pdf, conformant to IEEE 830-1998 and
+ISO/IEC/IEEE 29148:2018. It is structured in seven sections:
+introduction and scope (section 1), overall description and operating
+environment (section 2), specific functional and non-functional
+requirements (section 3), system models — lifecycle, actor mapping,
+authorisation matrix (section 4), the requirements traceability matrix
+(section 5), MoSCoW prioritisation (section 6), and
 constraints/limitations (section 7). This section summarises its content
 and states plainly where it is now stale relative to the delivered
 system (section 10.4).</p>
@@ -778,8 +766,7 @@ shipped. A matrix that understates the system is as much a defect as one
 that overstates it.</p>
 <p>Current totals: 24 of 35 requirement lines implemented and tested end
 to end, 5 partially implemented with a named remainder, 6 unbuilt.
-<code>docs/05-api-contract.md</code> and
-<code>docs/06-testing-report.md</code> are the authorities on what is
+API_Contract.pdf and Testing_Report.pdf are the authorities on what is
 reachable by route and proven by test; section 10.4 reconciles the
 three.</p>
 <h3 id="65-authorisation-matrix--the-registers-origin-point">6.5
@@ -793,9 +780,9 @@ written down.</p>
 <hr />
 <h2 id="7-software-effort-estimation">7. Software effort estimation</h2>
 <p>Full arithmetic, every intermediate figure, and the estimation method
-are in <code>docs/03-effort-estimation.md</code>. This section
-summarises the method, the headline figures and why they matter, without
-repeating the derivation.</p>
+are in Effort_Estimation.pdf. This section summarises the method, the
+headline figures and why they matter, without repeating the
+derivation.</p>
 <h3 id="71-method">7.1 Method</h3>
 <p><strong>Use Case Points (UCP)</strong> is the primary technique —
 actor and use-case weights are read directly off the functional
@@ -1249,9 +1236,9 @@ domain layer imports no framework code") — the requirement is not merely
 documented, it is enforced the same way a type error is: at build time,
 unconditionally.</p>
 <h3 id="93-api-design">9.3 API design</h3>
-<p>The HTTP boundary is documented exhaustively in
-<code>docs/05-api-contract.md</code>; this section states its governing
-design decisions rather than repeating the endpoint table.</p>
+<p>The HTTP boundary is documented exhaustively in API_Contract.pdf;
+this section states its governing design decisions rather than repeating
+the endpoint table.</p>
 <ul>
 <li><strong>Bearer-token backend, cookie-sessioned frontend.</strong>
 The FastAPI backend is a pure bearer-token API — short-lived JWT access
@@ -1400,8 +1387,7 @@ specifically so a reader can check this document's claims against the
 file it names. The same discipline extends to the authorisation layer
 (section 8.3) and the blinded projection (section 8.4): every mechanism
 described in this section has a named module, and every claim about its
-behaviour is backed by a named test in
-<code>docs/06-testing-report.md</code>.</p>
+behaviour is backed by a named test in Testing_Report.pdf.</p>
 <h3
 id="104-reconciling-three-documents-that-were-written-at-different-points-in-the-build">10.4
 Reconciling three documents that were written at different points in the
@@ -1411,20 +1397,20 @@ its own source documents, stated here rather than resolved silently in
 one direction, consistent with section 6.3's handling of the
 SRS-versus-specification lifecycle disagreement:</p>
 <ul>
-<li><strong><code>docs/02-srs.md</code> section 5</strong> (earliest)
-records almost the entire functional requirement set as "Planned," on
-the stated grounds that no <code>api/</code> directory and no frontend
-existed in the repository at the time it was written.</li>
-<li><strong><code>docs/05-api-contract.md</code></strong> (written once
-the API and frontend existed) documents a working <code>/auth</code>,
+<li><strong>SRS.pdf section 5</strong> (earliest) records almost the
+entire functional requirement set as "Planned," on the stated grounds
+that no <code>api/</code> directory and no frontend existed in the
+repository at the time it was written.</li>
+<li><strong>API_Contract.pdf</strong> (written once the API and frontend
+existed) documents a working <code>/auth</code>,
 <code>/manuscripts</code>, <code>/editorial</code>,
 <code>/reviews</code> and <code>/archive</code> surface — but explicitly
 states that
 <code>Action.PUBLISH</code>/<code>Manuscript.schedule</code>/<code>Manuscript.publish</code>
 have <strong>no corresponding route</strong>: "publication into the
 archive happens outside the HTTP boundary this plan builds."</li>
-<li><strong><code>docs/06-testing-report.md</code> section 3.4 and
-section 4.5</strong> (latest) records passing system tests named
+<li><strong>Testing_Report.pdf section 3.4 and section 4.5</strong>
+(latest) records passing system tests named
 <code>test_the_editor_in_chief_can_schedule_an_accepted_manuscript</code>
 and
 <code>test_the_editor_in_chief_can_publish_a_scheduled_manuscript</code>,
@@ -1450,10 +1436,10 @@ story.</p>
 <hr />
 <h2 id="11-testing">11. Testing</h2>
 <p>Full test-case tables, defect narratives and the UAT script are in
-<code>docs/06-testing-report.md</code>. This section summarises the
-strategy, headline numbers, and the finding this project treats as its
-most important methodological result (section 11.7, elaborated for the
-whole document in the introduction's through-line).</p>
+Testing_Report.pdf. This section summarises the strategy, headline
+numbers, and the finding this project treats as its most important
+methodological result (section 11.7, elaborated for the whole document
+in the introduction's through-line).</p>
 <h3 id="111-strategy--layered-to-match-the-architecture">11.1 Strategy —
 layered to match the architecture</h3>
 <div class="tablewrap"><table><colgroup><col style="width:26.0%" /><col style="width:45.26%" /><col style="width:28.74%" /></colgroup>
@@ -1627,10 +1613,10 @@ actual actor would. This is elaborated once, fully, in section 12.6,
 since the two documents converge on one finding rather than two.</p>
 <hr />
 <h2 id="12-technical-debt">12. Technical debt</h2>
-<p>The full register — fourteen entries, each with Debt → Cause → Impact
-→ Priority → Proposed resolution — is
-<code>docs/04-technical-debt-register.md</code>. This section summarises
-it by priority and draws out its methodological finding.</p>
+<p>The full register — fifteen entries, each with Debt → Cause → Impact
+→ Priority → Proposed resolution — is Technical_Debt_Plan.pdf. This
+section summarises it by priority and draws out its methodological
+finding.</p>
 <h3 id="121-summary">12.1 Summary</h3>
 <div class="tablewrap"><table><colgroup><col style="width:38.55%" /><col style="width:14.35%" /><col style="width:47.1%" /></colgroup>
 <thead>
@@ -1794,26 +1780,26 @@ was found — is the point (section 12.6, Section 11.4).</p>
 <h3
 id="126-the-registers-own-conclusion-and-this-documents-central-finding">12.6
 The register's own conclusion, and this document's central finding</h3>
-<p><code>docs/04-technical-debt-register.md</code> closes with a
-statement worth repeating verbatim in spirit rather than only citing:
-<strong>ten of its fourteen entries, and every serious defect in
-<code>docs/06-testing-report.md</code> section 4, were found by
-independent review of code that had already passed every automated gate
-available in this project — linting, strict type checking, an
-architecture contract, and a full test suite at 100% coverage — or by a
-person using the running system.</strong> Mutation testing showed the
-hash chain was, for a period, unprotected by any test that would notice
-its defining property being deleted. <code>TRUNCATE</code> bypassed a
-trigger that had been "confirmed firing against a live database" against
-the two statement types someone thought to check. Three lifecycle
-methods were implemented, unit-tested, type-checked and covered at 100%,
-and were still dead code from the system's perspective because no route
-called them. Passing every gate this project has was, in every one of
-these cases, necessary and not sufficient. That is this project's most
-defensible finding about software engineering practice, and it is the
-reason section 15's maintenance strategy treats the debt register as a
-<em>live</em> input to a repayment schedule rather than an inventory
-closed at submission.</p>
+<p>Technical_Debt_Plan.pdf closes with a statement worth repeating
+verbatim in spirit rather than only citing: <strong>ten of its fifteen
+entries, and every serious defect in Testing_Report.pdf section 4, were
+found by independent review of code that had already passed every
+automated gate available in this project — linting, strict type
+checking, an architecture contract, and a full test suite at 100%
+coverage — or by a person using the running system.</strong> Mutation
+testing showed the hash chain was, for a period, unprotected by any test
+that would notice its defining property being deleted.
+<code>TRUNCATE</code> bypassed a trigger that had been "confirmed firing
+against a live database" against the two statement types someone thought
+to check. Three lifecycle methods were implemented, unit-tested,
+type-checked and covered at 100%, and were still dead code from the
+system's perspective because no route called them. Passing every gate
+this project has was, in every one of these cases, necessary and not
+sufficient. That is this project's most defensible finding about
+software engineering practice, and it is the reason section 15's
+maintenance strategy treats the debt register as a <em>live</em> input
+to a repayment schedule rather than an inventory closed at
+submission.</p>
 <h3 id="127-repayment-sequence">12.7 Repayment sequence</h3>
 <p>TD-01 before any further infrastructure is provisioned. TD-02, TD-03
 and TD-07 are one piece of work — all three are consequences of reviewer
@@ -1932,14 +1918,13 @@ since App Runner bills provisioned capacity continuously while the
 health check keeps the instance active.</p>
 <hr />
 <h2 id="14-user-manual">14. User manual</h2>
-<p><code>docs/07-user-manual.md</code> is being written concurrently
-with this document and is the authoritative source once complete; this
-section summarises the system's user-facing surface directly from the
-implemented routes and roles (section 10.2,
-<code>docs/05-api-contract.md</code>) so that a reader has a usable
+<p>User_Manual.pdf is being written concurrently with this document and
+is the authoritative source once complete; this section summarises the
+system's user-facing surface directly from the implemented routes and
+roles (section 10.2, API_Contract.pdf) so that a reader has a usable
 account of "how to use the system" even before that document lands.
-Where the two disagree once <code>07-user-manual.md</code> exists, that
-document governs.</p>
+Where the two disagree once User_Manual.pdf exists, that document
+governs.</p>
 <h3 id="141-accounts-and-roles">14.1 Accounts and roles</h3>
 <p>Five roles exist (<code>Role</code> enum,
 <code>domain/enums.py</code>): <code>author</code>,
@@ -2000,8 +1985,7 @@ abstract, keywords, version and status — no author name, affiliation or
 identifier of any kind (section 8.4). Submit a recommendation and
 free-text comments; there are no per-criterion scores on the delivered
 wire format (a gap from the design specification's fuller
-<code>Review</code> model, noted in <code>docs/05-api-contract.md</code>
-section 8).</p>
+<code>Review</code> model, noted in API_Contract.pdf section 8).</p>
 <h3 id="144-as-an-editor">14.4 As an editor</h3>
 <p><code>/editor</code> lists the screening queue (manuscripts in
 <code>submitted</code>). Screen a submission to move it into
@@ -2029,9 +2013,8 @@ account required)</h3>
 authentication. Browse and search published papers; download the
 original PDF of any published paper. Citation export (BibTeX/RIS) and
 OAI-PMH harvesting are specified (design specification section 10.3) but
-not present in the delivered API surface
-(<code>docs/05-api-contract.md</code> section 6 — no
-<code>/archive</code> citation-export or <code>/oai</code> route
+not present in the delivered API surface (API_Contract.pdf section 6 —
+no <code>/archive</code> citation-export or <code>/oai</code> route
 exists).</p>
 <hr />
 <h2 id="15-maintenance-strategy">15. Maintenance strategy</h2>
@@ -2114,10 +2097,9 @@ Hungarian-algorithm (<code>scipy.optimize.linear_sum_assignment</code>)
 global assignment, editor-overridable. None of this is built; reviewer
 assignment today is a persistence-only record with no matching, no
 invitation lifecycle, and no conflict-of-interest check
-(<code>docs/05-api-contract.md</code> section 8). This is also the piece
-of work that retires TD-02, TD-03 and TD-07 together (section 12.7) —
-the highest-leverage single addition against the current debt
-register.</p>
+(API_Contract.pdf section 8). This is also the piece of work that
+retires TD-02, TD-03 and TD-07 together (section 12.7) — the
+highest-leverage single addition against the current debt register.</p>
 <p><strong>The asynchronous processing pipeline.</strong> Text
 extraction, MinHash/LSH similarity screening against the internal
 corpus, and metadata-stripped anonymised-derivative generation, enqueued
@@ -2215,8 +2197,7 @@ spec files (section 11.6).</li>
 <code>POST /manuscripts</code> is JSON-only — submission of an actual
 PDF, and the anonymisation/similarity pipeline that would process one,
 are specified (design specification section 10.2) but not built
-(<code>docs/05-api-contract.md</code> section 8, section 16 of this
-document).</li>
+(API_Contract.pdf section 8, section 16 of this document).</li>
 <li><strong>Explicit, permanent out-of-scope items</strong> (design
 specification section 4.2), restated as hard limits rather than soft
 gaps: no payment or article-processing-charge handling; no copy-editing
@@ -2314,7 +2295,7 @@ Cases: A Practical Guide</em>.</li>
 II</em> — Early Design model.</li>
 <li>Fowler, M. — technical debt quadrant (deliberate/inadvertent ×
 reckless/prudent), the classification basis for
-<code>docs/04-technical-debt-register.md</code>.</li>
+Technical_Debt_Plan.pdf.</li>
 <li>IETF RFC 9457, <em>Problem Details for HTTP APIs</em> — the
 platform's error-response format (section 9.3).</li>
 <li>Open Archives Initiative, <em>OAI-PMH 2.0 specification</em>
@@ -2322,28 +2303,24 @@ platform's error-response format (section 9.3).</li>
 </ul>
 <p><strong>Project documents (this repository):</strong></p>
 <ul>
-<li><code>docs/02-srs.md</code> — Software Requirements
-Specification</li>
-<li><code>docs/03-effort-estimation.md</code> — Effort estimation</li>
-<li><code>docs/04-technical-debt-register.md</code> — Technical debt
-register</li>
-<li><code>docs/05-api-contract.md</code> — API contract</li>
-<li><code>docs/06-testing-report.md</code> — Testing report</li>
-<li><code>docs/07-user-manual.md</code> — User manual (in progress at
-the time of writing; section 14 stands in until it is complete)</li>
-<li><code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code>
-— Design specification</li>
+<li>SRS.pdf — Software Requirements Specification</li>
+<li>Effort_Estimation.pdf — Effort estimation</li>
+<li>Technical_Debt_Plan.pdf — Technical debt register</li>
+<li>API_Contract.pdf — API contract</li>
+<li>Testing_Report.pdf — Testing report</li>
+<li>User_Manual.pdf — User manual (in progress at the time of writing;
+section 14 stands in until it is complete)</li>
+<li>the design specification — Design specification</li>
 </ul>
 <p><strong>AI-assisted development acknowledgement.</strong> Consistent
-with the acknowledgement recorded in
-<code>docs/03-effort-estimation.md</code> section 9 and section 11, this
-document — and the code, tests and documents it consolidates — were
-produced with Claude Code (Anthropic), an AI coding assistant, under the
-direction and review of the author. The assistant drafted prose and code
-from the author's instructions and the design specification; the author
-directed the work, reviewed every output, and accepts sole
-responsibility for its correctness and for the claims and conclusions
-recorded in this document.</p>
+with the acknowledgement recorded in Effort_Estimation.pdf section 9 and
+section 11, this document — and the code, tests and documents it
+consolidates — were produced with Claude Code (Anthropic), an AI coding
+assistant, under the direction and review of the author. The assistant
+drafted prose and code from the author's instructions and the design
+specification; the author directed the work, reviewed every output, and
+accepts sole responsibility for its correctness and for the claims and
+conclusions recorded in this document.</p>
 </main>
 <footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>
 </body>

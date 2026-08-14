@@ -270,7 +270,7 @@ This is the section with the most to learn from. Every entry below was found eit
 human or an agent reading code against what it claimed to do, by mutation testing, or by
 exercising the deployed system — none were found by a coverage number or a passing test suite
 on its own. Full Debt → Cause → Impact → Priority → Resolution entries for the still-open
-items are in `docs/04-technical-debt-register.md`; this section retells them from the
+items are in Technical_Debt_Plan.pdf; this section retells them from the
 testing perspective — what the test evidence looked like, and how the gap was closed.
 
 ### 4.1 Mutation testing found the hash chain's chaining step was untested
@@ -284,7 +284,7 @@ entire purpose of a hash *chain*. The suite was at 100% line and branch coverage
 
 **How it was found.** Manual mutation testing: deliberately deleting a line believed to be
 load-bearing and re-running the suite, rather than trusting the coverage figure. This is
-recorded in `docs/04-technical-debt-register.md` (TD-11) as one of four mutations that
+recorded in Technical_Debt_Plan.pdf (TD-11) as one of four mutations that
 survived a 100%-covered suite.
 
 **Why it mattered.** It is the sharpest illustration in this project of the gap between
@@ -357,7 +357,7 @@ found.
 
 **How it was found.** Reading the module's logic against what the coverage report claimed,
 rather than trusting "0 branches missing" as proof of exhaustive exercise. Recorded in
-`docs/04-technical-debt-register.md` (TD-11) as the register's second illustration of
+Technical_Debt_Plan.pdf (TD-11) as the register's second illustration of
 coverage as a weak signal — a companion finding to the mutation-testing result in section 4.1, found
 the same review pass.
 
@@ -509,7 +509,7 @@ revision is not repeated for this report beyond the live checks above.
   vulnerability scanner, a SAST tool, or a DAST pass against the deployed API. Security
   coverage in this project is what the tests in section 3.5 assert directly, and nothing beyond that.
 - **No mutation testing in CI.** The mutation-testing finding in section 4.1 was a one-off manual
-  review pass, not a repeatable gate. `docs/04-technical-debt-register.md` (TD-11) records
+  review pass, not a repeatable gate. Technical_Debt_Plan.pdf (TD-11) records
   systematic mutation testing (`mutmut` or `cosmic-ray`) as future evolution, not as something
   this project currently runs.
 - **No browser-matrix testing.** The live UAT pass in section 5 was run in one browser (a
@@ -580,7 +580,7 @@ upload hung.
 None of this is an argument against the automated suite. 402 unit tests, 84 integration tests
 against a real database, 79 frontend tests, two architecture contracts, and a strict type
 checker catch an enormous amount of regression cheaply and continuously — exactly what section 1 claims for them, and
-exactly the floor `docs/04-technical-debt-register.md` describes them as. But the register's
+exactly the floor Technical_Debt_Plan.pdf describes them as. But the register's
 own closing observation, produced independently of this report, states the same conclusion
 this section reaches from the test evidence directly: ten of its eleven entries were found by
 review of work that had already passed every automated gate — linting, strict typing, an

@@ -402,10 +402,10 @@ confirmed against its own <code>/openapi.json</code>), the live frontend
 (<code>https://ugjcs-frontend.vercel.app</code>), the backend source
 under <code>backend/src/ugjcs/api/</code> and
 <code>frontend/src/app/</code>, the test suites under
-<code>backend/tests/</code>, and <code>docs/06-testing-report.md</code>.
-That first revision moved twelve requirements from planned to
-implemented-and-tested, refined six to "partially implemented" with a
-named gap, and left eleven genuinely not implemented.</p>
+<code>backend/tests/</code>, and Testing_Report.pdf. That first revision
+moved twelve requirements from planned to implemented-and-tested,
+refined six to "partially implemented" with a named gap, and left eleven
+genuinely not implemented.</p>
 <p>A second revision on 2026-08-14 reconciled the document against two
 feature waves that landed after the original build. It moved eight
 further lines to implemented-and-tested, added six new requirements
@@ -548,11 +548,9 @@ predecessor's hash and its own payload</td>
 </table></div>
 <h3 id="14-references">1.4 References</h3>
 <ul>
-<li>Design specification —
-<code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code></li>
-<li>Effort estimation — <code>docs/03-effort-estimation.md</code></li>
-<li>Technical debt register —
-<code>docs/04-technical-debt-register.md</code></li>
+<li>Design specification — the design specification</li>
+<li>Effort estimation — Effort_Estimation.pdf</li>
+<li>Technical debt register — Technical_Debt_Plan.pdf</li>
 <li>Domain implementation —
 <code>backend/src/ugjcs/domain/{transitions,enums,policies,blinding,manuscript,hashchain,events}.py</code></li>
 <li>IEEE Std 830-1998, <em>Recommended Practice for Software
@@ -1968,7 +1966,7 @@ built and tested but a named, specific piece is missing — never "mostly
 done" without saying what the remainder is); <strong>Not
 implemented</strong> (no code exists for this requirement's behaviour,
 stated as such rather than described euphemistically).</p>
-<div class="tablewrap"><table><colgroup><col style="width:8.45%" /><col style="width:8.45%" /><col style="width:22.09%" /><col style="width:26.67%" /><col style="width:34.35%" /></colgroup>
+<div class="tablewrap"><table><colgroup><col style="width:8.45%" /><col style="width:8.45%" /><col style="width:22.1%" /><col style="width:26.67%" /><col style="width:34.33%" /></colgroup>
 <thead>
 <tr>
 <th>FR</th>
@@ -1995,10 +1993,9 @@ built and tested, including duplicate-email and replay handling. But no
 <code>/auth/register</code> route exists (absent from the live
 <code>/openapi.json</code>) and the frontend has no registration screen
 — only <code>/login</code>. Accounts in the deployed system are
-provisioned by seed data (the judge accounts in
-<code>docs/06-testing-report.md</code> section 5), not
-self-registration. Missing: the API route and the frontend form that
-would call it.</td>
+provisioned by seed data (the judge accounts in Testing_Report.pdf
+section 5), not self-registration. Missing: the API route and the
+frontend form that would call it.</td>
 </tr>
 <tr>
 <td>FR-02</td>
@@ -2033,8 +2030,8 @@ the persistence of a role change are both implemented and tested against
 a real database. No <code>/admin</code> API route or frontend screen
 exists to let an Administrator invoke this — confirmed absent from
 <code>/openapi.json</code> and from <code>frontend/src/app/</code>, and
-stated explicitly in <code>docs/06-testing-report.md</code> section 5:
-"no UI surface exists for this yet."</td>
+stated explicitly in Testing_Report.pdf section 5: "no UI surface exists
+for this yet."</td>
 </tr>
 <tr>
 <td>FR-04</td>
@@ -2256,8 +2253,8 @@ response-to-reviewers letter and the ownership check.</td>
 <td><code>test_manuscripts_router.py</code>:
 <code>test_mine_lists_only_the_callers_manuscripts</code>,
 <code>test_retrieving_someone_elses_manuscript_is_forbidden</code>; live
-UAT (<code>docs/06-testing-report.md</code> section 5): ten submissions
-listed with correct tracking codes and statuses</td>
+UAT (Testing_Report.pdf section 5): ten submissions listed with correct
+tracking codes and statuses</td>
 <td><strong>Partially implemented.</strong> An author's own-manuscripts
 list, correctly scoped and rendered, is implemented, tested and
 confirmed live. The <strong>status timeline</strong> clause is not met
@@ -2290,10 +2287,10 @@ a persisted aggregate — an <code>IssueId</code> is derived
 deterministically from <code>(volume, number)</code>
 (<code>domain/ids.py</code>, <code>mint_issue_id</code>) rather than
 looked up — a documented simplification, not a gap against this
-requirement's testable behaviour. <code>docs/06-testing-report.md</code>
-section 4.5 records that these two routes, plus resubmission, were at
-one point fully domain-tested but reachable by no route at all; that gap
-is closed and is exactly what the cited tests now pin.</td>
+requirement's testable behaviour. Testing_Report.pdf section 4.5 records
+that these two routes, plus resubmission, were at one point fully
+domain-tested but reachable by no route at all; that gap is closed and
+is exactly what the cited tests now pin.</td>
 </tr>
 <tr>
 <td>FR-16</td>
@@ -2341,8 +2338,7 @@ when the match landed in the body. Body text is extracted at publication
 and a failed extraction never blocks the publish. Still not met: the
 "with filters" clause, since no keyword or date filter exists. NFR-09's
 800 ms p95 bound remains unverified, because no load or performance test
-exists in this project (<code>docs/06-testing-report.md</code> section
-6).</td>
+exists in this project (Testing_Report.pdf section 6).</td>
 </tr>
 <tr>
 <td>FR-18</td>
@@ -2794,7 +2790,7 @@ single "still catching up" claim.</p>
 limitations</h2>
 <p>This system does not guarantee everything its feature list might
 suggest. The following limitations are stated plainly, each
-cross-referenced to <code>docs/04-technical-debt-register.md</code>.</p>
+cross-referenced to Technical_Debt_Plan.pdf.</p>
 <ul>
 <li><strong>Double-blind review is not text-scrubbed — implemented as
 designed, with a limit that is now demonstrated in production, not

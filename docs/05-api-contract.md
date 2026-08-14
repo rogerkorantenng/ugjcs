@@ -500,7 +500,7 @@ ActiveChangeRequest       { is_active: bool }
 
 ---
 
-## 8. Known gaps carried into `docs/04-technical-debt-register.md`
+## 8. Known gaps carried into Technical_Debt_Plan.pdf
 
 - `GET /auth/me` still cannot supply a display name. `SessionUser` on the frontend has only `{id, email, roles}`, and `email` comes from the login form the BFF already validated rather than from any backend response.
 - No pagination on any list endpoint.

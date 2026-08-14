@@ -439,7 +439,7 @@ analysis is not free to cherry-pick after the fact:
   (section 6) follow this method.
 - Boehm, B. et al. (2000). *Software Cost Estimation with COCOMO II* — Early
   Design model, scale factors and effort multipliers (section 7) follow this method.
-- `docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md` — the
+- the design specification — the
   design specification this estimate is derived from: section 5.1 supplies the
   functional-requirement inventory behind section 3's use cases; section 14 sets the
   estimation approach this document follows; section 15 sets the technical debt
