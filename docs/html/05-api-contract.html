@@ -6,6 +6,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>05 · API Contract</title>
   <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -87,32 +232,113 @@
     code span.vs { color: #4070a0; } /* VerbatimString */
     code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="" />
   <style>
-  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
-  * { box-sizing:border-box; }
-  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
-  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
-  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
-  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
-  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
-  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
-  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
-  h3 { font-size:1.12rem; margin-top:1.8rem; }
-  a { color:#4b3f9e; }
-  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
-  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
-  pre code { background:none; color:inherit; padding:0; }
-  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
-  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
-  th { background:#eceee9; font-weight:600; }
-  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
-  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
-  figure.diagram svg { max-width:100%; height:auto; }
-  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
-  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
-  </style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      /* The extra [class] is a hack that increases specificity enough to
+         override a similar rule in reveal.js */
+      ul.task-list[class]{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        font-size: inherit;
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1.6em;
+        vertical-align: middle;
+      }
+      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+      /* CSS for syntax highlighting */
+      html { -webkit-text-size-adjust: 100%; }
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { color: #008000; } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { color: #008000; font-weight: bold; } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+  <style>
+    :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+    header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+    header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+    header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+    main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+    h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+    h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+    h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+    h3 { font-size:1.12rem; margin-top:1.8rem; }
+    a { color:#4b3f9e; }
+    code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+    pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+    pre code { background:none; color:inherit; padding:0; }
+    table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+    th { background:#eceee9; font-weight:600; }
+    blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+    figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+    figure.diagram svg { max-width:100%; height:auto; }
+    nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+    footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+    </style>
 </head>
 <body>
 <header class="site">
@@ -125,106 +351,110 @@
 <h1 class="title">05 · API Contract</h1>
 </header>
 <h1 id="sdj-editorial-portal--api-contract">SDJ Editorial Portal — API
-Contract</h1>
-<p><strong>Project:</strong> SDJ Editorial Portal — an editorial portal
+contract</h1>
+<p><strong>Project:</strong> SDJ Editorial Portal, an editorial portal
 for the Science and Development Journal (SDJ), published by the College
 of Basic and Applied Sciences, University of Ghana
 <strong>Author:</strong> Roger Koranteng Obeng (22424140)
-<strong>Established:</strong> 2026-08-12 <strong>Status:</strong>
+<strong>Established:</strong> 2026-08-12 <strong>Last reconciled against
+the running code:</strong> 2026-08-14 <strong>Status:</strong>
 Authoritative. This document is the single source of truth for the HTTP
-boundary between the FastAPI backend (Plan 4) and the Next.js frontend
-(Plan 5). Where either plan's prose disagrees with this document, this
-document wins; the disagreement is a defect in the plan, to be corrected
-there, not here.</p>
+boundary between the FastAPI backend and the Next.js frontend. Where a
+plan's prose disagrees with this document, this document wins; the
+disagreement is a defect in the plan, to be corrected there, not
+here.</p>
 <h2 id="how-this-document-came-to-exist">How this document came to
 exist</h2>
 <p>Plan 4 (the editorial API) and Plan 5 (the frontend) were drafted
 concurrently, each against an assumed shape for the other. Plan 4 was
 written directly against the executed domain, persistence and
-authentication code from Plans 1–3, and is therefore authoritative on
-wire format. Plan 5's assumptions have been reconciled against it; this
-document records the settled contract both plans now point at, so a
-future change to either plan has one place to check rather than two
-plans to diff against each other.</p>
+authentication code from Plans 1 to 3, and is therefore authoritative on
+wire format. Plan 5's assumptions were reconciled against it, and this
+document records the settled contract both plans point at.</p>
+<p>It has since been re-reconciled against the two feature waves that
+followed the original build. Every route table below was regenerated
+from the router modules rather than edited by hand.</p>
 <hr />
 <h2 id="1-authentication-mechanism">1. Authentication mechanism</h2>
 <ul>
 <li><strong>Scheme:</strong> OAuth2-style bearer tokens. The backend
-issues a short-lived <strong>access token</strong> (a signed JWT,
-<code>HS256</code>, carrying <code>sub</code> and <code>exp</code>) and
-a longer-lived opaque <strong>refresh token</strong>, both minted by
-<code>ugjcs.infrastructure.security.tokens.JwtTokenService</code> (Plan
-3).</li>
+issues a short-lived access token (a signed JWT, <code>HS256</code>,
+carrying <code>sub</code> and <code>exp</code>) and a longer-lived
+opaque refresh token, both minted by
+<code>ugjcs.infrastructure.security.tokens.JwtTokenService</code>.</li>
 <li><strong>Presentation:</strong> every authenticated backend request
 carries <code>Authorization: Bearer &lt;access_token&gt;</code>. There
-is no cookie on the backend origin — the backend is a pure bearer-token
+is no cookie on the backend origin. The backend is a pure bearer-token
 API and holds no session state of its own beyond the persisted
 refresh-token record.</li>
 <li><strong>Token lifetimes:</strong> configurable via
 <code>Settings.access_token_minutes</code> and
-<code>Settings.refresh_token_days</code>; the access token's own
-<code>exp</code> claim is the only wire-visible expiry — no response
+<code>Settings.refresh_token_days</code>. The access token's own
+<code>exp</code> claim is the only wire-visible expiry; no response
 field states a lifetime in seconds.</li>
 <li><strong>Refresh rotation:</strong>
 <code>POST /api/v1/auth/refresh</code> consumes the current refresh
-token and returns a new access/refresh pair. Plan 3 rotates the refresh
-token on every use and supports reuse detection (a replayed,
-already-rotated refresh token revokes its whole token family). Only one
-refresh token is ever live per session; a client must persist the
-rotated value before its next call.</li>
+token and returns a new pair. The refresh token rotates on every use,
+and reuse is detected: a replayed, already-rotated token revokes its
+whole family. Only one refresh token is live per session, so a client
+must persist the rotated value before its next call.</li>
 <li><strong>Frontend session boundary:</strong> the browser never sees a
-bearer token. The Next.js app is a Backend-For-Frontend: Route Handlers
-under <code>frontend/src/app/api/**</code> unseal a single
-<strong>httpOnly, Secure (in production), SameSite=Lax cookie named
-<code>ugjcs_session</code></strong> (sealed with
-<code>iron-session</code>), attach the bearer token to the upstream
-backend call server-side, and reseal the cookie with any rotated tokens
-before responding. No Client Component, <code>localStorage</code>,
-<code>sessionStorage</code> or URL ever carries a token.</li>
-<li><strong>Frontend refresh flow:</strong> <code>authedFetch</code>
-(the only function permitted to call the backend on behalf of an
-authenticated page) refreshes proactively when the stored
-<code>accessTokenExpiresAt</code> — decoded from the access token's own
-<code>exp</code> claim, since the response carries no
-<code>expires_in</code> — is within 5 seconds of expiry, and reactively
+bearer token. The Next.js app is a Backend-For-Frontend. Route Handlers
+under <code>frontend/src/app/api/**</code> unseal a single httpOnly,
+Secure (in production), <code>SameSite=Lax</code> cookie named
+<code>ugjcs_session</code>, sealed with <code>iron-session</code>,
+attach the bearer token to the upstream call server-side, and reseal the
+cookie with any rotated tokens before responding. No Client Component,
+<code>localStorage</code>, <code>sessionStorage</code> or URL ever
+carries a token.</li>
+<li><strong>Frontend refresh flow:</strong> <code>authedFetch</code> is
+the only function permitted to call the backend on behalf of an
+authenticated page. It refreshes proactively when the stored
+<code>accessTokenExpiresAt</code>, decoded from the access token's own
+<code>exp</code> claim, is within 5 seconds of expiry, and reactively
 once more on an unexpected <code>401</code>, to absorb clock skew
 between the two processes. <code>middleware.ts</code> enforces the
-<code>/author</code>, <code>/reviewer</code>, <code>/editor</code>
-prefixes as a routing-level gate in front of this; the backend's own
-authorisation check is what is actually authoritative.</li>
+<code>/author</code>, <code>/reviewer</code>, <code>/editor</code> and
+<code>/admin</code> prefixes as a routing-level gate in front of this.
+The backend's own authorisation check is what is actually
+authoritative.</li>
 <li><strong>Login response does not carry a user object.</strong>
 <code>POST /auth/login</code> returns only
 <code>{access_token, refresh_token, token_type}</code>. The frontend
 derives the session's user by keeping the <code>email</code> from the
 request it already validated and calling <code>GET /auth/me</code> with
 the freshly issued access token for <code>{id, roles}</code>.</li>
+<li><strong>Self-service registration exists, for authors only.</strong>
+<code>POST /auth/register</code> grants exactly
+<code>Role.AUTHOR</code>. Reviewer, editor and administrator roles are
+appointed through the admin console, never self-selected. Email delivery
+is mocked in this prototype (the verification link is logged rather than
+sent), so a registered account is verified immediately and signed
+in.</li>
 </ul>
 <hr />
 <h2 id="2-naming-convention">2. Naming convention</h2>
-<p><strong>snake_case everywhere on the wire</strong> — every JSON field
-name and every enum value, on both requests and responses, exactly as
-Pydantic v2 serialises Python identifiers by default. There is
-<strong>no camelCase translation layer anywhere</strong> in either plan:
-<code>src/types/api.ts</code> on the frontend mirrors the backend's
-field names byte-for-byte, and <code>Role</code>,
-<code>ManuscriptStatus</code>, <code>Recommendation</code> and
-<code>DecisionType</code> are copied verbatim from
-<code>ugjcs.domain.enums</code> rather than re-spelled.</p>
-<p><strong>Conversion point:</strong> none exists, deliberately. This
-was a considered choice, not an oversight: introducing a camelCase
+<p>snake_case everywhere on the wire, for every JSON field name and
+every enum value, on both requests and responses, exactly as Pydantic v2
+serialises Python identifiers by default. There is no camelCase
+translation layer anywhere: <code>src/types/api.ts</code> on the
+frontend mirrors the backend's field names byte for byte, and
+<code>Role</code>, <code>ManuscriptStatus</code>,
+<code>Recommendation</code> and <code>DecisionType</code> are copied
+verbatim from <code>ugjcs.domain.enums</code> rather than
+re-spelled.</p>
+<p>No conversion point exists, deliberately. Introducing a camelCase
 boundary would mean maintaining a mapping layer with no behavioural
 payoff, since the frontend is the only consumer and TypeScript is
-equally happy with either casing. If a second, JavaScript-idiomatic API
-consumer is ever added, the conversion point would belong in
+equally happy with either casing. If a second, JavaScript-idiomatic
+consumer is ever added, the conversion belongs in
 <code>frontend/src/lib/backend.ts</code> and
-<code>frontend/src/lib/auth-fetch.ts</code> — the two functions every
-Route Handler is required to route backend calls through — and nowhere
-else.</p>
+<code>frontend/src/lib/auth-fetch.ts</code>, the two functions every
+Route Handler routes backend calls through, and nowhere else.</p>
 <hr />
 <h2 id="3-error-format">3. Error format</h2>
-<p>Every error response, from every endpoint, is an <strong>RFC 9457
-Problem Details</strong> JSON object served as
-<code>application/problem+json</code>:</p>
+<p>Every error response, from every endpoint, is an RFC 9457 Problem
+Details JSON object served as <code>application/problem+json</code>:</p>
 <table>
 <thead>
 <tr>
@@ -238,14 +468,14 @@ Problem Details</strong> JSON object served as
 <td><code>type</code></td>
 <td>string</td>
 <td>Always the literal <code>"about:blank"</code> in the current
-implementation — no per-error-class URIs are minted.</td>
+implementation; no per-error-class URIs are minted.</td>
 </tr>
 <tr>
 <td><code>title</code></td>
 <td>string</td>
-<td>The raising exception's class name (e.g.
-<code>"IllegalTransitionError"</code>,
-<code>"AuthorizationDeniedError"</code>). This is what the frontend's
+<td>The raising exception's class name, for example
+<code>"IllegalTransitionError"</code> or
+<code>"AuthorizationDeniedError"</code>. This is what the frontend's
 <code>ProblemAlert</code> component renders as its headline.</td>
 </tr>
 <tr>
@@ -256,7 +486,7 @@ implementation — no per-error-class URIs are minted.</td>
 <tr>
 <td><code>detail</code></td>
 <td>string, optional</td>
-<td>A human-readable elaboration; present on validation failures and
+<td>A human-readable elaboration, present on validation failures and
 most domain errors.</td>
 </tr>
 <tr>
@@ -266,9 +496,9 @@ most domain errors.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Status code mapping</strong> (<code>ugjcs.api.errors</code>,
-ordered by specificity — an unlisted <code>DomainError</code> subclass
-falls through to <code>400</code>):</p>
+<p>Status code mapping (<code>ugjcs.api.errors</code>, ordered by
+specificity; an unlisted <code>DomainError</code> subclass falls through
+to <code>400</code>):</p>
 <table>
 <thead>
 <tr>
@@ -308,27 +538,40 @@ validation)</td>
 <td>422 Unprocessable Entity</td>
 </tr>
 <tr>
-<td><code>HTTPException</code> raised directly (e.g. not-found
-lookups)</td>
-<td>whatever status it was raised with (typically 404)</td>
+<td><code>HTTPException</code> raised directly</td>
+<td>whatever status it was raised with, typically 404</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Frontend contract:</strong> every Route Handler relays this
-shape verbatim to the browser — <code>ProblemDetailsError</code>
-(<code>src/lib/backend.ts</code>, <code>src/lib/auth-fetch.ts</code>)
-carries the parsed <code>ProblemDetails</code> object and the status
-code together, and no Route Handler invents its own error shape.
-<code>ProblemDetails.type</code>/<code>title</code> are typed as plain
-<code>string</code>, not a narrower literal union, since the backend
-does not currently commit to a closed set of <code>type</code>
-values.</p>
+<p>Two status codes are raised directly by routers rather than mapped
+from a domain error, and are worth calling out because a client must
+handle them:</p>
+<ul>
+<li><strong>422</strong> from <code>POST /manuscripts</code> and
+<code>POST /manuscripts/{code}/resubmit</code> when the uploaded file is
+not a readable PDF. The anonymised derivative is produced before the
+original is stored, so a file that passes the <code>%PDF</code>
+magic-byte check but fails to parse is refused rather than
+half-stored.</li>
+<li><strong>502</strong> from
+<code>POST /billing/{code}/initialize</code> and <code>.../verify</code>
+when the upstream payment gateway is unreachable or answers with
+something unusable.</li>
+</ul>
+<p>The frontend relays this shape verbatim to the browser.
+<code>ProblemDetailsError</code> (<code>src/lib/backend.ts</code>,
+<code>src/lib/auth-fetch.ts</code>) carries the parsed
+<code>ProblemDetails</code> object and the status code together, and no
+Route Handler invents its own error shape.
+<code>ProblemDetails.type</code> and <code>title</code> are typed as
+plain <code>string</code>, not a narrower literal union, since the
+backend does not commit to a closed set of <code>type</code> values.</p>
 <hr />
 <h2 id="4-manuscript-status-vocabulary">4. Manuscript status
 vocabulary</h2>
-<p>Copied verbatim from <code>ugjcs.domain.enums.ManuscriptStatus</code>
-(Plan 1) — the frontend must never invent its own spelling of a value
-the backend sends:</p>
+<p>Copied verbatim from
+<code>ugjcs.domain.enums.ManuscriptStatus</code>. The frontend must
+never invent its own spelling of a value the backend sends:</p>
 <p><code>draft</code>, <code>submitted</code>,
 <code>under_screening</code>, <code>desk_rejected</code>,
 <code>under_review</code>, <code>reviews_complete</code>,
@@ -344,33 +587,36 @@ the backend sends:</p>
 <li><strong><code>Recommendation</code></strong>
 (<code>ugjcs.domain.enums.Recommendation</code>): <code>accept</code>,
 <code>minor_revision</code>, <code>major_revision</code>,
-<code>reject</code> — used only as <code>&lt;select&gt;</code> option
-values in the frontend's review form;
-<code>SubmitReviewRequest.recommendation</code> is an unvalidated
-<code>str</code> on the backend, so a value outside this list is a
-frontend bug, not a <code>422</code>.</li>
+<code>reject</code>. Used as <code>&lt;select&gt;</code> option values
+in the review form. <code>SubmitReviewRequest.recommendation</code> is
+an unvalidated <code>str</code> on the backend, so a value outside this
+list is a frontend bug, not a <code>422</code>.</li>
 <li><strong><code>DecisionType</code></strong>
 (<code>ugjcs.domain.enums.DecisionType</code>):
 <code>desk_reject</code>, <code>send_to_review</code>,
 <code>request_revision</code>, <code>accept</code>,
 <code>reject</code></li>
+<li><strong>APC invoice status</strong>
+(<code>ApcInvoiceOut.status</code>, a plain string on the wire):
+<code>pending</code>, <code>paid</code>, <code>waived</code></li>
 </ul>
 <hr />
 <h2 id="5-pagination">5. Pagination</h2>
 <p>None, anywhere. Every list-returning endpoint returns a flat,
-unbounded JSON array. This is a deliberate scope decision for a 48-hour
-demonstration corpus, recorded in Plan 4; adding pagination later is an
-additive query parameter, not a redesign.</p>
+unbounded JSON array. This is a deliberate scope decision for a
+demonstration corpus, and adding pagination later is an additive query
+parameter rather than a redesign.</p>
 <hr />
 <h2 id="6-endpoints">6. Endpoints</h2>
 <p>All paths below are relative to <code>/api/v1</code> unless marked
 <strong>(unversioned)</strong>. "Auth" states the bearer requirement
-and, where relevant, the role enforced by
-<code>ugjcs.domain.policies.Action</code> via
-<code>require(Action.…)</code>; "Ownership" marks the two actions
-(<code>RESUBMIT</code>, <code>WITHDRAW</code>) gated by
-<code>_OWNERSHIP_ACTIONS</code> — corresponding author only, checked a
-second time inside the handler once the manuscript is loaded.</p>
+and, where relevant, the <code>ugjcs.domain.policies.Action</code>
+enforced by <code>require_action(...)</code>. Two actions,
+<code>RESUBMIT</code> and <code>WITHDRAW</code>, are additionally gated
+on ownership: corresponding author only, checked a second time inside
+the handler once the manuscript is loaded.</p>
+<p>Forty-three routes exist across nine routers plus the two operational
+probes. They are listed here in full.</p>
 <h3 id="operations">Operations</h3>
 <table>
 <thead>
@@ -387,7 +633,7 @@ second time inside the handler once the manuscript is loaded.</p>
 <td>GET</td>
 <td><code>/health</code> <strong>(unversioned)</strong></td>
 <td>none</td>
-<td><code>{}</code>-shaped liveness body</td>
+<td>liveness body</td>
 <td>200</td>
 </tr>
 <tr>
@@ -414,19 +660,27 @@ second time inside the handler once the manuscript is loaded.</p>
 <tbody>
 <tr>
 <td>POST</td>
+<td><code>/auth/register</code></td>
+<td>none</td>
+<td><code>{email, password, full_name, affiliation}</code></td>
+<td><code>TokenPairOut</code></td>
+<td>201 / 400 (weak password or address already registered)</td>
+</tr>
+<tr>
+<td>POST</td>
 <td><code>/auth/login</code></td>
 <td>none</td>
 <td><code>{email, password}</code></td>
-<td><code>{access_token, refresh_token, token_type}</code></td>
-<td>200 / 401 (bad credentials)</td>
+<td><code>TokenPairOut</code></td>
+<td>200 / 401</td>
 </tr>
 <tr>
 <td>POST</td>
 <td><code>/auth/refresh</code></td>
 <td>none (refresh token in body)</td>
 <td><code>{refresh_token}</code></td>
-<td><code>{access_token, refresh_token, token_type}</code></td>
-<td>200 / 401 (invalid/expired/reused)</td>
+<td><code>TokenPairOut</code></td>
+<td>200 / 401 (invalid, expired or reused)</td>
 </tr>
 <tr>
 <td>POST</td>
@@ -441,18 +695,22 @@ second time inside the handler once the manuscript is loaded.</p>
 <td><code>/auth/me</code></td>
 <td>Bearer</td>
 <td>—</td>
-<td><code>{id, roles}</code></td>
+<td><code>ActorOut</code></td>
 <td>200 / 401</td>
 </tr>
 </tbody>
 </table>
 <p><code>GET /auth/me</code> serialises <code>Actor</code>, which
-carries only an id and a role set — <strong>no <code>email</code>, no
-<code>name</code></strong>. <code>Account.full_name</code> exists in
-Plan 3's domain but nothing on the auth path threads it through to HTTP
-yet (§8, technical debt).</p>
-<h3 id="manuscripts-manuscripts--author-facing">Manuscripts
-(<code>/manuscripts</code>) — author-facing</h3>
+carries an id and a role set and nothing else: no <code>email</code>, no
+<code>name</code>. <code>Account.full_name</code> exists in the domain
+but nothing on the auth path threads it through to HTTP. See section
+8.</p>
+<p><code>POST /auth/register</code> grants <code>Role.AUTHOR</code> and
+no other role, verifies the account immediately (email delivery is
+mocked), and signs it in by returning a token pair, so the frontend
+needs no second call to establish a session.</p>
+<h3 id="manuscripts-manuscripts-author-facing">Manuscripts
+(<code>/manuscripts</code>), author-facing</h3>
 <table>
 <thead>
 <tr>
@@ -468,12 +726,13 @@ yet (§8, technical debt).</p>
 <tr>
 <td>POST</td>
 <td><code>/manuscripts</code></td>
-<td>Bearer, role <code>author</code></td>
-<td><code>{title, abstract, keywords, co_author_ids?}</code> (JSON —
-<strong>not multipart</strong>; no file upload exists anywhere in this
-domain)</td>
-<td><code>ManuscriptOut</code></td>
-<td>201</td>
+<td>Bearer, <code>Action.SUBMIT</code></td>
+<td><strong><code>multipart/form-data</code></strong>:
+<code>title</code>, <code>abstract</code>, <code>file</code> (required),
+<code>keywords</code>, <code>co_author_ids</code></td>
+<td><code>ManuscriptSubmissionOut</code></td>
+<td>201 / 422 (unreadable PDF, or malformed
+<code>co_author_ids</code>)</td>
 </tr>
 <tr>
 <td>GET</td>
@@ -486,8 +745,8 @@ domain)</td>
 <tr>
 <td>GET</td>
 <td><code>/manuscripts/{tracking_code}</code></td>
-<td>Bearer; visibility via <code>Action.VIEW</code> (<code>can()</code>:
-editor/EIC/administrator, or a listed author)</td>
+<td>Bearer; visibility via <code>Action.VIEW</code> (editor, EIC,
+administrator, or a listed author)</td>
 <td>—</td>
 <td><code>ManuscriptOut</code></td>
 <td>200 / 403 / 404</td>
@@ -495,14 +754,40 @@ editor/EIC/administrator, or a listed author)</td>
 <tr>
 <td>POST</td>
 <td><code>/manuscripts/{tracking_code}/withdraw</code></td>
-<td>Bearer, <strong>ownership</strong> (<code>Action.WITHDRAW</code>;
-corresponding author only)</td>
+<td>Bearer, ownership (<code>Action.WITHDRAW</code>)</td>
 <td>—</td>
 <td><code>ManuscriptOut</code></td>
 <td>200 / 403 / 404</td>
 </tr>
+<tr>
+<td>POST</td>
+<td><code>/manuscripts/{tracking_code}/resubmit</code></td>
+<td>Bearer, ownership (<code>Action.RESUBMIT</code>)</td>
+<td><code>multipart/form-data</code> with a replacement
+<code>file</code></td>
+<td><code>ManuscriptSubmissionOut</code></td>
+<td>200 / 403 / 404 / 422</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/manuscripts/{tracking_code}/document</code></td>
+<td>Bearer, <code>Action.VIEW</code>; <code>?anonymised=true</code> is
+editor-only</td>
+<td>—</td>
+<td><code>DocumentUrlOut</code></td>
+<td>200 / 403 / 404 (no document attached)</td>
+</tr>
 </tbody>
 </table>
+<p>Submission is multipart only. A manuscript is required to carry a
+document from the moment it exists, so no submission path skips
+<code>file</code>. <code>keywords</code> and <code>co_author_ids</code>
+are comma-separated form strings, not JSON arrays, because they arrive
+in the same multipart body as the file.</p>
+<p>The anonymised derivative is produced before the original is stored.
+A file that passes the magic-byte check but fails to parse therefore
+yields a 422 and leaves nothing behind, rather than a 500 with a stored
+original and no derivative.</p>
 <h3 id="editorial-editorial">Editorial (<code>/editorial</code>)</h3>
 <table>
 <thead>
@@ -519,17 +804,32 @@ corresponding author only)</td>
 <tr>
 <td>GET</td>
 <td><code>/editorial/queue</code></td>
-<td>Bearer, role <code>editor</code>|<code>editor_in_chief</code>
-(<code>Action.SCREEN</code>)</td>
+<td><code>Action.SCREEN</code></td>
 <td>—</td>
 <td><code>ManuscriptOut[]</code> (hardcoded to
 <code>status == submitted</code>; no <code>?status=</code> filter)</td>
 <td>200</td>
 </tr>
 <tr>
+<td>GET</td>
+<td><code>/editorial/analytics</code></td>
+<td><code>Action.VIEW_AUDIT</code></td>
+<td>—</td>
+<td><code>EditorialAnalyticsOut</code></td>
+<td>200</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/editorial/reviewer-performance</code></td>
+<td><code>Action.VIEW_AUDIT</code></td>
+<td>—</td>
+<td><code>ReviewerPerformanceOut[]</code></td>
+<td>200</td>
+</tr>
+<tr>
 <td>POST</td>
 <td><code>/editorial/{tracking_code}/screen</code></td>
-<td>Bearer, <code>Action.SCREEN</code></td>
+<td><code>Action.SCREEN</code></td>
 <td><em>(no body)</em></td>
 <td><code>ManuscriptOut</code></td>
 <td>200 / 404</td>
@@ -537,25 +837,96 @@ corresponding author only)</td>
 <tr>
 <td>POST</td>
 <td><code>/editorial/{tracking_code}/decision</code></td>
-<td>Bearer, <code>Action.DECIDE</code></td>
+<td><code>Action.DECIDE</code></td>
 <td><code>{decision: DecisionType, rationale}</code></td>
 <td><code>ManuscriptOut</code></td>
-<td>200 / 404 — a desk rejection is <code>decision: "desk_reject"</code>
-on this same endpoint; there is no separate "screen with a rejecting
-decision" call</td>
+<td>200 / 404</td>
 </tr>
 <tr>
 <td>POST</td>
 <td><code>/editorial/{tracking_code}/reviewers</code></td>
-<td>Bearer, <code>Action.ASSIGN_REVIEWER</code></td>
+<td><code>Action.ASSIGN_REVIEWER</code></td>
 <td><code>{reviewer_id}</code></td>
 <td><em>(empty)</em></td>
-<td>204 / 404 — no <code>due_date</code>, no candidate-list endpoint;
-reviewer assignment is a persistence-only record (Plan 4 scope
-decision)</td>
+<td>204 / 404</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/editorial/{tracking_code}/assignments</code></td>
+<td><code>Action.ASSIGN_REVIEWER</code></td>
+<td>—</td>
+<td><code>AssignmentDeadlineOut[]</code></td>
+<td>200 / 404</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/editorial/{tracking_code}/reviewer-candidates</code></td>
+<td><code>Action.ASSIGN_REVIEWER</code></td>
+<td>—</td>
+<td><code>RankedReviewerCandidateOut[]</code></td>
+<td>200 / 404</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/editorial/{tracking_code}/reviews</code></td>
+<td><code>Action.DECIDE</code></td>
+<td>—</td>
+<td><code>ReviewOut[]</code></td>
+<td>200 / 404</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/editorial/{tracking_code}/schedule</code></td>
+<td><code>Action.PUBLISH</code></td>
+<td><code>{volume, number}</code></td>
+<td><code>ManuscriptOut</code></td>
+<td>200 / 404 / 409</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/editorial/{tracking_code}/publish</code></td>
+<td><code>Action.PUBLISH</code></td>
+<td><em>(no body)</em></td>
+<td><code>ManuscriptOut</code></td>
+<td>200 / 404 / 409</td>
 </tr>
 </tbody>
 </table>
+<p>A desk rejection is <code>decision: "desk_reject"</code> on the
+shared decision endpoint. There is no separate "screen with a rejecting
+decision" call.</p>
+<p><code>GET /{code}/reviews</code> is the only route in the API that
+returns <code>confidential_comments_to_editor</code>. It is gated on
+<code>Action.DECIDE</code>, which no author-reachable or
+reviewer-reachable route carries.</p>
+<p><code>POST /{code}/publish</code> also extracts the paper's body text
+and indexes it for full-text search. Indexing failure is not allowed to
+fail the publish.</p>
+<h3 id="decision-certificate-editorial-certificate">Decision certificate
+(<code>/editorial-certificate</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Auth</th>
+<th>Response</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/editorial-certificate/{tracking_code}</code></td>
+<td><code>Action.DECIDE</code></td>
+<td><code>application/pdf</code></td>
+<td>200 / 404 / 409 (no accept or reject decision recorded yet)</td>
+</tr>
+</tbody>
+</table>
+<p>A generated PDF stating the final decision, the tracking code and the
+audit chain's head hash, so a decision can be attested outside the
+portal. The response is a PDF byte stream, not JSON.</p>
 <h3 id="reviews-reviews">Reviews (<code>/reviews</code>)</h3>
 <table>
 <thead>
@@ -572,29 +943,90 @@ decision)</td>
 <tr>
 <td>GET</td>
 <td><code>/reviews/mine</code></td>
-<td>Bearer, role <code>reviewer</code> (<code>Action.REVIEW</code>)</td>
+<td><code>Action.REVIEW</code></td>
 <td>—</td>
-<td><code>BlindedManuscript[]</code> — the blinded manuscripts directly,
-not an assignment-summary wrapper; a manuscript's own
-<code>tracking_code</code> is the only handle on an assignment</td>
+<td><code>BlindedManuscriptOut[]</code></td>
 <td>200</td>
 </tr>
 <tr>
 <td>POST</td>
 <td><code>/reviews/{tracking_code}/submit</code></td>
-<td>Bearer, <code>Action.REVIEW</code></td>
-<td><code>{recommendation, comments}</code> — one free-text
-<code>recommendation</code> string, one free-text <code>comments</code>
-string; no per-criterion scores</td>
+<td><code>Action.REVIEW</code>, and assigned to this manuscript</td>
+<td><code>SubmitReviewRequest</code></td>
 <td><em>(empty)</em></td>
 <td>204 / 403 (not assigned)</td>
 </tr>
+<tr>
+<td>GET</td>
+<td><code>/reviews/{tracking_code}/document</code></td>
+<td><code>Action.REVIEW</code>, and assigned</td>
+<td>—</td>
+<td><code>DocumentUrlOut</code></td>
+<td>200 / 403 / 404</td>
+</tr>
 </tbody>
 </table>
-<h3
-id="public-archive-archive--no-authentication-anywhere-in-this-group">Public
-archive (<code>/archive</code>) — no authentication anywhere in this
-group</h3>
+<p><code>GET /reviews/mine</code> returns the blinded manuscripts
+directly rather than an assignment-summary wrapper, so a manuscript's
+own <code>tracking_code</code> is the only handle a reviewer has on an
+assignment.</p>
+<p><code>GET /reviews/{code}/document</code> returns a link to the
+anonymised derivative, never the original. The reviewer path has no
+route that can reach the original file.</p>
+<h3 id="administration-admin">Administration (<code>/admin</code>)</h3>
+<p>Every route is gated on <code>Action.MANAGE_USERS</code>, which only
+<code>Role.ADMINISTRATOR</code> holds.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Request body</th>
+<th>Response</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/admin/accounts</code></td>
+<td>—</td>
+<td><code>AdminAccountOut[]</code></td>
+<td>200 / 403</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/admin/accounts/{account_id}/roles</code></td>
+<td><code>{role: Role, grant: bool}</code></td>
+<td><code>AdminAccountOut</code></td>
+<td>200 / 403 (the administrator role itself) / 404</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/admin/accounts/{account_id}/capacity</code></td>
+<td><code>{reviewer_capacity: int}</code> (1 to 10)</td>
+<td><code>AdminAccountOut</code></td>
+<td>200 / 404 / 422</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/admin/accounts/{account_id}/active</code></td>
+<td><code>{is_active: bool}</code></td>
+<td><code>AdminAccountOut</code></td>
+<td>200 / 404 / 409 (self-deactivation)</td>
+</tr>
+</tbody>
+</table>
+<p>Two refusals are enforced in the router rather than the domain,
+because both are about protecting the console from itself. The
+administrator role cannot be granted or revoked through this API at all
+(403), and an administrator cannot deactivate their own account (409).
+Together these stop the last administrator from locking everyone
+out.</p>
+<h3 id="billing-billing">Billing (<code>/billing</code>)</h3>
+<p>Article processing charges. <code>GET</code> is readable by the
+corresponding author or any editor; settlement is corresponding-author
+only; waiving is Editor-in-Chief only.</p>
 <table>
 <thead>
 <tr>
@@ -608,36 +1040,116 @@ group</h3>
 <tbody>
 <tr>
 <td>GET</td>
+<td><code>/billing/{tracking_code}</code></td>
+<td>Bearer, payer or editor</td>
+<td><code>ApcInvoiceOut</code></td>
+<td>200 / 403 / 404 (no invoice)</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/billing/{tracking_code}/initialize</code></td>
+<td>Bearer, corresponding author</td>
+<td><code>BillingInitializeOut</code></td>
+<td>200 / 403 / 404 / 409 (already paid or waived) / 502</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/billing/{tracking_code}/verify</code></td>
+<td>Bearer, corresponding author</td>
+<td><code>BillingVerifyOut</code></td>
+<td>200 / 403 / 404 / 409 (waived, or never initialized) / 502</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/billing/{tracking_code}/waive</code></td>
+<td>Bearer, Editor-in-Chief</td>
+<td><code>ApcInvoiceOut</code></td>
+<td>200 / 403 / 404 / 409 (already paid)</td>
+</tr>
+</tbody>
+</table>
+<p>The waive route checks for the Editor-in-Chief role directly rather
+than reusing <code>Action.PUBLISH</code>. Waiving a charge and
+publishing a paper are different authorities that happen to sit with the
+same person, and borrowing the publish grant would misstate which one is
+being exercised.</p>
+<p>An invoice exists only once acceptance is on the record. Earlier
+statuses have nothing to bill, so <code>GET</code> answers 404 rather
+than inventing a zero invoice.</p>
+<p><strong>Mock mode is the default.</strong> With no Paystack secret
+key configured, <code>initialize</code> settles the invoice on the spot
+and answers <code>{mock: true, status: "paid"}</code> with no
+<code>authorization_url</code>. With a key configured it answers
+<code>{mock: false, status: "pending", authorization_url: "https://checkout.paystack.com/..."}</code>
+and the charge is only confirmed by a later <code>verify</code>. A
+caller must branch on <code>mock</code> explicitly rather than infer a
+real payment from a <code>paid</code> status. No billing shape carries
+the secret key, by construction.</p>
+<h3
+id="public-archive-archive-no-authentication-anywhere-in-this-group">Public
+archive (<code>/archive</code>), no authentication anywhere in this
+group</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>Response</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
 <td><code>/archive</code></td>
-<td>none</td>
-<td><code>ArchivePaperOut[]</code> — flat, unpaginated</td>
+<td><code>ArchivePaperOut[]</code>, flat and unpaginated</td>
+<td>200</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/archive/search?q=</code></td>
+<td><code>ArchiveSearchResultOut[]</code></td>
 <td>200</td>
 </tr>
 <tr>
 <td>GET</td>
 <td><code>/archive/{tracking_code}</code></td>
-<td>none</td>
 <td><code>ArchivePaperOut</code></td>
-<td>200 / 404 (also 404 if the manuscript exists but is not
-<code>published</code>)</td>
+<td>200 / 404</td>
 </tr>
 <tr>
 <td>GET</td>
-<td><code>/archive/search?q=</code></td>
-<td>none</td>
-<td><code>ArchivePaperOut[]</code> — a flat array, <strong>not</strong>
-<code>{results, total}</code>; no <code>page</code> parameter</td>
-<td>200</td>
+<td><code>/archive/{tracking_code}/document</code></td>
+<td><code>DocumentUrlOut</code></td>
+<td>200 / 404 (no document attached)</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/archive/{tracking_code}/provenance</code></td>
+<td><code>ProvenanceOut</code></td>
+<td>200 / 404</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/archive/{tracking_code}/citation?format=</code></td>
+<td><code>text/plain</code> (BibTeX or RIS)</td>
+<td>200 / 404</td>
 </tr>
 </tbody>
 </table>
-<p>Not exposed via HTTP in this plan:
-<code>Action.PUBLISH</code>/<code>Manuscript.schedule</code>/<code>Manuscript.publish</code>
-have no corresponding route — publication into the archive happens
-outside the HTTP boundary this plan builds.
-<code>Action.MANAGE_USERS</code> and <code>Action.VIEW_AUDIT</code> are
-likewise defined in the policy layer with no route exercising them
-yet.</p>
+<p>Every route here 404s if the manuscript exists but is not
+<code>published</code>. Unpublished work is not merely hidden from the
+list; it is unreachable by direct tracking code too.</p>
+<p><code>/archive/search</code> is Postgres full-text search over a
+stored <code>tsvector</code> covering title, abstract, keywords and the
+extracted body text of the PDF, ranked by <code>ts_rank</code>. Results
+carry a <code>snippet</code> (a <code>ts_headline</code> fragment with
+match terms wrapped in <code>&lt;b&gt;</code>) when the match landed in
+the body text, and <code>null</code> when it came from title, abstract
+or keywords.</p>
+<p><code>/archive/{code}/provenance</code> is the public face of the
+tamper-evident audit chain. What it returns and what it deliberately
+withholds is set out in section 7.</p>
 <hr />
 <h2 id="7-response-shapes">7. Response shapes</h2>
 <h3 id="tokenpairout"><code>TokenPairOut</code></h3>
@@ -646,10 +1158,9 @@ class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="
 <h3 id="actorout"><code>ActorOut</code></h3>
 <div class="sourceCode" id="cb2"><pre
 class="sourceCode json"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid&quot;</span><span class="fu">,</span> <span class="dt">&quot;roles&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;author&quot;</span><span class="ot">]</span> <span class="fu">}</span></span></code></pre></div>
-<h3
-id="manuscriptout--the-one-shape-every-manuscript-route-returns-no-separate-summarydetail-variant"><code>ManuscriptOut</code>
-— the one shape every manuscript route returns; no separate
-summary/detail variant</h3>
+<h3 id="manuscriptout"><code>ManuscriptOut</code></h3>
+<p>The one shape every manuscript route returns; there is no separate
+summary or detail variant.</p>
 <div class="sourceCode" id="cb3"><pre
 class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tracking_code&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
@@ -661,75 +1172,293 @@ class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;ManuscriptStatus&quot;</span><span class="fu">,</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;minimum_reviews&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;submitted_reviews&quot;</span><span class="fu">:</span> <span class="dv">0</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<p>Deliberately absent: <code>id</code> (<code>tracking_code</code> is
-the only identifier on the wire),
-<code>submitted_at</code>/<code>updated_at</code> (no response anywhere
-in this API carries a timestamp), and any event/audit trail (no endpoint
-exposes one).</p>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;submitted_reviews&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;has_document&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><code>has_document</code> states whether a document is attached
+without exposing its storage key. The key is reached only through
+<code>GET .../document</code>'s pre-signed URL and is never echoed on
+the manuscript resource.</p>
+<p>Still deliberately absent: <code>id</code>
+(<code>tracking_code</code> is the only manuscript identifier on the
+wire) and any timestamp on this particular model.</p>
 <h3
-id="blindedmanuscript--mirrors-ugjcsdomainblindingblindedmanuscript-field-for-field-exactly-these-six-fields-no-more"><code>BlindedManuscript</code>
-— mirrors <code>ugjcs.domain.blinding.BlindedManuscript</code>
-field-for-field; <strong>exactly these six fields, no more</strong></h3>
+id="manuscriptsubmissionout"><code>ManuscriptSubmissionOut</code></h3>
+<p><code>ManuscriptOut</code> plus the anonymisation preflight report.
+Returned by submission and resubmission only. It is a subclass, not a
+replacement, so every existing <code>ManuscriptOut</code> consumer keeps
+every field it relies on.</p>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tracking_code&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;abstract&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;keywords&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;string&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;ManuscriptStatus&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;...&quot;</span><span class="fu">:</span> <span class="st">&quot;every ManuscriptOut field&quot;</span><span class="fu">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;anonymisation_report&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;removed_docinfo_keys&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Author&quot;</span><span class="ot">,</span> <span class="st">&quot;Creator&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;xmp_removed&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">&quot;author_names_in_body&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Ama Serwaa&quot;</span><span class="ot">]</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<p>No author field of any kind (<code>author_ids</code>,
-<code>corresponding_author_id</code>) exists on this type — a structural
-guarantee, not a filtered value: the type itself has nowhere to put one.
-Also absent: <code>id</code>, <code>document_url</code> (no document
-storage exists in this domain).</p>
-<h3
-id="archivepaperout--the-public-shape-a-byline-a-human-or-google-scholar-can-read-never-an-account-uuid"><code>ArchivePaperOut</code>
-— the public shape; a byline a human or Google Scholar can read, never
-an account UUID</h3>
+<p><code>author_names_in_body</code> is an honest partial detector, not
+a guarantee. It is a case-insensitive substring scan of the extracted
+text for the manuscript's authors' full names. An empty list means
+nothing was found, never that the document is proven clean. This is the
+visible half of TD-05: metadata stripping cannot remove a name printed
+in the body.</p>
+<h3 id="blindedmanuscriptout"><code>BlindedManuscriptOut</code></h3>
+<p>Mirrors <code>ugjcs.domain.blinding.BlindedManuscript</code> field
+for field: exactly these six fields, no more.</p>
 <div class="sourceCode" id="cb5"><pre
 class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tracking_code&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;abstract&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;keywords&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;string&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;author_names&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;string&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;ManuscriptStatus&quot;</span><span class="fu">,</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="dv">0</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<p>Deliberately absent: <code>published_at</code>, <code>doi</code>,
-<code>pdf_url</code>, <code>volume</code>, <code>number</code> — none
-exist anywhere in the domain built so far. There is no
-<code>/archive/issues</code> endpoint of any kind.</p>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;ManuscriptStatus&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>No author field of any kind exists on this type. That is a structural
+guarantee rather than a filtered value: the type has nowhere to put
+one.</p>
+<h3 id="submitreviewrequest"><code>SubmitReviewRequest</code></h3>
+<p>The structured review required by FR-11. Four criterion scores
+bounded 1 to 5 by Pydantic, so an out-of-range score is a 422 before any
+handler runs.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;recommendation&quot;</span><span class="fu">:</span> <span class="st">&quot;minor_revision&quot;</span><span class="fu">,</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;originality_score&quot;</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;rigour_score&quot;</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;clarity_score&quot;</span><span class="fu">:</span> <span class="dv">5</span><span class="fu">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;significance_score&quot;</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;comments_to_author&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;confidential_comments_to_editor&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h3 id="reviewout"><code>ReviewOut</code></h3>
+<p>A submitted review, confidential comments included. Returned from
+exactly one route, <code>GET /editorial/{code}/reviews</code>, behind
+<code>Action.DECIDE</code>.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;reviewer_id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid&quot;</span><span class="fu">,</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;recommendation&quot;</span><span class="fu">:</span> <span class="st">&quot;string|null&quot;</span><span class="fu">,</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;originality_score&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;rigour_score&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;clarity_score&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;significance_score&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;comments_to_author&quot;</span><span class="fu">:</span> <span class="st">&quot;string|null&quot;</span><span class="fu">,</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;confidential_comments_to_editor&quot;</span><span class="fu">:</span> <span class="st">&quot;string|null&quot;</span><span class="fu">,</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;assigned_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime&quot;</span><span class="fu">,</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;submitted_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime|null&quot;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Every score and comment field is nullable, because an assignment
+exists before its review does.</p>
+<h3 id="archivepaperout"><code>ArchivePaperOut</code></h3>
+<p>The public shape: a byline a human or Google Scholar can read, never
+an account UUID.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tracking_code&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;abstract&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;keywords&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;string&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;author_names&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;string&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;ManuscriptStatus&quot;</span><span class="fu">,</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;version&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;has_document&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;doi&quot;</span><span class="fu">:</span> <span class="st">&quot;10.55555/sdj.2026.0004&quot;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><code>doi</code> is DOI-shaped and <strong>not registered</strong>.
+<code>10.55555</code> is a documented fake registrant prefix (SRS
+section 4.2; real Crossref registration is out of scope), and the suffix
+is derived from the tracking code by
+<code>ugjcs.application.scholarly.fake_doi</code> rather than stored.
+Resolving it at doi.org fails by design.</p>
+<p>Still absent: <code>published_at</code>, <code>volume</code>,
+<code>number</code>. There is no <code>/archive/issues</code>
+endpoint.</p>
+<h3 id="archivesearchresultout"><code>ArchiveSearchResultOut</code></h3>
+<p><code>ArchivePaperOut</code> plus one field. Subclassing keeps it
+structurally "the archive shape, plus where the match landed", so the
+list and search endpoints cannot drift apart silently.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;...&quot;</span><span class="fu">:</span> <span class="st">&quot;every ArchivePaperOut field&quot;</span><span class="fu">,</span> <span class="dt">&quot;snippet&quot;</span><span class="fu">:</span> <span class="st">&quot;string|null&quot;</span> <span class="fu">}</span></span></code></pre></div>
+<h3 id="provenanceout-and-provenanceeventout"><code>ProvenanceOut</code>
+and <code>ProvenanceEventOut</code></h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tracking_code&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;intact&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;head_hash&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;events&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">{</span> <span class="dt">&quot;sequence&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;event_type&quot;</span><span class="fu">:</span> <span class="st">&quot;MANUSCRIPT_SUBMITTED&quot;</span><span class="fu">,</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>      <span class="dt">&quot;occurred_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime&quot;</span><span class="fu">,</span> <span class="dt">&quot;hash_prefix&quot;</span><span class="fu">:</span> <span class="st">&quot;a1b2c3d4&quot;</span> <span class="fu">}</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><code>intact</code> means what
+<code>ugjcs.domain.hashchain.verify</code> proves and no more: every
+stored link reconciles against a recomputation from the genesis hash. It
+cannot detect truncation of the tail, a forged event appended through
+the normal path, or a wholly fabricated history rebuilt from genesis.
+Those need the external anchor described in TD-04.</p>
+<p>Each event carries its type, timestamp and an 8-character hash
+prefix. The payload and <code>actor_id</code> are withheld, because
+payloads can reference reviewer identifiers
+(<code>REVIEW_SUBMITTED</code> records the reviewer as its actor) and a
+public endpoint must not hand out even a pseudonymous handle for
+them.</p>
+<h3 id="documenturlout"><code>DocumentUrlOut</code></h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;url&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span> <span class="dt">&quot;expires_in_seconds&quot;</span><span class="fu">:</span> <span class="dv">900</span> <span class="fu">}</span></span></code></pre></div>
+<h3 id="personout"><code>PersonOut</code></h3>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid&quot;</span><span class="fu">,</span> <span class="dt">&quot;full_name&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span> <span class="dt">&quot;affiliation&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span> <span class="fu">}</span></span></code></pre></div>
+<p>The email address is deliberately absent. The caller already supplied
+it to make the match, and echoing it back would give this endpoint a
+second and harder to justify way to confirm which addresses have
+accounts.</p>
+<h3
+id="reviewercandidateout-and-rankedreviewercandidateout"><code>ReviewerCandidateOut</code>
+and <code>RankedReviewerCandidateOut</code></h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid&quot;</span><span class="fu">,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;full_name&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;affiliation&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;active_assignments&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;reviewer_capacity&quot;</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;excluded_reason&quot;</span><span class="fu">:</span> <span class="st">&quot;string|null&quot;</span><span class="fu">,</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;match_score&quot;</span><span class="fu">:</span> <span class="dv">2</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><code>excluded_reason</code> is <code>null</code> for an eligible
+reviewer, or a short human-readable string when they must not be
+assigned. <code>ugjcs.domain.conflicts.exclusion_reason</code> is the
+pure function that decides it. Excluded candidates are returned in the
+list with their reason rather than filtered out, so an editor can see
+why someone obvious is unavailable.</p>
+<p><code>match_score</code> counts how many of the manuscript's keywords
+appear, case-insensitively, in the reviewer's <code>expertise</code>
+list. It is present on excluded candidates too: "excluded, but a
+three-keyword match" tells an editor something useful that stripping the
+score would hide.</p>
+<h3 id="editorialanalyticsout"><code>EditorialAnalyticsOut</code></h3>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;pipeline&quot;</span><span class="fu">:</span> <span class="fu">{</span> <span class="dt">&quot;submitted&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;under_screening&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;under_review&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;reviews_complete&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;revision_requested&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;resubmitted&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;accepted&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;scheduled&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;published&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                <span class="dt">&quot;rejected&quot;</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span> <span class="dt">&quot;withdrawn&quot;</span><span class="fu">:</span> <span class="dv">0</span> <span class="fu">},</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;submissions_by_month&quot;</span><span class="fu">:</span> <span class="ot">[</span> <span class="fu">{</span> <span class="dt">&quot;month&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-08&quot;</span><span class="fu">,</span> <span class="dt">&quot;count&quot;</span><span class="fu">:</span> <span class="dv">4</span> <span class="fu">}</span> <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;acceptance_rate&quot;</span><span class="fu">:</span> <span class="fl">0.5</span><span class="fu">,</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;avg_days_submission_to_decision&quot;</span><span class="fu">:</span> <span class="fl">12.4</span><span class="fu">,</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;avg_days_review_turnaround&quot;</span><span class="fu">:</span> <span class="fl">6.1</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>One rule governs every aggregate here: a rate or average whose
+denominator is empty is <code>null</code>, never <code>0</code>. "No
+decisions yet" and "decisions arrive instantly" have to be
+distinguishable to anyone reading the JSON.</p>
+<p>The pipeline counts depart from <code>ManuscriptStatus</code> twice,
+on purpose. <code>draft</code> is absent, because a draft has never
+reached the editorial desk. <code>desk_rejected</code> is folded into
+<code>rejected</code>, because both are the journal declining the paper
+and the pipeline view has no reason to care at which desk that
+happened.</p>
+<p><code>submissions_by_month</code> counts original submissions only.
+Resubmissions emit <code>REVISION_SUBMITTED</code> and are not counted a
+second time.</p>
+<h3 id="reviewerperformanceout"><code>ReviewerPerformanceOut</code></h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid&quot;</span><span class="fu">,</span> <span class="dt">&quot;full_name&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span> <span class="dt">&quot;affiliation&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;active_assignments&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span> <span class="dt">&quot;reviewer_capacity&quot;</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span> <span class="dt">&quot;reviews_completed&quot;</span><span class="fu">:</span> <span class="dv">7</span><span class="fu">,</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;avg_turnaround_days&quot;</span><span class="fu">:</span> <span class="fl">5.5</span><span class="fu">,</span> <span class="dt">&quot;last_activity_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime|null&quot;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><code>avg_turnaround_days</code> and <code>last_activity_at</code>
+are both <code>null</code> until the reviewer completes a first review,
+for the same reason as above: an editor has to tell "new to the pool"
+apart from "turns reviews around instantly".</p>
+<h3 id="assignmentdeadlineout"><code>AssignmentDeadlineOut</code></h3>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;reviewer_id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid&quot;</span><span class="fu">,</span> <span class="dt">&quot;reviewer_name&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;assigned_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime&quot;</span><span class="fu">,</span> <span class="dt">&quot;due_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime|null&quot;</span><span class="fu">,</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;submitted&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span> <span class="dt">&quot;overdue&quot;</span><span class="fu">:</span> <span class="kw">true</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Carrying <code>reviewer_name</code> here is deliberate and correct.
+The blind this journal enforces is author to reviewer, not editor to
+reviewer; the editor chose this reviewer by name in the first place. The
+route is gated on <code>Action.ASSIGN_REVIEWER</code>, which no
+author-reachable route carries.</p>
+<p><code>overdue</code> is computed server-side so every consumer agrees
+on the rule: not yet submitted, and <code>due_at</code> in the past. A
+submitted review is never overdue however late it arrived, and a
+<code>null</code> deadline never counts as overdue.</p>
+<h3
+id="apcinvoiceout-billinginitializeout-billingverifyout"><code>ApcInvoiceOut</code>,
+<code>BillingInitializeOut</code>, <code>BillingVerifyOut</code></h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;tracking_code&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span> <span class="dt">&quot;amount_pesewas&quot;</span><span class="fu">:</span> <span class="dv">150000</span><span class="fu">,</span> <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;pending&quot;</span><span class="fu">,</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;paystack_reference&quot;</span><span class="fu">:</span> <span class="st">&quot;string|null&quot;</span><span class="fu">,</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;created_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime&quot;</span><span class="fu">,</span> <span class="dt">&quot;settled_at&quot;</span><span class="fu">:</span> <span class="st">&quot;datetime|null&quot;</span> <span class="fu">}</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;mock&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span> <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;paid&quot;</span><span class="fu">,</span> <span class="dt">&quot;authorization_url&quot;</span><span class="fu">:</span> <span class="kw">null</span> <span class="fu">}</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;paid&quot;</span> <span class="fu">}</span></span></code></pre></div>
+<p>Amounts are integer pesewas, never floats, so no rounding error can
+reach a charge. <code>paystack_reference</code> is this API's minted
+transaction reference, which the payer needs in order to reconcile a
+card statement. It is not a secret. The Paystack secret key appears in
+no billing shape at all.</p>
+<h3 id="adminaccountout"><code>AdminAccountOut</code></h3>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span> <span class="dt">&quot;id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid&quot;</span><span class="fu">,</span> <span class="dt">&quot;email&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span> <span class="dt">&quot;full_name&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span> <span class="dt">&quot;affiliation&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">,</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;roles&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;author&quot;</span><span class="ot">]</span><span class="fu">,</span> <span class="dt">&quot;reviewer_capacity&quot;</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;is_active&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span> <span class="dt">&quot;is_verified&quot;</span><span class="fu">:</span> <span class="kw">true</span> <span class="fu">}</span></span></code></pre></div>
+<p>The only shape in the API that serves email, activation and
+verification state together, which is why it is built by no router other
+than the <code>Action.MANAGE_USERS</code>-gated one. <code>roles</code>
+is sorted for a stable wire order, since <code>Account.roles</code> is a
+frozenset and a console diffing consecutive responses must not see
+phantom changes.</p>
 <h3 id="request-bodies">Request bodies</h3>
-<pre><code>SubmitManuscriptRequest   { title, abstract, keywords, co_author_ids? }
+<pre><code>RegisterRequest           { email, password, full_name, affiliation }
+LoginRequest              { email, password }
+RefreshRequest            { refresh_token }
+SubmitManuscript          multipart: title, abstract, file, keywords, co_author_ids
 RecordDecisionRequest     { decision: DecisionType, rationale }
 AssignReviewerRequest     { reviewer_id }
-SubmitReviewRequest       { recommendation, comments }
-LoginRequest               { email, password }
-RefreshRequest             { refresh_token }</code></pre>
+SubmitReviewRequest       { recommendation, four 1-5 scores, comments_to_author,
+                            confidential_comments_to_editor }
+ScheduleManuscriptRequest { volume, number }
+RoleChangeRequest         { role: Role, grant: bool }
+CapacityChangeRequest     { reviewer_capacity: int (1-10) }
+ActiveChangeRequest       { is_active: bool }</code></pre>
 <hr />
 <h2 id="8-known-gaps-carried-into-docs04-technical-debt-registermd">8.
 Known gaps carried into
 <code>docs/04-technical-debt-register.md</code></h2>
 <ul>
-<li><code>GET /auth/me</code> cannot supply a display name —
+<li><code>GET /auth/me</code> still cannot supply a display name.
 <code>SessionUser</code> on the frontend has only
-<code>{id, email, roles}</code>; <code>email</code> comes from the login
-form the BFF already validated, not from any backend response.</li>
-<li>No file upload, document storage, DOI minting or PDF export exists
-anywhere in the domain; <code>POST /manuscripts</code> is
-JSON-only.</li>
+<code>{id, email, roles}</code>, and <code>email</code> comes from the
+login form the BFF already validated rather than from any backend
+response.</li>
 <li>No pagination on any list endpoint.</li>
-<li>No event/audit-log endpoint, and no response anywhere carries a
-timestamp — the frontend's status displays cannot show a submission or
-decision date.</li>
-<li>Reviewer assignment has no invitation lifecycle, no
-conflict-of-interest check, and no candidate-listing endpoint (Plan 4's
-documented scope decision).</li>
+<li>No general event or audit-log endpoint.
+<code>/archive/{code}/provenance</code> exposes a deliberately narrow
+public projection of the chain, and nothing exposes the full
+payloads.</li>
+<li><code>ManuscriptOut</code> still carries no timestamp, so an
+author's status view cannot show a submission or decision date.
+Timestamps do exist elsewhere on the wire (<code>ReviewOut</code>,
+<code>AssignmentDeadlineOut</code>, <code>ApcInvoiceOut</code>,
+provenance events), which makes their absence here an inconsistency
+rather than a policy.</li>
+<li>Reviewer assignment has no invitation lifecycle. A reviewer is
+assigned rather than invited, and cannot decline.</li>
+<li><code>GET /people/lookup</code> has no rate limiting, and confirms
+whether an address has an account. This is TD-15.</li>
+<li>DOIs are shaped but never registered, and the citation exports carry
+no publication date, because the domain stores none.</li>
 </ul>
 </main>
 <footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>

@@ -35,13 +35,31 @@ The system recognises five kinds of user, and a person may hold more than one ro
 | **Author** | Submits manuscripts, tracks their progress, downloads their own submitted files, and responds when a revision is requested. |
 | **Reviewer** | Is assigned manuscripts to assess, reads an anonymised copy, and submits a recommendation and comments. |
 | **Editor** | Screens newly submitted manuscripts, assigns reviewers, and records editorial decisions (desk-reject, send to review, request revision, accept, reject). |
-| **Editor-in-Chief** | Everything an editor can do, plus the exclusive authority to schedule an accepted manuscript into a volume and issue number, and to publish it. |
-
-An **Administrator** account also exists for signing in to the API, but at the time of writing
-the web application has no screens built for it — see §9 for what this means in practice.
+| **Editor-in-Chief** | Everything an editor can do, plus the exclusive authority to schedule an accepted manuscript into a volume and issue number, to publish it, and to waive an article processing charge. |
+| **Administrator** | Manages accounts: grants and revokes roles, sets how many reviews a reviewer may hold at once, and deactivates accounts. See section 8. |
 
 Every manuscript's progress is described entirely by its **status** (Submitted, Under
-screening, Under review, and so on). §8 explains every status in plain language.
+screening, Under review, and so on). Section 10 explains every status in plain language.
+
+### Accounts for reviewing this prototype
+
+Every demo account uses the pattern `<role>@sdj.test`. The sign-in page's role chips fill
+these addresses for you (section 2.3); the passwords are typed by hand.
+
+| Role | Email | Password |
+|---|---|---|
+| Author | `author@sdj.test` | `Sdj-Author-2026!` |
+| Author (second) | `author2@sdj.test` | `Sdj-Author2-2026!` |
+| Reviewer | `reviewer@sdj.test` | `Sdj-Reviewer-2026!` |
+| Reviewer (2 to 7) | `reviewer2@sdj.test` … `reviewer7@sdj.test` | `Sdj-Reviewer2-2026!` … `Sdj-Reviewer7-2026!` |
+| Editor | `editor@sdj.test` | `Sdj-Editor-2026!` |
+| Editor-in-Chief | `eic@sdj.test` | `Sdj-EditorChief-2026!` |
+| Administrator | `admin@sdj.test` | `Sdj-Admin-2026!` |
+
+Seven reviewer accounts exist rather than one because the reviewer-candidate screen (section 6.3)
+only demonstrates its conflict-of-interest and capacity rules if there are enough people to
+exclude some and still leave others eligible. Two share the authors' affiliation, and five
+sit at five other institutions.
 
 ---
 
@@ -55,37 +73,61 @@ Open a web browser and go to:
 https://ugjcs-frontend.vercel.app
 ```
 
-The home page is public. It shows a short introduction to the journal and a "Recently
-published" list of papers. No account is required to reach it.
+The address lands on the sign-in page. That is deliberate: the portal is a working tool for
+authors, reviewers and editors, so the front door is the door you sign in through. A notice
+across the top states plainly that this is a final-project prototype and not the journal's
+official system.
+
+If you are already signed in, the page recognises your session and forwards you straight to
+your own working area without asking for credentials again.
+
+The public archive is still open to anyone. Follow **Browse the archive** from the sign-in
+page, or go directly to `/search`, to read published papers without an account.
 
 ### 2.2 What is public and what needs an account
 
 | Without signing in | Requires signing in |
 |---|---|
-| The home page and its "Recently published" list | Submitting a manuscript |
+| Searching and browsing the archive | Submitting a manuscript |
 | Opening any published paper's page | Tracking a manuscript's status |
-| Searching the archive | Reviewing an assigned manuscript |
-| | Screening, assigning reviewers, and recording decisions |
-| | Scheduling and publishing an accepted manuscript |
+| Downloading a published paper's PDF | Reviewing an assigned manuscript |
+| Verifying a paper's editorial provenance | Screening, assigning reviewers, and recording decisions |
+| Exporting a citation as BibTeX or RIS | Scheduling and publishing an accepted manuscript |
+| The About, For authors and For reviewers pages | Paying or waiving an article processing charge |
+| | Managing accounts (Administrator only) |
 
 ### 2.3 Signing in
 
-1. Click **Sign in** at the top right of any public page, or go directly to
-   `https://ugjcs-frontend.vercel.app/login`.
+1. Go to `https://ugjcs-frontend.vercel.app`, which opens the sign-in page directly. From
+   any public page you can also click **Sign in** at the top right.
 2. You should see a page headed **Sign in**, with an **Email** field, a **Password** field, and
-   a **Sign in** button.
+   a **Sign in** button. A campus photograph fills the left half of the screen on a
+   wide display, and sits above the form on a phone.
 3. Enter your account's email and password and click **Sign in**.
 4. If your credentials are correct, you are taken to the working area for your role: authors
-   land on **My submissions**, reviewers on **My assignments**, and editors and the
-   Editor-in-Chief on the **Screening queue**. The page banner along the top now shows your
-   email address and a **Sign out** button in place of the **Sign in** link.
+   land on **My submissions**, reviewers on **My assignments**, editors and the
+   Editor-in-Chief on the **Screening queue**, and administrators on **Accounts**. The
+   banner along the top now shows your email address and a **Sign out** button in place of
+   the **Sign in** link.
 5. If your credentials are wrong, the page stays on the sign-in form and shows an alert
    reading:
 
    > **AuthenticationError**
    > email or password is incorrect
 
-   Check for typing mistakes — in particular a mistyped password — and try again.
+   Check for typing mistakes, a mistyped password most often, and try again.
+
+**Demo accounts.** Above the form is a row of role chips: **Author**, **Reviewer**,
+**Editor**, **Editor-in-chief**, **Administrator**. Clicking one fills in that desk's email
+address and moves the cursor to the password box, which you then type yourself. The chips
+save you retyping a long address; they do not sign you in, and they never fill a password.
+The passwords are listed in section 1.
+
+**Creating your own account.** If you have no account, click **Sign up as an author** below
+the form. Give your full name, affiliation, email and a password of at least twelve
+characters. Self-registration creates an author account and nothing more. Reviewer, editor
+and administrator roles are granted by the editorial office through the admin console (section 8),
+never chosen by the person signing up.
 
 A person with more than one role (the Editor-in-Chief account, for example, also carries
 editor authority) can move between the different working areas by editing the address bar —
@@ -161,7 +203,7 @@ Sign in with an author account (or any account that also carries author rights) 
 4. Click **Submit manuscript**.
 5. If the submission succeeds, you are taken straight to the manuscript's own page, which now
    shows a **Submitted** badge and a newly minted tracking code (for example
-   `SDJ-2026-939860`). If it fails, an alert appears above the form explaining why — see §9
+   `SDJ-2026-939860`). If it fails, an alert appears above the form explaining why — see section 11
    for the two most common reasons (wrong file type, file too large).
 
 **Preparing your file for double-blind review is your responsibility.** The portal strips the PDF's
@@ -189,7 +231,7 @@ That detail page shows:
   "Revision requested" — click it to pull the manuscript out of consideration. Withdrawal
   cannot be undone.
 
-See §8 for what each status means and what happens next.
+See section 10 for what each status means and what happens next.
 
 ### 4.3 Downloading your own submission
 
@@ -251,7 +293,7 @@ touch anything printed as visible text on the page. If an author's name, institu
 identifying self-reference is typed into the body of the manuscript, you may still see it.
 Anonymisation is therefore a shared responsibility: the system strips what it can strip
 automatically, and authors are asked to prepare a manuscript that does not identify itself in
-its own text (§4.1). If you do recognise or infer an author's identity from the text itself,
+its own text (section 4.1). If you do recognise or infer an author's identity from the text itself,
 treat that as you would in any double-blind process — it is not something the platform can
 prevent.
 
@@ -274,7 +316,7 @@ To submit:
 3. Click **Submit review**.
 4. On success you are returned to **My assignments**; the manuscript no longer requires
    further action from you. Once every reviewer assigned to a manuscript has submitted, its
-   status moves on automatically (§8) and the editor is able to record a decision.
+   status moves on automatically (section 10) and the editor is able to record a decision.
 
 ---
 
@@ -315,7 +357,7 @@ reviewer directly).
 1. Enter the reviewer's account id.
 2. Click **Assign**.
 3. The field clears on success. Repeat for each reviewer you want assigned; two are normally
-   expected before a decision on the reviews becomes possible (§8).
+   expected before a decision on the reviews becomes possible (section 10).
 
 ### 6.4 Recording a decision
 
@@ -337,7 +379,7 @@ To record a decision:
 2. Write your reasoning in **Rationale** (this is required and must be at least 20 characters
    — a one-word rationale will be rejected).
 3. Click **Record decision**.
-4. The manuscript's status badge updates immediately to reflect the outcome (see §8 for what
+4. The manuscript's status badge updates immediately to reflect the outcome (see section 10 for what
    each decision leads to).
 
 *A small labelling quirk you may notice:* the "send to review" option is occasionally rendered
@@ -348,7 +390,7 @@ formatting slip, not a different option — it is still the same "send to review
 
 ## 7. For the Editor-in-Chief
 
-Everything in §6 is also available to the Editor-in-Chief account. In addition, on any
+Everything in section 6 is also available to the Editor-in-Chief account. In addition, on any
 manuscript whose status is **Accepted** or **Scheduled**, a further **Publication** section
 appears on its detail page — visible only to the Editor-in-Chief, not to ordinary editors.
 
@@ -366,15 +408,84 @@ appears on its detail page — visible only to the Editor-in-Chief, not to ordin
 ### 7.2 Publishing
 
 1. On a **Scheduled** manuscript's page, click the **Publish** button under **Publication**.
-2. The status badge updates to **Published**. The paper now appears in the public archive
-   ("Recently published" on the home page, its own `/papers/<tracking-code>` page, and in
-   search results) immediately.
+2. The status badge updates to **Published**. The paper appears in the public archive
+   immediately: on its own `/papers/<tracking-code>` page and in search results.
 
-Publishing is not reversible through the web application — there is no "unpublish" action.
+Publishing also extracts the text of the PDF so the paper becomes findable by its body
+content and not only its title and abstract. If the text cannot be extracted, the paper is
+still published; it simply stays searchable by title, abstract and keywords alone.
+
+Publishing is not reversible through the web application. There is no "unpublish" action.
+
+### 7.3 Waiving an article processing charge
+
+Only the Editor-in-Chief can waive a charge. Open the accepted manuscript, find the
+**Article processing charge** panel, and click **Waive**. A charge that has already been
+paid cannot be waived; the button refuses with an explanation rather than reversing a
+settled payment. See section 9 for the charge itself.
 
 ---
 
-## 8. Understanding manuscript status
+## 8. For administrators
+
+Sign in as an administrator and you land on **Accounts**, the roster of every account in the
+system. This screen exists to do four things.
+
+**Grant or revoke a role.** Each row lists the roles that account holds. Use the controls on
+the row to add or remove `author`, `reviewer`, `editor` or `editor_in_chief`. This is how
+someone becomes a reviewer or an editor: it cannot be chosen by the person signing up.
+
+**Set reviewer capacity.** Capacity is how many live assignments a reviewer may hold at
+once, between 1 and 10. It feeds the reviewer-candidate screen (section 6.3), where a reviewer at
+capacity is shown to the editor as excluded, with the reason stated, rather than hidden.
+
+**Deactivate or reactivate an account.** A deactivated account cannot sign in and stops
+appearing as an eligible reviewer.
+
+**Read the roster.** This is the only screen that shows an account's email address alongside
+its activation and verification state.
+
+Two things the console deliberately refuses, both to stop an administrator locking everyone
+out of the system:
+
+- The **administrator role itself cannot be granted or revoked** here. Changing who is an
+  administrator is a database-level operation, not a click.
+- **You cannot deactivate your own account.** The attempt is refused with an explanation.
+
+---
+
+## 9. Article processing charges
+
+SDJ raises an article processing charge (APC) once a manuscript is accepted. Nothing is
+billed before acceptance, so no charge appears at submission, during screening, or while a
+manuscript is under review.
+
+**As an author.** Open your accepted manuscript. Below the manuscript details is an
+**Article processing charge** panel showing the amount and one of three states:
+
+| Status | Meaning |
+|---|---|
+| **Pending** | The charge is outstanding. A **Pay** button starts settlement. |
+| **Paid** | Settled. The panel shows the transaction reference, which you need if you have to reconcile a card statement. |
+| **Waived** | The Editor-in-Chief has cancelled the charge. Nothing is owed. |
+
+Click **Pay** and one of two things happens, depending on how the deployment is configured.
+
+In the default configuration the portal uses a **mock payment gateway**: the charge settles
+immediately, the panel flips to **Paid**, and no card is involved. This is how the deployed
+prototype behaves, and it is the mode you should expect while reviewing this project. **No
+real money moves through this system.**
+
+If a live Paystack key is configured, clicking **Pay** instead sends you to Paystack's
+checkout page. After paying you return to the manuscript, and the portal confirms the charge
+with Paystack before marking it **Paid**. A charge is never marked paid on your say-so.
+
+**As an editor.** Any editor can read a manuscript's charge and its status. Only the
+corresponding author can pay it, and only the Editor-in-Chief can waive it (section 7.3).
+
+---
+
+## 10. Understanding manuscript status
 
 Every manuscript carries exactly one status at a time, shown as a coloured badge throughout
 the application. The table below explains each one in plain language: what it means, who can
@@ -389,11 +500,11 @@ act on it next, and what they can do. ("Terminal" means the manuscript stays the
 | **Desk rejected** | *Terminal.* The editor decided, without sending it for review, that the manuscript is not suitable for the journal. | — | Nothing further happens to this manuscript. |
 | **Under review** | The manuscript has been sent to one or more reviewers and is awaiting their assessments. | Reviewer(s) | Submit their review; the author may still withdraw it. |
 | **Reviews complete** | Every required review has been submitted. The manuscript is waiting for an editor to record a decision. | Editor | Record a decision: request revision, accept, or reject; or the author may withdraw it. |
-| **Revision requested** | The editor has asked the author to revise the manuscript before it can proceed. | Author | Upload a revised PDF and a written response to reviewers (§4.4); or withdraw the manuscript instead. |
+| **Revision requested** | The editor has asked the author to revise the manuscript before it can proceed. | Author | Upload a revised PDF and a written response to reviewers (section 4.4); or withdraw the manuscript instead. |
 | **Resubmitted** | The author has uploaded a revised version and explained the changes. It is back with the editor. | Editor | Decide whether it needs another round of review (send back to Under screening) or straight to review (Under review) — this is an editorial judgement call, not shown as a distinct button in the interface at the time of writing. |
-| **Accepted** | The editor has decided to accept the manuscript for publication. | Editor-in-Chief | Schedule it into a volume and issue number (§7.1). |
+| **Accepted** | The editor has decided to accept the manuscript for publication. | Editor-in-Chief | Schedule it into a volume and issue number (section 7.1). |
 | **Rejected** | *Terminal.* The editor decided, after review, not to publish the manuscript. | — | Nothing further happens to this manuscript. |
-| **Scheduled** | The Editor-in-Chief has assigned the manuscript to a specific volume and issue number, but it is not yet public. | Editor-in-Chief | Publish it (§7.2). |
+| **Scheduled** | The Editor-in-Chief has assigned the manuscript to a specific volume and issue number, but it is not yet public. | Editor-in-Chief | Publish it (section 7.2). |
 | **Published** | *Terminal.* The manuscript is live on the public site — visible on the home page, its own paper page, and in search. | — | Nothing further happens to this manuscript through the application. |
 | **Withdrawn** | *Terminal.* The author pulled the manuscript out of consideration. Available from Submitted, Under screening, Under review, Reviews complete, or Revision requested. | — | Nothing further happens to this manuscript. |
 
@@ -402,7 +513,7 @@ is accepted, the only paths forward are scheduling and publishing.
 
 ---
 
-## 9. Troubleshooting
+## 11. Troubleshooting
 
 **"UnsupportedDocumentTypeError — document does not begin with the PDF magic number"**
 The file you attached is not actually a PDF (or is empty/corrupted), regardless of its file
@@ -432,7 +543,7 @@ This almost always means the manuscript is not currently in the status that acti
 The portal only offers an action when the manuscript's status allows it — for example, the Decision
 form's "accept/reject/request revision" choices only appear once every assigned review is in
 (status "Reviews complete"); while reviews are still outstanding, that section is empty on
-purpose. Check the status badge at the top of the page against §8 to see what is expected
+purpose. Check the status badge at the top of the page against section 10 to see what is expected
 before the action you want becomes available.
 
 **You try to act on a manuscript and are told "cannot move manuscript from *X* to *Y*"**
@@ -457,9 +568,7 @@ This is a genuine gap in the current system, not a mistake on your part — the 
 page shows only the title, authors, keywords and abstract; no PDF download link is offered to
 readers at the time of writing.
 
-**Signing in with the Administrator account does not lead anywhere useful**
-This is expected with the system as currently built: the Administrator account authenticates
-successfully, but the web application has no screens built for it. Signing in redirects
-straight back to the public home page, and none of the `/author`, `/reviewer` or `/editor`
-areas will admit it. There is nothing further for this role to do in the browser at the time
-of writing.
+**The Administrator account lands on Accounts and nothing else**
+That is the whole of the administrator's workspace, and it is deliberate. The role manages
+accounts (section 8); it does not screen manuscripts, review them, or record decisions, so
+`/author`, `/reviewer` and `/editor` all refuse it.

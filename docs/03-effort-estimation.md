@@ -5,18 +5,18 @@ Journal (SDJ), published by the College of Basic and Applied Sciences, Universit
 **Document:** 03 — Effort estimation
 **Author:** Roger Koranteng Obeng, student ID 22424140
 **Date:** 2026-08-12
-**Status:** Authoritative. This document's MoSCoW cut (§8) governs the scope of
+**Status:** Authoritative. This document's MoSCoW cut (section 8) governs the scope of
 Plans 2–6.
 
 ---
 
 ## 1. Method
 
-Per the design specification's estimation approach (§14), **Use Case Points (UCP)**
+Per the design specification's estimation approach (section 14), **Use Case Points (UCP)**
 is the primary technique: the portal is defined by actor interactions with a stable
 use-case boundary — the situation UCP was designed for — and the unadjusted actor
 and use-case weights can be read directly off the functional requirements table
-(§5.1) rather than guessed. **COCOMO II Early Design** serves as an independent
+(section 5.1) rather than guessed. **COCOMO II Early Design** serves as an independent
 cross-check from a size-and-cost-driver perspective, using different inputs
 entirely (source lines of code and process/product/personnel ratings rather than
 actor and transaction counts). Agreement — or a *diagnosable* disagreement —
@@ -24,7 +24,7 @@ between two methods driven by different inputs is stronger evidence than
 precision from either one alone.
 
 The estimate is computed before implementation. Its output determines the
-MoSCoW cut recorded in §8: requirements that do not fit the available 48-hour
+MoSCoW cut recorded in section 8: requirements that do not fit the available 48-hour
 window are demoted rather than rushed, and the demotion is recorded with its
 reason. Every intermediate figure below shows its arithmetic so a reader can
 recompute it independently rather than trust a stated total.
@@ -59,7 +59,7 @@ Arithmetic: six GUI actors at weight 3 plus one API actor at weight 1 —
 Use-case weights follow Karner's transaction-count classification: **Simple**
 (≤3 transactions) = 5, **Average** (4–7) = 10, **Complex** (>7) = 15. The `FR`
 column traces each use case back to the functional requirement it implements in
-the design specification (§5.1), so the inventory is derived rather than
+the design specification (section 5.1), so the inventory is derived rather than
 invented.
 
 | # | Use case | FR | Class | Wt |
@@ -238,7 +238,7 @@ orders of magnitude, and **the full system is a roughly two-to-four
 person-year effort** by either reckoning (1.8 person-years from UCP on the
 full scope, up to 47.2 ÷ 12 ≈ 3.9 person-years from COCOMO II). That
 agreement — on the scale of the problem, not its exact magnitude — is what
-governs the scope decision in §8.
+governs the scope decision in section 8.
 
 ---
 
@@ -250,7 +250,7 @@ governs the scope decision in §8.
 nearly two orders of magnitude short of what classical estimation predicts the
 full system requires. The estimate therefore governs scope in two ways: it forces a
 MoSCoW cut (below), and it forces an explicit reckoning with the fact that the
-build method itself — not just the schedule — has to absorb that gap (§9).
+build method itself — not just the schedule — has to absorb that gap (section 9).
 
 ### 8.1 MoSCoW cut — authoritative scope for Plans 2–6
 
@@ -285,7 +285,7 @@ it.
 Four things follow from that:
 
 1. **The realised PF is a local calibration, not a general claim.** It will be
-   reported in §10 once the build completes, computed as `actual hours ÷ UCP
+   reported in section 10 once the build completes, computed as `actual hours ÷ UCP
    of the delivered scope`. It describes this developer, this tool, this
    domain and this 48-hour window. The sample size is one project, by one
    developer, and the figure does not generalise to other developers, other
@@ -294,7 +294,7 @@ Four things follow from that:
 2. **A lower PF does not mean the 2,514-hour estimate was wrong.** UCP still
    correctly sizes the *problem*; what changes is the rate at which the
    chosen method converts that size into elapsed hours. The estimate remains
-   the correct basis for the MoSCoW cut in §8, which was decided before the
+   the correct basis for the MoSCoW cut in section 8, which was decided before the
    method's realised productivity was known.
 3. **The gap between estimated and realised hours is not free capacity — it
    is capacity that was not spent on activities the classical estimate priced
@@ -302,7 +302,7 @@ Four things follow from that:
    technical debt register (not yet created at the time of writing; it is
    produced in a later implementation plan and each item below will carry a
    Debt → Cause → Impact → Priority → Proposed resolution entry per the
-   design specification's technical debt policy, §15):
+   design specification's technical debt policy, section 15):
    - **Test depth below what 2,514 hours would buy.** A fully-priced manual
      effort would include exhaustive edge-case testing, mutation testing and
      broader property-based coverage than a 48-hour window permits even with
@@ -321,7 +321,7 @@ Four things follow from that:
 4. **Acknowledgement.** Consistent with the requirement to acknowledge all
    external resources and tools used in this work, AI assistance (Claude
    Code, Anthropic) is acknowledged here as a substantive contributor to
-   implementation, and again in §11 (References and acknowledgements), which
+   implementation, and again in section 11 (References and acknowledgements), which
    records the specific tools and the boundary of their use: direction,
    review and final acceptance of all code and documentation rest with the
    author.
@@ -346,9 +346,9 @@ Four things follow from that:
 ### 10.2 Constraints
 
 - A 48-hour development window, which is the constraint the estimate is
-  measured against in §8.
+  measured against in section 8.
 - No registered domain is available, which shapes the CloudFront TLS strategy
-  recorded in the design specification (§16) rather than the estimate itself,
+  recorded in the design specification (section 16) rather than the estimate itself,
   but is recorded here as a project constraint.
 - A solo developer, which is why the COCOMO II `TEAM` scale factor is rated
   at the Very High end (1.10, the lowest-penalty rating) — there is no
@@ -383,23 +383,23 @@ present for the build.
    sum all phases to give total actual hours.
 
 **Realised productivity factor.** `PF_actual = total actual hours ÷ UCP of the
-scope actually delivered at project close` — UCP taken from §6's Must-have
+scope actually delivered at project close` — UCP taken from section 6's Must-have
 figure (125.7) if only Must-have use cases ship, or recomputed by the same
-method as §3 over whichever Should-have use cases from §8.1 are also
-delivered, if any are. This is the single figure §9 describes as "a local
+method as section 3 over whichever Should-have use cases from section 8.1 are also
+delivered, if any are. This is the single figure section 9 describes as "a local
 calibration, not a general claim."
 
 **Variance percentage.** `Variance % = (actual hours − estimated hours) ÷
 estimated hours × 100`, computed against the Must-have UCP estimate (2,514
 hours) as the primary comparison, since that is the estimate the MoSCoW cut in
-§8 was built against. A secondary variance figure against the COCOMO II
-estimate (7,170 hours) is reported alongside it, since §7 established that the
+Section 8 was built against. A secondary variance figure against the COCOMO II
+estimate (7,170 hours) is reported alongside it, since section 7 established that the
 two methods bound the same answer from different sides and a large variance
 against one without checking the other would be misleading.
 
-**Hindsight re-rating of factors.** At project close, each Technical (§4) and
-Environmental (§5) factor rating, and each COCOMO II scale factor and effort
-multiplier (§7), is re-examined against what was actually observed during the
+**Hindsight re-rating of factors.** At project close, each Technical (section 4) and
+Environmental (section 5) factor rating, and each COCOMO II scale factor and effort
+multiplier (section 7), is re-examined against what was actually observed during the
 build, and any rating that the build's evidence contradicts is flagged with
 what it should have been rated and why. Three ratings are already flagged here
 as pre-registered candidates for revision, precisely so that the hindsight
@@ -430,16 +430,16 @@ analysis is not free to cherry-pick after the fact:
 - Karner, G. (1993). *Use Case Points* method for effort estimation, as
   codified in Cockburn, A. (2000), *Writing Effective Use Cases*, and
   Schneider & Winters (1998), *Applying Use Cases: A Practical Guide* — actor
-  and use-case weighting rules (§2, §3) and the productivity-factor rule
-  (§6) follow this method.
+  and use-case weighting rules (section 2, section 3) and the productivity-factor rule
+  (section 6) follow this method.
 - Boehm, B. et al. (2000). *Software Cost Estimation with COCOMO II* — Early
-  Design model, scale factors and effort multipliers (§7) follow this method.
+  Design model, scale factors and effort multipliers (section 7) follow this method.
 - `docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md` — the
-  design specification this estimate is derived from: §5.1 supplies the
-  functional-requirement inventory behind §3's use cases; §14 sets the
-  estimation approach this document follows; §15 sets the technical debt
-  policy referenced in §9; §16 supplies the assumptions and constraints
-  reproduced in §10.
+  design specification this estimate is derived from: section 5.1 supplies the
+  functional-requirement inventory behind section 3's use cases; section 14 sets the
+  estimation approach this document follows; section 15 sets the technical debt
+  policy referenced in section 9; section 16 supplies the assumptions and constraints
+  reproduced in section 10.
 - **AI-assisted development.** This document, and the implementation plans
   and code it governs the scope of, were produced with Claude Code
   (Anthropic), an AI coding assistant, under the direction and review of the
@@ -448,6 +448,6 @@ analysis is not free to cherry-pick after the fact:
   reviewed every output, and accepts sole responsibility for its correctness
   and for the estimates and decisions recorded in this document. This
   acknowledgement satisfies the requirement to declare all external
-  resources and tools used in this work, and is cross-referenced from §9,
+  resources and tools used in this work, and is cross-referenced from section 9,
   where the productivity consequence of that method is analysed rather than
   merely disclosed.

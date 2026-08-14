@@ -6,6 +6,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>06 · Testing Report</title>
   <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -22,32 +167,113 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <link rel="stylesheet" href="" />
   <style>
-  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
-  * { box-sizing:border-box; }
-  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
-  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
-  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
-  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
-  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
-  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
-  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
-  h3 { font-size:1.12rem; margin-top:1.8rem; }
-  a { color:#4b3f9e; }
-  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
-  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
-  pre code { background:none; color:inherit; padding:0; }
-  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
-  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
-  th { background:#eceee9; font-weight:600; }
-  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
-  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
-  figure.diagram svg { max-width:100%; height:auto; }
-  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
-  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
-  </style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      /* The extra [class] is a hack that increases specificity enough to
+         override a similar rule in reveal.js */
+      ul.task-list[class]{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        font-size: inherit;
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1.6em;
+        vertical-align: middle;
+      }
+      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+      /* CSS for syntax highlighting */
+      html { -webkit-text-size-adjust: 100%; }
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { color: #008000; } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { color: #008000; font-weight: bold; } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+  <style>
+    :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+    header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+    header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+    header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+    main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+    h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+    h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+    h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+    h3 { font-size:1.12rem; margin-top:1.8rem; }
+    a { color:#4b3f9e; }
+    code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+    pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+    pre code { background:none; color:inherit; padding:0; }
+    table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+    th { background:#eceee9; font-weight:600; }
+    blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+    figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+    figure.diagram svg { max-width:100%; height:auto; }
+    nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+    footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+    </style>
 </head>
 <body>
 <header class="site">
@@ -167,23 +393,23 @@ moment someone remembers to check a list.</td>
 <tr>
 <td><strong>End-to-end</strong></td>
 <td>Exercised manually against the deployed system with a
-Playwright-driven browser session (§5), not as a committed automated
-suite.</td>
+Playwright-driven browser session (section 5), not as a committed
+automated suite.</td>
 <td><code>frontend/package.json</code> declares
 <code>@playwright/test</code> and <code>@axe-core/playwright</code> as
 dependencies and a <code>test:e2e</code> script, but no
 <code>playwright.config.ts</code> or spec files exist in the repository
-at the time of writing — this is stated plainly in §6 rather than
+at the time of writing — this is stated plainly in section 6 rather than
 implied by the tooling being present.</td>
 </tr>
 <tr>
 <td><strong>Manual acceptance testing</strong></td>
 <td>Scripted, role-scoped scenarios run against the live deployment with
-named judge accounts (§5).</td>
+named judge accounts (section 5).</td>
 <td>Automated gates check what someone thought to assert. Three domain
 lifecycle methods were fully implemented and unit-tested but reachable
-by no API route (§4) — a defect only visible by using the system as an
-actual actor would.</td>
+by no API route (section 4) — a defect only visible by using the system
+as an actual actor would.</td>
 </tr>
 </tbody>
 </table>
@@ -271,7 +497,7 @@ badges, forms, keyboard operability).</td>
 <code>@axe-core/playwright</code> 4.13.0</td>
 <td>Present in <code>package.json</code> as
 <code>npm run test:e2e</code>; no config or spec files exist yet
-(§6).</td>
+(section 6).</td>
 </tr>
 <tr>
 <td>CI</td>
@@ -320,18 +546,33 @@ reversibility, not just forward application), then runs
 <p>A pull request cannot merge past either job failing.</p>
 <hr />
 <h2 id="3-test-cases">3. Test cases</h2>
-<p>The counts below are what <code>make check</code> and
-<code>make integration</code> reported on 2026-08-12, against the
-current commit, run from <code>backend/</code>:</p>
-<pre><code>$ make check   → 267 passed, 56 deselected. Coverage: 88.24% (gate: 85%)
-$ make integration → 56 passed, 267 deselected. Infrastructure coverage: 87%</code></pre>
-<p>267 + 56 = 323 tests total across the two runs
-(<code>--strict-markers</code> and the <code>integration</code> marker
-partition the suite so each test runs in exactly one of the two). The
-tables below draw specific, representative cases from the suites rather
-than reproducing all 323; the full set is in
-<code>backend/tests/</code>, one file per module under test, one test
-function per row these tables summarise.</p>
+<p>The counts below are what the suites reported on 2026-08-14, against
+the current commit, run from <code>backend/</code> and
+<code>frontend/</code>:</p>
+<pre><code>$ make check       → 402 passed, 84 deselected. Coverage: 90.03% (gate: 85%)
+$ make integration → 84 passed, 402 deselected
+$ npx vitest run   → 79 passed (20 files)</code></pre>
+<p>402 + 84 = 486 backend tests across the two runs.
+<code>--strict-markers</code> and the <code>integration</code> marker
+partition the suite so each test runs in exactly one of the two, which
+is why each run reports the other's count as deselected. The frontend
+adds 79 more, for 565 in total.</p>
+<p>Both backend figures are from CI run 31791711326 on 2026-08-14, which
+reports <code>collected 486 items / 402 deselected / 84 selected</code>
+then <code>84 passed</code> for the integration job, and
+<code>402 passed</code> at 90.03% coverage for the gates job.</p>
+<p><strong>On the integration figure.</strong> These 84 tests stand up a
+real PostgreSQL 16 in a throwaway container via
+<code>testcontainers</code>, so they cannot run on a machine without a
+Docker daemon. On such a machine every one of them errors at setup
+rather than failing, which is a different and more honest signal than a
+false pass, and it is why this report cites the CI run rather than a
+local one. CI provides Postgres as a service container and additionally
+verifies that the Alembic migration chain applies, reverses to base, and
+re-applies.</p>
+<p>The tables below draw specific, representative cases from the suites
+rather than reproducing all 486. The full set is in
+<code>backend/tests/</code>, one file per module under test.</p>
 <h3 id="31-functional-testing--domain-lifecycle-and-rules">3.1
 Functional testing — domain lifecycle and rules</h3>
 <table>
@@ -519,7 +760,7 @@ over 100 generated payload sequences (size 1–12)</td>
 known limitation, TD-04)</td>
 <td><code>verify()</code> accepts the truncated chain</td>
 <td>Accepts</td>
-<td>Pass — by design; see §6</td>
+<td>Pass — by design; see section 6</td>
 </tr>
 <tr>
 <td>The blinded projection never carries the author id, for any
@@ -576,7 +817,7 @@ Integration testing (real PostgreSQL via testcontainers)</h3>
 (<code>test_truncating_the_event_log_is_rejected</code>)</td>
 <td>Rejected by a statement-level trigger</td>
 <td>Rejected</td>
-<td>Pass — closes TD-13, see §4</td>
+<td>Pass — closes TD-13, see section 4</td>
 </tr>
 <tr>
 <td>Deleting a manuscript that has audit events
@@ -899,14 +1140,14 @@ regardless of UTC offset
 (<code>test_the_same_instant_hashes_identically_regardless_of_offset</code>)</td>
 <td>Identical bytes</td>
 <td>Identical</td>
-<td>Pass — regression test for TD-12, see §4</td>
+<td>Pass — regression test for TD-12, see section 4</td>
 </tr>
 <tr>
 <td><code>UPDATE</code>/<code>DELETE</code>/<code>TRUNCATE</code> on the
 audit log, and a manuscript delete with attached events</td>
 <td>All rejected at the database level</td>
 <td>All rejected</td>
-<td>Pass — see §3.3, §4</td>
+<td>Pass — see section 3.3, section 4</td>
 </tr>
 </tbody>
 </table>
@@ -976,17 +1217,108 @@ body before ever calling upstream (<code>route.test.ts</code>)</td>
 </tr>
 </tbody>
 </table>
-<p>Frontend suite: 10 test files, 17 individual <code>it(...)</code>
-cases (counted directly from
-<code>frontend/src/**/*.test.{ts,tsx}</code>). This report could not
-execute <code>npm test</code> in the environment it was written in —
-<code>node_modules</code> is not installed and package installation was
-out of scope for producing this document — so no pass/fail run output is
-claimed for the frontend suite as a whole; the table above states what
-each test asserts, sourced by reading the test files directly, not a run
-log. <code>npx tsc --noEmit</code> and ESLint (<code>make check</code>
-in <code>frontend/</code>) gate the same code on every CI-equivalent
-local run.</p>
+<p>| Clicking a demo-account chip fills the email and leaves the
+password empty and focused (<code>login-page.test.tsx</code>) | Email
+set, password empty and focused | Confirmed | Pass | | A seeded address
+never carries across a switch to the sign-up form
+(<code>login-page.test.tsx</code>) | Email cleared | Cleared | Pass | |
+The prototype notice precedes the form in document order
+(<code>login-page.test.tsx</code>) | Notice first | Confirmed | Pass
+|</p>
+<p>Frontend suite: <strong>20 test files, 79 cases, all passing</strong>
+under <code>npx vitest run</code>.</p>
+<p>One environment note, since it caused a false alarm once. Two suites
+import <code>frontend/src/lib/env.ts</code>, which parses
+<code>process.env</code> at import time, so they fail with a Zod error
+unless <code>API_BASE_URL</code> and <code>SESSION_SECRET</code> are
+present. <code>vitest.config.ts</code> feeds them in through
+<code>loadEnv</code>, which reads <code>.env*</code> files; a checkout
+without a local <code>.env.local</code> therefore sees those suites
+error rather than fail. Copying <code>.env.local.example</code> resolves
+it.</p>
+<h3 id="37-feature-suites-added-after-the-original-build">3.7 Feature
+suites added after the original build</h3>
+<p>The two waves that followed the 48-hour build brought their own
+suites. These are the files, with the property each one exists to
+pin:</p>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>What it pins</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_billing_router.py</code></td>
+<td>An invoice opens on an accept decision and only on an accept
+decision; a repeated accept never double-bills; mock and real gateway
+modes are distinguishable on the wire; only the corresponding author may
+settle, only the Editor-in-Chief may waive</td>
+</tr>
+<tr>
+<td><code>test_invoice_repository.py</code> (integration)</td>
+<td>Invoice persistence and status transitions against real
+Postgres</td>
+</tr>
+<tr>
+<td><code>test_admin_router.py</code></td>
+<td>Every admin route is closed to non-administrators; the administrator
+role can be neither granted nor revoked; capacity is bounded 1 to 10; an
+administrator cannot deactivate themselves</td>
+</tr>
+<tr>
+<td><code>test_provenance_router.py</code></td>
+<td>An intact chain verifies and reports its head; a tampered interior
+event is reported as broken; payloads and actor ids are never
+exposed</td>
+</tr>
+<tr>
+<td><code>test_citation_router.py</code></td>
+<td>BibTeX and RIS are well formed; an unknown or missing format is 422;
+a DOI-shaped identifier is present</td>
+</tr>
+<tr>
+<td><code>test_editorial_analytics.py</code></td>
+<td>Aggregates over an empty desk return nulls rather than zero rates;
+reviewer performance reports workload and turnaround; deadlines carry a
+server-computed overdue flag; reviewers cannot read any of it</td>
+</tr>
+<tr>
+<td><code>test_archive_search_fulltext.py</code></td>
+<td>Body-text matches carry a snippet, title and keyword matches carry
+null; publishing extracts PDF text into the search column; an unreadable
+document never blocks a publish</td>
+</tr>
+<tr>
+<td><code>test_submission_preflight.py</code></td>
+<td>Submission and resubmission report stripped metadata keys and flag
+author names still present in body text, without dropping any
+<code>ManuscriptOut</code> field</td>
+</tr>
+<tr>
+<td><code>test_certificate_router.py</code>,
+<code>test_certificate_auth.py</code></td>
+<td>A certificate is a PDF, reachable by editor and Editor-in-Chief, and
+names no reviewer and no confidential comment</td>
+</tr>
+<tr>
+<td><code>test_fulltext_search.py</code>,
+<code>test_due_at_migration.py</code> (integration)</td>
+<td>The <code>tsvector</code> column and the <code>due_at</code>
+migration behave against real Postgres</td>
+</tr>
+</tbody>
+</table>
+<p>Two of these deserve a note because they assert an absence rather
+than a presence.
+<code>test_event_payloads_and_actor_ids_are_never_exposed</code> and
+<code>test_the_certificate_never_names_a_reviewer_or_leaks_confidential_comments</code>
+both guard the double-blind guarantee at points where a new feature
+could plausibly have broken it: a public verification endpoint and a
+downloadable PDF are exactly the kind of additions that leak an
+identifier by accident. Asserting the absence directly is cheaper than
+hoping a reviewer notices.</p>
 <hr />
 <h2 id="4-defects-found-and-corrective-action">4. Defects found and
 corrective action</h2>
@@ -1105,8 +1437,8 @@ what the coverage report claimed, rather than trusting "0 branches
 missing" as proof of exhaustive exercise. Recorded in
 <code>docs/04-technical-debt-register.md</code> (TD-11) as the
 register's second illustration of coverage as a weak signal — a
-companion finding to the mutation-testing result in §4.1, found the same
-review pass.</p>
+companion finding to the mutation-testing result in section 4.1, found
+the same review pass.</p>
 <p><strong>Why it mattered.</strong> "100% coverage, zero branches
 missed" is a claim readers reasonably take to mean both arms of every
 branch ran. It did not mean that here, because coverage.py's branch
@@ -1126,11 +1458,11 @@ Three lifecycle methods were implemented and tested, but reachable by no
 route</h3>
 <p><strong>What was found.</strong> <code>Manuscript.resubmit</code>,
 <code>Manuscript.schedule</code> and <code>Manuscript.publish</code>
-were fully implemented in the domain and covered by unit tests (§3.1) —
-but at one point in the build, no API route in <code>ugjcs.api</code>
-called them. The domain logic was correct and verified in isolation; the
-system as a whole could not do the things those tests proved the domain
-capable of.</p>
+were fully implemented in the domain and covered by unit tests (section
+3.1) — but at one point in the build, no API route in
+<code>ugjcs.api</code> called them. The domain logic was correct and
+verified in isolation; the system as a whole could not do the things
+those tests proved the domain capable of.</p>
 <p><strong>How it was found.</strong> Not by any automated test — every
 domain test for these methods passed. It was found by the project owner
 attempting to use the deployed system through the actual workflow
@@ -1149,12 +1481,12 @@ every needed route existing.</p>
 <p><strong>What was done.</strong> The three routes were added to
 <code>ugjcs.api</code> (manuscript resubmission, editor-in-chief
 scheduling, editor-in-chief publication), each exercised by the system
-tests in §3.4
+tests in section 3.4
 (<code>test_the_corresponding_author_can_resubmit_with_a_revised_file</code>,
 <code>test_the_editor_in_chief_can_schedule_an_accepted_manuscript</code>,
 <code>test_the_editor_in_chief_can_publish_a_scheduled_manuscript</code>).
-The gap itself is the strongest argument in this report for §5's manual
-acceptance pass being a required step, not an optional one: it is
+The gap itself is the strongest argument in this report for section 5's
+manual acceptance pass being a required step, not an optional one: it is
 precisely the class of defect route-level and unit-level testing cannot
 see.</p>
 <h3
@@ -1326,7 +1658,7 @@ correct tracking codes and statuses (<code>Published</code>,
 rendered, no session state exposed on that page</td>
 <td>Pass — matches <code>frontend/middleware.ts</code>: a session
 present without the required role redirects to <code>/</code>, distinct
-from the no-session case (§5, next row), which redirects to
+from the no-session case (section 5, next row), which redirects to
 <code>/login</code></td>
 </tr>
 </tbody>
@@ -1337,10 +1669,10 @@ distinguishes "no session" (→ <code>/login</code>, so the user can
 authenticate and retry) from "session present, wrong role" (→
 <code>/</code>, so a legitimately authenticated user with insufficient
 privilege lands somewhere useful rather than at a bare error). The
-backend's own authorization check — exercised in §3.4 and §3.5 — is what
-is actually authoritative for every state-changing action regardless of
-what the frontend route guard does; the middleware is a routing-level
-convenience, not the security boundary.</p>
+backend's own authorization check — exercised in section 3.4 and section
+3.5 — is what is actually authoritative for every state-changing action
+regardless of what the frontend route guard does; the middleware is a
+routing-level convenience, not the security boundary.</p>
 <h3 id="scripted-scenarios-per-role-full-acceptance-script">Scripted
 scenarios per role (full acceptance script)</h3>
 <p>The remaining scenarios below constitute the acceptance script run
@@ -1425,7 +1757,7 @@ submissions"</td>
 </tr>
 <tr>
 <td>Administrator</td>
-<td>(Role management — see §6: no UI surface exists for this yet;
+<td>(Role management — see section 6: no UI surface exists for this yet;
 verified only via <code>test_policies.py</code>'s
 <code>test_administrator_may_manage_users</code> at the policy
 layer)</td>
@@ -1453,32 +1785,32 @@ design time, not confirmed against the running system.</li>
 checking, an architecture contract, and the test suites — it does not
 run a dependency vulnerability scanner, a SAST tool, or a DAST pass
 against the deployed API. Security coverage in this project is what the
-tests in §3.5 assert directly, and nothing beyond that.</li>
+tests in section 3.5 assert directly, and nothing beyond that.</li>
 <li><strong>No mutation testing in CI.</strong> The mutation-testing
-finding in §4.1 was a one-off manual review pass, not a repeatable gate.
-<code>docs/04-technical-debt-register.md</code> (TD-11) records
-systematic mutation testing (<code>mutmut</code> or
+finding in section 4.1 was a one-off manual review pass, not a
+repeatable gate. <code>docs/04-technical-debt-register.md</code> (TD-11)
+records systematic mutation testing (<code>mutmut</code> or
 <code>cosmic-ray</code>) as future evolution, not as something this
 project currently runs.</li>
-<li><strong>No browser-matrix testing.</strong> The live UAT pass in §5
-was run in one browser (a Chromium-based automated session). No
-cross-browser or cross-device matrix was exercised;
+<li><strong>No browser-matrix testing.</strong> The live UAT pass in
+section 5 was run in one browser (a Chromium-based automated session).
+No cross-browser or cross-device matrix was exercised;
 <code>@axe-core/playwright</code> is present as a dependency for
-accessibility auditing but, as noted in §1 and §3.6, no Playwright spec
-files are committed to run it against.</li>
+accessibility auditing but, as noted in section 1 and section 3.6, no
+Playwright spec files are committed to run it against.</li>
 <li><strong>No committed automated end-to-end suite.</strong>
 <code>test:e2e</code> is declared in <code>package.json</code> but there
 is no <code>playwright.config.ts</code> or <code>tests/e2e/</code>
-directory in the repository. The acceptance evidence in §5 substitutes a
-manual (and, for this report, live-browser-driven) pass for what an
-automated E2E suite would otherwise provide continuously; it is not
-equivalent to one, because it was not re-run on every change, only at
-the points recorded here.</li>
+directory in the repository. The acceptance evidence in section 5
+substitutes a manual (and, for this report, live-browser-driven) pass
+for what an automated E2E suite would otherwise provide continuously; it
+is not equivalent to one, because it was not re-run on every change,
+only at the points recorded here.</li>
 <li><strong>The double-blind guarantee has a stated limit.</strong>
 <code>blind()</code> strips <code>author_ids</code> and
 <code>corresponding_author_id</code> from the type a reviewer receives —
-proven for every input by the property test in §3.2 and the
-sentinel-based leak tests in §3.5 — but <code>title</code>,
+proven for every input by the property test in section 3.2 and the
+sentinel-based leak tests in section 3.5 — but <code>title</code>,
 <code>abstract</code> and <code>keywords</code> are carried
 <strong>verbatim</strong>. An author's name in a title, or an abstract
 that reads "extending our earlier work in [Obeng 2025]," reaches the
@@ -1492,21 +1824,21 @@ the guarantee more than not attempting redaction at all.</li>
 <li><strong>Administrator role management has no UI.</strong> The policy
 layer grants and denies this correctly
 (<code>test_administrator_may_manage_users</code>), but no frontend
-surface exercises it, so §5's administrator row is verified only at the
-policy-test level, not end to end.</li>
+surface exercises it, so section 5's administrator row is verified only
+at the policy-test level, not end to end.</li>
 </ul>
 <hr />
 <h2 id="7-evaluation-of-the-testing-strategy">7. Evaluation of the
 testing strategy</h2>
-<p>The honest conclusion, and the one the evidence in §4 supports
+<p>The honest conclusion, and the one the evidence in section 4 supports
 without qualification: <strong>automated gates establish a floor and
 catch regressions; they did not find the defects that mattered most on
-this project.</strong> Every serious defect recorded in §4 was found by
-a human or an agent reading code against what it claimed to do, by
-mutation testing deliberately designed to distrust the coverage figure,
-or by using the running system as an actual actor would — never by a
-coverage number or a green test run on its own.</p>
-<p>The clearest single data point is §4.1: coverage on
+this project.</strong> Every serious defect recorded in section 4 was
+found by a human or an agent reading code against what it claimed to do,
+by mutation testing deliberately designed to distrust the coverage
+figure, or by using the running system as an actual actor would — never
+by a coverage number or a green test run on its own.</p>
+<p>The clearest single data point is section 4.1: coverage on
 <code>hashchain.py</code> stood at 100% — every line, every branch —
 while the line that makes a hash chain a <em>chain</em>, rather than a
 list of independently checksummed events, could be deleted without
@@ -1516,46 +1848,48 @@ exists was, for a period, unprotected by any test that would have
 noticed its removal. That is not a marginal case; it is the load-bearing
 property of the module, and coverage reported nothing wrong.</p>
 <p>Three further findings sharpen the same point from different angles.
-§4.2 shows that 100% coverage inside a module says nothing about what
-happens at a boundary the module doesn't know it crosses — every test
-used a UTC datetime, so the suite was structurally blind to a defect
-that only a database round trip could expose, and the defect it hid was
-actively harmful (a false tamper alert), not merely a missed detection.
-§4.3 shows that a control verified against the cases its author thought
-to check — <code>UPDATE</code>, <code>DELETE</code> — said nothing about
-the case nobody asked about — <code>TRUNCATE</code> — despite the
-control having been "confirmed firing against a live database." §4.4
-shows the measurement tool itself has blind spots: an inline ternary's
-second arm never ran, and coverage.py's branch instrumentation does not
-model a conditional expression as a branch, so the report read as
-complete when it was not.</p>
-<p>§4.5 and §4.6 extend the same lesson past the test suite entirely.
-§4.5 — three fully implemented, fully unit-tested domain methods
-reachable by no API route — is a defect no unit test, integration test,
-or route-audit test was positioned to find, because each of those tests
-presupposes the thing under test is reachable; the question "does
-anything reach this code" sits above all of them, and was answered only
-by the owner using the deployed system as a user would. §4.6 — correct
-IAM policy, no network path to use it — sits a layer below every test in
-this suite: nothing here runs against the actual deployed network
-topology, so the gap was invisible until the feature was exercised
-against the real infrastructure and the upload hung.</p>
-<p>None of this is an argument against the automated suite. 267 unit
-tests, 56 integration tests against a real database, two architecture
-contracts, and a strict type checker catch an enormous amount of
-regression cheaply and continuously — exactly what §1 claims for them,
-and exactly the floor <code>docs/04-technical-debt-register.md</code>
-describes them as. But the register's own closing observation, produced
-independently of this report, states the same conclusion this section
-reaches from the test evidence directly: ten of its eleven entries were
-found by review of work that had already passed every automated gate —
-linting, strict typing, an architecture contract, and a full test suite
-at 100% coverage. Passing every gate available in this project is
-necessary and was, in every one of these cases, not sufficient. What
-found the defects that mattered was a human, or an agent acting as one,
-asking whether the code was still true to what it claimed — and, twice
-in this project, whether the <em>deployed system</em> still did what the
-code claimed once it left the test suite entirely.</p>
+Section 4.2 shows that 100% coverage inside a module says nothing about
+what happens at a boundary the module doesn't know it crosses — every
+test used a UTC datetime, so the suite was structurally blind to a
+defect that only a database round trip could expose, and the defect it
+hid was actively harmful (a false tamper alert), not merely a missed
+detection. Section 4.3 shows that a control verified against the cases
+its author thought to check — <code>UPDATE</code>, <code>DELETE</code> —
+said nothing about the case nobody asked about — <code>TRUNCATE</code> —
+despite the control having been "confirmed firing against a live
+database." section 4.4 shows the measurement tool itself has blind
+spots: an inline ternary's second arm never ran, and coverage.py's
+branch instrumentation does not model a conditional expression as a
+branch, so the report read as complete when it was not.</p>
+<p>Section 4.5 and section 4.6 extend the same lesson past the test
+suite entirely. Section 4.5 — three fully implemented, fully unit-tested
+domain methods reachable by no API route — is a defect no unit test,
+integration test, or route-audit test was positioned to find, because
+each of those tests presupposes the thing under test is reachable; the
+question "does anything reach this code" sits above all of them, and was
+answered only by the owner using the deployed system as a user would.
+Section 4.6 — correct IAM policy, no network path to use it — sits a
+layer below every test in this suite: nothing here runs against the
+actual deployed network topology, so the gap was invisible until the
+feature was exercised against the real infrastructure and the upload
+hung.</p>
+<p>None of this is an argument against the automated suite. 402 unit
+tests, 84 integration tests against a real database, 79 frontend tests,
+two architecture contracts, and a strict type checker catch an enormous
+amount of regression cheaply and continuously — exactly what section 1
+claims for them, and exactly the floor
+<code>docs/04-technical-debt-register.md</code> describes them as. But
+the register's own closing observation, produced independently of this
+report, states the same conclusion this section reaches from the test
+evidence directly: ten of its eleven entries were found by review of
+work that had already passed every automated gate — linting, strict
+typing, an architecture contract, and a full test suite at 100%
+coverage. Passing every gate available in this project is necessary and
+was, in every one of these cases, not sufficient. What found the defects
+that mattered was a human, or an agent acting as one, asking whether the
+code was still true to what it claimed — and, twice in this project,
+whether the <em>deployed system</em> still did what the code claimed
+once it left the test suite entirely.</p>
 </main>
 <footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>
 </body>

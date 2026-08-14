@@ -6,6 +6,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>02 · Software Requirements Specification</title>
   <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -22,32 +167,113 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <link rel="stylesheet" href="" />
   <style>
-  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
-  * { box-sizing:border-box; }
-  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
-  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
-  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
-  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
-  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
-  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
-  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
-  h3 { font-size:1.12rem; margin-top:1.8rem; }
-  a { color:#4b3f9e; }
-  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
-  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
-  pre code { background:none; color:inherit; padding:0; }
-  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
-  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
-  th { background:#eceee9; font-weight:600; }
-  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
-  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
-  figure.diagram svg { max-width:100%; height:auto; }
-  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
-  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
-  </style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      /* The extra [class] is a hack that increases specificity enough to
+         override a similar rule in reveal.js */
+      ul.task-list[class]{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        font-size: inherit;
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1.6em;
+        vertical-align: middle;
+      }
+      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+      /* CSS for syntax highlighting */
+      html { -webkit-text-size-adjust: 100%; }
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { color: #008000; } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { color: #008000; font-weight: bold; } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+  <style>
+    :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+    header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+    header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+    header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+    main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+    h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+    h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+    h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+    h3 { font-size:1.12rem; margin-top:1.8rem; }
+    a { color:#4b3f9e; }
+    code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+    pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+    pre code { background:none; color:inherit; padding:0; }
+    table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+    th { background:#eceee9; font-weight:600; }
+    blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+    figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+    figure.diagram svg { max-width:100%; height:auto; }
+    nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+    footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+    </style>
 </head>
 <body>
 <header class="site">
@@ -70,7 +296,7 @@ of Basic and Applied Sciences (CBAS), University of Ghana
 2026-08-12 <strong>Conformance:</strong> Adapted from IEEE 830-1998 and
 ISO/IEC/IEEE 29148:2018 <strong>Status:</strong> Authoritative. Where
 this document and the implementation disagree, the implementation
-governs and the disagreement is recorded (§4.1, §7).</p>
+governs and the disagreement is recorded (section 4.1, section 7).</p>
 <p><strong>Naming.</strong> The product specified here is the
 <strong>SDJ Editorial Portal</strong>. The repository
 (<code>github.com/rogerkorantenng/ugjcs</code>), hosting URLs, package
@@ -82,20 +308,25 @@ Engineering exam, not SDJ's official production system.</p>
 <p><strong>Revision note (2026-08-12, post-implementation).</strong>
 This document was originally authored before the API and frontend
 existed, when only the domain layer and the database persistence adapter
-were built. §2.1, §2.4, §4.3, §5 and §7 have since been revised against
-the finished, deployed system — the live API
-(<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>, confirmed
-against its own <code>/openapi.json</code>), the live frontend
+were built. Section 2.1, section 2.4, section 4.3, section 5 and section
+7 have since been revised against the finished, deployed system — the
+live API (<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>,
+confirmed against its own <code>/openapi.json</code>), the live frontend
 (<code>https://ugjcs-frontend.vercel.app</code>), the backend source
 under <code>backend/src/ugjcs/api/</code> and
 <code>frontend/src/app/</code>, the test suites under
 <code>backend/tests/</code>, and <code>docs/06-testing-report.md</code>.
-The revision moved twelve requirements from planned to
-implemented-and-tested, refined six from "planned" to "partially
-implemented" with a named gap, and left eleven genuinely not implemented
-— stated as such rather than glossed over. Requirement identifiers,
-MoSCoW priorities and the sections not touched by this revision are
-unchanged from the original.</p>
+That first revision moved twelve requirements from planned to
+implemented-and-tested, refined six to "partially implemented" with a
+named gap, and left eleven genuinely not implemented.</p>
+<p>A second revision on 2026-08-14 reconciled the document against two
+feature waves that landed after the original build. It moved eight
+further lines to implemented-and-tested, added six new requirements
+(FR-29 to FR-34) for capabilities the original set never anticipated,
+and corrected several rows that had begun to understate the system
+rather than overstate it. The current totals are in section 5.
+Requirement identifiers, MoSCoW priorities and the sections neither
+revision touched are unchanged from the original.</p>
 <hr />
 <h2 id="1-introduction">1. Introduction</h2>
 <h3 id="11-purpose">1.1 Purpose</h3>
@@ -120,9 +351,9 @@ public archive with search, citation export and metadata harvesting; and
 a tamper-evident editorial audit trail. Payment processing,
 copy-editing/typesetting, multi-journal tenancy, ORCID federation, real
 DOI registration, and plagiarism screening against external corpora are
-explicitly out of scope (design specification §4.2). The full functional
-boundary is enumerated in §5 of that specification and restated as
-testable requirements in §3 of this document.</p>
+explicitly out of scope (design specification section 4.2). The full
+functional boundary is enumerated in section 5 of that specification and
+restated as testable requirements in section 3 of this document.</p>
 <h3 id="13-definitions-acronyms-and-abbreviations">1.3 Definitions,
 acronyms and abbreviations</h3>
 <table>
@@ -200,7 +431,7 @@ for authenticated traffic</td>
 <tr>
 <td>DOI</td>
 <td>Digital Object Identifier (the portal issues DOI-<em>shaped</em> but
-unregistered identifiers — §4.2)</td>
+unregistered identifiers — section 4.2)</td>
 </tr>
 <tr>
 <td>TF-IDF</td>
@@ -243,14 +474,15 @@ Requirements Specifications</em></li>
 cycle processes — Requirements engineering</em></li>
 </ul>
 <h3 id="15-overview">1.5 Overview</h3>
-<p>§2 describes the product, its user classes and its operating
-constraints. §3 states each functional and non-functional requirement in
-testable form. §4 gives the manuscript lifecycle as implemented, the
-actor/use-case mapping and the authorisation matrix. §5 is the
-requirements traceability matrix, stated honestly for what is built
-versus planned. §6 explains the MoSCoW prioritisation and how the effort
-estimate drove it. §7 states the system's limitations plainly,
-cross-referenced to the technical debt register.</p>
+<p>Section 2 describes the product, its user classes and its operating
+constraints. Section 3 states each functional and non-functional
+requirement in testable form. Section 4 gives the manuscript lifecycle
+as implemented, the actor/use-case mapping and the authorisation matrix.
+Section 5 is the requirements traceability matrix, stated honestly for
+what is built versus planned. Section 6 explains the MoSCoW
+prioritisation and how the effort estimate drove it. Section 7 states
+the system's limitations plainly, cross-referenced to the technical debt
+register.</p>
 <hr />
 <h2 id="2-overall-description">2. Overall description</h2>
 <h3 id="21-product-perspective">2.1 Product perspective</h3>
@@ -267,53 +499,64 @@ core, and PostgreSQL and S3 as its persistence and document-storage
 infrastructure.</p>
 <p><strong>This is no longer a forward-looking description.</strong> The
 domain layer, the database persistence adapter, the application use-case
-layer, the FastAPI API layer (<code>/auth</code>,
-<code>/manuscripts</code>, <code>/editorial</code>,
-<code>/reviews</code>, <code>/archive</code>, <code>/health</code>,
-<code>/ready</code>) and the Next.js frontend are all built, tested and
-deployed: API at
+layer, the FastAPI API layer (<code>/auth</code>, <code>/admin</code>,
+<code>/billing</code>, <code>/manuscripts</code>,
+<code>/editorial</code>, <code>/editorial-certificate</code>,
+<code>/reviews</code>, <code>/archive</code>, <code>/people</code>,
+<code>/health</code>, <code>/ready</code>) and the Next.js frontend are
+all built, tested and deployed: API at
 <code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>, frontend at
-<code>https://ugjcs-frontend.vercel.app</code>. §5's traceability matrix
-states, requirement by requirement, which of these are implemented and
-tested, which are partially built with a named gap, and which — reviewer
-expertise-matching, asynchronous post-upload processing, OAI-PMH,
-citation export, notifications, and analytics — are not built at all.
-Redis and an ARQ worker were designed for asynchronous processing
-(design specification §7) but are not present in the delivered codebase;
-nothing in the current system depends on them, and FR-20 (similarity
-screening) is the requirement that would have used them, and remains
-unimplemented. Terraform-managed ECS/ALB/CloudFront was the original
-deployment design; the actual deployment target differs (§2.4,
-TD-14).</p>
+<code>https://ugjcs-frontend.vercel.app</code>. Section 5's traceability
+matrix states, requirement by requirement, which of these are
+implemented and tested, which are partially built with a named gap, and
+which are not built at all.</p>
+<p>Four things named in the original design remain unbuilt: OAI-PMH
+harvesting (FR-22), similarity screening (FR-20), notifications of any
+kind, and asynchronous post-upload processing. Redis and an ARQ worker
+were designed for that last one (design specification Section 7) but are
+absent from the delivered codebase, and nothing in the current system
+depends on them; FR-20 is the requirement that would have used them.
+Terraform-managed ECS/ALB/CloudFront was the original deployment design,
+and the actual deployment target differs (section 2.4, TD-14).</p>
+<p>Six capabilities have no counterpart in the original requirement set,
+because they were identified after it was written. They are added as
+FR-29 to FR-34: article processing charges, the administrator console,
+decision certificates, anonymisation preflight, review deadlines, and
+self-service author registration.</p>
 <h3 id="22-product-functions--summary">2.2 Product functions —
 summary</h3>
 <ul>
-<li>Register, authenticate and authorise users under five roles, several
-of which one account may hold concurrently.</li>
-<li>Accept manuscript submissions, validate and process them
-asynchronously, and produce an anonymised derivative for reviewers.</li>
-<li>Screen submissions and route them to review, revision, or desk
-rejection.</li>
-<li>Recommend reviewers by expertise match, exclude conflicts, balance
-workload, and let the editor accept, reject or override every
-recommendation.</li>
-<li>Collect structured, double-blind reviews and aggregate them into an
-editorial decision once a quorum is met.</li>
-<li>Support revision rounds between author and editor.</li>
-<li>Compose issues from accepted manuscripts and publish them to a
-public archive.</li>
-<li>Serve the archive to anonymous readers with full-text search,
-citation export and OAI-PMH harvesting.</li>
-<li>Record every editorial event in a tamper-evident, append-only
-log.</li>
+<li><p>Register, authenticate and authorise users under five roles,
+several of which one account may hold concurrently.</p></li>
+<li><p>Accept manuscript submissions, validate and process them
+asynchronously, and produce an anonymised derivative for
+reviewers.</p></li>
+<li><p>Screen submissions and route them to review, revision, or desk
+rejection.</p></li>
+<li><p>Recommend reviewers by expertise match, exclude conflicts,
+balance workload, and let the editor accept, reject or override every
+recommendation.</p></li>
+<li><p>Collect structured, double-blind reviews and aggregate them into
+an editorial decision once a quorum is met.</p></li>
+<li><p>Support revision rounds between author and editor.</p></li>
+<li><p>Compose issues from accepted manuscripts and publish them to a
+public archive.</p></li>
+<li><p>Serve the archive to anonymous readers with full-text search,
+citation export and OAI-PMH harvesting.</p></li>
+<li><p>Record every editorial event in a tamper-evident, append-only
+log.</p></li>
+<li><p>Bill and settle an article processing charge once a paper is
+accepted.</p></li>
+<li><p>Administer accounts, roles, reviewer capacity and activation from
+a console.</p></li>
+<li><p>Let anyone verify a published paper's editorial history against a
+tamper-evident chain.</p></li>
 </ul>
-<p><em>This list states intended product scope, unchanged from the
-original design; it is not a claim that every bullet is built. §5's
-traceability matrix is the authoritative, requirement-by-requirement
-account of what is implemented today — notably, expertise- ranked
-reviewer recommendation (FR-08), asynchronous processing (§2.1),
-citation export and OAI-PMH harvesting (FR-21, FR-22) are not yet
-built.</em></p>
+<p><em>This list states intended product scope. It is not a claim that
+every bullet is built. Section 5's traceability matrix is the
+authoritative, requirement-by-requirement account of what is implemented
+today. Of the bullets above, asynchronous processing (section 2.1) and
+OAI-PMH harvesting (FR-22) are the two that are not built.</em></p>
 <h3 id="23-user-classes-and-characteristics">2.3 User classes and
 characteristics</h3>
 <table>
@@ -378,10 +621,10 @@ configuration</td>
 </tbody>
 </table>
 <p>A single account may hold multiple roles simultaneously (design
-specification §3); this is a deliberate design choice with a direct
-security consequence recorded in §4.3 and §7 (an Author–Reviewer
-dual-role holder is not currently prevented from reviewing their own
-manuscript).</p>
+specification section 3); this is a deliberate design choice with a
+direct security consequence recorded in section 4.3 and Section 7 (an
+Author–Reviewer dual-role holder is not currently prevented from
+reviewing their own manuscript).</p>
 <h3 id="24-operating-environment">2.4 Operating environment</h3>
 <p><strong>As deployed</strong> (superseding the design specification's
 ECS/ALB/CloudFront topology — see TD-14 for why, and for why no
@@ -398,14 +641,15 @@ buckets, documents reachable only via short-lived pre-signed URLs.
 Client environment: any evergreen browser at 360 px width or above;
 readers require no account. Redis and an ARQ worker, specified for
 asynchronous post-upload processing, are not present in the delivered
-infrastructure — nothing currently deployed depends on them (§2.1).</p>
+infrastructure — nothing currently deployed depends on them (section
+2.1).</p>
 <h3 id="25-design-and-implementation-constraints">2.5 Design and
 implementation constraints</h3>
 <ul>
-<li>A 48-hour solo development window (effort estimation §8), which
-forced the MoSCoW cut in §6 of this document.</li>
+<li>A 48-hour solo development window (effort estimation section 8),
+which forced the MoSCoW cut in section 6 of this document.</li>
 <li>No registered domain — the CloudFront TLS strategy is not optional
-but architecturally necessary (design specification §7.3).</li>
+but architecturally necessary (design specification section 7.3).</li>
 <li>AWS and Vercel free/low-cost tiers; operating cost is targeted at
 USD 35–55/month.</li>
 <li>Domain layer must import no framework code, enforced by an
@@ -942,6 +1186,100 @@ deviation) is available</td>
 <td>A reviewer who declines every invitation shows a 0% acceptance rate,
 not a null or error</td>
 </tr>
+<tr>
+<td>FR-30</td>
+<td>The system shall let an Administrator manage accounts: grant and
+revoke roles, set reviewer capacity, and deactivate accounts.</td>
+<td>Administrator</td>
+<td>M</td>
+<td>Actor holds <code>ADMINISTRATOR</code></td>
+<td>The account's roles, capacity or activation state are updated and
+visible on the next read</td>
+<td>The administrator role itself cannot be granted or revoked through
+this interface, and an administrator cannot deactivate their own
+account</td>
+</tr>
+<tr>
+<td>FR-33</td>
+<td>The system shall record a due date for each review assignment and
+mark an assignment overdue once that date passes without a submitted
+review.</td>
+<td>Editor, EiC</td>
+<td>S</td>
+<td>A reviewer is assigned to a manuscript</td>
+<td>The assignment carries a deadline and a server-computed overdue
+flag</td>
+<td>A review submitted after its deadline is not flagged overdue; an
+assignment with no deadline is never flagged overdue</td>
+</tr>
+</tbody>
+</table>
+<h4 id="group-i--publication-economics-and-scholarly-record">Group I —
+Publication economics and scholarly record</h4>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Statement</th>
+<th>Actor</th>
+<th>Pri</th>
+<th>Preconditions</th>
+<th>Postconditions</th>
+<th>Acceptance criteria</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FR-29</td>
+<td>The system shall raise an article processing charge when a
+manuscript is accepted, and let the corresponding author settle it
+through a payment gateway.</td>
+<td>Author, EiC</td>
+<td>S</td>
+<td>Manuscript is <code>ACCEPTED</code>, <code>SCHEDULED</code> or
+<code>PUBLISHED</code></td>
+<td>An invoice exists with a status of <code>pending</code>,
+<code>paid</code> or <code>waived</code></td>
+<td>No invoice exists before acceptance; a settled invoice cannot be
+waived, and a waived invoice cannot be verified</td>
+</tr>
+<tr>
+<td>FR-31</td>
+<td>The system shall issue a signed-style decision certificate for a
+manuscript whose final decision is recorded.</td>
+<td>Editor, EiC</td>
+<td>C</td>
+<td>An <code>accept</code> or <code>reject</code> decision exists in the
+manuscript's event chain</td>
+<td>A PDF stating the decision, the tracking code and the audit chain's
+head hash is returned</td>
+<td>Requesting a certificate before any final decision is a 409, not an
+empty document</td>
+</tr>
+<tr>
+<td>FR-32</td>
+<td>The system shall report, at submission time, what the anonymiser
+removed from the uploaded document and what it could not remove.</td>
+<td>Author</td>
+<td>S</td>
+<td>A document has been uploaded</td>
+<td>The submission response carries a report of removed metadata keys
+and any author names still detectable in the body text</td>
+<td>An author whose name appears in the manuscript body is told so at
+submission rather than after a reviewer sees it</td>
+</tr>
+<tr>
+<td>FR-34</td>
+<td>The system shall let a member of the public register an author
+account without editorial-office involvement.</td>
+<td>Reader</td>
+<td>S</td>
+<td>The email address is not already registered</td>
+<td>An account exists holding exactly the <code>AUTHOR</code> role,
+signed in</td>
+<td>Registration cannot grant reviewer, editor or administrator roles
+under any request body</td>
+</tr>
 </tbody>
 </table>
 <h3 id="32-non-functional-requirements">3.2 Non-functional
@@ -971,7 +1309,7 @@ no credential-shaped value appears in captured log output</td>
 <td>Every endpoint is authorised by an explicit policy; access is denied
 by default.</td>
 <td>Integration test that walks the full route table and fails if any
-route lacks a policy check (design specification §11)</td>
+route lacks a policy check (design specification section 11)</td>
 </tr>
 <tr>
 <td>NFR-03</td>
@@ -1188,7 +1526,8 @@ exported.</td>
 <td>NFR-17</td>
 <td>Personal data is minimised; the audit log retains identity only
 where required.</td>
-<td>Design review against the data model (design specification §8)</td>
+<td>Design review against the data model (design specification section
+8)</td>
 </tr>
 </tbody>
 </table>
@@ -1291,7 +1630,7 @@ modelled as withdrawal.</p>
 
 <h4 id="413-spec-versus-code-disagreement--resubmitted-routing">4.1.3
 Spec-versus-code disagreement — RESUBMITTED routing</h4>
-<p>The design specification's §6.2 diagram draws
+<p>The design specification's section 6.2 diagram draws
 <code>RESUBMITTED</code> flowing directly into
 <code>REVIEWS_COMPLETE</code> ("<code>RESUBMITTED</code> ◀── … ▶
 <code>REVIEWS_COMPLETE</code>"), implying a resubmission closes the
@@ -1312,7 +1651,7 @@ direction without comment.</p>
 <thead>
 <tr>
 <th>Actor</th>
-<th>Use cases (effort estimation §3)</th>
+<th>Use cases (effort estimation section 3)</th>
 </tr>
 </thead>
 <tbody>
@@ -1459,7 +1798,8 @@ TD-02)</em></td>
 <td>—</td>
 <td>Yes</td>
 <td>Yes</td>
-<td>— <em>(role grant exists; no route reaches it — §5, FR-19)</em></td>
+<td>— <em>(role grant exists; no route reaches it — section 5,
+FR-19)</em></td>
 </tr>
 <tr>
 <td><code>WITHDRAW</code> <em>(FR-25a)</em></td>
@@ -1569,8 +1909,9 @@ built and tested, including duplicate-email and replay handling. But no
 <code>/openapi.json</code>) and the frontend has no registration screen
 — only <code>/login</code>. Accounts in the deployed system are
 provisioned by seed data (the judge accounts in
-<code>docs/06-testing-report.md</code> §5), not self-registration.
-Missing: the API route and the frontend form that would call it.</td>
+<code>docs/06-testing-report.md</code> section 5), not
+self-registration. Missing: the API route and the frontend form that
+would call it.</td>
 </tr>
 <tr>
 <td>FR-02</td>
@@ -1605,8 +1946,8 @@ the persistence of a role change are both implemented and tested against
 a real database. No <code>/admin</code> API route or frontend screen
 exists to let an Administrator invoke this — confirmed absent from
 <code>/openapi.json</code> and from <code>frontend/src/app/</code>, and
-stated explicitly in <code>docs/06-testing-report.md</code> §5: "no UI
-surface exists for this yet."</td>
+stated explicitly in <code>docs/06-testing-report.md</code> section 5:
+"no UI surface exists for this yet."</td>
 </tr>
 <tr>
 <td>FR-04</td>
@@ -1621,8 +1962,8 @@ surface exists for this yet."</td>
 <code>test_transitions.py</code>, <code>test_manuscript.py</code></td>
 <td><strong>Implemented &amp; tested</strong>, end to end: route,
 upload, lifecycle guard and the author's submission form all exist and
-are exercised by the cited tests plus the live UAT pass in §5 of the
-testing report.</td>
+are exercised by the cited tests plus the live UAT pass in section 5 of
+the testing report.</td>
 </tr>
 <tr>
 <td>FR-05</td>
@@ -1653,10 +1994,10 @@ both an original and an anonymised S3 key on every submit/resubmit</td>
 <td><strong>Implemented &amp; tested.</strong> Every submitted document
 produces a metadata-stripped derivative, distinct from the original,
 before either reaches storage. <strong>Note the scope of what
-"anonymised" means here</strong> — see §7: XMP/DocInfo metadata is
-stripped; visible body text (a title or abstract that names the author)
-is not touched, which is FR-06 as designed, not a shortfall against
-it.</td>
+"anonymised" means here</strong> — see section 7: XMP/DocInfo metadata
+is stripped; visible body text (a title or abstract that names the
+author) is not touched, which is FR-06 as designed, not a shortfall
+against it.</td>
 </tr>
 <tr>
 <td>FR-07</td>
@@ -1686,17 +2027,31 @@ reachable and tested.</td>
 <tr>
 <td>FR-08</td>
 <td>UC7</td>
-<td><em>(none)</em></td>
-<td><em>(none)</em></td>
-<td><strong>Not implemented.</strong> No matching or ranking code exists
-anywhere in <code>backend/src/ugjcs/</code> — grep for TF-IDF,
-Hungarian-algorithm, or any "matcher" module returns nothing. An editor
-assigns a reviewer by supplying a raw <code>reviewer_id</code>
-(<code>AssignReviewerRequest</code>, <code>editorial.py</code>); there
-is no candidate list, no score, no conflict-of-interest exclusion, and
-no capacity check at assignment time. Recorded as future evolution
-alongside TD-02/TD-03, which are the conflict-of-interest gaps this
-requirement's "excluding conflicts of interest" clause would close.</td>
+<td><code>api/routers/editorial.py</code>
+(<code>GET /editorial/{tracking_code}/reviewer-candidates</code>,
+<code>_match_score</code>); <code>domain/conflicts.py</code>
+(<code>exclusion_reason</code>); <code>api/schemas_analytics.py</code>
+(<code>RankedReviewerCandidateOut</code>); frontend reviewer-candidate
+picker</td>
+<td><code>test_editorial_router.py</code>:
+<code>test_reviewer_candidates_are_ranked_by_expertise_match_then_load</code>,
+<code>test_reviewer_candidates_lists_eligible_and_excluded_with_their_reasons</code>,
+<code>test_a_candidate_at_capacity_is_excluded</code>,
+<code>test_a_candidate_already_assigned_to_this_manuscript_is_excluded</code>,
+<code>test_reviewer_candidates_omits_unverified_inactive_and_non_reviewer_accounts</code>,
+<code>test_a_reviewer_cannot_see_reviewer_candidates</code></td>
+<td><strong>Implemented &amp; tested.</strong> A ranked candidate list
+exists: <code>match_score</code> counts the manuscript's keywords
+appearing in a reviewer's <code>expertise</code>, candidates sort by
+match then by load, and <code>exclusion_reason</code> (a pure function)
+marks shared affiliation, existing assignment on this manuscript, and
+capacity exhaustion. Excluded candidates are returned
+<strong>with</strong> their reason rather than filtered away, so an
+editor can see why an obvious name is unavailable. Matching is keyword
+overlap, not TF-IDF or an assignment-optimisation algorithm; that is a
+simpler mechanism than the design specification sketched, and it is a
+deliberate one, since the corpus is far too small for term weighting to
+mean anything.</td>
 </tr>
 <tr>
 <td>FR-09</td>
@@ -1712,12 +2067,15 @@ integration <code>test_review_assignment_repository.py</code>:
 <code>test_an_assignment_is_visible_to_both_parties</code>,
 <code>test_assigning_the_same_reviewer_twice_is_rejected</code></td>
 <td><strong>Implemented &amp; tested</strong> for the invite mechanism
-itself. The "may override any system recommendation" clause is vacuously
-true rather than exercised — FR-08 (the recommendation) does not exist,
-so every invitation is, in effect, an override with nothing to override.
-<code>assign_reviewer</code> also does not check the invited reviewer
-against <code>author_ids</code> (TD-02) before creating the
-assignment.</td>
+itself. The "may override any system recommendation" clause is now
+genuinely exercised rather than vacuous: FR-08's ranked candidate list
+exists, marks excluded reviewers with a reason instead of hiding them,
+and the editor remains free to assign any <code>reviewer_id</code>
+regardless of what the ranking said. <code>assign_reviewer</code> still
+does not check the invited reviewer against <code>author_ids</code>
+(TD-02) before creating the assignment, so the exclusion is advisory at
+the candidate-list layer rather than enforced at the assignment
+layer.</td>
 </tr>
 <tr>
 <td>FR-10</td>
@@ -1739,30 +2097,33 @@ invitation-response step at all.</td>
 <td>UC10</td>
 <td><code>api/routers/reviews.py</code>
 (<code>POST /reviews/{tracking_code}/submit</code>);
-<code>api/schemas.py</code>
-(<code>SubmitReviewRequest: recommendation, comments</code>);
-<code>domain/manuscript.py</code> (<code>record_review</code>, quorum
-counter)</td>
+<code>api/schemas.py</code> (<code>SubmitReviewRequest</code>: four 1-5
+criterion scores, <code>comments_to_author</code>,
+<code>confidential_comments_to_editor</code>; <code>ReviewOut</code>);
+<code>api/routers/editorial.py</code>
+(<code>GET /editorial/{tracking_code}/reviews</code>, the only route
+returning confidential comments); <code>domain/manuscript.py</code>
+(<code>record_review</code>, quorum counter)</td>
 <td><code>test_reviews_router.py</code>:
 <code>test_submitting_a_review_counts_it_and_records_the_content</code>,
+<code>test_a_score_outside_one_to_five_is_rejected</code>,
 <code>test_submitting_without_an_assignment_is_forbidden</code>;
+<code>test_editorial_router.py</code>:
+<code>test_an_editor_can_list_the_reviews_recorded_for_a_manuscript</code>,
+<code>test_an_editor_sees_the_confidential_comments_a_reviewer_wrote</code>;
 integration <code>test_review_assignment_repository.py</code>:
 <code>test_marking_submitted_records_the_review_content</code></td>
-<td><strong>Partially implemented.</strong> A reviewer can submit a
-recommendation and free-text comments, gated on holding an assignment
-(<code>_assigned_or_403</code>). Missing against the requirement text:
-<strong>criterion-level scores</strong>
-(<code>SubmitReviewRequest</code> carries only
-<code>recommendation</code> and a single <code>comments</code> string —
-no per-criterion structure), and the <strong>two-channel comment
-split</strong> ("comments to the author" vs "confidential comments to
-the editor") — there is one <code>comments</code> field, not two. The
-acceptance criterion "confidential comments never appear in any
-author-facing view" holds today only because no view exposes any review
-comments to an author at all, not because a confidential channel is
-enforced. The quorum-counting defect (TD-03, an actor with an accepted
-assignment could submit twice and close the round alone) is unresolved —
-see §4.3.</td>
+<td><strong>Implemented &amp; tested.</strong>
+<code>SubmitReviewRequest</code> carries four criterion scores
+(originality, rigour, clarity, significance), each bounded 1 to 5 by
+Pydantic so an out-of-range score is a 422 before any handler runs, and
+the comment field is split into <code>comments_to_author</code> and
+<code>confidential_comments_to_editor</code>. The confidential channel
+is now enforced structurally rather than vacuously:
+<code>ReviewOut</code> is built by exactly one route, gated on
+<code>Action.DECIDE</code>, which no author-reachable or
+reviewer-reachable route carries. The quorum-counting defect (TD-03) is
+still unresolved; see section 4.3.</td>
 </tr>
 <tr>
 <td>FR-12</td>
@@ -1808,8 +2169,8 @@ response-to-reviewers letter and the ownership check.</td>
 <td><code>test_manuscripts_router.py</code>:
 <code>test_mine_lists_only_the_callers_manuscripts</code>,
 <code>test_retrieving_someone_elses_manuscript_is_forbidden</code>; live
-UAT (<code>docs/06-testing-report.md</code> §5): ten submissions listed
-with correct tracking codes and statuses</td>
+UAT (<code>docs/06-testing-report.md</code> section 5): ten submissions
+listed with correct tracking codes and statuses</td>
 <td><strong>Partially implemented.</strong> An author's own-manuscripts
 list, correctly scoped and rendered, is implemented, tested and
 confirmed live. The <strong>status timeline</strong> clause is not met
@@ -1843,9 +2204,9 @@ deterministically from <code>(volume, number)</code>
 (<code>domain/ids.py</code>, <code>mint_issue_id</code>) rather than
 looked up — a documented simplification, not a gap against this
 requirement's testable behaviour. <code>docs/06-testing-report.md</code>
-§4.5 records that these two routes, plus resubmission, were at one point
-fully domain-tested but reachable by no route at all; that gap is closed
-and is exactly what the cited tests now pin.</td>
+section 4.5 records that these two routes, plus resubmission, were at
+one point fully domain-tested but reachable by no route at all; that gap
+is closed and is exactly what the cited tests now pin.</td>
 </tr>
 <tr>
 <td>FR-16</td>
@@ -1867,66 +2228,94 @@ genuinely, not accidentally, public.</td>
 <tr>
 <td>FR-17</td>
 <td>UC16</td>
-<td><code>infrastructure/db/repository.py</code>
-(<code>search_published</code> — <code>ILIKE</code> over
-<code>title</code>/<code>abstract</code>);
+<td><code>infrastructure/storage/fulltext.py</code> (PDF text
+extraction); <code>infrastructure/db/models.py</code> (stored
+<code>tsvector</code> column);
+<code>infrastructure/db/repository.py</code>
+(<code>search_published</code>, <code>websearch_to_tsquery</code> ranked
+by <code>ts_rank</code>, <code>ts_headline</code> snippets);
 <code>api/routers/archive.py</code> (<code>GET /archive/search</code>);
+<code>api/schemas_wave2.py</code> (<code>ArchiveSearchResultOut</code>);
 frontend <code>app/(public)/search/page.tsx</code></td>
-<td><code>test_archive_router.py</code>:
-<code>test_search_finds_a_matching_paper</code>,
-<code>test_search_with_no_match_returns_an_empty_list</code>;
-integration <code>test_archive_queries.py</code></td>
-<td><strong>Implemented, but simplified against the requirement's
-design.</strong> Search works and is tested, but it is a
-case-insensitive substring match (<code>ILIKE '%query%'</code>) over
-title and abstract, not the <code>tsvector</code>/GIN ranked full-text
-search the design specification (§16) called for — no keyword or date
-filter exists either. NFR-09's 800 ms p95 bound is unverified:
-<code>docs/06-testing-report.md</code> §6 states plainly that no load or
-performance test exists in this project.</td>
+<td><code>test_archive_search_fulltext.py</code>:
+<code>test_a_fulltext_match_carries_a_snippet_of_context</code>,
+<code>test_a_title_match_carries_a_null_snippet</code>,
+<code>test_a_keyword_match_is_found_with_a_null_snippet</code>,
+<code>test_no_match_anywhere_returns_an_empty_list</code>,
+<code>test_publishing_extracts_the_pdf_text_into_the_search_column</code>,
+<code>test_a_missing_or_unreadable_document_never_blocks_publishing</code>;
+integration <code>test_fulltext_search.py</code>,
+<code>test_archive_queries.py</code></td>
+<td><strong>Implemented &amp; tested.</strong> Search is PostgreSQL
+full-text over a stored <code>tsvector</code> covering title, abstract,
+keywords and the extracted body text of the published PDF, ranked by
+<code>ts_rank</code>, with <code>ts_headline</code> snippets returned
+when the match landed in the body. Body text is extracted at publication
+and a failed extraction never blocks the publish. Still not met: the
+"with filters" clause, since no keyword or date filter exists. NFR-09's
+800 ms p95 bound remains unverified, because no load or performance test
+exists in this project (<code>docs/06-testing-report.md</code> section
+6).</td>
 </tr>
 <tr>
 <td>FR-18</td>
 <td>UC17</td>
-<td><em>(none)</em></td>
-<td><em>(none)</em></td>
-<td><strong>Not implemented — a genuine gap the code and this
-requirement still disagree on.</strong> <code>ArchivePaperOut</code>
-(<code>api/schemas.py</code>) carries no document field,
-<code>archive.py</code> has no document/download route, and the public
-paper page (<code>app/(public)/papers/[trackingCode]/page.tsx</code>)
-contains no download link at all — its own source comment still reads
-"no <code>pdf_url</code> field, no file storage… re-add this once a
-document-storage capability exists," which is now stale: document
-storage exists (FR-04/FR-06) and is reachable by authenticated actors
-via <code>GET /manuscripts/{tracking_code}/document</code>, but that
-route requires authentication and an anonymous reader cannot call it.
-Closing this needs one new public, unauthenticated route serving the
-<em>original</em> document for a published manuscript only — a small,
-well-scoped gap, not a large one, but a real one.</td>
+<td><code>api/routers/archive.py</code>
+(<code>GET /archive/{tracking_code}/document</code>, no auth
+dependency); <code>api/schemas.py</code>
+(<code>ArchivePaperOut.has_document</code>,
+<code>DocumentUrlOut</code>); frontend
+<code>app/(public)/papers/[trackingCode]/page.tsx</code> (inline PDF
+viewer)</td>
+<td><code>test_archive_router.py</code>:
+<code>test_a_published_papers_document_is_downloadable_without_authentication</code>,
+<code>test_archive_entries_report_whether_a_document_is_attached</code>,
+<code>test_downloading_a_missing_papers_document_is_404</code>,
+<code>test_downloading_when_no_document_was_ever_attached_is_404</code>;
+route audit
+<code>test_the_archive_prefix_genuinely_has_no_authorization_dependency</code></td>
+<td><strong>Implemented &amp; tested.</strong> A public, unauthenticated
+route serves a pre-signed URL for the original document of a published
+manuscript only. <code>has_document</code> on the archive shape lets a
+reader's page decide whether to render a viewer without first attempting
+a download. The route sits inside the <code>/archive</code> prefix,
+which the route audit proves carries no authorisation dependency
+anywhere.</td>
 </tr>
 <tr>
 <td>FR-19</td>
 <td>UC18</td>
 <td><code>domain/hashchain.py</code>; PostgreSQL append-only triggers
-(Alembic migration)</td>
-<td><code>test_hashchain.py</code>; integration
-<code>test_append_only.py</code>:
+(Alembic migration); <code>api/routers/archive.py</code>
+(<code>GET /archive/{tracking_code}/provenance</code>);
+<code>api/schemas_scholarly.py</code> (<code>ProvenanceOut</code>,
+<code>ProvenanceEventOut</code>);
+<code>api/routers/certificate.py</code> (decision certificate carrying
+the chain head)</td>
+<td><code>test_hashchain.py</code>;
+<code>test_provenance_router.py</code>:
+<code>test_an_intact_chain_verifies_and_reports_its_head_hash</code>,
+<code>test_a_tampered_interior_event_is_reported_as_not_intact</code>,
+<code>test_event_payloads_and_actor_ids_are_never_exposed</code>,
+<code>test_provenance_for_an_unpublished_manuscript_is_404</code>;
+integration <code>test_append_only.py</code>:
 <code>test_updating_an_event_is_rejected_by_the_database</code>,
 <code>test_truncating_the_event_log_is_rejected</code>;
 <code>test_chain_persistence.py</code></td>
-<td><strong>Partially implemented.</strong> The hash chain itself —
-construction, tamper detection, and persistence-level enforcement
-against <code>UPDATE</code>/<code>DELETE</code>/<code>TRUNCATE</code> —
-is complete and thoroughly tested, including at the database boundary.
-But no API route exposes it: there is no
-<code>/manuscripts/{tracking_code}/audit</code> endpoint in the live
-<code>/openapi.json</code>, and <code>ManuscriptOut</code>'s own
-docstring states the omission is deliberate ("no separate summary/detail
-variant… any event/audit trail" is absent by design at this layer). An
-Editor or Editor-in-Chief today has no way to view the audit trail
-through the system; the guarantee exists and is provably sound, but
-nothing surfaces it.</td>
+<td><strong>Implemented &amp; tested.</strong> The chain was already
+enforced at the database boundary;
+<code>GET /archive/{code}/provenance</code> now surfaces it, and goes
+further than the requirement asked by making verification public rather
+than editor-only: anyone can recompute a published paper's chain from
+genesis and see <code>intact</code>, the head hash, and each event's
+type, timestamp and 8-character hash prefix. Payloads and
+<code>actor_id</code> are deliberately withheld, because a
+<code>REVIEW_SUBMITTED</code> payload names its reviewer and a public
+endpoint must not hand out even a pseudonymous handle. What
+<code>intact</code> does <strong>not</strong> prove (tail truncation, a
+forged event appended through the normal path, a history rebuilt
+wholesale from genesis) is stated in TD-04 and in the endpoint's own
+contract.</td>
 </tr>
 <tr>
 <td>FR-20</td>
@@ -1939,10 +2328,28 @@ or LSH code exists anywhere in the delivered backend.</td>
 <tr>
 <td>FR-21</td>
 <td>UC19</td>
-<td><em>(none)</em></td>
-<td><em>(none)</em></td>
-<td><strong>Not implemented.</strong> No BibTeX/RIS export code or route
-exists.</td>
+<td><code>application/scholarly.py</code> (<code>bibtex_citation</code>,
+<code>ris_citation</code>, <code>fake_doi</code>,
+<code>_citation_key</code>); <code>api/routers/archive.py</code>
+(<code>GET /archive/{tracking_code}/citation?format=</code>); frontend
+<code>components/paper-scholarly.tsx</code>
+(<code>CitationRow</code>)</td>
+<td><code>test_citation_router.py</code>:
+<code>test_a_bibtex_citation_is_well_formed_plain_text</code>,
+<code>test_a_ris_citation_is_a_jour_record_with_one_au_tag_per_author</code>,
+<code>test_archive_entries_carry_the_doi_shaped_identifier</code>,
+<code>test_an_unknown_citation_format_is_422</code>,
+<code>test_a_missing_citation_format_is_422</code>,
+<code>test_a_citation_for_an_unpublished_manuscript_is_404</code></td>
+<td><strong>Implemented &amp; tested.</strong> Both formats are served
+as <code>text/plain</code> from one route, with an unknown or missing
+<code>format</code> answered 422 rather than silently defaulting. Each
+paper also carries a DOI-shaped identifier derived from its tracking
+code. The identifier is <strong>not registered</strong>:
+<code>10.55555</code> is a documented fake registrant prefix (section
+4.2) and resolving it at doi.org fails by design. Neither citation
+carries a publication date, because the domain stores none; that
+omission is the same underlying gap as FR-14's missing timeline.</td>
 </tr>
 <tr>
 <td>FR-22</td>
@@ -1968,10 +2375,27 @@ explicitly in the design spec as future evolution; it remains that.</td>
 <tr>
 <td>FR-24</td>
 <td>UC22</td>
-<td><em>(none)</em></td>
-<td><em>(none)</em></td>
-<td><strong>Not implemented.</strong> No analytics computation or
-endpoint exists.</td>
+<td><code>api/routers/editorial.py</code>
+(<code>GET /editorial/analytics</code>, gated on
+<code>Action.VIEW_AUDIT</code>); <code>api/schemas_analytics.py</code>
+(<code>EditorialAnalyticsOut</code>, <code>PipelineCounts</code>,
+<code>MonthlySubmissions</code>); frontend
+<code>app/editor/analytics/page.tsx</code></td>
+<td><code>test_editorial_analytics.py</code>:
+<code>test_analytics_reports_pipeline_months_rate_and_averages</code>,
+<code>test_analytics_over_an_empty_desk_reports_zeros_and_nulls_not_zero_rates</code>,
+<code>test_a_reviewer_may_not_read_analytics</code>; integration
+<code>test_editorial_queries.py</code></td>
+<td><strong>Implemented &amp; tested.</strong> Throughput (pipeline
+counts by current status), decision mix (acceptance rate), and
+time-to-decision and review-turnaround averages are computed from the
+editorial event chain rather than from mutable manuscript rows, so the
+numbers derive from the same append-only record the audit guarantee
+covers. One rule governs every aggregate: an average or rate over an
+empty denominator is <code>null</code>, never <code>0</code>, so "no
+decisions yet" stays distinguishable from "decisions arrive instantly".
+The pipeline view drops <code>draft</code> (never reached the desk) and
+folds <code>desk_rejected</code> into <code>rejected</code>.</td>
 </tr>
 <tr>
 <td>FR-25</td>
@@ -2004,7 +2428,7 @@ authorisation half this line previously lacked — see FR-25a.</td>
 authorisation predicate this line was added to demand now exists, is
 wired into the live route, and is directly tested for both the positive
 case and two distinct negative cases (a stranger; a non-corresponding
-co-author). §4.3 records this as resolved rather than merely
+co-author). Section 4.3 records this as resolved rather than merely
 documented.</td>
 </tr>
 <tr>
@@ -2013,7 +2437,161 @@ documented.</td>
 <td><em>(none)</em></td>
 <td><em>(none)</em></td>
 <td><strong>Not implemented.</strong> Deferred (Could-have; effort
-estimation §8.1) — no policy-configuration route or UI exists.</td>
+estimation section 8.1) — no policy-configuration route or UI
+exists.</td>
+</tr>
+<tr>
+<td>FR-29</td>
+<td><em>(no dedicated UC — added after the original use-case
+set)</em></td>
+<td><code>api/routers/billing.py</code> (all four routes);
+<code>api/schemas_wave2.py</code> (<code>ApcInvoiceOut</code>,
+<code>BillingInitializeOut</code>, <code>BillingVerifyOut</code>);
+<code>application/ports.py</code> (<code>PaymentGateway</code>,
+<code>ApcInvoiceRecord</code>); <code>infrastructure/config.py</code>
+(Paystack key, optional); frontend
+<code>components/apc-panel.tsx</code></td>
+<td><code>test_billing_router.py</code>:
+<code>test_an_accept_decision_opens_a_pending_invoice_at_the_default_tariff</code>,
+<code>test_a_non_accept_decision_opens_no_invoice</code>,
+<code>test_a_repeated_accept_path_never_double_bills</code>,
+<code>test_the_corresponding_author_can_read_their_invoice</code>,
+<code>test_a_co_author_cannot_read_the_invoice</code>,
+<code>test_mock_mode_initialize_settles_the_invoice_and_says_so</code>,
+<code>test_real_mode_initialize_returns_the_checkout_url_and_stores_the_reference</code>,
+<code>test_only_the_corresponding_author_may_initialize</code>,
+<code>test_initializing_a_settled_invoice_is_a_conflict</code>;
+integration <code>test_invoice_repository.py</code></td>
+<td><strong>Implemented &amp; tested.</strong> An invoice opens
+automatically on an accept decision and only on an accept decision, at a
+default tariff, and the accept path is idempotent so a repeated
+transition never double-bills. Amounts are integer pesewas throughout,
+never floats. <strong>Mock mode is the default</strong>: with no
+Paystack secret key configured, <code>initialize</code> settles on the
+spot and answers <code>mock: true</code>, so the flow is demonstrable
+without a card; with a key configured it returns a real checkout URL and
+the charge is confirmed only by a later <code>verify</code>. Waiving is
+Editor-in-Chief only and is checked directly rather than by borrowing
+<code>Action.PUBLISH</code>, since waiving a charge and publishing a
+paper are different authorities that happen to sit with the same
+person.</td>
+</tr>
+<tr>
+<td>FR-30</td>
+<td><em>(no dedicated UC — added after the original use-case
+set)</em></td>
+<td><code>api/routers/admin.py</code> (all four routes, gated on
+<code>Action.MANAGE_USERS</code>); <code>api/schemas_wave2.py</code>
+(<code>AdminAccountOut</code>, <code>RoleChangeRequest</code>,
+<code>CapacityChangeRequest</code>, <code>ActiveChangeRequest</code>);
+frontend <code>app/admin/page.tsx</code></td>
+<td><code>test_admin_router.py</code>:
+<code>test_every_admin_route_is_forbidden_to_non_administrators</code>,
+<code>test_admin_routes_require_authentication</code>,
+<code>test_the_roster_lists_every_account_with_its_administrative_shape</code>,
+<code>test_granting_the_reviewer_role_adds_it</code>,
+<code>test_revoking_a_held_role_removes_it</code>,
+<code>test_the_administrator_role_can_be_neither_granted_nor_revoked</code>,
+<code>test_capacity_can_be_set_within_one_to_ten</code>,
+<code>test_capacity_outside_one_to_ten_is_a_422</code>,
+<code>test_an_administrator_can_deactivate_and_reactivate_another_account</code></td>
+<td><strong>Implemented &amp; tested.</strong>
+<code>Action.MANAGE_USERS</code> was defined in the policy layer from
+the start with no route exercising it; this closes that. Two refusals
+are enforced in the router rather than the domain because both protect
+the console from itself: the administrator role can be neither granted
+nor revoked through the API (403), and an administrator cannot
+deactivate their own account (409). Together they stop the last
+administrator locking everyone out.</td>
+</tr>
+<tr>
+<td>FR-31</td>
+<td><em>(no dedicated UC — added after the original use-case
+set)</em></td>
+<td><code>api/routers/certificate.py</code>
+(<code>GET /editorial-certificate/{tracking_code}</code>, gated on
+<code>Action.DECIDE</code>);
+<code>infrastructure/storage/certificate_pdf.py</code></td>
+<td><code>test_certificate_router.py</code>:
+<code>test_an_editor_receives_a_pdf_certificate</code>,
+<code>test_the_editor_in_chief_may_also_fetch_a_certificate</code>,
+<code>test_the_certificate_never_names_a_reviewer_or_leaks_confidential_comments</code>;
+<code>test_certificate_auth.py</code></td>
+<td><strong>Implemented &amp; tested.</strong> A generated PDF stating
+the final decision, the tracking code and the audit chain's head hash,
+so a decision can be attested outside the portal. Requesting one before
+any <code>accept</code> or <code>reject</code> decision is a 409 rather
+than an empty document. The certificate names no reviewer and carries no
+confidential comment, which is asserted directly rather than left to
+inspection.</td>
+</tr>
+<tr>
+<td>FR-32</td>
+<td><em>(no dedicated UC — added after the original use-case
+set)</em></td>
+<td><code>infrastructure/storage/preflight.py</code>
+(<code>PdfInspection</code>); <code>api/schemas_scholarly.py</code>
+(<code>AnonymisationReport</code>,
+<code>ManuscriptSubmissionOut</code>);
+<code>api/routers/manuscripts.py</code>
+(<code>_submission_response</code>); frontend submission form</td>
+<td><code>test_submission_preflight.py</code>:
+<code>test_the_submission_response_reports_the_stripped_docinfo_keys</code>,
+<code>test_an_author_name_in_the_body_text_is_flagged</code>,
+<code>test_a_resubmission_also_carries_the_preflight_report</code>,
+<code>test_the_response_still_carries_every_manuscript_out_field</code></td>
+<td><strong>Implemented &amp; tested.</strong> This is the visible half
+of TD-05. Metadata stripping cannot remove a name printed in the body
+text, so rather than leave that silent, submission and resubmission now
+return what was removed (DocInfo keys, XMP) and which author names were
+still found in the extracted text. <code>author_names_in_body</code> is
+an honest partial detector: an empty list means nothing was found, never
+that the document is proven clean. The response is a subclass of
+<code>ManuscriptOut</code>, so every existing consumer keeps every field
+it relied on.</td>
+</tr>
+<tr>
+<td>FR-33</td>
+<td><em>(no dedicated UC — added after the original use-case
+set)</em></td>
+<td><code>api/routers/editorial.py</code>
+(<code>GET /editorial/{tracking_code}/assignments</code>);
+<code>api/schemas_analytics.py</code>
+(<code>AssignmentDeadlineOut</code>); Alembic <code>due_at</code>
+migration; frontend editor assignments panel</td>
+<td><code>test_editorial_analytics.py</code>:
+<code>test_assignments_lists_deadlines_names_and_the_overdue_flag</code>,
+<code>test_an_assignment_before_its_deadline_is_not_overdue</code>,
+<code>test_assignments_for_a_missing_manuscript_is_404</code>;
+integration <code>test_due_at_migration.py</code></td>
+<td><strong>Implemented &amp; tested.</strong> <code>overdue</code> is
+computed server-side so every consumer agrees on one rule: not yet
+submitted, and <code>due_at</code> in the past. A review submitted late
+is never flagged overdue, and a null deadline never is either. The model
+carries <code>reviewer_name</code>, which is correct rather than a leak:
+the blind is author to reviewer, not editor to reviewer, and the route
+is gated on <code>Action.ASSIGN_REVIEWER</code>, which no
+author-reachable route carries.</td>
+</tr>
+<tr>
+<td>FR-34</td>
+<td><em>(no dedicated UC — added after the original use-case
+set)</em></td>
+<td><code>api/routers/auth.py</code> (<code>POST /auth/register</code>,
+<code>RegisterRequest</code>); <code>application/registration.py</code>
+(<code>RegistrationService</code>); frontend
+<code>app/login/page.tsx</code> (sign-up tab)</td>
+<td><code>test_auth_router.py</code>:
+<code>test_registering_creates_a_verified_author_and_signs_in</code>,
+<code>test_registering_never_grants_an_editorial_role</code></td>
+<td><strong>Implemented &amp; tested.</strong> The route grants exactly
+<code>Role.AUTHOR</code> and ignores any role the request body might
+carry, which is asserted directly. Email delivery is mocked
+(<code>LoggingEmailSender</code> logs the verification link rather than
+sending it), so the account is verified immediately and signed in; that
+shortcut is honest about itself and is the same stub FR-23 records as
+unbuilt. Password policy is length-based, enforced in
+<code>RegistrationService</code>.</td>
 </tr>
 <tr>
 <td>FR-27</td>
@@ -2026,41 +2604,46 @@ persistent-identifier resolution route exists.</td>
 <tr>
 <td>FR-28</td>
 <td><em>(no dedicated UC — reporting over UC10/UC22 data, effort
-estimation §3)</em></td>
-<td><em>(none)</em></td>
-<td><em>(none)</em></td>
-<td><strong>Not implemented.</strong> Deferred (Could-have) — no
-reviewer-performance endpoint exists.</td>
+estimation section 3)</em></td>
+<td><code>api/routers/editorial.py</code>
+(<code>GET /editorial/reviewer-performance</code>, gated on
+<code>Action.VIEW_AUDIT</code>); <code>api/schemas_analytics.py</code>
+(<code>ReviewerPerformanceOut</code>)</td>
+<td><code>test_editorial_analytics.py</code>:
+<code>test_reviewer_performance_reports_workload_and_turnaround_per_reviewer</code>,
+<code>test_a_reviewer_may_not_read_reviewer_performance</code></td>
+<td><strong>Implemented &amp; tested.</strong> Per reviewer: active
+assignments against capacity, reviews completed, average turnaround in
+days, and last activity. Turnaround and last activity are
+<code>null</code> until a first review completes, for the same reason
+the analytics aggregates are: an editor has to tell "new to the pool"
+apart from "turns reviews around instantly". The requirement's
+"acceptance rate" clause is not met, and cannot be, because FR-10's
+invitation lifecycle does not exist, so no reviewer has ever declined
+anything to compute a rate from.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>Reading this matrix honestly.</strong> Of the 29 requirement
-lines (FR-01…FR-28 plus FR-25a), <strong>12 are implemented and tested
-end to end</strong> (FR-02, FR-04, FR-05, FR-06, FR-07, FR-09, FR-12,
-FR-13, FR-15, FR-16, FR-25, FR-25a), <strong>6 are partially implemented
-with a specifically named remainder</strong> (FR-01, FR-03, FR-11,
-FR-14, FR-17, FR-19), and <strong>11 are genuinely not
-implemented</strong> (FR-08, FR-10, FR-18, FR-20, FR-21, FR-22, FR-23,
-FR-24, FR-26, FR-27, FR-28). This is a large improvement on the version
-of this matrix written before the API and frontend existed, when the
-great majority of lines read "Planned" — but it is not a claim that the
-system is complete. FR-08 (reviewer expertise matching), FR-20
-(similarity screening) and their shared prerequisite infrastructure,
-FR-22 (OAI-PMH), FR-21 (citation export), FR-23 (notifications) and
-FR-24 (analytics) remain exactly as unbuilt as the technical debt
-register and the design specification's future- evolution section
-describe them. FR-18 (public PDF download) is the one item on this list
-found only during this revision, not previously flagged: a small,
-well-scoped, genuine gap between what the requirement promises and what
-the deployed archive currently serves. A matrix claiming everything is
-delivered would be worse than the stale one it replaces, because it
-would be false rather than merely out of date.</p>
+<p><strong>Reading this matrix honestly.</strong> Of the 35 requirement
+lines (FR-01 to FR-34 plus FR-25a), <strong>24 are implemented and
+tested end to end</strong> (FR-02, FR-04, FR-05, FR-06, FR-07, FR-08,
+FR-09, FR-11, FR-12, FR-13, FR-15, FR-16, FR-18, FR-19, FR-21, FR-24,
+FR-25, FR-25a, FR-29 to FR-34), <strong>5 are partially implemented with
+a specifically named remainder</strong> (FR-01, FR-03, FR-14, FR-17,
+FR-28), and <strong>6 are genuinely not implemented</strong> (FR-10,
+FR-20, FR-22, FR-23, FR-26, FR-27).</p>
+<p>FR-10, the reviewer invitation lifecycle, is the absence that
+propagates furthest: because no reviewer can decline, FR-28 cannot
+report an acceptance rate, and an assignment takes effect the moment it
+is created. The other five unbuilt requirements stand as the technical
+debt register and the design specification's future-evolution section
+describe them.</p>
 <hr />
 <h2 id="6-requirements-prioritisation">6. Requirements
 prioritisation</h2>
 <p>Prioritisation uses MoSCoW, carried unchanged from the design
-specification (§5) and made authoritative by the effort estimation
-document's scope decision (§8):</p>
+specification (section 5) and made authoritative by the effort
+estimation document's scope decision (section 8):</p>
 <table>
 <thead>
 <tr>
@@ -2089,18 +2672,18 @@ document's scope decision (§8):</p>
 </table>
 <p><strong>How the estimate drove the cut.</strong> Use Case Points
 sized the Must-have subset alone at 188 UUCP → 125.7 UCP → 2,514
-person-hours (effort estimation §6), against a 48-hour development
-window — 1.9% of the Must-have estimate. COCOMO II Early Design, an
-independent cross-check on different inputs (source lines of code and
-process/product ratings rather than actor and transaction counts),
-priced the full system at approximately 7,170 person-hours. The two
-methods disagree by roughly 2.2× on the exact figure but agree on the
-order of magnitude: both place the full system in the
+person-hours (effort estimation section 6), against a 48-hour
+development window — 1.9% of the Must-have estimate. COCOMO II Early
+Design, an independent cross-check on different inputs (source lines of
+code and process/product ratings rather than actor and transaction
+counts), priced the full system at approximately 7,170 person-hours. The
+two methods disagree by roughly 2.2× on the exact figure but agree on
+the order of magnitude: both place the full system in the
 one-to-four-person-year range, nearly two orders of magnitude beyond the
-available window (effort estimation §7). That agreement, not either
-figure's precision, is what forced a MoSCoW cut rather than an attempt
-to build everything thinly. Should-have items are attempted only after
-every Must-have item reaches production quality; Could-have items
+available window (effort estimation section 7). That agreement, not
+either figure's precision, is what forced a MoSCoW cut rather than an
+attempt to build everything thinly. Should-have items are attempted only
+after every Must-have item reaches production quality; Could-have items
 (FR-26, FR-27, FR-28) are not attempted within the window under any
 circumstance.</p>
 <p><strong>Consequence for what exists today.</strong> At the time this
@@ -2109,16 +2692,16 @@ application, API and frontend layers were still planned — consistent
 with, not contrary to, the MoSCoW cut: the cut governs <em>what</em> is
 built, not the <em>order</em> in which layers within a use case are
 built, and a hexagonal architecture's domain core is the natural first
-layer to complete and verify in isolation (design specification §7.1).
-That sequencing has since played out as intended: §5's revised
-traceability matrix shows the API and frontend layers have caught up for
-most of the Must-have set (12 of 29 requirement lines implemented and
-tested end to end, domain through frontend). Where a gap remains within
-the Must-have set — FR-08's reviewer matching and FR-19's audit-trail
-route being the clearest examples — it is a gap in a specific layer or
-route, not evidence that an entire layer was skipped; §5 states each one
-by name rather than folding them back into a single "still catching up"
-claim.</p>
+layer to complete and verify in isolation (design specification section
+7.1). That sequencing has since played out as intended: section 5's
+revised traceability matrix shows the API and frontend layers have
+caught up for most of the Must-have set (12 of 29 requirement lines
+implemented and tested end to end, domain through frontend). Where a gap
+remains within the Must-have set — FR-08's reviewer matching and FR-19's
+audit-trail route being the clearest examples — it is a gap in a
+specific layer or route, not evidence that an entire layer was skipped;
+section 5 states each one by name rather than folding them back into a
+single "still catching up" claim.</p>
 <hr />
 <h2 id="7-constraints-and-limitations">7. Constraints and
 limitations</h2>
@@ -2180,9 +2763,9 @@ permits <code>WITHDRAWN</code> from five states
 (<code>policies.py</code>) now gates
 <code>POST /manuscripts/{tracking_code}/withdraw</code> on the actor
 being the manuscript's corresponding author, exactly as FR-25a
-specified. See §4.3 and §5 (FR-25a) for the tests that prove it. This
-entry is retained here, rather than deleted, so the document's history —
-a gap identified, then closed — stays legible.</li>
+specified. See section 4.3 and section 5 (FR-25a) for the tests that
+prove it. This entry is retained here, rather than deleted, so the
+document's history — a gap identified, then closed — stays legible.</li>
 <li><strong>The editorial event log has no blinded view.</strong>
 <code>EditorialEvent</code> carries <code>actor_id</code> and an
 editor's free-text rationale; there is no <code>BlindedEvent</code>
@@ -2213,14 +2796,14 @@ assignment is usable by the reviewer immediately on creation; the
 <code>AssignmentStatus</code> vocabulary declares
 <code>INVITED</code>/<code>ACCEPTED</code>/<code>DECLINED</code>, but
 nothing in the delivered code writes or reads those states, and no route
-lets a reviewer decline. See §5, FR-10.</li>
+lets a reviewer decline. See section 5, FR-10.</li>
 <li><strong>A published paper cannot be downloaded by an anonymous
 reader (FR-18).</strong> Document storage, upload, and authenticated
 download all exist (FR-04/FR-06), but no public, unauthenticated route
 serves a published manuscript's PDF, and the public paper page has no
 download link. This is the one gap this revision found that was not
-previously recorded anywhere in this project's documentation — see §5,
-FR-18.</li>
+previously recorded anywhere in this project's documentation — see
+section 5, FR-18.</li>
 <li><strong>AWS access currently uses root credentials.</strong> The
 toolchain authenticates as the AWS account root user rather than a
 least-privilege IAM principal (<strong>TD-01</strong>, critical).
@@ -2231,30 +2814,36 @@ root keys off CI and used solely from the developer's own workstation
 resolve the underlying debt, which remains the highest-priority item in
 the technical debt register.</li>
 <li><strong>Explicit out-of-scope items</strong> (design specification
-§4.2), restated here as hard limits rather than soft gaps: no payment or
-article-processing-charge handling; no copy-editing or typesetting
-workflow; no production-quality PDF galley generation; no multi-journal
-tenancy; no ORCID federation; identifiers are DOI-<em>shaped</em> but
-not registered with Crossref; similarity screening (FR-20, not
-implemented — see §5) would in any case be against the internal corpus
-only, never the open web; email deliverability is not implemented at all
-today (FR-23 — see §5), let alone guaranteed through a transactional
-provider; reviewer expertise-matching (FR-08), OAI-PMH (FR-22), citation
-export (FR-21) and editorial analytics (FR-24) are, likewise, not
-implemented, consistent with the design specification's future-evolution
-section and the technical debt register — this list is not exhaustive of
-§5's not-implemented rows, only a restatement of the ones the original
+section 4.2), restated here as hard limits rather than soft gaps: no
+copy-editing or typesetting workflow; no production-quality PDF galley
+generation; no multi-journal tenancy; no ORCID federation; identifiers
+are DOI-<em>shaped</em> but not registered with Crossref; similarity
+screening (FR-20, not implemented, see section 5) would in any case be
+against the internal corpus only, never the open web; email
+deliverability is not implemented at all today (FR-23), let alone
+guaranteed through a transactional provider; OAI-PMH (FR-22) is likewise
+not implemented. This list is not exhaustive of section 5's
+not-implemented rows, only a restatement of the ones the original
 specification called out as deliberately out of scope.</li>
+<li><strong>One item has left this list.</strong> Article processing
+charges were originally declared out of scope and are now built (FR-29).
+The scope line that has <em>not</em> moved is the one that matters for
+anyone reading a charge on screen: the default configuration uses a mock
+gateway that settles an invoice without contacting Paystack, and a real
+Paystack integration is exercised only when a secret key is configured.
+No money has moved through this system, and the mock/real distinction is
+reported to the caller on every initialisation rather than
+inferred.</li>
 <li><strong>Requirements traceability reflects the finished system, not
-the pre-implementation build.</strong> §5 of this document, revised
-2026-08-12, shows 12 of 29 requirement lines implemented and tested end
-to end, 6 partially implemented with a named remainder, and 11 genuinely
-not implemented. That is a large shift from the version of this document
-written before the API and frontend existed, when the great majority of
-lines read "Planned" — but §5's closing paragraph is explicit that this
-is still not a claim of completeness, and this document's own revision
-note (p.1) records when and against what evidence that shift was
-made.</li>
+the pre-implementation build.</strong> section 5 of this document,
+re-reconciled against the running code on 2026-08-14, shows 24 of 35
+requirement lines implemented and tested end to end, 5 partially
+implemented with a named remainder, and 6 genuinely not implemented. The
+matrix has now been revised twice against the code rather than against
+intent, and both revisions moved lines in both directions: the second
+one had to correct rows that understated the system as much as the first
+corrected rows that overstated it. Section 5's closing paragraph is
+explicit that none of this is a claim of completeness.</li>
 </ul>
 </main>
 <footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>

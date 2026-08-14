@@ -6,6 +6,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>07 · User Manual</title>
   <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -22,32 +167,113 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <link rel="stylesheet" href="" />
   <style>
-  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
-  * { box-sizing:border-box; }
-  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
-  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
-  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
-  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
-  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
-  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
-  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
-  h3 { font-size:1.12rem; margin-top:1.8rem; }
-  a { color:#4b3f9e; }
-  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
-  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
-  pre code { background:none; color:inherit; padding:0; }
-  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
-  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
-  th { background:#eceee9; font-weight:600; }
-  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
-  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
-  figure.diagram svg { max-width:100%; height:auto; }
-  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
-  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
-  </style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      /* The extra [class] is a hack that increases specificity enough to
+         override a similar rule in reveal.js */
+      ul.task-list[class]{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        font-size: inherit;
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1.6em;
+        vertical-align: middle;
+      }
+      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+      /* CSS for syntax highlighting */
+      html { -webkit-text-size-adjust: 100%; }
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { color: #008000; } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { color: #008000; font-weight: bold; } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+  <style>
+    :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+    header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+    header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+    header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+    main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+    h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+    h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+    h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+    h3 { font-size:1.12rem; margin-top:1.8rem; }
+    a { color:#4b3f9e; }
+    code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+    pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+    pre code { background:none; color:inherit; padding:0; }
+    table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+    th { background:#eceee9; font-weight:600; }
+    blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+    figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+    figure.diagram svg { max-width:100%; height:auto; }
+    nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+    footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+    </style>
 </head>
 <body>
 <header class="site">
@@ -122,25 +348,94 @@ accept, reject).</td>
 <tr>
 <td><strong>Editor-in-Chief</strong></td>
 <td>Everything an editor can do, plus the exclusive authority to
-schedule an accepted manuscript into a volume and issue number, and to
-publish it.</td>
+schedule an accepted manuscript into a volume and issue number, to
+publish it, and to waive an article processing charge.</td>
+</tr>
+<tr>
+<td><strong>Administrator</strong></td>
+<td>Manages accounts: grants and revokes roles, sets how many reviews a
+reviewer may hold at once, and deactivates accounts. See section 8.</td>
 </tr>
 </tbody>
 </table>
-<p>An <strong>Administrator</strong> account also exists for signing in
-to the API, but at the time of writing the web application has no
-screens built for it — see §9 for what this means in practice.</p>
 <p>Every manuscript's progress is described entirely by its
 <strong>status</strong> (Submitted, Under screening, Under review, and
-so on). §8 explains every status in plain language.</p>
+so on). Section 10 explains every status in plain language.</p>
+<h3 id="accounts-for-reviewing-this-prototype">Accounts for reviewing
+this prototype</h3>
+<p>Every demo account uses the pattern
+<code>&lt;role&gt;@sdj.test</code>. The sign-in page's role chips fill
+these addresses for you (section 2.3); the passwords are typed by
+hand.</p>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Email</th>
+<th>Password</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Author</td>
+<td><code>author@sdj.test</code></td>
+<td><code>Sdj-Author-2026!</code></td>
+</tr>
+<tr>
+<td>Author (second)</td>
+<td><code>author2@sdj.test</code></td>
+<td><code>Sdj-Author2-2026!</code></td>
+</tr>
+<tr>
+<td>Reviewer</td>
+<td><code>reviewer@sdj.test</code></td>
+<td><code>Sdj-Reviewer-2026!</code></td>
+</tr>
+<tr>
+<td>Reviewer (2 to 7)</td>
+<td><code>reviewer2@sdj.test</code> …
+<code>reviewer7@sdj.test</code></td>
+<td><code>Sdj-Reviewer2-2026!</code> …
+<code>Sdj-Reviewer7-2026!</code></td>
+</tr>
+<tr>
+<td>Editor</td>
+<td><code>editor@sdj.test</code></td>
+<td><code>Sdj-Editor-2026!</code></td>
+</tr>
+<tr>
+<td>Editor-in-Chief</td>
+<td><code>eic@sdj.test</code></td>
+<td><code>Sdj-EditorChief-2026!</code></td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td><code>admin@sdj.test</code></td>
+<td><code>Sdj-Admin-2026!</code></td>
+</tr>
+</tbody>
+</table>
+<p>Seven reviewer accounts exist rather than one because the
+reviewer-candidate screen (section 6.3) only demonstrates its
+conflict-of-interest and capacity rules if there are enough people to
+exclude some and still leave others eligible. Two share the authors'
+affiliation, and five sit at five other institutions.</p>
 <hr />
 <h2 id="2-getting-started">2. Getting started</h2>
 <h3 id="21-reaching-the-site">2.1 Reaching the site</h3>
 <p>Open a web browser and go to:</p>
 <pre><code>https://ugjcs-frontend.vercel.app</code></pre>
-<p>The home page is public. It shows a short introduction to the journal
-and a "Recently published" list of papers. No account is required to
-reach it.</p>
+<p>The address lands on the sign-in page. That is deliberate: the portal
+is a working tool for authors, reviewers and editors, so the front door
+is the door you sign in through. A notice across the top states plainly
+that this is a final-project prototype and not the journal's official
+system.</p>
+<p>If you are already signed in, the page recognises your session and
+forwards you straight to your own working area without asking for
+credentials again.</p>
+<p>The public archive is still open to anyone. Follow <strong>Browse the
+archive</strong> from the sign-in page, or go directly to
+<code>/search</code>, to read published papers without an account.</p>
 <h3 id="22-what-is-public-and-what-needs-an-account">2.2 What is public
 and what needs an account</h3>
 <table>
@@ -152,7 +447,7 @@ and what needs an account</h3>
 </thead>
 <tbody>
 <tr>
-<td>The home page and its "Recently published" list</td>
+<td>Searching and browsing the archive</td>
 <td>Submitting a manuscript</td>
 </tr>
 <tr>
@@ -160,45 +455,70 @@ and what needs an account</h3>
 <td>Tracking a manuscript's status</td>
 </tr>
 <tr>
-<td>Searching the archive</td>
+<td>Downloading a published paper's PDF</td>
 <td>Reviewing an assigned manuscript</td>
 </tr>
 <tr>
-<td></td>
+<td>Verifying a paper's editorial provenance</td>
 <td>Screening, assigning reviewers, and recording decisions</td>
 </tr>
 <tr>
-<td></td>
+<td>Exporting a citation as BibTeX or RIS</td>
 <td>Scheduling and publishing an accepted manuscript</td>
+</tr>
+<tr>
+<td>The About, For authors and For reviewers pages</td>
+<td>Paying or waiving an article processing charge</td>
+</tr>
+<tr>
+<td></td>
+<td>Managing accounts (Administrator only)</td>
 </tr>
 </tbody>
 </table>
 <h3 id="23-signing-in">2.3 Signing in</h3>
 <ol type="1">
-<li><p>Click <strong>Sign in</strong> at the top right of any public
-page, or go directly to
-<code>https://ugjcs-frontend.vercel.app/login</code>.</p></li>
+<li><p>Go to <code>https://ugjcs-frontend.vercel.app</code>, which opens
+the sign-in page directly. From any public page you can also click
+<strong>Sign in</strong> at the top right.</p></li>
 <li><p>You should see a page headed <strong>Sign in</strong>, with an
 <strong>Email</strong> field, a <strong>Password</strong> field, and a
-<strong>Sign in</strong> button.</p></li>
+<strong>Sign in</strong> button. A campus photograph fills the left half
+of the screen on a wide display, and sits above the form on a
+phone.</p></li>
 <li><p>Enter your account's email and password and click <strong>Sign
 in</strong>.</p></li>
 <li><p>If your credentials are correct, you are taken to the working
 area for your role: authors land on <strong>My submissions</strong>,
-reviewers on <strong>My assignments</strong>, and editors and the
-Editor-in-Chief on the <strong>Screening queue</strong>. The page banner
-along the top now shows your email address and a <strong>Sign
-out</strong> button in place of the <strong>Sign in</strong>
-link.</p></li>
+reviewers on <strong>My assignments</strong>, editors and the
+Editor-in-Chief on the <strong>Screening queue</strong>, and
+administrators on <strong>Accounts</strong>. The banner along the top
+now shows your email address and a <strong>Sign out</strong> button in
+place of the <strong>Sign in</strong> link.</p></li>
 <li><p>If your credentials are wrong, the page stays on the sign-in form
 and shows an alert reading:</p>
 <blockquote>
 <p><strong>AuthenticationError</strong> email or password is
 incorrect</p>
 </blockquote>
-<p>Check for typing mistakes — in particular a mistyped password — and
-try again.</p></li>
+<p>Check for typing mistakes, a mistyped password most often, and try
+again.</p></li>
 </ol>
+<p><strong>Demo accounts.</strong> Above the form is a row of role
+chips: <strong>Author</strong>, <strong>Reviewer</strong>,
+<strong>Editor</strong>, <strong>Editor-in-chief</strong>,
+<strong>Administrator</strong>. Clicking one fills in that desk's email
+address and moves the cursor to the password box, which you then type
+yourself. The chips save you retyping a long address; they do not sign
+you in, and they never fill a password. The passwords are listed in
+section 1.</p>
+<p><strong>Creating your own account.</strong> If you have no account,
+click <strong>Sign up as an author</strong> below the form. Give your
+full name, affiliation, email and a password of at least twelve
+characters. Self-registration creates an author account and nothing
+more. Reviewer, editor and administrator roles are granted by the
+editorial office through the admin console (section 8), never chosen by
+the person signing up.</p>
 <p>A person with more than one role (the Editor-in-Chief account, for
 example, also carries editor authority) can move between the different
 working areas by editing the address bar — <code>/author</code>,
@@ -283,8 +603,8 @@ click it to open a file picker. Once a file is chosen, its name and size
 manuscript's own page, which now shows a <strong>Submitted</strong>
 badge and a newly minted tracking code (for example
 <code>SDJ-2026-939860</code>). If it fails, an alert appears above the
-form explaining why — see §9 for the two most common reasons (wrong file
-type, file too large).</li>
+form explaining why — see section 11 for the two most common reasons
+(wrong file type, file too large).</li>
 </ol>
 <p><strong>Preparing your file for double-blind review is your
 responsibility.</strong> The portal strips the PDF's embedded metadata
@@ -313,7 +633,7 @@ downloads the exact PDF you uploaded.</li>
 stage up to and including "Revision requested" — click it to pull the
 manuscript out of consideration. Withdrawal cannot be undone.</li>
 </ul>
-<p>See §8 for what each status means and what happens next.</p>
+<p>See section 10 for what each status means and what happens next.</p>
 <h3 id="43-downloading-your-own-submission">4.3 Downloading your own
 submission</h3>
 <p>On any of your manuscripts' detail pages, click <strong>Download my
@@ -381,9 +701,9 @@ institution, or an identifying self-reference is typed into the body of
 the manuscript, you may still see it. Anonymisation is therefore a
 shared responsibility: the system strips what it can strip
 automatically, and authors are asked to prepare a manuscript that does
-not identify itself in its own text (§4.1). If you do recognise or infer
-an author's identity from the text itself, treat that as you would in
-any double-blind process — it is not something the platform can
+not identify itself in its own text (section 4.1). If you do recognise
+or infer an author's identity from the text itself, treat that as you
+would in any double-blind process — it is not something the platform can
 prevent.</p>
 <h3 id="53-submitting-your-review">5.3 Submitting your review</h3>
 <p>The <strong>Submit your review</strong> form has two fields:</p>
@@ -408,7 +728,8 @@ specific.</li>
 <li>On success you are returned to <strong>My assignments</strong>; the
 manuscript no longer requires further action from you. Once every
 reviewer assigned to a manuscript has submitted, its status moves on
-automatically (§8) and the editor is able to record a decision.</li>
+automatically (section 10) and the editor is able to record a
+decision.</li>
 </ol>
 <hr />
 <h2 id="6-for-editors">6. For editors</h2>
@@ -453,7 +774,7 @@ the reviewer directly).</p>
 <li>Click <strong>Assign</strong>.</li>
 <li>The field clears on success. Repeat for each reviewer you want
 assigned; two are normally expected before a decision on the reviews
-becomes possible (§8).</li>
+becomes possible (section 10).</li>
 </ol>
 <h3 id="64-recording-a-decision">6.4 Recording a decision</h3>
 <p>The <strong>Decision</strong> section shows a
@@ -480,7 +801,7 @@ and must be at least 20 characters — a one-word rationale will be
 rejected).</li>
 <li>Click <strong>Record decision</strong>.</li>
 <li>The manuscript's status badge updates immediately to reflect the
-outcome (see §8 for what each decision leads to).</li>
+outcome (see section 10 for what each decision leads to).</li>
 </ol>
 <p><em>A small labelling quirk you may notice:</em> the "send to review"
 option is occasionally rendered by the interface as <strong>"send
@@ -489,11 +810,11 @@ formatting slip, not a different option — it is still the same "send to
 review" decision.</p>
 <hr />
 <h2 id="7-for-the-editor-in-chief">7. For the Editor-in-Chief</h2>
-<p>Everything in §6 is also available to the Editor-in-Chief account. In
-addition, on any manuscript whose status is <strong>Accepted</strong> or
-<strong>Scheduled</strong>, a further <strong>Publication</strong>
-section appears on its detail page — visible only to the
-Editor-in-Chief, not to ordinary editors.</p>
+<p>Everything in section 6 is also available to the Editor-in-Chief
+account. In addition, on any manuscript whose status is
+<strong>Accepted</strong> or <strong>Scheduled</strong>, a further
+<strong>Publication</strong> section appears on its detail page —
+visible only to the Editor-in-Chief, not to ordinary editors.</p>
 <h3 id="71-scheduling-an-accepted-manuscript-into-an-issue">7.1
 Scheduling an accepted manuscript into an issue</h3>
 <ol type="1">
@@ -514,14 +835,102 @@ in (for example Volume <code>3</code>, Number <code>1</code>).</li>
 <li>On a <strong>Scheduled</strong> manuscript's page, click the
 <strong>Publish</strong> button under <strong>Publication</strong>.</li>
 <li>The status badge updates to <strong>Published</strong>. The paper
-now appears in the public archive ("Recently published" on the home
-page, its own <code>/papers/&lt;tracking-code&gt;</code> page, and in
-search results) immediately.</li>
+appears in the public archive immediately: on its own
+<code>/papers/&lt;tracking-code&gt;</code> page and in search
+results.</li>
 </ol>
-<p>Publishing is not reversible through the web application — there is
-no "unpublish" action.</p>
+<p>Publishing also extracts the text of the PDF so the paper becomes
+findable by its body content and not only its title and abstract. If the
+text cannot be extracted, the paper is still published; it simply stays
+searchable by title, abstract and keywords alone.</p>
+<p>Publishing is not reversible through the web application. There is no
+"unpublish" action.</p>
+<h3 id="73-waiving-an-article-processing-charge">7.3 Waiving an article
+processing charge</h3>
+<p>Only the Editor-in-Chief can waive a charge. Open the accepted
+manuscript, find the <strong>Article processing charge</strong> panel,
+and click <strong>Waive</strong>. A charge that has already been paid
+cannot be waived; the button refuses with an explanation rather than
+reversing a settled payment. See section 9 for the charge itself.</p>
 <hr />
-<h2 id="8-understanding-manuscript-status">8. Understanding manuscript
+<h2 id="8-for-administrators">8. For administrators</h2>
+<p>Sign in as an administrator and you land on
+<strong>Accounts</strong>, the roster of every account in the system.
+This screen exists to do four things.</p>
+<p><strong>Grant or revoke a role.</strong> Each row lists the roles
+that account holds. Use the controls on the row to add or remove
+<code>author</code>, <code>reviewer</code>, <code>editor</code> or
+<code>editor_in_chief</code>. This is how someone becomes a reviewer or
+an editor: it cannot be chosen by the person signing up.</p>
+<p><strong>Set reviewer capacity.</strong> Capacity is how many live
+assignments a reviewer may hold at once, between 1 and 10. It feeds the
+reviewer-candidate screen (section 6.3), where a reviewer at capacity is
+shown to the editor as excluded, with the reason stated, rather than
+hidden.</p>
+<p><strong>Deactivate or reactivate an account.</strong> A deactivated
+account cannot sign in and stops appearing as an eligible reviewer.</p>
+<p><strong>Read the roster.</strong> This is the only screen that shows
+an account's email address alongside its activation and verification
+state.</p>
+<p>Two things the console deliberately refuses, both to stop an
+administrator locking everyone out of the system:</p>
+<ul>
+<li>The <strong>administrator role itself cannot be granted or
+revoked</strong> here. Changing who is an administrator is a
+database-level operation, not a click.</li>
+<li><strong>You cannot deactivate your own account.</strong> The attempt
+is refused with an explanation.</li>
+</ul>
+<hr />
+<h2 id="9-article-processing-charges">9. Article processing charges</h2>
+<p>SDJ raises an article processing charge (APC) once a manuscript is
+accepted. Nothing is billed before acceptance, so no charge appears at
+submission, during screening, or while a manuscript is under review.</p>
+<p><strong>As an author.</strong> Open your accepted manuscript. Below
+the manuscript details is an <strong>Article processing charge</strong>
+panel showing the amount and one of three states:</p>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pending</strong></td>
+<td>The charge is outstanding. A <strong>Pay</strong> button starts
+settlement.</td>
+</tr>
+<tr>
+<td><strong>Paid</strong></td>
+<td>Settled. The panel shows the transaction reference, which you need
+if you have to reconcile a card statement.</td>
+</tr>
+<tr>
+<td><strong>Waived</strong></td>
+<td>The Editor-in-Chief has cancelled the charge. Nothing is owed.</td>
+</tr>
+</tbody>
+</table>
+<p>Click <strong>Pay</strong> and one of two things happens, depending
+on how the deployment is configured.</p>
+<p>In the default configuration the portal uses a <strong>mock payment
+gateway</strong>: the charge settles immediately, the panel flips to
+<strong>Paid</strong>, and no card is involved. This is how the deployed
+prototype behaves, and it is the mode you should expect while reviewing
+this project. <strong>No real money moves through this
+system.</strong></p>
+<p>If a live Paystack key is configured, clicking <strong>Pay</strong>
+instead sends you to Paystack's checkout page. After paying you return
+to the manuscript, and the portal confirms the charge with Paystack
+before marking it <strong>Paid</strong>. A charge is never marked paid
+on your say-so.</p>
+<p><strong>As an editor.</strong> Any editor can read a manuscript's
+charge and its status. Only the corresponding author can pay it, and
+only the Editor-in-Chief can waive it (section 7.3).</p>
+<hr />
+<h2 id="10-understanding-manuscript-status">10. Understanding manuscript
 status</h2>
 <p>Every manuscript carries exactly one status at a time, shown as a
 coloured badge throughout the application. The table below explains each
@@ -589,8 +998,8 @@ author may withdraw it.</td>
 <td>The editor has asked the author to revise the manuscript before it
 can proceed.</td>
 <td>Author</td>
-<td>Upload a revised PDF and a written response to reviewers (§4.4); or
-withdraw the manuscript instead.</td>
+<td>Upload a revised PDF and a written response to reviewers (section
+4.4); or withdraw the manuscript instead.</td>
 </tr>
 <tr>
 <td><strong>Resubmitted</strong></td>
@@ -607,7 +1016,7 @@ time of writing.</td>
 <td>The editor has decided to accept the manuscript for
 publication.</td>
 <td>Editor-in-Chief</td>
-<td>Schedule it into a volume and issue number (§7.1).</td>
+<td>Schedule it into a volume and issue number (section 7.1).</td>
 </tr>
 <tr>
 <td><strong>Rejected</strong></td>
@@ -621,7 +1030,7 @@ the manuscript.</td>
 <td>The Editor-in-Chief has assigned the manuscript to a specific volume
 and issue number, but it is not yet public.</td>
 <td>Editor-in-Chief</td>
-<td>Publish it (§7.2).</td>
+<td>Publish it (section 7.2).</td>
 </tr>
 <tr>
 <td><strong>Published</strong></td>
@@ -645,7 +1054,7 @@ Reviews complete, or Revision requested.</td>
 withdrawn through the application — once it is accepted, the only paths
 forward are scheduling and publishing.</p>
 <hr />
-<h2 id="9-troubleshooting">9. Troubleshooting</h2>
+<h2 id="11-troubleshooting">11. Troubleshooting</h2>
 <p><strong>"UnsupportedDocumentTypeError — document does not begin with
 the PDF magic number"</strong> The file you attached is not actually a
 PDF (or is empty/corrupted), regardless of its file extension. The
@@ -676,8 +1085,9 @@ portal only offers an action when the manuscript's status allows it —
 for example, the Decision form's "accept/reject/request revision"
 choices only appear once every assigned review is in (status "Reviews
 complete"); while reviews are still outstanding, that section is empty
-on purpose. Check the status badge at the top of the page against §8 to
-see what is expected before the action you want becomes available.</p>
+on purpose. Check the status badge at the top of the page against
+section 10 to see what is expected before the action you want becomes
+available.</p>
 <p><strong>You try to act on a manuscript and are told "cannot move
 manuscript from <em>X</em> to <em>Y</em>"</strong> This is the same rule
 as above, surfaced as an error rather than a hidden button — it usually
@@ -701,14 +1111,11 @@ PDF</strong> This is a genuine gap in the current system, not a mistake
 on your part — the public paper page shows only the title, authors,
 keywords and abstract; no PDF download link is offered to readers at the
 time of writing.</p>
-<p><strong>Signing in with the Administrator account does not lead
-anywhere useful</strong> This is expected with the system as currently
-built: the Administrator account authenticates successfully, but the web
-application has no screens built for it. Signing in redirects straight
-back to the public home page, and none of the <code>/author</code>,
-<code>/reviewer</code> or <code>/editor</code> areas will admit it.
-There is nothing further for this role to do in the browser at the time
-of writing.</p>
+<p><strong>The Administrator account lands on Accounts and nothing
+else</strong> That is the whole of the administrator's workspace, and it
+is deliberate. The role manages accounts (section 8); it does not screen
+manuscripts, review them, or record decisions, so <code>/author</code>,
+<code>/reviewer</code> and <code>/editor</code> all refuse it.</p>
 </main>
 <footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>
 </body>

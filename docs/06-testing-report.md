@@ -32,8 +32,8 @@ different way and needs a different kind of test to catch it.
 | **Integration** (`tests/integration`, `-m integration`) | The same repositories, unit of work and triggers running against a **real PostgreSQL in a `testcontainers` container** — not a mock, not SQLite. | Several defects in this project (below) exist only at the boundary between the domain's in-memory model and what PostgreSQL actually does — `timestamptz` normalisation, trigger firing semantics, foreign-key `RESTRICT` behaviour. A mocked repository cannot fail in these ways, so it cannot catch them. |
 | **Contract tests** (`.importlinter`, `mypy --strict`) | Two import-linter contracts (`domain-purity`, `layers`) plus strict static typing, run as part of `make check`. | These are architectural tests: they fail the build if a future change routes a dependency the wrong way, independent of any behaviour a functional test would check. |
 | **Route audit** (`tests/unit/api/test_route_audit.py`) | Walks the *live* FastAPI route table built by `create_app()` and asserts every non-public route carries an authorization dependency somewhere in its dependency tree. | Its own docstring states the reason directly: a hand-maintained checklist of "which routes need auth" is exactly the kind of artefact a future change forgets to update. Walking the actual route table means a new unprotected route fails this test the moment it is added, not the moment someone remembers to check a list. |
-| **End-to-end** | Exercised manually against the deployed system with a Playwright-driven browser session (§5), not as a committed automated suite. | `frontend/package.json` declares `@playwright/test` and `@axe-core/playwright` as dependencies and a `test:e2e` script, but no `playwright.config.ts` or spec files exist in the repository at the time of writing — this is stated plainly in §6 rather than implied by the tooling being present. |
-| **Manual acceptance testing** | Scripted, role-scoped scenarios run against the live deployment with named judge accounts (§5). | Automated gates check what someone thought to assert. Three domain lifecycle methods were fully implemented and unit-tested but reachable by no API route (§4) — a defect only visible by using the system as an actual actor would. |
+| **End-to-end** | Exercised manually against the deployed system with a Playwright-driven browser session (section 5), not as a committed automated suite. | `frontend/package.json` declares `@playwright/test` and `@axe-core/playwright` as dependencies and a `test:e2e` script, but no `playwright.config.ts` or spec files exist in the repository at the time of writing — this is stated plainly in section 6 rather than implied by the tooling being present. |
+| **Manual acceptance testing** | Scripted, role-scoped scenarios run against the live deployment with named judge accounts (section 5). | Automated gates check what someone thought to assert. Three domain lifecycle methods were fully implemented and unit-tested but reachable by no API route (section 4) — a defect only visible by using the system as an actual actor would. |
 
 ---
 
@@ -49,7 +49,7 @@ different way and needs a different kind of test to catch it.
 | Architecture contracts | import-linter ≥2.13 | `.importlinter` — `domain-purity` (forbids `fastapi`, `sqlalchemy`, `pydantic`, `boto3`, `os`, `io`, `socket`, `logging`, `asyncio`, and thirteen other framework/I/O modules from `ugjcs.domain`) and `layers` (`api → infrastructure → application → domain`, dependencies point inward only). |
 | Coverage | coverage.py via `pytest-cov`, branch mode on (`[tool.coverage.run] branch = true`) | Gate at `--cov-fail-under=85`, scoped to `src/ugjcs/domain` and `src/ugjcs/application` only. |
 | Frontend unit/component tests | Vitest 4.1.10, Testing Library, jsdom | `frontend/vitest.config.ts`; 10 test files under `src/**/*.test.{ts,tsx}` covering session-cookie sealing, Route Handler validation, and component rendering (blinding, status badges, forms, keyboard operability). |
-| Frontend e2e (declared, not committed) | `@playwright/test` 1.62.1, `@axe-core/playwright` 4.13.0 | Present in `package.json` as `npm run test:e2e`; no config or spec files exist yet (§6). |
+| Frontend e2e (declared, not committed) | `@playwright/test` 1.62.1, `@axe-core/playwright` 4.13.0 | Present in `package.json` as `npm run test:e2e`; no config or spec files exist yet (section 6). |
 | CI | GitHub Actions, `.github/workflows/backend-ci.yml` | Two jobs, `check` and `integration`, both gating on `push`/`pull_request` to `main`/`master`. |
 
 ### Why the coverage gate is scoped to domain and application only
@@ -86,19 +86,32 @@ A pull request cannot merge past either job failing.
 
 ## 3. Test cases
 
-The counts below are what `make check` and `make integration` reported on 2026-08-12,
-against the current commit, run from `backend/`:
+The counts below are what the suites reported on 2026-08-14, against the current commit,
+run from `backend/` and `frontend/`:
 
 ```
-$ make check   → 267 passed, 56 deselected. Coverage: 88.24% (gate: 85%)
-$ make integration → 56 passed, 267 deselected. Infrastructure coverage: 87%
+$ make check       → 402 passed, 84 deselected. Coverage: 90.03% (gate: 85%)
+$ make integration → 84 passed, 402 deselected
+$ npx vitest run   → 79 passed (20 files)
 ```
 
-267 + 56 = 323 tests total across the two runs (`--strict-markers` and the `integration`
-marker partition the suite so each test runs in exactly one of the two). The tables below
-draw specific, representative cases from the suites rather than reproducing all 323; the
-full set is in `backend/tests/`, one file per module under test, one test function per row
-these tables summarise.
+402 + 84 = 486 backend tests across the two runs. `--strict-markers` and the `integration`
+marker partition the suite so each test runs in exactly one of the two, which is why each
+run reports the other's count as deselected. The frontend adds 79 more, for 565 in total.
+
+Both backend figures are from CI run 31791711326 on 2026-08-14, which reports
+`collected 486 items / 402 deselected / 84 selected` then `84 passed` for the integration
+job, and `402 passed` at 90.03% coverage for the gates job.
+
+**On the integration figure.** These 84 tests stand up a real PostgreSQL 16 in a throwaway
+container via `testcontainers`, so they cannot run on a machine without a Docker daemon.
+On such a machine every one of them errors at setup rather than failing, which is a
+different and more honest signal than a false pass, and it is why this report cites the CI
+run rather than a local one. CI provides Postgres as a service container and additionally
+verifies that the Alembic migration chain applies, reverses to base, and re-applies.
+
+The tables below draw specific, representative cases from the suites rather than
+reproducing all 486. The full set is in `backend/tests/`, one file per module under test.
 
 ### 3.1 Functional testing — domain lifecycle and rules
 
@@ -130,7 +143,7 @@ these tables summarise.
 | `PUBLISHED` reachable only from `SCHEDULED`, `SCHEDULED` only from `ACCEPTED` — chained, so `PUBLISHED` is unreachable without acceptance | Holds | Holds | Pass |
 | A chain built entirely through `append` always verifies, over 100 generated payload sequences (size 1–12) | `verify()` raises nothing | Raises nothing | Pass |
 | Removing any event except the last always breaks verification, over 50 generated (chain, victim-index) pairs | `ChainBrokenError` raised every time | Raised every time | Pass |
-| Truncating the chain's tail is **not** detected (pinned known limitation, TD-04) | `verify()` accepts the truncated chain | Accepts | Pass — by design; see §6 |
+| Truncating the chain's tail is **not** detected (pinned known limitation, TD-04) | `verify()` accepts the truncated chain | Accepts | Pass — by design; see section 6 |
 | The blinded projection never carries the author id, for any generated title/abstract/keyword combination | Author id absent from the serialised projection | Absent | Pass |
 | `canonical_bytes()` always parses back as valid JSON, over 100 generated payloads | Round-trips | Round-trips | Pass |
 
@@ -141,7 +154,7 @@ these tables summarise.
 | A stored manuscript reads back with its roles and authors intact (`test_a_stored_manuscript_can_be_read_back`, `test_row_preserves_author_order`) | Exact round trip | Confirmed | Pass |
 | `UPDATE` on `editorial_events` (`test_updating_an_event_is_rejected_by_the_database`) | Rejected by a trigger, error matches `"append-only"` | Rejected | Pass |
 | `DELETE` on `editorial_events` (`test_deleting_an_event_is_rejected_by_the_database`) | Rejected | Rejected | Pass |
-| `TRUNCATE TABLE editorial_events` (`test_truncating_the_event_log_is_rejected`) | Rejected by a statement-level trigger | Rejected | Pass — closes TD-13, see §4 |
+| `TRUNCATE TABLE editorial_events` (`test_truncating_the_event_log_is_rejected`) | Rejected by a statement-level trigger | Rejected | Pass — closes TD-13, see section 4 |
 | Deleting a manuscript that has audit events (`test_deleting_a_manuscript_with_events_is_refused`) | Refused by `ON DELETE RESTRICT` | Refused | Pass |
 | A persisted hash chain verifies after a round trip through Postgres (`test_a_persisted_chain_verifies`) | Verifies | Verifies | Pass |
 | The chain stays consecutive across separate transactions (`test_the_chain_stays_consecutive_across_separate_transactions`) | Confirmed | Confirmed | Pass |
@@ -191,8 +204,8 @@ these tables summarise.
 | The manuscript type returned to a reviewer exposes exactly the permitted field set, no more, no fewer (`test_the_manuscript_returned_by_my_assignments_is_the_blinded_type`) | `{tracking_code, title, abstract, keywords, version, status}` exactly | Exact match | Pass |
 | A registration for an existing email raises and sends no second verification message (`test_registering_an_existing_email_raises_and_sends_no_second_message`) | No enumeration signal via message count | Confirmed | Pass |
 | An unknown email at login fails identically to a wrong password (`test_unknown_email_is_rejected_identically_to_a_wrong_password`) | Same response either way | Confirmed | Pass |
-| `canonical_bytes()` hashes the same instant identically regardless of UTC offset (`test_the_same_instant_hashes_identically_regardless_of_offset`) | Identical bytes | Identical | Pass — regression test for TD-12, see §4 |
-| `UPDATE`/`DELETE`/`TRUNCATE` on the audit log, and a manuscript delete with attached events | All rejected at the database level | All rejected | Pass — see §3.3, §4 |
+| `canonical_bytes()` hashes the same instant identically regardless of UTC offset (`test_the_same_instant_hashes_identically_regardless_of_offset`) | Identical bytes | Identical | Pass — regression test for TD-12, see section 4 |
+| `UPDATE`/`DELETE`/`TRUNCATE` on the audit log, and a manuscript delete with attached events | All rejected at the database level | All rejected | Pass — see section 3.3, section 4 |
 
 ### 3.6 Frontend unit/component testing (Vitest)
 
@@ -206,13 +219,44 @@ these tables summarise.
 | Login form is fully keyboard-operable — Tab order reaches email, password, submit (`login-page.test.tsx`) | Confirmed | Confirmed | Pass |
 | `POST /api/manuscripts` Route Handler rejects an invalid body before ever calling upstream (`route.test.ts`) | Upstream not called | Not called | Pass |
 
-Frontend suite: 10 test files, 17 individual `it(...)` cases (counted directly from
-`frontend/src/**/*.test.{ts,tsx}`). This report could not execute `npm test` in the
-environment it was written in — `node_modules` is not installed and package installation was
-out of scope for producing this document — so no pass/fail run output is claimed for the
-frontend suite as a whole; the table above states what each test asserts, sourced by reading
-the test files directly, not a run log. `npx tsc --noEmit` and ESLint (`make check` in
-`frontend/`) gate the same code on every CI-equivalent local run.
+| Clicking a demo-account chip fills the email and leaves the password empty and focused (`login-page.test.tsx`) | Email set, password empty and focused | Confirmed | Pass |
+| A seeded address never carries across a switch to the sign-up form (`login-page.test.tsx`) | Email cleared | Cleared | Pass |
+| The prototype notice precedes the form in document order (`login-page.test.tsx`) | Notice first | Confirmed | Pass |
+
+Frontend suite: **20 test files, 79 cases, all passing** under `npx vitest run`.
+
+One environment note, since it caused a false alarm once. Two suites import
+`frontend/src/lib/env.ts`, which parses `process.env` at import time, so they fail with a
+Zod error unless `API_BASE_URL` and `SESSION_SECRET` are present. `vitest.config.ts` feeds
+them in through `loadEnv`, which reads `.env*` files; a checkout without a local
+`.env.local` therefore sees those suites error rather than fail. Copying
+`.env.local.example` resolves it.
+
+### 3.7 Feature suites added after the original build
+
+The two waves that followed the 48-hour build brought their own suites. These are the
+files, with the property each one exists to pin:
+
+| Suite | What it pins |
+|---|---|
+| `test_billing_router.py` | An invoice opens on an accept decision and only on an accept decision; a repeated accept never double-bills; mock and real gateway modes are distinguishable on the wire; only the corresponding author may settle, only the Editor-in-Chief may waive |
+| `test_invoice_repository.py` (integration) | Invoice persistence and status transitions against real Postgres |
+| `test_admin_router.py` | Every admin route is closed to non-administrators; the administrator role can be neither granted nor revoked; capacity is bounded 1 to 10; an administrator cannot deactivate themselves |
+| `test_provenance_router.py` | An intact chain verifies and reports its head; a tampered interior event is reported as broken; payloads and actor ids are never exposed |
+| `test_citation_router.py` | BibTeX and RIS are well formed; an unknown or missing format is 422; a DOI-shaped identifier is present |
+| `test_editorial_analytics.py` | Aggregates over an empty desk return nulls rather than zero rates; reviewer performance reports workload and turnaround; deadlines carry a server-computed overdue flag; reviewers cannot read any of it |
+| `test_archive_search_fulltext.py` | Body-text matches carry a snippet, title and keyword matches carry null; publishing extracts PDF text into the search column; an unreadable document never blocks a publish |
+| `test_submission_preflight.py` | Submission and resubmission report stripped metadata keys and flag author names still present in body text, without dropping any `ManuscriptOut` field |
+| `test_certificate_router.py`, `test_certificate_auth.py` | A certificate is a PDF, reachable by editor and Editor-in-Chief, and names no reviewer and no confidential comment |
+| `test_fulltext_search.py`, `test_due_at_migration.py` (integration) | The `tsvector` column and the `due_at` migration behave against real Postgres |
+
+Two of these deserve a note because they assert an absence rather than a presence.
+`test_event_payloads_and_actor_ids_are_never_exposed` and
+`test_the_certificate_never_names_a_reviewer_or_leaks_confidential_comments` both guard the
+double-blind guarantee at points where a new feature could plausibly have broken it: a
+public verification endpoint and a downloadable PDF are exactly the kind of additions that
+leak an identifier by accident. Asserting the absence directly is cheaper than hoping a
+reviewer notices.
 
 ---
 
@@ -310,7 +354,7 @@ found.
 **How it was found.** Reading the module's logic against what the coverage report claimed,
 rather than trusting "0 branches missing" as proof of exhaustive exercise. Recorded in
 `docs/04-technical-debt-register.md` (TD-11) as the register's second illustration of
-coverage as a weak signal — a companion finding to the mutation-testing result in §4.1, found
+coverage as a weak signal — a companion finding to the mutation-testing result in section 4.1, found
 the same review pass.
 
 **Why it mattered.** "100% coverage, zero branches missed" is a claim readers reasonably take
@@ -326,7 +370,7 @@ reports for it.
 ### 4.5 Three lifecycle methods were implemented and tested, but reachable by no route
 
 **What was found.** `Manuscript.resubmit`, `Manuscript.schedule` and `Manuscript.publish` were
-fully implemented in the domain and covered by unit tests (§3.1) — but at one point in the
+fully implemented in the domain and covered by unit tests (section 3.1) — but at one point in the
 build, no API route in `ugjcs.api` called them. The domain logic was correct and verified in
 isolation; the system as a whole could not do the things those tests proved the domain
 capable of.
@@ -345,10 +389,10 @@ route-audit — was positioned to catch a route's *absence*; `test_route_audit.p
 
 **What was done.** The three routes were added to `ugjcs.api` (manuscript resubmission,
 editor-in-chief scheduling, editor-in-chief publication), each exercised by the system tests
-in §3.4 (`test_the_corresponding_author_can_resubmit_with_a_revised_file`,
+in section 3.4 (`test_the_corresponding_author_can_resubmit_with_a_revised_file`,
 `test_the_editor_in_chief_can_schedule_an_accepted_manuscript`,
 `test_the_editor_in_chief_can_publish_a_scheduled_manuscript`). The gap itself is the
-strongest argument in this report for §5's manual acceptance pass being a required step, not
+strongest argument in this report for section 5's manual acceptance pass being a required step, not
 an optional one: it is precisely the class of defect route-level and unit-level testing
 cannot see.
 
@@ -413,13 +457,13 @@ UAT was run as scripted, role-scoped scenarios against the **live deployment**
 |---|---|---|---|---|
 | Author login and dashboard | Navigate to `/login`, submit `author@sdj.test` / `Sdj-Author-2026!` | Redirected to `/author`, listing this author's submissions with status | Redirected to `/author`; ten submissions listed with correct tracking codes and statuses (`Published`, `Revision requested`, `Submitted`, `Under review`) | Pass |
 | Public archive reachable without authentication | Navigate to `/search` with no session | Search page renders, no login redirect | Page rendered directly, titled "Search · SDJ Editorial Portal" | Pass |
-| Cross-role access denied at the routing layer | While authenticated as `author`, navigate directly to `/editor` | Access refused, not the editor queue | Redirected to `/` (public homepage); no editor content rendered, no session state exposed on that page | Pass — matches `frontend/middleware.ts`: a session present without the required role redirects to `/`, distinct from the no-session case (§5, next row), which redirects to `/login` |
+| Cross-role access denied at the routing layer | While authenticated as `author`, navigate directly to `/editor` | Access refused, not the editor queue | Redirected to `/` (public homepage); no editor content rendered, no session state exposed on that page | Pass — matches `frontend/middleware.ts`: a session present without the required role redirects to `/`, distinct from the no-session case (section 5, next row), which redirects to `/login` |
 
 The redirect-to-home behaviour on a denied role check is a deliberate design choice, not a
 UAT defect: `middleware.ts` distinguishes "no session" (→ `/login`, so the user can
 authenticate and retry) from "session present, wrong role" (→ `/`, so a legitimately
 authenticated user with insufficient privilege lands somewhere useful rather than at a bare
-error). The backend's own authorization check — exercised in §3.4 and §3.5 — is what is
+error). The backend's own authorization check — exercised in section 3.4 and section 3.5 — is what is
 actually authoritative for every state-changing action regardless of what the frontend route
 guard does; the middleware is a routing-level convenience, not the security boundary.
 
@@ -445,7 +489,7 @@ revision is not repeated for this report beyond the live checks above.
 | Editor | Attempt to schedule or publish (denied — EiC only) | `test_a_plain_editor_cannot_schedule`, `test_a_plain_editor_cannot_publish` |
 | Editor-in-Chief | Schedule an accepted manuscript into a volume/issue | `test_the_editor_in_chief_can_schedule_an_accepted_manuscript` |
 | Editor-in-Chief | Publish a scheduled manuscript | `test_the_editor_in_chief_can_publish_a_scheduled_manuscript` |
-| Administrator | (Role management — see §6: no UI surface exists for this yet; verified only via `test_policies.py`'s `test_administrator_may_manage_users` at the policy layer) | `test_administrator_may_manage_users` |
+| Administrator | (Role management — see section 6: no UI surface exists for this yet; verified only via `test_policies.py`'s `test_administrator_may_manage_users` at the policy layer) | `test_administrator_may_manage_users` |
 | Reader (unauthenticated) | Browse the public archive, search, download a published paper | `test_the_archive_requires_no_authentication`, `test_search_finds_a_matching_paper` |
 
 ---
@@ -459,24 +503,24 @@ revision is not repeated for this report beyond the live checks above.
 - **No automated security scanning in CI.** `.github/workflows/backend-ci.yml` runs linting,
   type checking, an architecture contract, and the test suites — it does not run a dependency
   vulnerability scanner, a SAST tool, or a DAST pass against the deployed API. Security
-  coverage in this project is what the tests in §3.5 assert directly, and nothing beyond that.
-- **No mutation testing in CI.** The mutation-testing finding in §4.1 was a one-off manual
+  coverage in this project is what the tests in section 3.5 assert directly, and nothing beyond that.
+- **No mutation testing in CI.** The mutation-testing finding in section 4.1 was a one-off manual
   review pass, not a repeatable gate. `docs/04-technical-debt-register.md` (TD-11) records
   systematic mutation testing (`mutmut` or `cosmic-ray`) as future evolution, not as something
   this project currently runs.
-- **No browser-matrix testing.** The live UAT pass in §5 was run in one browser (a
+- **No browser-matrix testing.** The live UAT pass in section 5 was run in one browser (a
   Chromium-based automated session). No cross-browser or cross-device matrix was exercised;
   `@axe-core/playwright` is present as a dependency for accessibility auditing but, as noted
-  in §1 and §3.6, no Playwright spec files are committed to run it against.
+  in section 1 and section 3.6, no Playwright spec files are committed to run it against.
 - **No committed automated end-to-end suite.** `test:e2e` is declared in `package.json` but
   there is no `playwright.config.ts` or `tests/e2e/` directory in the repository. The
-  acceptance evidence in §5 substitutes a manual (and, for this report, live-browser-driven)
+  acceptance evidence in section 5 substitutes a manual (and, for this report, live-browser-driven)
   pass for what an automated E2E suite would otherwise provide continuously; it is not
   equivalent to one, because it was not re-run on every change, only at the points recorded
   here.
 - **The double-blind guarantee has a stated limit.** `blind()` strips `author_ids` and
   `corresponding_author_id` from the type a reviewer receives — proven for every input by
-  the property test in §3.2 and the sentinel-based leak tests in §3.5 — but `title`,
+  the property test in section 3.2 and the sentinel-based leak tests in section 3.5 — but `title`,
   `abstract` and `keywords` are carried **verbatim**. An author's name in a title, or an
   abstract that reads "extending our earlier work in [Obeng 2025]," reaches the reviewer
   unchanged; nothing in this system detects or redacts self-identifying body text. This is
@@ -487,20 +531,20 @@ revision is not repeated for this report beyond the live checks above.
   redaction at all.
 - **Administrator role management has no UI.** The policy layer grants and denies this
   correctly (`test_administrator_may_manage_users`), but no frontend surface exercises it, so
-  §5's administrator row is verified only at the policy-test level, not end to end.
+  section 5's administrator row is verified only at the policy-test level, not end to end.
 
 ---
 
 ## 7. Evaluation of the testing strategy
 
-The honest conclusion, and the one the evidence in §4 supports without qualification:
+The honest conclusion, and the one the evidence in section 4 supports without qualification:
 **automated gates establish a floor and catch regressions; they did not find the defects that
-mattered most on this project.** Every serious defect recorded in §4 was found by a human or
+mattered most on this project.** Every serious defect recorded in section 4 was found by a human or
 an agent reading code against what it claimed to do, by mutation testing deliberately
 designed to distrust the coverage figure, or by using the running system as an actual actor
 would — never by a coverage number or a green test run on its own.
 
-The clearest single data point is §4.1: coverage on `hashchain.py` stood at 100% — every line,
+The clearest single data point is section 4.1: coverage on `hashchain.py` stood at 100% — every line,
 every branch — while the line that makes a hash chain a *chain*, rather than a list of
 independently checksummed events, could be deleted without failing a single one of 104 tests
 that existed at the time. A tamper-evidence guarantee that is the entire reason this
@@ -508,30 +552,30 @@ subsystem exists was, for a period, unprotected by any test that would have noti
 removal. That is not a marginal case; it is the load-bearing property of the module, and
 coverage reported nothing wrong.
 
-Three further findings sharpen the same point from different angles. §4.2 shows that 100%
+Three further findings sharpen the same point from different angles. Section 4.2 shows that 100%
 coverage inside a module says nothing about what happens at a boundary the module doesn't
 know it crosses — every test used a UTC datetime, so the suite was structurally blind to a
 defect that only a database round trip could expose, and the defect it hid was actively
-harmful (a false tamper alert), not merely a missed detection. §4.3 shows that a control
+harmful (a false tamper alert), not merely a missed detection. Section 4.3 shows that a control
 verified against the cases its author thought to check — `UPDATE`, `DELETE` — said nothing
 about the case nobody asked about — `TRUNCATE` — despite the control having been "confirmed
-firing against a live database." §4.4 shows the measurement tool itself has blind spots: an
+firing against a live database." section 4.4 shows the measurement tool itself has blind spots: an
 inline ternary's second arm never ran, and coverage.py's branch instrumentation does not
 model a conditional expression as a branch, so the report read as complete when it was not.
 
-§4.5 and §4.6 extend the same lesson past the test suite entirely. §4.5 — three fully
+Section 4.5 and section 4.6 extend the same lesson past the test suite entirely. Section 4.5 — three fully
 implemented, fully unit-tested domain methods reachable by no API route — is a defect no unit
 test, integration test, or route-audit test was positioned to find, because each of those
 tests presupposes the thing under test is reachable; the question "does anything reach this
 code" sits above all of them, and was answered only by the owner using the deployed system as
-a user would. §4.6 — correct IAM policy, no network path to use it — sits a layer below every
+a user would. Section 4.6 — correct IAM policy, no network path to use it — sits a layer below every
 test in this suite: nothing here runs against the actual deployed network topology, so the
 gap was invisible until the feature was exercised against the real infrastructure and the
 upload hung.
 
-None of this is an argument against the automated suite. 267 unit tests, 56 integration tests
-against a real database, two architecture contracts, and a strict type checker catch an
-enormous amount of regression cheaply and continuously — exactly what §1 claims for them, and
+None of this is an argument against the automated suite. 402 unit tests, 84 integration tests
+against a real database, 79 frontend tests, two architecture contracts, and a strict type
+checker catch an enormous amount of regression cheaply and continuously — exactly what section 1 claims for them, and
 exactly the floor `docs/04-technical-debt-register.md` describes them as. But the register's
 own closing observation, produced independently of this report, states the same conclusion
 this section reaches from the test evidence directly: ten of its eleven entries were found by

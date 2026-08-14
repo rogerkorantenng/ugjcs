@@ -123,11 +123,11 @@ not yet begun are forecasts, not debt, and are kept in the relevant implementati
 
 | | |
 |---|---|
-| **Debt** | The live deployment runs the FastAPI backend on AWS App Runner behind its own `*.awsapprunner.com` TLS endpoint, rather than the ECS Fargate / Application Load Balancer / CloudFront topology designed in `docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md` §7.3. |
+| **Debt** | The live deployment runs the FastAPI backend on AWS App Runner behind its own `*.awsapprunner.com` TLS endpoint, rather than the ECS Fargate / Application Load Balancer / CloudFront topology designed in `docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md` section 7.3. |
 | **Cause** | Deliberate. Provisioning the ECS/ALB/CloudFront stack — a VPC, a target group and listener rules, a CloudFront distribution, task definitions and a service, and the IAM wiring between all of it — measured at 4–6 hours against a 48-hour budget that, at the point this trade-off was made, still owed a working API, a working frontend, and five accompanying documents. |
 | **Impact** | The examiner reaches a functioning, HTTPS-verified backend, and the ECS/ALB/CloudFront design is assessed on its own architectural merits wherever the spec is read — but the two do not match. No functional capability is lost: App Runner supplies the identical trusted-TLS-without-a-registered-domain guarantee CloudFront was chosen for, over the same container image, with less to operate and less to tear down. |
 | **Priority** | **Scheduled** — repayable once the document and feature backlog this budget was protecting is clear, i.e. after submission, not before. |
-| **Resolution** | Provision `infra/` from the ECS/ALB/CloudFront design already specified in §7.3, migrate the container from an App Runner source to an ECS Fargate service behind a new target group, and decommission the App Runner service once the ALB responds on the same health check. Recorded in `docs/superpowers/plans/2026-08-12-ugjcs-plan-6-deployment.md`'s "Why this is smaller than the specification" section, so the gap is a documented, bounded decision rather than unnoticed drift. |
+| **Resolution** | Provision `infra/` from the ECS/ALB/CloudFront design already specified in section 7.3, migrate the container from an App Runner source to an ECS Fargate service behind a new target group, and decommission the App Runner service once the ALB responds on the same health check. Recorded in `docs/superpowers/plans/2026-08-12-ugjcs-plan-6-deployment.md`'s "Why this is smaller than the specification" section, so the gap is a documented, bounded decision rather than unnoticed drift. |
 
 ---
 

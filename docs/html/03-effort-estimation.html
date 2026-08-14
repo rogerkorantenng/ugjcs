@@ -6,6 +6,151 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>03 · Effort Estimation (UCP + COCOMO II)</title>
   <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -22,32 +167,113 @@
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
   </style>
-  <link rel="stylesheet" href="" />
   <style>
-  :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
-  * { box-sizing:border-box; }
-  body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
-  header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
-  header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-  header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
-  main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
-  h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
-  h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
-  h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
-  h3 { font-size:1.12rem; margin-top:1.8rem; }
-  a { color:#4b3f9e; }
-  code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
-  pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
-  pre code { background:none; color:inherit; padding:0; }
-  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
-  th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
-  th { background:#eceee9; font-weight:600; }
-  blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
-  figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
-  figure.diagram svg { max-width:100%; height:auto; }
-  nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
-  footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
-  </style>
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      div.columns{display: flex; gap: min(4vw, 1.5em);}
+      div.column{flex: auto; overflow-x: auto;}
+      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+      /* The extra [class] is a hack that increases specificity enough to
+         override a similar rule in reveal.js */
+      ul.task-list[class]{list-style: none;}
+      ul.task-list li input[type="checkbox"] {
+        font-size: inherit;
+        width: 0.8em;
+        margin: 0 0.8em 0.2em -1.6em;
+        vertical-align: middle;
+      }
+      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+      /* CSS for syntax highlighting */
+      html { -webkit-text-size-adjust: 100%; }
+      pre > code.sourceCode { white-space: pre; position: relative; }
+      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+      pre > code.sourceCode > span:empty { height: 1.2em; }
+      .sourceCode { overflow: visible; }
+      code.sourceCode > span { color: inherit; text-decoration: inherit; }
+      div.sourceCode { margin: 1em 0; }
+      pre.sourceCode { margin: 0; }
+      @media screen {
+      div.sourceCode { overflow: auto; }
+      }
+      @media print {
+      pre > code.sourceCode { white-space: pre-wrap; }
+      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+      }
+      pre.numberSource code
+        { counter-reset: source-line 0; }
+      pre.numberSource code > span
+        { position: relative; left: -4em; counter-increment: source-line; }
+      pre.numberSource code > span > a:first-child::before
+        { content: counter(source-line);
+          position: relative; left: -1em; text-align: right; vertical-align: baseline;
+          border: none; display: inline-block;
+          -webkit-touch-callout: none; -webkit-user-select: none;
+          -khtml-user-select: none; -moz-user-select: none;
+          -ms-user-select: none; user-select: none;
+          padding: 0 4px; width: 4em;
+          color: #aaaaaa;
+        }
+      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+      div.sourceCode
+        {   }
+      @media screen {
+      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+      }
+      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+      code span.at { color: #7d9029; } /* Attribute */
+      code span.bn { color: #40a070; } /* BaseN */
+      code span.bu { color: #008000; } /* BuiltIn */
+      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+      code span.ch { color: #4070a0; } /* Char */
+      code span.cn { color: #880000; } /* Constant */
+      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+      code span.dt { color: #902000; } /* DataType */
+      code span.dv { color: #40a070; } /* DecVal */
+      code span.er { color: #ff0000; font-weight: bold; } /* Error */
+      code span.ex { } /* Extension */
+      code span.fl { color: #40a070; } /* Float */
+      code span.fu { color: #06287e; } /* Function */
+      code span.im { color: #008000; font-weight: bold; } /* Import */
+      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+      code span.op { color: #666666; } /* Operator */
+      code span.ot { color: #007020; } /* Other */
+      code span.pp { color: #bc7a00; } /* Preprocessor */
+      code span.sc { color: #4070a0; } /* SpecialChar */
+      code span.ss { color: #bb6688; } /* SpecialString */
+      code span.st { color: #4070a0; } /* String */
+      code span.va { color: #19177c; } /* Variable */
+      code span.vs { color: #4070a0; } /* VerbatimString */
+      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    </style>
+  <style>
+    :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
+    * { box-sizing:border-box; }
+    body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
+    header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
+    header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
+    header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
+    main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
+    h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
+    h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
+    h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
+    h3 { font-size:1.12rem; margin-top:1.8rem; }
+    a { color:#4b3f9e; }
+    code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
+    pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
+    pre code { background:none; color:inherit; padding:0; }
+    table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
+    th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
+    th { background:#eceee9; font-weight:600; }
+    blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
+    figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
+    figure.diagram svg { max-width:100%; height:auto; }
+    nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
+    footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
+    </style>
 </head>
 <body>
 <header class="site">
@@ -66,24 +292,24 @@ of Basic and Applied Sciences, University of Ghana
 <strong>Document:</strong> 03 — Effort estimation
 <strong>Author:</strong> Roger Koranteng Obeng, student ID 22424140
 <strong>Date:</strong> 2026-08-12 <strong>Status:</strong>
-Authoritative. This document's MoSCoW cut (§8) governs the scope of
-Plans 2–6.</p>
+Authoritative. This document's MoSCoW cut (section 8) governs the scope
+of Plans 2–6.</p>
 <hr />
 <h2 id="1-method">1. Method</h2>
-<p>Per the design specification's estimation approach (§14), <strong>Use
-Case Points (UCP)</strong> is the primary technique: the portal is
-defined by actor interactions with a stable use-case boundary — the
-situation UCP was designed for — and the unadjusted actor and use-case
-weights can be read directly off the functional requirements table
-(§5.1) rather than guessed. <strong>COCOMO II Early Design</strong>
-serves as an independent cross-check from a size-and-cost-driver
-perspective, using different inputs entirely (source lines of code and
-process/product/personnel ratings rather than actor and transaction
-counts). Agreement — or a <em>diagnosable</em> disagreement — between
-two methods driven by different inputs is stronger evidence than
-precision from either one alone.</p>
+<p>Per the design specification's estimation approach (section 14),
+<strong>Use Case Points (UCP)</strong> is the primary technique: the
+portal is defined by actor interactions with a stable use-case boundary
+— the situation UCP was designed for — and the unadjusted actor and
+use-case weights can be read directly off the functional requirements
+table (section 5.1) rather than guessed. <strong>COCOMO II Early
+Design</strong> serves as an independent cross-check from a
+size-and-cost-driver perspective, using different inputs entirely
+(source lines of code and process/product/personnel ratings rather than
+actor and transaction counts). Agreement — or a <em>diagnosable</em>
+disagreement — between two methods driven by different inputs is
+stronger evidence than precision from either one alone.</p>
 <p>The estimate is computed before implementation. Its output determines
-the MoSCoW cut recorded in §8: requirements that do not fit the
+the MoSCoW cut recorded in section 8: requirements that do not fit the
 available 48-hour window are demoted rather than rushed, and the
 demotion is recorded with its reason. Every intermediate figure below
 shows its arithmetic so a reader can recompute it independently rather
@@ -156,8 +382,8 @@ Use-case inventory and unadjusted use-case weight (UUCW)</h2>
 <strong>Simple</strong> (≤3 transactions) = 5, <strong>Average</strong>
 (4–7) = 10, <strong>Complex</strong> (&gt;7) = 15. The <code>FR</code>
 column traces each use case back to the functional requirement it
-implements in the design specification (§5.1), so the inventory is
-derived rather than invented.</p>
+implements in the design specification (section 5.1), so the inventory
+is derived rather than invented.</p>
 <table>
 <thead>
 <tr>
@@ -663,7 +889,7 @@ exceed the 48-hour window by roughly two orders of magnitude, and
 effort</strong> by either reckoning (1.8 person-years from UCP on the
 full scope, up to 47.2 ÷ 12 ≈ 3.9 person-years from COCOMO II). That
 agreement — on the scale of the problem, not its exact magnitude — is
-what governs the scope decision in §8.</p>
+what governs the scope decision in section 8.</p>
 <hr />
 <h2 id="8-scope-decision">8. Scope decision</h2>
 <p>48 hours is 1.5% of the lower (UCP, full-scope) estimate of 3,262
@@ -674,7 +900,7 @@ short of what classical estimation predicts the full system requires.
 The estimate therefore governs scope in two ways: it forces a MoSCoW cut
 (below), and it forces an explicit reckoning with the fact that the
 build method itself — not just the schedule — has to absorb that gap
-(§9).</p>
+(section 9).</p>
 <h3 id="81-moscow-cut--authoritative-scope-for-plans-26">8.1 MoSCoW cut
 — authoritative scope for Plans 2–6</h3>
 <table>
@@ -727,19 +953,20 @@ historical rate no longer describes it.</p>
 <p>Four things follow from that:</p>
 <ol type="1">
 <li><strong>The realised PF is a local calibration, not a general
-claim.</strong> It will be reported in §10 once the build completes,
-computed as <code>actual hours ÷ UCP of the delivered scope</code>. It
-describes this developer, this tool, this domain and this 48-hour
-window. The sample size is one project, by one developer, and the figure
-does not generalise to other developers, other tools, or other problem
-domains — it is evidence about this build, not a claim about AI-assisted
+claim.</strong> It will be reported in section 10 once the build
+completes, computed as
+<code>actual hours ÷ UCP of the delivered scope</code>. It describes
+this developer, this tool, this domain and this 48-hour window. The
+sample size is one project, by one developer, and the figure does not
+generalise to other developers, other tools, or other problem domains —
+it is evidence about this build, not a claim about AI-assisted
 development in general.</li>
 <li><strong>A lower PF does not mean the 2,514-hour estimate was
 wrong.</strong> UCP still correctly sizes the <em>problem</em>; what
 changes is the rate at which the chosen method converts that size into
 elapsed hours. The estimate remains the correct basis for the MoSCoW cut
-in §8, which was decided before the method's realised productivity was
-known.</li>
+in section 8, which was decided before the method's realised
+productivity was known.</li>
 <li><strong>The gap between estimated and realised hours is not free
 capacity — it is capacity that was not spent on activities the classical
 estimate priced in.</strong> Three of those are named here and
@@ -747,7 +974,7 @@ cross-referenced forward to the technical debt register (not yet created
 at the time of writing; it is produced in a later implementation plan
 and each item below will carry a Debt → Cause → Impact → Priority →
 Proposed resolution entry per the design specification's technical debt
-policy, §15):
+policy, section 15):
 <ul>
 <li><strong>Test depth below what 2,514 hours would buy.</strong> A
 fully-priced manual effort would include exhaustive edge-case testing,
@@ -768,10 +995,10 @@ beyond the specified baseline is not.</li>
 <li><strong>Acknowledgement.</strong> Consistent with the requirement to
 acknowledge all external resources and tools used in this work, AI
 assistance (Claude Code, Anthropic) is acknowledged here as a
-substantive contributor to implementation, and again in §11 (References
-and acknowledgements), which records the specific tools and the boundary
-of their use: direction, review and final acceptance of all code and
-documentation rest with the author.</li>
+substantive contributor to implementation, and again in section 11
+(References and acknowledgements), which records the specific tools and
+the boundary of their use: direction, review and final acceptance of all
+code and documentation rest with the author.</li>
 </ol>
 <hr />
 <h2 id="10-assumptions-constraints-and-estimated-versus-actual">10.
@@ -792,10 +1019,10 @@ used.</li>
 <h3 id="102-constraints">10.2 Constraints</h3>
 <ul>
 <li>A 48-hour development window, which is the constraint the estimate
-is measured against in §8.</li>
+is measured against in section 8.</li>
 <li>No registered domain is available, which shapes the CloudFront TLS
-strategy recorded in the design specification (§16) rather than the
-estimate itself, but is recorded here as a project constraint.</li>
+strategy recorded in the design specification (section 16) rather than
+the estimate itself, but is recorded here as a project constraint.</li>
 <li>A solo developer, which is why the COCOMO II <code>TEAM</code> scale
 factor is rated at the Very High end (1.10, the lowest-penalty rating) —
 there is no cross-team coordination overhead to pay for — and why
@@ -830,27 +1057,28 @@ phase, and sum all phases to give total actual hours.</li>
 </ol>
 <p><strong>Realised productivity factor.</strong>
 <code>PF_actual = total actual hours ÷ UCP of the scope actually delivered at project close</code>
-— UCP taken from §6's Must-have figure (125.7) if only Must-have use
-cases ship, or recomputed by the same method as §3 over whichever
-Should-have use cases from §8.1 are also delivered, if any are. This is
-the single figure §9 describes as "a local calibration, not a general
-claim."</p>
+— UCP taken from section 6's Must-have figure (125.7) if only Must-have
+use cases ship, or recomputed by the same method as section 3 over
+whichever Should-have use cases from section 8.1 are also delivered, if
+any are. This is the single figure section 9 describes as "a local
+calibration, not a general claim."</p>
 <p><strong>Variance percentage.</strong>
 <code>Variance % = (actual hours − estimated hours) ÷ estimated hours × 100</code>,
 computed against the Must-have UCP estimate (2,514 hours) as the primary
-comparison, since that is the estimate the MoSCoW cut in §8 was built
-against. A secondary variance figure against the COCOMO II estimate
-(7,170 hours) is reported alongside it, since §7 established that the
-two methods bound the same answer from different sides and a large
-variance against one without checking the other would be misleading.</p>
+comparison, since that is the estimate the MoSCoW cut in Section 8 was
+built against. A secondary variance figure against the COCOMO II
+estimate (7,170 hours) is reported alongside it, since section 7
+established that the two methods bound the same answer from different
+sides and a large variance against one without checking the other would
+be misleading.</p>
 <p><strong>Hindsight re-rating of factors.</strong> At project close,
-each Technical (§4) and Environmental (§5) factor rating, and each
-COCOMO II scale factor and effort multiplier (§7), is re-examined
-against what was actually observed during the build, and any rating that
-the build's evidence contradicts is flagged with what it should have
-been rated and why. Three ratings are already flagged here as
-pre-registered candidates for revision, precisely so that the hindsight
-analysis is not free to cherry-pick after the fact:</p>
+each Technical (section 4) and Environmental (section 5) factor rating,
+and each COCOMO II scale factor and effort multiplier (section 7), is
+re-examined against what was actually observed during the build, and any
+rating that the build's evidence contradicts is flagged with what it
+should have been rated and why. Three ratings are already flagged here
+as pre-registered candidates for revision, precisely so that the
+hindsight analysis is not free to cherry-pick after the fact:</p>
 <ul>
 <li><strong><code>SCED</code> (schedule compression, COCOMO II, rated
 1.43).</strong> This penalty models compression of a <em>manual</em>
@@ -878,17 +1106,19 @@ acknowledgements</h2>
 <li>Karner, G. (1993). <em>Use Case Points</em> method for effort
 estimation, as codified in Cockburn, A. (2000), <em>Writing Effective
 Use Cases</em>, and Schneider &amp; Winters (1998), <em>Applying Use
-Cases: A Practical Guide</em> — actor and use-case weighting rules (§2,
-§3) and the productivity-factor rule (§6) follow this method.</li>
-<li>Boehm, B. et al. (2000). <em>Software Cost Estimation with COCOMO
-II</em> — Early Design model, scale factors and effort multipliers (§7)
+Cases: A Practical Guide</em> — actor and use-case weighting rules
+(section 2, section 3) and the productivity-factor rule (section 6)
 follow this method.</li>
+<li>Boehm, B. et al. (2000). <em>Software Cost Estimation with COCOMO
+II</em> — Early Design model, scale factors and effort multipliers
+(section 7) follow this method.</li>
 <li><code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code>
-— the design specification this estimate is derived from: §5.1 supplies
-the functional-requirement inventory behind §3's use cases; §14 sets the
-estimation approach this document follows; §15 sets the technical debt
-policy referenced in §9; §16 supplies the assumptions and constraints
-reproduced in §10.</li>
+— the design specification this estimate is derived from: section 5.1
+supplies the functional-requirement inventory behind section 3's use
+cases; section 14 sets the estimation approach this document follows;
+section 15 sets the technical debt policy referenced in section 9;
+section 16 supplies the assumptions and constraints reproduced in
+section 10.</li>
 <li><strong>AI-assisted development.</strong> This document, and the
 implementation plans and code it governs the scope of, were produced
 with Claude Code (Anthropic), an AI coding assistant, under the
@@ -898,7 +1128,7 @@ directed the work, reviewed every output, and accepts sole
 responsibility for its correctness and for the estimates and decisions
 recorded in this document. This acknowledgement satisfies the
 requirement to declare all external resources and tools used in this
-work, and is cross-referenced from §9, where the productivity
+work, and is cross-referenced from section 9, where the productivity
 consequence of that method is analysed rather than merely
 disclosed.</li>
 </ul>

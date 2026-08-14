@@ -23,7 +23,7 @@ cross-references six authoritative supporting documents and the codebase itself 
 duplicating them; where a figure, table, or claim has a fuller treatment elsewhere, that
 document is named and the reader is pointed to it. Nothing here should be taken to override
 what those documents say — where a discrepancy exists between two of them, it is recorded
-rather than silently resolved in one direction (see §10.4).
+rather than silently resolved in one direction (see section 10.4).
 
 **Referenced source documents**
 
@@ -55,7 +55,7 @@ The College of Basic and Applied Sciences (CBAS), University of Ghana publishes 
 and Development Journal (SDJ), but the journal has no dedicated system for managing its
 editorial process: submissions, reviews and decisions are coordinated manually over email,
 shared drives and spreadsheets. That approach fails in four specific ways (design
-specification §1):
+specification section 1):
 
 1. **Blinding is not enforceable.** Double-blind review depends on a human remembering to strip
    identifying information from a document before forwarding it. Author names routinely survive
@@ -91,10 +91,10 @@ integrity and editorial auditability enforced by the system rather than by conve
 - **O6.** Demonstrate disciplined engineering practice: estimation-driven scope, automated
   quality gates, infrastructure as code, and an explicit technical debt register.
 
-Objectives O1–O3 are demonstrably met by the delivered domain layer (§8, §10); O4 is partially
+Objectives O1–O3 are demonstrably met by the delivered domain layer (section 8, section 10); O4 is partially
 met (reviewer assignment is a persistence record without matching or a conflict check — TD-02,
-TD-03); O5 is met for the archive read path; O6 is the subject of §7, §11 and §12, and is, on
-the evidence in §11.7, the objective this project delivers most convincingly.
+TD-03); O5 is met for the archive read path; O6 is the subject of section 7, section 11 and section 12, and is, on
+the evidence in section 11.7, the objective this project delivers most convincingly.
 
 ---
 
@@ -115,37 +115,37 @@ authors.
 | CBAS college leadership | Secondary | Editorial throughput and workload analytics |
 | Indexing services | External system | Harvest metadata via OAI-PMH |
 
-Non-human stakeholders: the AWS platform (cost and operability, §13) and future maintainers,
-for whom the technical debt register (§12) is written.
+Non-human stakeholders: the AWS platform (cost and operability, section 13) and future maintainers,
+for whom the technical debt register (section 12) is written.
 
 A single account may hold multiple roles simultaneously — a deliberate design choice (design
-specification §3, SRS §2.3) with a direct security consequence: the authorisation layer does
+specification section 3, SRS section 2.3) with a direct security consequence: the authorisation layer does
 not currently prevent an Author–Reviewer dual-role holder from reviewing their own manuscript
-(TD-02, §12).
+(TD-02, section 12).
 
 ---
 
 ## 5. Requirements analysis
 
-Requirements were elicited from the problem statement (§2) rather than from structured
+Requirements were elicited from the problem statement (section 2) rather than from structured
 interviews with SDJ's editorial office, and no real SDJ submissions or reviewer data were
-available to the project (SRS §2.6) — a stated constraint, not a hidden one. The analysis proceeded in four steps, each of which left an artefact this
+available to the project (SRS section 2.6) — a stated constraint, not a hidden one. The analysis proceeded in four steps, each of which left an artefact this
 consolidation points to rather than repeats:
 
-1. **Actor and use-case inventory.** Eight stakeholder classes (§4) were mapped to 25 use cases
+1. **Actor and use-case inventory.** Eight stakeholder classes (section 4) were mapped to 25 use cases
    spanning identity, submission, screening, review, decision, publication, archive and
-   administration (effort estimation §3; SRS §4.2).
+   administration (effort estimation section 3; SRS section 4.2).
 2. **Functional requirements, stated testably.** Each of 28 functional requirements (plus one,
    FR-25a, added during this analysis — see below) is written as "the system shall …", with
    explicit preconditions, postconditions and an acceptance criterion, following IEEE 830-1998
-   and ISO/IEC/IEEE 29148:2018 (SRS §1.1, §3.1).
+   and ISO/IEC/IEEE 29148:2018 (SRS section 1.1, section 3.1).
 3. **Non-functional requirements, each with a verification method.** Seventeen NFRs across
    security, integrity, performance, reliability, availability, usability, maintainability,
    observability, portability and compliance, each naming the test or check that verifies it
-   (SRS §3.2) — "non-functional" is deliberately not allowed to mean "unverifiable."
+   (SRS section 3.2) — "non-functional" is deliberately not allowed to mean "unverifiable."
 4. **Prioritisation against an effort estimate, not against intuition.** MoSCoW priorities were
-   assigned per requirement in the design specification (§5) and made authoritative once the
-   effort estimate (§7 below) confirmed the full system was roughly two orders of magnitude
+   assigned per requirement in the design specification (section 5) and made authoritative once the
+   effort estimate (section 7 below) confirmed the full system was roughly two orders of magnitude
    larger than the 48-hour window — the cut was a consequence of measurement, not a guess made
    in parallel with it.
 
@@ -154,40 +154,46 @@ implemented lifecycle guard (`transitions.py`, which permits `WITHDRAWN` as a ta
 the implemented authorisation layer (`policies.py`, which has no action gating who may invoke
 it) surfaced a live authorisation gap the original FR-25 did not anticipate. This was recorded as
 **FR-25a**, marked NEW, rather than silently patched — a demonstration that requirements analysis
-did not stop once the SRS was signed off (SRS §3.1, Group E).
+did not stop once the SRS was signed off (SRS section 3.1, Group E).
 
 The full requirement set, with preconditions, postconditions and acceptance criteria, is in
-`docs/02-srs.md` §3; this section summarises the *process*, that document contains the *content*.
+`docs/02-srs.md` section 3; this section summarises the *process*, that document contains the *content*.
 
 ---
 
 ## 6. Software Requirements Specification (SRS)
 
 The authoritative SRS is `docs/02-srs.md`, conformant to IEEE 830-1998 and ISO/IEC/IEEE
-29148:2018. It is structured in seven sections: introduction and scope (§1), overall
-description and operating environment (§2), specific functional and non-functional
-requirements (§3), system models — lifecycle, actor mapping, authorisation matrix (§4), the
-requirements traceability matrix (§5), MoSCoW prioritisation (§6), and constraints/limitations
-(§7). This section summarises its content and states plainly where it is now stale relative to
-the delivered system (§10.4).
+29148:2018. It is structured in seven sections: introduction and scope (section 1), overall
+description and operating environment (section 2), specific functional and non-functional
+requirements (section 3), system models — lifecycle, actor mapping, authorisation matrix (section 4), the
+requirements traceability matrix (section 5), MoSCoW prioritisation (section 6), and constraints/limitations
+(section 7). This section summarises its content and states plainly where it is now stale relative to
+the delivered system (section 10.4).
 
 ### 6.1 Requirement counts
 
 | Category | Count | Priority split |
 |---|---|---|
-| Functional requirements | 28 (FR-01…FR-28) + FR-25a (new) | 18 Must, 7 Should, 3 Could |
+| Functional requirements | 34 (FR-01…FR-34) + FR-25a | 19 Must, 12 Should, 3 Could |
 | Non-functional requirements | 17 (NFR-01…NFR-17) | Security (6), Integrity (1), Performance (2), Reliability (1), Availability (1), Usability (1), Maintainability (2), Observability (1), Portability (1), Compliance (1) |
+
+FR-29 to FR-34 cover capabilities the first requirement set never anticipated: article
+processing charges, the administrator console, decision certificates, anonymisation
+preflight, review deadlines, and self-service author registration. They were written after
+their implementation, by reading the delivered routes and tests, so they describe what
+exists rather than what was intended.
 
 ### 6.2 The manuscript lifecycle is the SRS's executable core
 
-SRS §4.1 transcribes the lifecycle directly from `backend/src/ugjcs/domain/transitions.py`'s
+SRS section 4.1 transcribes the lifecycle directly from `backend/src/ugjcs/domain/transitions.py`'s
 `LEGAL_TRANSITIONS` mapping — stated explicitly as the tested source of truth, not the narrative
 diagram in the design specification. The full state table and diagram are reproduced and
-explained in §8.2 of this document, since the lifecycle is equally central to system analysis.
+explained in section 8.2 of this document, since the lifecycle is equally central to system analysis.
 
 ### 6.3 A recorded, load-bearing disagreement between two authoritative documents
 
-SRS §4.1.3 records that the design specification's own lifecycle diagram (§6.2 of that document)
+SRS section 4.1.3 records that the design specification's own lifecycle diagram (section 6.2 of that document)
 draws `RESUBMITTED` flowing directly into `REVIEWS_COMPLETE`, implying a resubmission
 automatically closes the review round. The implemented `LEGAL_TRANSITIONS` table instead routes
 `RESUBMITTED` to **either** `UNDER_REVIEW` **or** `UNDER_SCREENING`, at editorial discretion,
@@ -197,20 +203,22 @@ follow the code.
 
 ### 6.4 Traceability matrix — read honestly, not optimistically
 
-SRS §5 states plainly that, as written, most functional requirements are recorded as "Planned"
-rather than "Implemented," because the SRS was authored early, against only the domain layer and
-the database persistence adapter. **This is now stale**: the delivered codebase includes a
-complete `api/` layer (routers for auth, manuscripts, editorial, reviews, archive — §10.2) and a
-full Next.js frontend, neither of which existed when SRS §5 was written. `docs/05-api-contract.md`
-and `docs/06-testing-report.md` are the current authorities on what is actually reachable by
-route; §10.4 of this document reconciles the three. The SRS's traceability *method* — status
-categories tied to a named module and test, not to a claim of completeness — remains sound and is
-the right lens through which to read §10 of this document.
+SRS section 5 has been reconciled against the running code twice: once when the `api/` layer
+and frontend first existed, and again after the two feature waves. The second pass corrected
+rows that had drifted in the opposite direction, recording expertise-ranked matching,
+structured reviews, public document download, audit-chain exposure, citation export and
+analytics as unbuilt when all six had shipped. A matrix that understates the system is as
+much a defect as one that overstates it.
+
+Current totals: 24 of 35 requirement lines implemented and tested end to end, 5 partially
+implemented with a named remainder, 6 unbuilt. `docs/05-api-contract.md` and
+`docs/06-testing-report.md` are the authorities on what is reachable by route and proven by
+test; section 10.4 reconciles the three.
 
 ### 6.5 Authorisation matrix — the register's origin point
 
-SRS §4.3 derives the authorisation matrix directly from `policies.py`'s `_ROLE_GRANTS` and
-`_OWNERSHIP_ACTIONS`, and names the two critical gaps that became TD-02 and TD-03 (§12) before
+SRS section 4.3 derives the authorisation matrix directly from `policies.py`'s `_ROLE_GRANTS` and
+`_OWNERSHIP_ACTIONS`, and names the two critical gaps that became TD-02 and TD-03 (section 12) before
 the technical debt register existed as a separate document — the SRS is where those gaps were
 first written down.
 
@@ -247,7 +255,7 @@ inputs is stronger evidence than precision from either alone.
 
 `PF = 20 h/UCP` follows Karner's productivity-factor rule: the count of E1–E6 rated below 3, plus
 the count of E7–E8 rated above 3, sums to 0 here — within the ≤2 threshold for PF = 20, not a
-default assumption (effort estimation §6).
+default assumption (effort estimation section 6).
 
 ### 7.3 Reconciliation, not convergence
 
@@ -275,30 +283,30 @@ MoSCoW cut.
 The Must-have estimate of 2,514 person-hours assumes Karner's PF = 20 h/UCP, calibrated on manual
 development. This build used AI-assisted development — Claude Code (Anthropic) pair-programming
 the implementation under the author's direction and review — which the estimation document
-treats as a change of development **method**, not merely of pace (effort estimation §9). Three
-consequences follow, and each is load-bearing for how this document's conclusion (§18) should be
+treats as a change of development **method**, not merely of pace (effort estimation section 9). Three
+consequences follow, and each is load-bearing for how this document's conclusion (section 18) should be
 read:
 
 1. **UCP still correctly sized the problem.** What changes under AI assistance is the rate at
    which a chosen method converts problem-size into elapsed hours (the productivity factor), not
-   the size of the problem itself. The MoSCoW cut in §7.4 was decided before the realised
+   the size of the problem itself. The MoSCoW cut in section 7.4 was decided before the realised
    productivity was known, and remains the correct basis for it.
 2. **The realised productivity factor is a local calibration, not a general claim** — evidence
    about this developer, this tool, this domain and this window, computed formally by the method
-   in effort estimation §10.3 (actual session-hours from commit history ÷ delivered UCP). It does
+   in effort estimation section 10.3 (actual session-hours from commit history ÷ delivered UCP). It does
    not generalise to other developers or tools.
 3. **The gap between estimated and realised hours is not free capacity.** It is capacity that was
    not spent on activities the classical estimate priced in: test depth beyond the 85% coverage
    floor, architecture decision records and onboarding documentation, and security hardening
-   beyond the NFR-01–NFR-06 baseline. This connects directly to the limitations recorded in §17.
+   beyond the NFR-01–NFR-06 baseline. This connects directly to the limitations recorded in section 17.
 
 ---
 
 ## 8. System analysis
 
-This section and §9 are original to this consolidation. §8 analyses the problem domain as
+This section and section 9 are original to this consolidation. Section 8 analyses the problem domain as
 modelled — the aggregates, the manuscript lifecycle as a state machine, the double-blind
-projection, the audit mechanism's design rationale, and the persisted data model. §9 covers the
+projection, the audit mechanism's design rationale, and the persisted data model. Section 9 covers the
 architectural design decisions that realise that analysis — the hexagonal layering, its two
 mechanically enforced contracts, the API design, and the deployment topology.
 
@@ -318,8 +326,8 @@ The eight domain modules and their responsibilities:
 | `manuscript.py` | The `Manuscript` aggregate: lifecycle transitions, review-quorum counting, resubmission versioning |
 | `transitions.py` | `LEGAL_TRANSITIONS` — the exhaustive state table and `assert_legal` guard |
 | `policies.py` | `can(actor, action, resource)` — role-based and ownership-based authorisation, deny by default |
-| `blinding.py` | `blind()` — the structural double-blind projection (§8.4) |
-| `hashchain.py` | `append`/`verify` — the tamper-evident audit chain (§8.5) |
+| `blinding.py` | `blind()` — the structural double-blind projection (section 8.4) |
+| `hashchain.py` | `append`/`verify` — the tamper-evident audit chain (section 8.5) |
 | `events.py` | `EditorialEvent` — the audit record's canonical, hashable representation |
 | `account.py` | `Account` aggregate: identity, roles, credentials (role vocabulary only — no registration flow in the domain layer) |
 | `enums.py`, `ids.py`, `errors.py` | Shared vocabulary, typed identifiers, the `DomainError` hierarchy |
@@ -327,7 +335,7 @@ The eight domain modules and their responsibilities:
 ### 8.2 The manuscript lifecycle as a state machine
 
 The lifecycle below is transcribed from `transitions.py`'s `LEGAL_TRANSITIONS` mapping — the
-executable, tested source of truth (SRS §4.1), reproduced here because it is the single most
+executable, tested source of truth (SRS section 4.1), reproduced here because it is the single most
 important artefact in the system's analysis.
 
 | Source state | Legal targets | Terminal? |
@@ -374,20 +382,20 @@ stateDiagram-v2
 No transition is legal out of a terminal state — `assert_legal` raises `IllegalTransitionError`
 for any pair absent from `LEGAL_TRANSITIONS`, checked exhaustively over all 121 (source × target)
 status pairs by a property test (`test_lifecycle_permits_expected_transitions`,
-`test_lifecycle_forbids_shortcut_transitions`, testing report §3.1–§3.2). `ACCEPTED` and
+`test_lifecycle_forbids_shortcut_transitions`, testing report section 3.1–section 3.2). `ACCEPTED` and
 `SCHEDULED` are deliberately excluded from the withdrawable set: retracting an accepted paper is
 editorial retraction, with its own notice obligations, and is not modelled as author withdrawal.
 
 ### 8.3 Authorisation as an explicit relation, not scattered checks
 
 `policies.can(actor, action, resource)` is a single function computing every access decision in
-the system, called as a FastAPI dependency so no route can omit it (§9.3). It composes two kinds
+the system, called as a FastAPI dependency so no route can omit it (section 9.3). It composes two kinds
 of rule: `_ROLE_GRANTS` (an action is available to any actor holding a given role — e.g. `SCREEN`
 requires `editor` or `editor_in_chief`) and `_OWNERSHIP_ACTIONS` (an action additionally requires
 the actor's identity to match a predicate over the resource — e.g. `RESUBMIT` and `WITHDRAW`
 require the actor to be the manuscript's corresponding author). Two of this matrix's known gaps
 — `REVIEW` granted on role alone with no ownership predicate excluding an author reviewing their
-own work — are TD-02 and TD-03 (§12); they are gaps in the *matrix*, found by asking whether every
+own work — are TD-02 and TD-03 (section 12); they are gaps in the *matrix*, found by asking whether every
 action that should be ownership-checked is, not gaps in the mechanism that enforces it.
 
 ### 8.4 Double-blind integrity as a projection, not a filter
@@ -411,10 +419,10 @@ class BlindedManuscript:
 There is no field a future change could accidentally repopulate with an author id, because the
 type has nowhere to put one. This is verified by a property test asserting the author id is
 absent from the serialised projection for every generated title/abstract/keyword combination
-(testing report §3.2), and by sentinel-based leak tests over every reviewer-facing endpoint
-(testing report §3.5). The documented limit — `title`, `abstract` and `keywords` are copied
+(testing report section 3.2), and by sentinel-based leak tests over every reviewer-facing endpoint
+(testing report section 3.5). The documented limit — `title`, `abstract` and `keywords` are copied
 **verbatim**, so self-identifying text in the body is not scrubbed — is TD-05 and is restated in
-§17.
+Section 17.
 
 ### 8.5 The hash-chained audit log
 
@@ -436,14 +444,14 @@ inconsistency in sequence, predecessor hash, or digest. This detects **alteratio
 removal within the chain** — it is deliberately, and explicitly in the module's own docstring,
 **not** a defence against tail truncation, a forged event appended through the legitimate API, or
 a wholly rebuilt history from genesis: all three require an external anchor the domain layer does
-not provide (TD-04, restated in §17). A PostgreSQL trigger closes the most direct way to defeat
+not provide (TD-04, restated in section 17). A PostgreSQL trigger closes the most direct way to defeat
 this at the database layer for `UPDATE`/`DELETE`; a second, statement-level trigger closes
-`TRUNCATE`, which the first trigger did not — see §11.4's account of how that gap was found.
+`TRUNCATE`, which the first trigger did not — see section 11.4's account of how that gap was found.
 
 ### 8.6 Data model — entity-relationship diagram
 
 The tables below are the delivered PostgreSQL schema (`backend/src/ugjcs/infrastructure/db/models.py`),
-not the fuller schema sketched in the design specification (§8 of that document) — `reviews`,
+not the fuller schema sketched in the design specification (section 8 of that document) — `reviews`,
 `editorial_decisions`, `issues`, `issue_papers`, `similarity_reports`, `notifications` and a
 dedicated roles table are specified there but not present in the delivered database; roles are a
 `user_roles` join table, and the review outcome is folded into `review_assignments`.
@@ -528,9 +536,9 @@ erDiagram
 — referential integrity between authorship/reviewer assignment and the user table is an
 application-level guarantee, not a database-enforced one. `editorial_events.manuscript_id` *is* a
 declared foreign key with `ON DELETE RESTRICT`, so a manuscript with audit events cannot be
-deleted (verified: testing report §3.3). `editorial_events` carries a unique constraint on
+deleted (verified: testing report section 3.3). `editorial_events` carries a unique constraint on
 `(manuscript_id, event_hash)` and no application code path issues `UPDATE` or `DELETE` against it;
-the database-level enforcement of that is described in §8.5 and §11.4.
+the database-level enforcement of that is described in section 8.5 and section 11.4.
 
 ---
 
@@ -541,7 +549,7 @@ the database-level enforcement of that is described in §8.5 and §11.4.
 ```
 backend/src/ugjcs/
 ├── domain/          entities, value objects, events, state machine, policies
-│                    NO framework imports (enforced by import-linter, §9.2)
+│                    NO framework imports (enforced by import-linter, section 9.2)
 ├── application/     use-case services, port protocols, DTOs, unit of work
 ├── infrastructure/  SQLAlchemy repositories, S3 storage, JWT, Argon2, email
 └── api/             FastAPI routers, request/response schemas, dependencies, wiring
@@ -551,7 +559,7 @@ Dependencies point inwards only. Concrete adapters (SQLAlchemy repositories, the
 store, JWT token service) implement port *protocols* declared in `application/ports.py` and are
 bound to them at a composition root (`api/wiring.py`), so the application and domain layers never
 import a concrete adapter. The payoff is directly demonstrable, not asserted: the entire domain
-test suite runs with no database, no network and no framework loaded (testing report §1).
+test suite runs with no database, no network and no framework loaded (testing report section 1).
 
 ```mermaid
 graph TB
@@ -597,7 +605,7 @@ graph TB
 ### 9.2 The two import-linter contracts, and why they are mechanical rather than aspirational
 
 `.importlinter` at the backend root defines two contracts, both run as a CI gate in `make check`
-(testing report §2):
+(testing report section 2):
 
 - **`layers`** — `ugjcs.api → ugjcs.infrastructure → ugjcs.application → ugjcs.domain`. A layer may
   import only the layers named after it in this list; an import running the other way fails the
@@ -624,7 +632,7 @@ its governing design decisions rather than repeating the endpoint table.
   unseal an httpOnly, Secure, `SameSite=Lax` cookie and attach the bearer token server-side. No
   browser-side JavaScript ever holds a token. This exists specifically to avoid third-party
   cookie blocking between the `*.vercel.app` and `*.awsapprunner.com` origins (design
-  specification §7.2).
+  specification section 7.2).
 - **Errors as RFC 9457 Problem Details**, uniformly, from every endpoint — `{type, title,
   status, detail?, instance?}` served as `application/problem+json`, with a fixed exception→status
   mapping (`IllegalTransitionError→409`, `AuthorizationDeniedError→403`, etc.) so the frontend
@@ -637,7 +645,7 @@ its governing design decisions rather than repeating the endpoint table.
 - **Authorisation as a dependency, not a decorator convention.** Every route's `Action` is
   resolved through `policies.can()` as a FastAPI dependency, and `test_route_audit.py` walks the
   *live* route table asserting every non-public route carries one — a defect a hand-maintained
-  checklist would eventually miss (testing report §1).
+  checklist would eventually miss (testing report section 1).
 
 ### 9.4 Sequence — submit to publish
 
@@ -696,14 +704,14 @@ sequenceDiagram
     API-->>Reader: 200 ArchivePaperOut (author_names, no UUIDs)
 ```
 
-This flow is exercised end to end by the acceptance script in testing report §5, and the
+This flow is exercised end to end by the acceptance script in testing report section 5, and the
 `schedule`/`publish` steps are the specific ones that were, for a period, implemented and
-unit-tested but reachable by no route — the finding retold in §11.4 and cross-referenced from
-§10.4.
+unit-tested but reachable by no route — the finding retold in section 11.4 and cross-referenced from
+Section 10.4.
 
 ### 9.5 Deployment topology
 
-Covered fully in §13; the topology is a component of the design and is diagrammed there once
+Covered fully in section 13; the topology is a component of the design and is diagrammed there once
 alongside its discrepancy from the design specification (TD-14) rather than twice.
 
 ---
@@ -712,14 +720,14 @@ alongside its discrepancy from the design specification (TD-14) rather than twic
 
 ### 10.1 Technology stack
 
-| Layer | Choice | Rationale (design specification §7.4) |
+| Layer | Choice | Rationale (design specification section 7.4) |
 |---|---|---|
 | Backend | FastAPI, Python 3.13 | Native async I/O; Pydantic v2 gives validation and OpenAPI from one type |
 | ORM | SQLAlchemy 2.0 + Alembic | Mature migrations; mapping style keeps domain classes framework-free |
 | Database | PostgreSQL 16 | Native full-text search and JSONB avoid a separate search engine |
 | Storage | S3 | Durable, private, pre-signed access only |
 | Frontend | Next.js 15, TypeScript, Tailwind | Static public pages plus a server-side BFF in one deployment |
-| Testing | pytest, Hypothesis, testcontainers, Vitest | Layer-appropriate verification (§11) |
+| Testing | pytest, Hypothesis, testcontainers, Vitest | Layer-appropriate verification (section 11) |
 | IaC | Terraform | Reproducible, reviewable, destroyable |
 
 ### 10.2 What is implemented, by layer
@@ -727,7 +735,7 @@ alongside its discrepancy from the design specification (TD-14) rather than twic
 **Domain** (`backend/src/ugjcs/domain/`, 812 lines across 11 modules) — complete: the manuscript
 lifecycle, RBAC policy, the double-blind projection, the hash chain, the account aggregate,
 typed identifiers. This is the layer with no external dependency and the highest test confidence
-(§11).
+(section 11).
 
 **Application** (`backend/src/ugjcs/application/`, 487 lines) — port protocols (`ports.py`, 236
 lines), identity-related use-case orchestration (`identity.py`, 186 lines) and document handling
@@ -738,44 +746,44 @@ work (`infrastructure/db/`), an S3-backed document store with a demo-PDF generat
 (`infrastructure/storage/`), Argon2 password hashing and JWT issuance
 (`infrastructure/security/`), and a logging-only email sender
 (`infrastructure/email/logging_sender.py` — no live transactional provider is wired in this
-build, a limitation restated in §17).
+build, a limitation restated in section 17).
 
 **API** (`backend/src/ugjcs/api/`, 966 lines) — five routers (`auth`, `manuscripts`, `editorial`,
 `reviews`, `archive`), RFC 9457 error mapping (`errors.py`), and the composition-root wiring
 (`wiring.py`) that binds concrete adapters to the application's port protocols. This layer, and
-the frontend below it, are what SRS §5 (written earlier in the project) records as "Planned" —
-§10.4 reconciles that.
+the frontend below it, are what SRS section 5 (written earlier in the project) records as "Planned" —
+Section 10.4 reconciles that.
 
 **Frontend** (`frontend/src/app/`) — a public route group (`(public)/search`, `(public)/papers`)
 requiring no authentication, and role-scoped authenticated routes (`author/`, `author/submit/`,
 `author/[trackingCode]/`, `editor/`, `editor/[trackingCode]/`, `reviewer/`,
 `reviewer/[trackingCode]/`, `login/`), plus a `frontend/src/app/api/**` BFF layer mirroring the
 backend's resource groups. There is no dedicated Administrator UI — role management is verified
-only at the policy-test level (testing report §5, §6), consistent with FR-03's grant existing in
+only at the policy-test level (testing report section 5, section 6), consistent with FR-03's grant existing in
 `policies.py` without a corresponding administration screen.
 
 ### 10.3 Domain code, as evidence rather than assertion
 
-The lifecycle guard and the hash chain shown in §8.2 and §8.5 are reproduced directly from source,
+The lifecycle guard and the hash chain shown in section 8.2 and section 8.5 are reproduced directly from source,
 not paraphrased, specifically so a reader can check this document's claims against the file it
-names. The same discipline extends to the authorisation layer (§8.3) and the blinded projection
-(§8.4): every mechanism described in this section has a named module, and every claim about its
+names. The same discipline extends to the authorisation layer (section 8.3) and the blinded projection
+(section 8.4): every mechanism described in this section has a named module, and every claim about its
 behaviour is backed by a named test in `docs/06-testing-report.md`.
 
 ### 10.4 Reconciling three documents that were written at different points in the build
 
 This consolidation surfaced a genuine discrepancy between three of its own source documents,
-stated here rather than resolved silently in one direction, consistent with §6.3's handling of
+stated here rather than resolved silently in one direction, consistent with section 6.3's handling of
 the SRS-versus-specification lifecycle disagreement:
 
-- **`docs/02-srs.md` §5** (earliest) records almost the entire functional requirement set as
+- **`docs/02-srs.md` section 5** (earliest) records almost the entire functional requirement set as
   "Planned," on the stated grounds that no `api/` directory and no frontend existed in the
   repository at the time it was written.
 - **`docs/05-api-contract.md`** (written once the API and frontend existed) documents a working
   `/auth`, `/manuscripts`, `/editorial`, `/reviews` and `/archive` surface — but explicitly states
   that `Action.PUBLISH`/`Manuscript.schedule`/`Manuscript.publish` have **no corresponding
   route**: "publication into the archive happens outside the HTTP boundary this plan builds."
-- **`docs/06-testing-report.md` §3.4 and §4.5** (latest) records passing system tests named
+- **`docs/06-testing-report.md` section 3.4 and section 4.5** (latest) records passing system tests named
   `test_the_editor_in_chief_can_schedule_an_accepted_manuscript` and
   `test_the_editor_in_chief_can_publish_a_scheduled_manuscript`, and states directly that these
   two routes, along with manuscript resubmission, were **added after** being found reachable by no
@@ -789,7 +797,7 @@ document treats the testing report as authoritative on current reachability, the
 authoritative on wire format for the routes it does describe, and the SRS as authoritative on
 requirement *content and traceability method* rather than current build status. A reader
 integrating all three should not conclude either that publication is unreachable (05, superseded)
-or that the majority of FRs remain unbuilt (02 §5, superseded) — §11.4's account of finding and
+or that the majority of FRs remain unbuilt (02 section 5, superseded) — section 11.4's account of finding and
 closing that exact gap is the more current and more informative story.
 
 ---
@@ -798,7 +806,7 @@ closing that exact gap is the more current and more informative story.
 
 Full test-case tables, defect narratives and the UAT script are in
 `docs/06-testing-report.md`. This section summarises the strategy, headline numbers, and the
-finding this project treats as its most important methodological result (§11.7, elaborated for
+finding this project treats as its most important methodological result (section 11.7, elaborated for
 the whole document in the introduction's through-line).
 
 ### 11.1 Strategy — layered to match the architecture
@@ -813,18 +821,23 @@ the whole document in the introduction's through-line).
 | Route audit | Every non-public route carries an authorisation dependency | pytest walking the live route table |
 | End-to-end / manual acceptance | Scripted, role-scoped scenarios against the **live deployment** | Playwright-driven browser session |
 
-### 11.2 Headline numbers (2026-08-12, from `make check` / `make integration`)
+### 11.2 Headline numbers (2026-08-14, CI run 31791711326)
 
 ```
-make check       → 267 passed, 56 deselected. Coverage: 88.24% (gate: 85%)
-make integration → 56 passed, 267 deselected. Infrastructure coverage: 87%
+make check       → 402 passed, 84 deselected. Coverage: 90.03% (gate: 85%)
+make integration → 84 passed, 402 deselected
+npx vitest run   → 79 passed (20 files)
 ```
 
-323 backend tests total. Frontend: 10 Vitest files, 17 `it(...)` cases (asserted by reading the
-files directly; the report could not execute `npm test` in its authoring environment — stated
-plainly rather than estimated). Coverage is gated only on `domain` and `application` — a
-documented decision, not an oversight: measuring infrastructure coverage in a run that has
-excluded infrastructure tests would credit incidental coverage, not genuine exercise.
+486 backend tests and 79 frontend tests, 565 in total. The backend figures are taken from a
+CI run rather than a local one, because the 84 integration tests stand up a real PostgreSQL
+16 through `testcontainers` and cannot run on a machine without Docker; there they error at
+setup instead of failing, which is a more honest signal than a false pass but not a result
+worth citing.
+
+Coverage is gated on `domain` and `application` only. That is a documented decision rather
+than an oversight: measuring infrastructure coverage in a run that has excluded the
+infrastructure tests would credit incidental import-time coverage, not genuine exercise.
 
 ### 11.3 CI gates
 
@@ -836,7 +849,7 @@ is optional for merge.
 
 ### 11.4 Defects found — the section with the most to learn from
 
-Six defects are recorded in testing report §4, none found by a coverage number or a green test
+Six defects are recorded in testing report section 4, none found by a coverage number or a green test
 run alone:
 
 | # | Defect | Found by |
@@ -851,7 +864,7 @@ run alone:
 Defects 1–4 were found by review of code that had already passed linting, strict typing, an
 architecture contract and a 100%-covered test suite; defects 5–6 were found only by using the
 running system. This is the single clearest piece of evidence this project produced about
-software engineering practice, and it is why the technical debt register (§12) and this report
+software engineering practice, and it is why the technical debt register (section 12) and this report
 both state it directly rather than let it sit implicit in a defect table.
 
 ### 11.5 User acceptance testing
@@ -859,19 +872,19 @@ both state it directly rather than let it sit implicit in a defect table.
 Run as scripted, role-scoped scenarios against the live deployment
 (`https://ugjcs-frontend.vercel.app`, backed by `https://tsxsbf9rzp.us-east-1.awsapprunner.com`),
 with five named judge accounts (author, reviewer, editor, editor-in-chief, administrator — see
-§14). Three scenarios were exercised live for the testing report (author login and dashboard,
+Section 14). Three scenarios were exercised live for the testing report (author login and dashboard,
 unauthenticated archive access, cross-role access denial redirecting to `/` rather than `/login`
 — a deliberate distinction in `frontend/middleware.ts`); the remaining role-scoped scenarios are
 documented against their automated backstop test.
 
 ### 11.6 What testing did not cover
 
-Stated plainly in testing report §6, not omitted: no load or performance testing (NFR-08/NFR-09
+Stated plainly in testing report section 6, not omitted: no load or performance testing (NFR-08/NFR-09
 are unverified against the running system); no automated security scanning in CI (no SAST, DAST
-or dependency vulnerability scan); no mutation testing in CI (§11.4's finding #1 was a one-off
+or dependency vulnerability scan); no mutation testing in CI (section 11.4's finding #1 was a one-off
 manual pass); no browser-matrix testing (one Chromium-based session only); no committed automated
 end-to-end suite (`@playwright/test` is a declared dependency with no spec files committed). Each
-is restated as a limitation in §17.
+is restated as a limitation in section 17.
 
 ### 11.7 Evaluation
 
@@ -880,7 +893,7 @@ technical debt register's closing observation exactly: **automated gates establi
 catch regressions; they did not find the defects that mattered most.** Every serious defect was
 found by a human or an agent reading code against what it claimed to do, by mutation testing
 designed specifically to distrust the coverage figure, or by using the running system as an
-actual actor would. This is elaborated once, fully, in §12.6, since the two documents converge on
+actual actor would. This is elaborated once, fully, in section 12.6, since the two documents converge on
 one finding rather than two.
 
 ---
@@ -916,8 +929,8 @@ draws out its methodological finding.
 | TD-05 | Blinding does not scrub the manuscript body — `title`/`abstract`/`keywords` are verbatim | Screening surfaces name matches to the editor; automated redaction is future evolution, not near-term |
 | TD-06 | The editorial event log has no blinded projection (`actor_id`, rationale text carried in full) | Before any reviewer-facing audit view is built |
 | TD-07 | No `Action` connects `blind()` to `policies.can()` — an adapter must remember to call it | Alongside TD-02 |
-| TD-08 | The tail-append capability (§8.5) is unverified by a dedicated test | With the persistence work that first exploits it |
-| TD-14 | Deployed infrastructure is App Runner, not the ECS/ALB/CloudFront topology specified | After submission — repayable once the pre-submission document/feature backlog is clear (§13.3) |
+| TD-08 | The tail-append capability (section 8.5) is unverified by a dedicated test | With the persistence work that first exploits it |
+| TD-14 | Deployed infrastructure is App Runner, not the ECS/ALB/CloudFront topology specified | After submission — repayable once the pre-submission document/feature backlog is clear (section 13.3) |
 
 ### 12.4 Acceptable — a conscious, revisitable trade-off
 
@@ -925,20 +938,20 @@ draws out its methodological finding.
 |---|---|---|
 | TD-09 | A hybrid event log (materialised status + append-only log) rather than full event sourcing | If projections multiply beyond one, or replay-to-a-past-state becomes a requirement |
 | TD-10 | The coverage gate sits at 85% while the code delivers 88–100% | Cheap to raise; deliberately not set to the exact current figure so a legitimate refactor doesn't fail the build |
-| TD-11 | Coverage is a weak signal — the register's own evidence (§12.6) | Compensated by mutation testing and review, not by the gate alone |
+| TD-11 | Coverage is a weak signal — the register's own evidence (section 12.6) | Compensated by mutation testing and review, not by the gate alone |
 
 ### 12.5 Resolved, retained as a record
 
 TD-12 (a UTC-offset timestamp representation would have produced a false tamper alert) and TD-13
 (`TRUNCATE` bypassed the row-level append-only trigger) are both closed, but kept in the register
-rather than deleted, because the *class* of defect — and how each was found — is the point (§12.6,
-§11.4).
+rather than deleted, because the *class* of defect — and how each was found — is the point (section 12.6,
+Section 11.4).
 
 ### 12.6 The register's own conclusion, and this document's central finding
 
 `docs/04-technical-debt-register.md` closes with a statement worth repeating verbatim in spirit
 rather than only citing: **ten of its fourteen entries, and every serious defect in
-`docs/06-testing-report.md` §4, were found by independent review of code that had already passed
+`docs/06-testing-report.md` section 4, were found by independent review of code that had already passed
 every automated gate available in this project — linting, strict type checking, an architecture
 contract, and a full test suite at 100% coverage — or by a person using the running system.**
 Mutation testing showed the hash chain was, for a period, unprotected by any test that would
@@ -947,7 +960,7 @@ firing against a live database" against the two statement types someone thought 
 Three lifecycle methods were implemented, unit-tested, type-checked and covered at 100%, and were
 still dead code from the system's perspective because no route called them. Passing every gate
 this project has was, in every one of these cases, necessary and not sufficient. That is this
-project's most defensible finding about software engineering practice, and it is the reason §15's
+project's most defensible finding about software engineering practice, and it is the reason section 15's
 maintenance strategy treats the debt register as a *live* input to a repayment schedule rather
 than an inventory closed at submission.
 
@@ -993,12 +1006,12 @@ graph LR
 
 App Runner supplies its own `*.awsapprunner.com` TLS endpoint, which is what makes an HTTPS
 frontend able to reach the backend without a registered domain — the same guarantee the design
-specification's CloudFront strategy (§7.3 of that document) was chosen for, over the same
+specification's CloudFront strategy (section 7.3 of that document) was chosen for, over the same
 container image.
 
 ### 13.3 The gap between this topology and the specified one — TD-14
 
-The design specification (§7.3) specifies `Reader → Vercel → CloudFront → ALB → ECS Fargate (api)
+The design specification (section 7.3) specifies `Reader → Vercel → CloudFront → ALB → ECS Fargate (api)
 → RDS / S3 / Redis → ECS Fargate (worker)`. What is deployed is `Reader → Vercel → App Runner →
 RDS / S3`, with no CloudFront, no ALB, no ECS, no Redis, and no worker service. This is recorded
 in the technical debt register as **TD-14**, deliberate and scheduled: provisioning the
@@ -1009,13 +1022,13 @@ and five accompanying documents. No functional capability is lost by the substit
 Runner supplies the identical trusted-TLS-without-a-registered-domain guarantee CloudFront was
 chosen for, over the same image, with less to operate and less to tear down. The absence of Redis
 and a worker service means the asynchronous submission-processing pipeline described in the
-design specification (§10.2 of that document — text extraction, similarity screening, anonymised
-derivative generation) is not deployed either; this is restated in §16 and §17 rather than left
+design specification (section 10.2 of that document — text extraction, similarity screening, anonymised
+derivative generation) is not deployed either; this is restated in section 16 and section 17 rather than left
 implicit in the infrastructure diagram alone.
 
 ### 13.4 CI/CD
 
-`.github/workflows/backend-ci.yml` gates every push and pull request (§11.3). Deployment itself is
+`.github/workflows/backend-ci.yml` gates every push and pull request (section 11.3). Deployment itself is
 run **locally**, not from CI — a deliberate mitigation for TD-01: AWS root credentials are used
 only from the developer's workstation and are specifically not stored as a GitHub Actions secret,
 which meaningfully reduces exposure relative to a CI secret store, though it is a mitigation, not
@@ -1024,8 +1037,8 @@ every push to the default branch.
 
 ### 13.5 Operating cost
 
-Targeted at USD 35–55/month against AWS and Vercel free/low-cost tiers (design specification §13,
-§16). App Runner at the smallest instance size (0.25 vCPU / 0.5 GB) is a deliberate cost decision
+Targeted at USD 35–55/month against AWS and Vercel free/low-cost tiers (design specification section 13,
+Section 16). App Runner at the smallest instance size (0.25 vCPU / 0.5 GB) is a deliberate cost decision
 recorded directly in `infra/apprunner_service.tf`'s own comments: roughly USD 14/month against
 ~USD 57 for the next tier up, since App Runner bills provisioned capacity continuously while the
 health check keeps the instance active.
@@ -1036,15 +1049,15 @@ health check keeps the instance active.
 
 `docs/07-user-manual.md` is being written concurrently with this document and is the authoritative
 source once complete; this section summarises the system's user-facing surface directly from the
-implemented routes and roles (§10.2, `docs/05-api-contract.md`) so that a reader has a usable
+implemented routes and roles (section 10.2, `docs/05-api-contract.md`) so that a reader has a usable
 account of "how to use the system" even before that document lands. Where the two disagree once
 `07-user-manual.md` exists, that document governs.
 
 ### 14.1 Accounts and roles
 
 Five roles exist (`Role` enum, `domain/enums.py`): `author`, `reviewer`, `editor`,
-`editor_in_chief`, `administrator`. A single account may hold several roles at once (§4). Judge
-accounts used for acceptance testing (testing report §5):
+`editor_in_chief`, `administrator`. A single account may hold several roles at once (section 4). Judge
+accounts used for acceptance testing (testing report section 5):
 
 | Role | Account |
 |---|---|
@@ -1059,7 +1072,7 @@ accounts used for acceptance testing (testing report §5):
 Log in at `/login`; the session lands on `/author`, listing your own submissions with status
 (never another author's). Submit a new manuscript at `/author/submit` with title, abstract,
 keywords and optional co-authors (JSON submission — there is no file-upload path in the delivered
-domain; see §17). View a specific manuscript and its status at
+domain; see section 17). View a specific manuscript and its status at
 `/author/[trackingCode]`. If a manuscript is returned with `revision_requested`, resubmit from the
 same page; only the corresponding author may do so (`Action.RESUBMIT`, ownership-checked). A
 manuscript may be withdrawn from any of `submitted`, `under_screening`, `under_review`,
@@ -1069,35 +1082,35 @@ manuscript may be withdrawn from any of `submitted`, `under_screening`, `under_r
 
 `GET /reviews/mine` (surfaced at `/reviewer/[trackingCode]`) lists only manuscripts you are
 assigned to review, in the **blinded** form: title, abstract, keywords, version and status — no
-author name, affiliation or identifier of any kind (§8.4). Submit a recommendation and free-text
+author name, affiliation or identifier of any kind (section 8.4). Submit a recommendation and free-text
 comments; there are no per-criterion scores on the delivered wire format (a gap from the design
-specification's fuller `Review` model, noted in `docs/05-api-contract.md` §8).
+specification's fuller `Review` model, noted in `docs/05-api-contract.md` section 8).
 
 ### 14.4 As an editor
 
 `/editor` lists the screening queue (manuscripts in `submitted`). Screen a submission to move it
 into `under_screening`; from there, send to review, request pre-review changes, or desk-reject.
 Assign a reviewer directly by id — there is no candidate-recommendation UI in the delivered
-system (FR-08 is planned, not built; §17). Record a decision once the review quorum is met.
+system (FR-08 is planned, not built; section 17). Record a decision once the review quorum is met.
 
 ### 14.5 As Editor-in-Chief
 
 All Editor capability, plus scheduling an accepted manuscript into an issue and publishing it —
 both denied to a plain Editor (verified: `test_a_plain_editor_cannot_schedule`,
-`test_a_plain_editor_cannot_publish`, testing report §3.4).
+`test_a_plain_editor_cannot_publish`, testing report section 3.4).
 
 ### 14.6 As an Administrator
 
 Role management (`Action.MANAGE_USERS`) is granted and denied correctly at the policy layer, but
 has **no frontend surface** in this build — verified only by `test_administrator_may_manage_users`
-at the policy-test level (testing report §5, §6). There is no `/admin` route to walk through.
+at the policy-test level (testing report section 5, section 6). There is no `/admin` route to walk through.
 
 ### 14.7 As a reader (no account required)
 
 `/search` and `/(public)/papers` require no authentication. Browse and search published papers;
 download the original PDF of any published paper. Citation export (BibTeX/RIS) and OAI-PMH
-harvesting are specified (design specification §10.3) but not present in the delivered API
-surface (`docs/05-api-contract.md` §6 — no `/archive` citation-export or `/oai` route exists).
+harvesting are specified (design specification section 10.3) but not present in the delivered API
+surface (`docs/05-api-contract.md` section 6 — no `/archive` citation-export or `/oai` route exists).
 
 ---
 
@@ -1110,26 +1123,26 @@ maintenance categories, and states plainly what monitoring exists today and what
 ### 15.1 Corrective maintenance
 
 Defects are triaged by the same severity language the technical debt register already uses
-(Critical / Scheduled / Acceptable, §12), so a newly discovered defect slots into the existing
-repayment sequence rather than requiring a new taxonomy. Given §11.7's finding — that automated
+(Critical / Scheduled / Acceptable, section 12), so a newly discovered defect slots into the existing
+repayment sequence rather than requiring a new taxonomy. Given section 11.7's finding — that automated
 gates did not catch the defects that mattered — corrective maintenance should not rely on CI alone
 even after TD items are closed: a periodic manual review pass, and mutation testing once it exists
 in CI (currently absent, TD-11), are both load-bearing parts of this strategy, not optional
 extras. Every corrective fix should add the regression test that would have caught it, following
-the pattern already established for TD-12 and TD-13 (§11.4).
+the pattern already established for TD-12 and TD-13 (section 11.4).
 
 ### 15.2 Adaptive maintenance
 
 Two adaptive pressures are already named and scheduled rather than hypothetical: **TD-14**
-(migrating from App Runner to the specified ECS/ALB/CloudFront topology, §13.3) and the
+(migrating from App Runner to the specified ECS/ALB/CloudFront topology, section 13.3) and the
 introduction of reviewer assignment as a first-class entity (the work that closes TD-02, TD-03
-and TD-07 together, §12.7). Both are adaptive in the ISO sense — changing the system to fit an
+and TD-07 together, section 12.7). Both are adaptive in the ISO sense — changing the system to fit an
 environment (a scaled deployment target; a real reviewer-matching subsystem) rather than fixing a
 defect in the current one.
 
 ### 15.3 Perfective maintenance
 
-Ordered by the repayment sequence in §12.7: TD-01 (least-privilege IAM) first, as it blocks
+Ordered by the repayment sequence in section 12.7: TD-01 (least-privilege IAM) first, as it blocks
 admitting real users; then the TD-02/TD-03/TD-07 reviewer-assignment work; then TD-04 (an external
 audit anchor); then TD-05/TD-06/TD-08 as convenient. Raising the coverage gate (TD-10) is
 low-cost and should be revisited whenever coverage is observed to drift, not on a fixed schedule.
@@ -1137,28 +1150,28 @@ low-cost and should be revisited whenever coverage is observed to drift, not on 
 ### 15.4 Preventive maintenance
 
 Dependency and security updates are currently manual and ad hoc: `pip-audit` and `npm audit` are
-named as intended CI gates in the design specification (§11) but are **not** present in
-`.github/workflows/backend-ci.yml` today (testing report §6) — this is itself a preventive-maintenance
+named as intended CI gates in the design specification (section 11) but are **not** present in
+`.github/workflows/backend-ci.yml` today (testing report section 6) — this is itself a preventive-maintenance
 gap, not only a testing gap, and should be the first thing added to CI once the critical-priority
-items in §12.2 are closed. Systematic mutation testing (`mutmut` or `cosmic-ray`, TD-11) belongs in
-the same category: a preventive control against the specific class of defect §11.4 shows this
+items in section 12.2 are closed. Systematic mutation testing (`mutmut` or `cosmic-ray`, TD-11) belongs in
+the same category: a preventive control against the specific class of defect section 11.4 shows this
 project's existing gates cannot see.
 
 ### 15.5 What monitoring exists, and what does not
 
 **Exists:** liveness and readiness probes (`/health`, `/ready`, NFR-11), consumed by App Runner's
 own health check to replace an unresponsive instance automatically — this is precisely the
-mechanism that surfaced defect §11.4 #6 (a hung upload killed by the health check, not caught by
+mechanism that surfaced defect section 11.4 #6 (a hung upload killed by the health check, not caught by
 any application-level alert).
 
 **Does not exist:** no structured-log aggregation or trace export is deployed, despite NFR-15
-specifying one (SRS §3.2) — App Runner's default logging is what is actually available, not the
+specifying one (SRS section 3.2) — App Runner's default logging is what is actually available, not the
 correlation-ID-carrying structured JSON the requirement describes. No alerting is configured
 beyond the platform's own instance-replacement behaviour. No dashboard exists for the editorial
-analytics FR-24 specifies (that FR is itself unbuilt, §10.4). No performance monitoring exists
-(NFR-08/NFR-09 are unverified in production, §11.6). A maintainer inheriting this system should
+analytics FR-24 specifies (that FR is itself unbuilt, section 10.4). No performance monitoring exists
+(NFR-08/NFR-09 are unverified in production, section 11.6). A maintainer inheriting this system should
 treat "nothing paged me" as meaning nothing detectable paged, not as evidence of correct
-operation — the same caution §12.6 draws about automated gates applies to monitoring that has
+operation — the same caution section 12.6 draws about automated gates applies to monitoring that has
 never been exercised against a real incident.
 
 ---
@@ -1166,26 +1179,26 @@ never been exercised against a real incident.
 ## 16. Future evolution
 
 Drawn from the technical debt register's scheduled items and the design specification's own
-future-work section (§17 of that document), organised by size rather than by document of origin:
+future-work section (section 17 of that document), organised by size rather than by document of origin:
 
-**Reviewer matching with expertise scoring.** The design specification (§10.1) specifies a
+**Reviewer matching with expertise scoring.** The design specification (section 10.1) specifies a
 TF-IDF vocabulary over reviewer expertise and manuscript text, hard exclusions (author,
 affiliation match, prior decline, unavailability, capacity), and a Hungarian-algorithm
 (`scipy.optimize.linear_sum_assignment`) global assignment, editor-overridable. None of this is
 built; reviewer assignment today is a persistence-only record with no matching, no invitation
-lifecycle, and no conflict-of-interest check (`docs/05-api-contract.md` §8). This is also the
-piece of work that retires TD-02, TD-03 and TD-07 together (§12.7) — the highest-leverage single
+lifecycle, and no conflict-of-interest check (`docs/05-api-contract.md` section 8). This is also the
+piece of work that retires TD-02, TD-03 and TD-07 together (section 12.7) — the highest-leverage single
 addition against the current debt register.
 
 **The asynchronous processing pipeline.** Text extraction, MinHash/LSH similarity screening
 against the internal corpus, and metadata-stripped anonymised-derivative generation, enqueued on
-upload and keyed by content checksum for idempotency (design specification §10.2). Requires the
-Redis/ARQ worker component that TD-14 also notes is absent from the current deployment (§13.3) —
+upload and keyed by content checksum for idempotency (design specification section 10.2). Requires the
+Redis/ARQ worker component that TD-14 also notes is absent from the current deployment (section 13.3) —
 these two gaps compound, and closing the deployment gap first is a precondition for this one.
 
 **OAI-PMH and citation export.** `Identify`/`ListMetadataFormats`/`ListIdentifiers`/`ListRecords`/
 `GetRecord` over Dublin Core with resumption tokens (FR-22), plus BibTeX/RIS export (FR-21) — both
-Should-have priority (§7.4), specified, and absent from the delivered `/archive` surface.
+Should-have priority (section 7.4), specified, and absent from the delivered `/archive` surface.
 
 **Full event sourcing.** TD-09 records the current hybrid (materialised status + append-only
 event log) as an acceptable, revisitable trade-off. The stated condition for revisiting it: if
@@ -1193,7 +1206,7 @@ projections multiply beyond the current single materialised view, or replaying h
 state becomes a requirement, full event sourcing with rebuildable projections becomes worth its
 cost.
 
-**Multi-journal tenancy.** Explicitly out of scope for this build (design specification §4.2), but
+**Multi-journal tenancy.** Explicitly out of scope for this build (design specification section 4.2), but
 the codebase separates journal-configuration data from platform logic as a deliberate seam
 (design specification Appendix A) specifically so this remains reachable without restructuring —
 future evolution here is closer to "activate a seam" than "redesign."
@@ -1205,59 +1218,59 @@ one name would undermine the guarantee more than not attempting it); a `BlindedE
 for a future reviewer-facing audit view (TD-06); embedding-based reviewer matching to replace
 TF-IDF, ORCID authentication, real Crossref DOI registration, a production typesetting/galley
 pipeline, reviewer reputation modelling, blue-green deployment, and read-replica scaling for the
-archive (design specification §17, none yet begun).
+archive (design specification section 17, none yet begun).
 
 ---
 
 ## 17. Limitations
 
 Stated plainly, each cross-referenced to where it is verified or recorded, following the same
-convention as SRS §7 and the technical debt register.
+convention as SRS section 7 and the technical debt register.
 
 - **This system was built in 48 hours by one developer with AI assistance.** Every limitation
-  below is a direct consequence of that constraint, not of an unconsidered choice; §7.5 explains
+  below is a direct consequence of that constraint, not of an unconsidered choice; section 7.5 explains
   why the resulting scope decisions were nonetheless estimation-driven rather than ad hoc.
 - **Anonymisation strips PDF metadata but not author names typed into the body.** `blind()`
-  (§8.4) is structurally guaranteed to omit author fields from the type a reviewer receives — but
+  (section 8.4) is structurally guaranteed to omit author fields from the type a reviewer receives — but
   `title`, `abstract` and `keywords` are copied verbatim. An author who writes their own name into
   the title, or an abstract that reads "extending our earlier work in [Obeng 2025]," reaches the
   reviewer unchanged. Double-blind integrity therefore depends partly on author compliance with
   submission guidance, not entirely on what the system enforces (TD-05).
 - **The audit chain has no external anchor.** Hash chaining detects alteration, reordering and
-  removal *within* the chain (§8.5), and a database trigger blocks direct tampering — but
+  removal *within* the chain (section 8.5), and a database trigger blocks direct tampering — but
   truncation of the chain's tail, or a forged event appended through the legitimate API, is
   **undetectable by the application alone**, because there is no periodically published,
   independently held checkpoint of the latest `event_hash` to compare against (TD-04).
 - **A reviewer's conflict of interest is not checked by the authorisation layer**, and submitted
-  reviews are counted rather than identity-checked against an assignment (TD-02, TD-03, §12.2) —
+  reviews are counted rather than identity-checked against an assignment (TD-02, TD-03, section 12.2) —
   both critical, both unresolved as of this document.
 - **Deployment runs on AWS root credentials.** Mitigated by never storing them as a CI secret, but
-  not resolved (TD-01, §12.2, §13.4) — this is the single highest-priority open item in the
+  not resolved (TD-01, section 12.2, section 13.4) — this is the single highest-priority open item in the
   project.
 - **The deployed architecture is smaller than the specified one.** App Runner, not ECS Fargate
-  behind an ALB and CloudFront; no Redis; no asynchronous worker (TD-14, §13.3). No functional
+  behind an ALB and CloudFront; no Redis; no asynchronous worker (TD-14, section 13.3). No functional
   capability is lost on the read/write paths that exist, but the asynchronous processing pipeline
-  described in the design specification (§10.2 of that document, and §16 of this one) cannot run
+  described in the design specification (section 10.2 of that document, and section 16 of this one) cannot run
   without the missing worker component.
 - **No load testing.** NFR-08 and NFR-09's performance objectives (archive pages within 500 ms
   p95, search within 800 ms p95) were sized at design time and have never been measured against
-  the running system (§11.6).
+  the running system (section 11.6).
 - **No automated security scanning.** No SAST tool, dependency vulnerability scanner, or DAST pass
-  runs in CI, despite both being named in the design specification (§11) as intended gates
-  (§11.6, §15.4).
+  runs in CI, despite both being named in the design specification (section 11) as intended gates
+  (section 11.6, section 15.4).
 - **No browser-matrix or committed end-to-end testing.** UAT was run in a single Chromium-based
-  session; `@playwright/test` is a declared dependency with no committed spec files (§11.6).
+  session; `@playwright/test` is a declared dependency with no committed spec files (section 11.6).
 - **No file upload exists in the delivered domain.** `POST /manuscripts` is JSON-only —
   submission of an actual PDF, and the anonymisation/similarity pipeline that would process one,
-  are specified (design specification §10.2) but not built (`docs/05-api-contract.md` §8, §16 of
+  are specified (design specification section 10.2) but not built (`docs/05-api-contract.md` section 8, section 16 of
   this document).
-- **Explicit, permanent out-of-scope items** (design specification §4.2), restated as hard limits
+- **Explicit, permanent out-of-scope items** (design specification section 4.2), restated as hard limits
   rather than soft gaps: no payment or article-processing-charge handling; no copy-editing or
-  typesetting workflow; no multi-journal tenancy (though the seam for it exists, §16); no ORCID
+  typesetting workflow; no multi-journal tenancy (though the seam for it exists, section 16); no ORCID
   federation; identifiers are DOI-*shaped* but not registered with Crossref; similarity screening,
   when built, will be against the internal corpus only, never the open web; email deliverability
   is guaranteed through a single transactional provider only — and today, no live provider is
-  wired in at all (`infrastructure/email/logging_sender.py` logs rather than sends, §10.2).
+  wired in at all (`infrastructure/email/logging_sender.py` logs rather than sends, section 10.2).
 
 ---
 
@@ -1267,36 +1280,36 @@ convention as SRS §7 and the technical debt register.
 
 Use Case Points sized the Must-have subset of this system (UC1–UC18) at 2,514 person-hours, and
 the full specified system at 3,262 person-hours; COCOMO II's independent cross-check placed the
-full system at approximately 7,170 person-hours (§7.2). The 48-hour window available for this
+full system at approximately 7,170 person-hours (section 7.2). The 48-hour window available for this
 final project is roughly 1.5–1.9% of either figure. The delivery — a working domain layer with 812
 lines of framework-free, fully tested code; a complete API and frontend; a deployed, HTTPS-reachable
 system; and six supporting documents including this one — took a small fraction of the classically
-estimated effort. §7.5 explains why this does not invalidate the method: UCP measured the
+estimated effort. Section 7.5 explains why this does not invalidate the method: UCP measured the
 *problem's* size correctly, and what changed was the *rate* at which AI-assisted development
 converts that size into elapsed hours — a change in method, not evidence the sizing was wrong. The
 formal accounting of realised productivity is left to the mechanical procedure specified in effort
-estimation §10.3, to be computed from commit history rather than asserted here.
+estimation section 10.3, to be computed from commit history rather than asserted here.
 
 ### 18.2 What that trade bought, and what it cost
 
-It bought a system that meets its three sharpest objectives (§3) more convincingly than most
+It bought a system that meets its three sharpest objectives (section 3) more convincingly than most
 final projects reach in the available time: **O1** (no illegal transition reachable through any
-interface) is enforced by an exhaustively tested state machine (§8.2, §11.2); **O2** (structural
+interface) is enforced by an exhaustively tested state machine (section 8.2, section 11.2); **O2** (structural
 double-blind integrity) is enforced by a projection type with nowhere to put an author field
-(§8.4); **O3** (a tamper-evident audit trail) is enforced by a hash chain and two database
+(section 8.4); **O3** (a tamper-evident audit trail) is enforced by a hash chain and two database
 triggers, the second one added specifically because the first didn't cover every statement class
-(§8.5, §11.4). It bought a hexagonal architecture whose separation is not aspirational but
-mechanically checked on every commit by two import-linter contracts (§9.2). And it bought a
+(section 8.5, section 11.4). It bought a hexagonal architecture whose separation is not aspirational but
+mechanically checked on every commit by two import-linter contracts (section 9.2). And it bought a
 technical debt register and testing report that state their own limitations more precisely than
-most fully-staffed projects manage, because — per §12.6 — this project's clearest lesson is about
+most fully-staffed projects manage, because — per section 12.6 — this project's clearest lesson is about
 what automated rigour does and does not catch.
 
-It cost what §7.5 named in advance rather than discovered afterward: test depth below what a
+It cost what section 7.5 named in advance rather than discovered afterward: test depth below what a
 fully-priced 2,514-hour effort would buy (partially offset by the mutation-testing pass that found
-what coverage alone missed, §11.4); documentation formality reduced to what six documents and
+what coverage alone missed, section 11.4); documentation formality reduced to what six documents and
 inline code comments provide, rather than a fuller set of architecture decision records; and
 security hardening that verifies the NFR-01–NFR-06 baseline without attempting threat modelling or
-penetration testing beyond it. It cost the three critical, currently-open items in §12.2 — root AWS
+penetration testing beyond it. It cost the three critical, currently-open items in section 12.2 — root AWS
 credentials, an unenforced reviewer conflict-of-interest check, and an uncounted review quorum —
 none of which are hypothetical risks; all three are load-bearing gaps in a system whose stated
 purpose is enforcing exactly the guarantees they undermine.
@@ -1320,15 +1333,15 @@ finding, not the deployment URL, is this final project's most transferable resul
 
 - IEEE Std 830-1998, *Recommended Practice for Software Requirements Specifications*.
 - ISO/IEC/IEEE 29148:2018, *Systems and software engineering — Life cycle processes — Requirements engineering*.
-- ISO/IEC 14764, *Software Engineering — Software Life Cycle Processes — Maintenance* (maintenance category taxonomy used in §15).
+- ISO/IEC 14764, *Software Engineering — Software Life Cycle Processes — Maintenance* (maintenance category taxonomy used in section 15).
 - Karner, G. (1993). *Use Case Points* method for effort estimation, as codified in Cockburn, A.
   (2000), *Writing Effective Use Cases*, and Schneider & Winters (1998), *Applying Use Cases: A
   Practical Guide*.
 - Boehm, B. et al. (2000). *Software Cost Estimation with COCOMO II* — Early Design model.
 - Fowler, M. — technical debt quadrant (deliberate/inadvertent × reckless/prudent), the
   classification basis for `docs/04-technical-debt-register.md`.
-- IETF RFC 9457, *Problem Details for HTTP APIs* — the platform's error-response format (§9.3).
-- Open Archives Initiative, *OAI-PMH 2.0 specification* (§16, future evolution).
+- IETF RFC 9457, *Problem Details for HTTP APIs* — the platform's error-response format (section 9.3).
+- Open Archives Initiative, *OAI-PMH 2.0 specification* (section 16, future evolution).
 
 **Project documents (this repository):**
 
@@ -1337,12 +1350,12 @@ finding, not the deployment URL, is this final project's most transferable resul
 - `docs/04-technical-debt-register.md` — Technical debt register
 - `docs/05-api-contract.md` — API contract
 - `docs/06-testing-report.md` — Testing report
-- `docs/07-user-manual.md` — User manual (in progress at the time of writing; §14 stands in until
+- `docs/07-user-manual.md` — User manual (in progress at the time of writing; section 14 stands in until
   it is complete)
 - `docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md` — Design specification
 
 **AI-assisted development acknowledgement.** Consistent with the acknowledgement recorded in
-`docs/03-effort-estimation.md` §9 and §11, this document — and the code, tests and documents it
+`docs/03-effort-estimation.md` section 9 and section 11, this document — and the code, tests and documents it
 consolidates — were produced with Claude Code (Anthropic), an AI coding assistant, under the
 direction and review of the author. The assistant drafted prose and code from the author's
 instructions and the design specification; the author directed the work, reviewed every output,
