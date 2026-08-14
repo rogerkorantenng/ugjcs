@@ -1,78 +1,121 @@
-UGJCS — University of Ghana Journal of Computing Science
-Advanced Software Engineering — Individual Capstone
+SDJ Editorial Portal — Science and Development Journal
+Advanced Software Engineering (CSCD602) — Individual Final Project
 
-Student Name:   Roger Koranteng Obeng
-Student ID:     22424140
-Project Title:  UGJCS — A Double-Blind Peer-Reviewed Journal Management Platform
+Student Name:    Roger Koranteng Obeng
+Student ID:      22424140
+Project Title:   SDJ Editorial Portal — a submission and double-blind peer-review
+                 portal for the Science and Development Journal, published by the
+                 College of Basic and Applied Sciences, University of Ghana
 
 --------------------------------------------------------------------------------
 LIVE APPLICATION
 --------------------------------------------------------------------------------
 
-Live Application (frontend):  https://ugjcs-frontend.vercel.app
+Live Application:             https://ugjcs-frontend.vercel.app
+Admin URL:                    https://ugjcs-frontend.vercel.app/admin
+Source Code Repository:       https://github.com/rogerkorantenng/ugjcs
+
 Backend API:                  https://tsxsbf9rzp.us-east-1.awsapprunner.com
 API documentation (OpenAPI):  https://tsxsbf9rzp.us-east-1.awsapprunner.com/docs
 Health endpoint:              https://tsxsbf9rzp.us-east-1.awsapprunner.com/health
 
-Admin URL:                    https://ugjcs-frontend.vercel.app/login
-                              (there is no separate admin site; administrative
-                              capability is granted by role, not by a distinct
-                              application)
+The base URL opens the sign-in page. There is no separate admin application:
+administrative capability is granted by role, so /admin is reachable only by an
+account holding the administrator role.
 
-Source Code Repository:       https://github.com/rogerkorantenng/ugjcs
+Naming note: the repository, hosting URLs and package names use "ugjcs", the
+project's internal codename from before the journal was named. Wherever "ugjcs"
+appears in a path or URL it refers to this same system.
 
 --------------------------------------------------------------------------------
-TEST CREDENTIALS
+CREDENTIALS REQUIRED BY THE SUBMISSION
 --------------------------------------------------------------------------------
 
-All accounts are pre-verified and were created through the application's own
-registration service, so they behave exactly as a self-registered user would.
+Test Username:    editor@sdj.test
+Test Password:    Sdj-Editor-2026!
 
-Role                       Email                     Password
--------------------------  ------------------------  ------------------------
-Author                     author@ugjcs.test         Ugjcs-Author-2026!
-Author (2nd byline)        author2@ugjcs.test        Ugjcs-Author2-2026!
-Reviewer (internal, UG)    reviewer@ugjcs.test       Ugjcs-Reviewer-2026!
-Reviewer (internal, UG)    reviewer2@ugjcs.test      Ugjcs-Reviewer2-2026!
-Reviewer (Univ. of Lagos)  reviewer3@ugjcs.test      Ugjcs-Reviewer3-2026!
-Reviewer (KNUST)           reviewer4@ugjcs.test      Ugjcs-Reviewer4-2026!
-Reviewer (Univ. Cape Coast) reviewer5@ugjcs.test     Ugjcs-Reviewer5-2026!
-Reviewer (Ashesi Univ.)    reviewer6@ugjcs.test      Ugjcs-Reviewer6-2026!
-Reviewer (Makerere Univ.)  reviewer7@ugjcs.test      Ugjcs-Reviewer7-2026!
-Editor                     editor@ugjcs.test         Ugjcs-Editor-2026!
-Editor-in-Chief            eic@ugjcs.test            Ugjcs-EditorChief-2026!
-Administrator              admin@ugjcs.test          Ugjcs-Admin-2026!
+Admin Username:   admin@sdj.test
+Admin Password:   Sdj-Admin-2026!
 
-The two "internal" reviewers share every author's affiliation (University of Ghana), on
-purpose: they demonstrate the conflict-of-interest picker's affiliation exclusion. The
-five numbered 3-7 are external, at five different institutions, and are what make the
-picker (GET /api/v1/editorial/{code}/reviewer-candidates) actually show eligible
-candidates alongside the excluded ones.
+All credentials below were verified against the live API on 2026-08-14; each
+returns HTTP 200 from POST /api/v1/auth/login.
 
-Test Username:    editor@ugjcs.test
-Test Password:    Ugjcs-Editor-2026!
-Admin Username:   admin@ugjcs.test
-Admin Password:   Ugjcs-Admin-2026!
+--------------------------------------------------------------------------------
+ALL TEST ACCOUNTS
+--------------------------------------------------------------------------------
+
+The sign-in page carries a row of role chips that fill these email addresses for
+you; the password is typed by hand.
+
+Role                         Email                  Password
+---------------------------  ---------------------  -----------------------
+Author (Ama Serwaa)          author@sdj.test        Sdj-Author-2026!
+Author (Kojo Antwi)          author2@sdj.test       Sdj-Author2-2026!
+Reviewer (UG)                reviewer@sdj.test      Sdj-Reviewer-2026!
+Reviewer (UG)                reviewer2@sdj.test     Sdj-Reviewer2-2026!
+Reviewer (Univ. of Lagos)    reviewer3@sdj.test     Sdj-Reviewer3-2026!
+Reviewer (KNUST)             reviewer4@sdj.test     Sdj-Reviewer4-2026!
+Reviewer (Univ. Cape Coast)  reviewer5@sdj.test     Sdj-Reviewer5-2026!
+Reviewer (Ashesi Univ.)      reviewer6@sdj.test     Sdj-Reviewer6-2026!
+Reviewer (Makerere Univ.)    reviewer7@sdj.test     Sdj-Reviewer7-2026!
+Editor (Efua Mensah)         editor@sdj.test        Sdj-Editor-2026!
+Editor-in-Chief (Kofi B.)    eic@sdj.test           Sdj-EditorChief-2026!
+Administrator (Abena Osei)   admin@sdj.test         Sdj-Admin-2026!
+
+Seven reviewers exist rather than one so the reviewer-candidate screen can
+actually demonstrate its rules. The two marked UG share every author's
+affiliation and are therefore shown to the editor as excluded, with the reason
+stated; the five external reviewers are what make eligible candidates appear
+alongside them.
 
 --------------------------------------------------------------------------------
 SUGGESTED WALKTHROUGH FOR ASSESSMENT
 --------------------------------------------------------------------------------
 
-1. Open the live application. The public archive requires no login and lists
-   four papers published through the full editorial lifecycle.
+1.  Open the live application. It lands on the sign-in page; follow "Browse the
+    archive" to read the four published papers without an account. Each carries a
+    downloadable PDF, a DOI-shaped identifier, BibTeX/RIS citation export, and a
+    provenance panel that verifies its editorial history against the audit chain.
 
-2. Open any paper to see its record and citation metadata.
+2.  Search the archive. Search is PostgreSQL full-text over the extracted body
+    text of each PDF, so a distinctive term from inside a paper returns it with a
+    highlighted snippet.
 
-3. Sign in as the Editor. The screening queue shows a manuscript awaiting
-   screening; the editorial actions available are constrained by the manuscript's
-   current lifecycle state, not by the interface hiding buttons.
+3.  Sign in as the Author. Submit a manuscript with a PDF. The response reports
+    what the anonymiser stripped from the file and flags any author name it can
+    still find in the body text.
 
-4. Sign in as the Reviewer. The assigned manuscript is shown in its BLINDED form:
-   no author name, no affiliation, no author identifier. This is enforced by the
-   type the API returns, which has no author fields at all, rather than by
-   filtering them out at the edge.
+4.  Sign in as the Editor. The screening queue shows the new submission. Open the
+    reviewer-candidate list: candidates are ranked by expertise match against the
+    manuscript's keywords, and excluded candidates appear with their reason
+    (shared affiliation, at capacity) rather than being hidden. Assign two
+    reviewers and note the deadlines and overdue flags.
 
-5. Sign in as the Author to view submissions and their status timelines.
+5.  Sign in as a Reviewer. The manuscript appears in blinded form: no author
+    name, affiliation or identifier. This is enforced by the type the API
+    returns, which has no author fields at all, not by filtering at the edge.
+    Submit a structured review: four 1-5 criterion scores, comments to the
+    author, and confidential comments to the editor.
+
+6.  Back as the Editor, read both reviews (only this role can see the
+    confidential channel) and record a decision. Download the decision
+    certificate, a PDF carrying the decision and the audit chain's head hash.
+    View the analytics dashboard for pipeline counts, acceptance rate and
+    turnaround times.
+
+7.  As the Author, an accepted manuscript raises an article processing charge.
+    The deployment uses a mock payment gateway by default, so "Pay" settles the
+    invoice immediately and no card is involved. No real money moves through this
+    system.
+
+8.  Sign in as the Editor-in-Chief to schedule the paper into an issue and
+    publish it, or to waive the charge.
+
+9.  Sign in as the Administrator to see the accounts console: grant and revoke
+    roles, set reviewer capacity, deactivate accounts. Two actions are refused by
+    design, to stop the last administrator locking everyone out: the
+    administrator role cannot be changed here, and you cannot deactivate
+    yourself.
 
 --------------------------------------------------------------------------------
 INFRASTRUCTURE
@@ -87,18 +130,26 @@ Region:     us-east-1
 Infrastructure as code: Terraform, in infra/
 
 --------------------------------------------------------------------------------
-NOTES FOR THE JUDGES
+NOTES FOR THE EXAMINER
 --------------------------------------------------------------------------------
 
-- The deployed architecture is smaller than the one specified in the design
-  document, which describes ECS Fargate behind an Application Load Balancer with
-  CloudFront. That decision, its reasoning and its repayment cost are recorded as
-  entry TD-14 in the technical debt register.
+- Tests: 402 backend unit, 84 integration against a real PostgreSQL container,
+  and 79 frontend, all passing. Domain and application coverage is 90.03%
+  against an 85% gate. Verified by GitHub Actions run 31791711326.
 
-- The technical debt register (docs/04-technical-debt-register.md) contains
-  fourteen entries. Ten were found by independent review of code that had already
-  passed linting, strict type checking, an architecture contract and a full test
-  suite at 100% coverage.
+- The deployed architecture is smaller than the design document specifies (ECS
+  Fargate behind an Application Load Balancer with CloudFront). That decision,
+  its reasoning and its repayment cost are recorded as TD-14 in the technical
+  debt register.
 
-- The application must remain reachable for grading. Please note that the AWS
-  infrastructure is billed continuously at roughly USD 29 per month while running.
+- The technical debt register carries fifteen entries across three categories:
+  critical, scheduled, and acceptable. Ten were found by review of code that had
+  already passed linting, strict type checking, an architecture contract and a
+  full test suite.
+
+- Payments are mocked by default. A real Paystack integration exists and is
+  exercised only when a secret key is configured; no key is deployed, and no
+  payment has ever been taken.
+
+- The application must remain reachable for grading. The AWS infrastructure is
+  billed continuously at roughly USD 29 per month while running.

@@ -12,3 +12,6 @@ htmlcov/
 .playwright-mcp/
 *.png
 .gstack/
+
+# Assembled submission bundle (regenerate rather than track the binary)
+submission/
