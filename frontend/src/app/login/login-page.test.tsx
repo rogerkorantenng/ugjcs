@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { DEMO_ACCOUNTS } from "@/lib/demo-accounts";
 import LoginPage from "./page";
 
 vi.mock("next/navigation", () => ({
@@ -34,21 +35,52 @@ describe("LoginPage", () => {
     await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Invalid email or password"));
   });
 
-  it("is fully keyboard-operable: Tab reaches the links, then email, password, submit in order", async () => {
+  it("is fully keyboard-operable: Tab reaches the links, the demo chips, then email, password, submit in order", async () => {
     vi.stubGlobal("fetch", signedOut());
     render(<LoginPage />);
     // The image half carries no focusable elements, so keyboard users land on the
-    // wordmark, the way back, and then the form — top to bottom of the right panel.
+    // wordmark, the way back, each demo-account chip, and then the form — top to bottom
+    // of the right panel.
     await userEvent.tab();
     expect(screen.getByRole("link", { name: "SDJ" })).toHaveFocus();
     await userEvent.tab();
-    expect(screen.getByRole("link", { name: /back to the journal/i })).toHaveFocus();
+    expect(screen.getByRole("link", { name: /browse the archive/i })).toHaveFocus();
+    for (const account of DEMO_ACCOUNTS) {
+      await userEvent.tab();
+      expect(screen.getByRole("button", { name: account.label })).toHaveFocus();
+    }
     await userEvent.tab();
     expect(screen.getByLabelText("Email")).toHaveFocus();
     await userEvent.tab();
     expect(screen.getByLabelText("Password")).toHaveFocus();
     await userEvent.tab();
     expect(screen.getByRole("button", { name: /^sign in$/i })).toHaveFocus();
+  });
+
+  it("prints the prototype notice above the form, so it is read without scrolling", () => {
+    vi.stubGlobal("fetch", signedOut());
+    render(<LoginPage />);
+    const notice = screen.getByRole("note");
+    expect(notice).toHaveTextContent(/final-project prototype, not an official system/i);
+    // DOCUMENT_POSITION_FOLLOWING and nothing else: the form comes after the notice in
+    // document order and is not nested inside it.
+    expect(notice.compareDocumentPosition(screen.getByLabelText("Email"))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it("fills the email from a demo-account chip but never the password", async () => {
+    vi.stubGlobal("fetch", signedOut());
+    render(<LoginPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Editor" }));
+
+    expect(screen.getByLabelText("Email")).toHaveValue("editor@sdj.test");
+    // The whole point of the chip: it saves the typing it can, and leaves the credential
+    // that actually authenticates to the reader — with the cursor already waiting there.
+    expect(screen.getByLabelText("Password")).toHaveValue("");
+    expect(screen.getByLabelText("Password")).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Editor" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Author" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("switches to a sign-up form with name and affiliation, and back again", async () => {
@@ -61,10 +93,25 @@ describe("LoginPage", () => {
     expect(screen.getByLabelText("Full name")).toBeInTheDocument();
     expect(screen.getByLabelText("Affiliation")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /create account/i })).toBeInTheDocument();
+    // Seeded desks belong to signing in; offering one here would contradict the form.
+    expect(screen.queryByRole("button", { name: "Author" })).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: /^sign in$/i }));
     expect(screen.getByRole("heading", { name: /^sign in$/i })).toBeInTheDocument();
     expect(screen.queryByLabelText("Full name")).not.toBeInTheDocument();
+  });
+
+  it("carries no address across a mode switch", async () => {
+    vi.stubGlobal("fetch", signedOut());
+    render(<LoginPage />);
+    await userEvent.click(screen.getByRole("button", { name: "Reviewer" }));
+    expect(screen.getByLabelText("Email")).toHaveValue("reviewer@sdj.test");
+
+    // The email is the one controlled field, so unlike the rest it survives the form's
+    // remount unless it is cleared on purpose — a seeded address must not leak into a
+    // registration the reader is about to type by hand.
+    await userEvent.click(screen.getByRole("button", { name: /sign up as an author/i }));
+    expect(screen.getByLabelText("Email")).toHaveValue("");
   });
 
   it("registers through the register route and includes every sign-up field", async () => {

@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect, useState, type FormEvent } from "react";
+import { Suspense, useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProblemAlert } from "@/components/ui/alert";
 import { DemoBanner } from "@/components/layout/demo-banner";
+import { DemoAccountPicker } from "@/components/auth/demo-account-picker";
 import { roleHome } from "@/lib/role-home";
 import type { ProblemDetails, SessionUser } from "@/types/api";
 
@@ -20,6 +21,9 @@ function AuthPanel() {
   const [mode, setMode] = useState<Mode>("sign-in");
   const [problem, setProblem] = useState<ProblemDetails | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Controlled so the demo-account chips can write into it; the password never is.
+  const [email, setEmail] = useState("");
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   // Someone with a live session has no business at the sign-in form: send them straight
   // to their desk instead of asking for credentials they've already presented.
@@ -39,6 +43,16 @@ function AuthPanel() {
   function switchMode(target: Mode) {
     setMode(target);
     setProblem(null);
+    // The form remounts on `key={mode}`, clearing every uncontrolled field; the email is
+    // controlled now, so it has to be cleared by hand to keep that same clean-slate rule.
+    setEmail("");
+  }
+
+  /** Fill the address, then put the cursor where the reader still has work to do. */
+  function pickDemoAccount(address: string) {
+    setEmail(address);
+    setProblem(null);
+    passwordRef.current?.focus();
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -85,6 +99,7 @@ function AuthPanel() {
           : "Authors register themselves; reviewer and editor accounts are appointed by the editorial office."}
       </p>
       {problem && <div className="mt-4"><ProblemAlert problem={problem} /></div>}
+      {signingIn && <DemoAccountPicker selected={email} onPick={pickDemoAccount} />}
       {/* Keyed on mode so the panel re-enters with the rise animation on each switch —
           a full remount also clears field state, so a half-typed password never carries
           over from one form into the other. `animate-rise-in` respects reduced motion. */}
@@ -101,8 +116,17 @@ function AuthPanel() {
             />
           </>
         )}
-        <Input label="Email" name="email" type="email" required autoComplete="email" />
         <Input
+          label="Email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <Input
+          ref={passwordRef}
           label="Password"
           name="password"
           type="password"
@@ -133,10 +157,15 @@ function AuthPanel() {
 export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col bg-paper">
+      {/* Above the fold, not under it: this is the first thing anyone landing on the portal
+          reads, and since `/` now lands here it is the notice for the whole site. */}
+      <DemoBanner />
       <div className="grid flex-1 lg:grid-cols-2">
         {/* The campus, filling the left half on wide screens and a banner strip on small
-            ones. Decorative: the empty alt keeps screen readers on the form. */}
-        <div className="relative h-44 sm:h-56 lg:h-auto lg:min-h-screen">
+            ones. Decorative: the empty alt keeps screen readers on the form. No
+            `lg:min-h-screen`: the grid is already `flex-1` inside a `min-h-screen` column,
+            so a full viewport here would push the page past the fold by the banner's height. */}
+        <div className="relative h-44 sm:h-56 lg:h-auto">
           <Image
             src="/legon-campus.jpg"
             alt=""
@@ -176,7 +205,6 @@ export default function LoginPage() {
           </main>
         </div>
       </div>
-      <DemoBanner />
     </div>
   );
 }
