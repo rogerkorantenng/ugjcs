@@ -48,9 +48,7 @@ def _final_decision(chain: list[ChainedEvent]) -> tuple[str, str] | None:
 
 
 @router.get("/{tracking_code}")
-async def decision_certificate(
-    tracking_code: str, actor: CertificateDep, uow: UowDep
-) -> Response:
+async def decision_certificate(tracking_code: str, actor: CertificateDep, uow: UowDep) -> Response:
     """`application/pdf`: masthead, tracking code, title, the decision with its
     rationale, each submitted review by ordinal, and the audit-chain head hash as a
     provenance line. 409 until an accept or reject decision has been recorded."""

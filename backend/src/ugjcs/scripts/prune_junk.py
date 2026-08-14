@@ -44,8 +44,7 @@ async def prune(engine: AsyncEngine) -> int:
         junk = (
             await conn.execute(
                 text(
-                    "SELECT id, tracking_code FROM manuscripts"
-                    " WHERE tracking_code != ALL(:allow)"
+                    "SELECT id, tracking_code FROM manuscripts WHERE tracking_code != ALL(:allow)"
                 ),
                 {"allow": allow},
             )

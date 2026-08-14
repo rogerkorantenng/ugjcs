@@ -120,9 +120,7 @@ async def resubmit(
     data = await file.read()
     validate_document(data)
     next_version = manuscript.version + 1
-    o_key, a_key, inspection = await _store_document(
-        documents, manuscript.id, next_version, data
-    )
+    o_key, a_key, inspection = await _store_document(documents, manuscript.id, next_version, data)
     manuscript.resubmit(
         actor_id=UserId(actor.id),
         occurred_at=datetime.now(UTC),

@@ -110,9 +110,7 @@ async def citation(
     manuscript = await _published_or_404(uow, tracking_code)
     paper = await ArchivePaperOut.from_domain(manuscript, uow.accounts)
     render = bibtex_citation if citation_format == "bibtex" else ris_citation
-    text = render(
-        tracking_code=paper.tracking_code, title=paper.title, authors=paper.author_names
-    )
+    text = render(tracking_code=paper.tracking_code, title=paper.title, authors=paper.author_names)
     return PlainTextResponse(content=text)
 
 

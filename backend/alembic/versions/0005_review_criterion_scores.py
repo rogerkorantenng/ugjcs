@@ -32,12 +32,8 @@ _SCORE_COLUMNS = (
 
 def upgrade() -> None:
     for column in _SCORE_COLUMNS:
-        op.add_column(
-            "review_assignments", sa.Column(column, sa.Integer(), nullable=True)
-        )
-    op.add_column(
-        "review_assignments", sa.Column("comments_to_author", sa.Text(), nullable=True)
-    )
+        op.add_column("review_assignments", sa.Column(column, sa.Integer(), nullable=True))
+    op.add_column("review_assignments", sa.Column("comments_to_author", sa.Text(), nullable=True))
     op.add_column(
         "review_assignments",
         sa.Column("confidential_comments_to_editor", sa.Text(), nullable=True),

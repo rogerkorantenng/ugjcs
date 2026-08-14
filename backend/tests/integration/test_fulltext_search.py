@@ -140,9 +140,7 @@ async def test_backfill_indexes_published_papers_and_is_idempotent(engine: Async
         )
         # Unreadable PDF: skipped with a message, never fatal (the entrypoint runs
         # under `set -eu`, so "fatal" would mean the API never boots).
-        await _seed_published(
-            session, 709, title="Corrupt Document", document_key="docs/709.pdf"
-        )
+        await _seed_published(session, 709, title="Corrupt Document", document_key="docs/709.pdf")
     store.objects["docs/707.pdf"] = build_demo_pdf(
         tracking_code="SDJ-2026-0707",
         title="Solar Microgrids",
@@ -155,9 +153,7 @@ async def test_backfill_indexes_published_papers_and_is_idempotent(engine: Async
     assert await backfill(engine, store) == 1
 
     async with engine.connect() as conn:
-        rows = (
-            await conn.execute(text("SELECT tracking_code, fulltext FROM manuscripts"))
-        ).all()
+        rows = (await conn.execute(text("SELECT tracking_code, fulltext FROM manuscripts"))).all()
     by_code = {row.tracking_code: row.fulltext for row in rows}
     assert "gradient boosting" in by_code[indexed_one.tracking_code.value]
     assert by_code["SDJ-2026-0708"] == "previously extracted text"

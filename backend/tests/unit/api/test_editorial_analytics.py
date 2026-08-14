@@ -189,9 +189,7 @@ def test_reviewer_performance_reports_workload_and_turnaround_per_reviewer() -> 
         newcomer, name="Ben Newcomer", email="newcomer@sdj.test"
     )
     first, second, pending = ManuscriptId(uuid4()), ManuscriptId(uuid4()), ManuscriptId(uuid4())
-    uow.assignments.assignments.extend(
-        [(first, veteran), (second, veteran), (pending, veteran)]
-    )
+    uow.assignments.assignments.extend([(first, veteran), (second, veteran), (pending, veteran)])
     # Two completed reviews, 3 and 5 days after the fake's fixed `assigned_at` (NOW),
     # plus one still outstanding: average 4.0 days, latest activity NOW + 5 days.
     uow.assignments.submitted[(first, veteran)] = _submitted_review(

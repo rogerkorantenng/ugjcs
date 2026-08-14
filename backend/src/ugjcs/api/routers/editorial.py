@@ -182,8 +182,7 @@ async def analytics(actor: AuditDep, uow: UowDep) -> EditorialAnalyticsOut:
             withdrawn=status_counts[S.WITHDRAWN],
         ),
         submissions_by_month=[
-            MonthlySubmissions(month=month, count=count)
-            for month, count in sorted(monthly.items())
+            MonthlySubmissions(month=month, count=count) for month, count in sorted(monthly.items())
         ],
         acceptance_rate=round(accepted / decided, 2) if decided else None,
         avg_days_submission_to_decision=(
@@ -342,9 +341,7 @@ def _match_score(keywords: tuple[str, ...], expertise: tuple[str, ...]) -> int:
     return sum(1 for keyword in keywords if keyword.strip().lower() in expertise_tokens)
 
 
-@router.get(
-    "/{tracking_code}/reviewer-candidates", response_model=list[RankedReviewerCandidateOut]
-)
+@router.get("/{tracking_code}/reviewer-candidates", response_model=list[RankedReviewerCandidateOut])
 async def reviewer_candidates(
     tracking_code: str, actor: AssignReviewerDep, uow: UowDep
 ) -> list[RankedReviewerCandidateOut]:

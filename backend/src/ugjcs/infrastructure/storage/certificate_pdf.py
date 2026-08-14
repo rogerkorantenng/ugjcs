@@ -27,8 +27,7 @@ from ugjcs.infrastructure.storage.pdf_text import (
 )
 
 _MASTHEAD = (
-    "Science and Development Journal - College of Basic and Applied Sciences, "
-    "University of Ghana"
+    "Science and Development Journal - College of Basic and Applied Sciences, University of Ghana"
 )
 
 

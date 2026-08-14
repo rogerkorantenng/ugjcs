@@ -11,7 +11,15 @@ from ugjcs.domain.ids import UserId
 from ugjcs.infrastructure.security.passwords import Argon2PasswordHasher
 from ugjcs.infrastructure.security.tokens import InvalidTokenError, JwtTokenService
 
-NOW = datetime(2026, 8, 12, 9, 0, tzinfo=UTC)
+# Anchored to the real clock rather than a hardcoded moment, and deliberately so.
+# `JwtTokenService` mints `exp` from the clock injected into it, but PyJWT validates that
+# claim against the *system* clock when the token is decoded. A fixed date therefore makes
+# every verification test a time bomb: it passes until the wall clock drifts past the
+# verification window, then fails for a reason that has nothing to do with the code under
+# test. This one detonated on 2026-08-14, two days after the date it was pinned to.
+# Reading the clock once here keeps the determinism the frozen fake exists to provide,
+# since every clock in a given run still returns the same instant.
+NOW = datetime.now(UTC)
 PASSWORD = "correct horse battery staple"
 
 

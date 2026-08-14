@@ -63,9 +63,7 @@ async def _row_counts(engine: AsyncEngine) -> dict[str, int]:
     async with engine.connect() as conn:
         counts: dict[str, int] = {}
         for table in _WIPE_ORDER:
-            counts[table] = (
-                await conn.execute(text(f"SELECT count(*) FROM {table}"))
-            ).scalar_one()
+            counts[table] = (await conn.execute(text(f"SELECT count(*) FROM {table}"))).scalar_one()
         return counts
 
 
