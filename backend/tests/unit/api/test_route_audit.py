@@ -32,6 +32,9 @@ except ImportError:  # pragma: no cover - depends on the installed FastAPI's int
     _EffectiveRouteContext = None  # type: ignore[assignment,misc]
 
 PUBLIC_PATHS = {
+    # The base-URL signpost: tells a visitor the API is up and where the application
+    # lives. It reads nothing and changes nothing, so it carries no auth by design.
+    "/",
     "/health",
     "/ready",
     "/openapi.json",
