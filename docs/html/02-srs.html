@@ -1,156 +1,11 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>02 · Software Requirements Specification</title>
-  <style>
-    html {
-      color: #1a1a1a;
-      background-color: #fdfdfd;
-    }
-    body {
-      margin: 0 auto;
-      max-width: 36em;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 50px;
-      padding-bottom: 50px;
-      hyphens: auto;
-      overflow-wrap: break-word;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-    }
-    @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-        padding: 12px;
-      }
-      h1 {
-        font-size: 1.8em;
-      }
-    }
-    @media print {
-      html {
-        background-color: white;
-      }
-      body {
-        background-color: transparent;
-        color: black;
-        font-size: 12pt;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
-    p {
-      margin: 1em 0;
-    }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
-    }
-    img {
-      max-width: 100%;
-    }
-    svg {
-      height: auto;
-      max-width: 100%;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.4em;
-    }
-    h5, h6 {
-      font-size: 1em;
-      font-style: italic;
-    }
-    h6 {
-      font-weight: normal;
-    }
-    ol, ul {
-      padding-left: 1.7em;
-      margin-top: 1em;
-    }
-    li > ol, li > ul {
-      margin-top: 0;
-    }
-    blockquote {
-      margin: 1em 0 1em 1.7em;
-      padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
-      color: #606060;
-    }
-    code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
-      font-size: 85%;
-      margin: 0;
-      hyphens: manual;
-    }
-    pre {
-      margin: 1em 0;
-      overflow: auto;
-    }
-    pre code {
-      padding: 0;
-      overflow: visible;
-      overflow-wrap: normal;
-    }
-    .sourceCode {
-     background-color: transparent;
-     overflow: visible;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid #1a1a1a;
-      height: 1px;
-      margin: 1em 0;
-    }
-    table {
-      margin: 1em 0;
-      border-collapse: collapse;
-      width: 100%;
-      overflow-x: auto;
-      display: block;
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    table caption {
-      margin-bottom: 0.75em;
-    }
-    tbody {
-      margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    th {
-      border-top: 1px solid #1a1a1a;
-      padding: 0.25em 0.5em 0.25em 0.5em;
-    }
-    td {
-      padding: 0.125em 0.5em 0.25em 0.5em;
-    }
-    header {
-      margin-bottom: 4em;
-      text-align: center;
-    }
-    #TOC li {
-      list-style: none;
-    }
-    #TOC ul {
-      padding-left: 1.3em;
-    }
-    #TOC > ul {
-      padding-left: 0;
-    }
-    #TOC a:not(:hover) {
-      text-decoration: none;
-    }
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>02 · Software Requirements Specification</title>
+<style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -166,137 +21,369 @@
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <style>
-      code{white-space: pre-wrap;}
-      span.smallcaps{font-variant: small-caps;}
-      div.columns{display: flex; gap: min(4vw, 1.5em);}
-      div.column{flex: auto; overflow-x: auto;}
-      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-      /* The extra [class] is a hack that increases specificity enough to
-         override a similar rule in reveal.js */
-      ul.task-list[class]{list-style: none;}
-      ul.task-list li input[type="checkbox"] {
-        font-size: inherit;
-        width: 0.8em;
-        margin: 0 0.8em 0.2em -1.6em;
-        vertical-align: middle;
-      }
-      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-      /* CSS for syntax highlighting */
-      html { -webkit-text-size-adjust: 100%; }
-      pre > code.sourceCode { white-space: pre; position: relative; }
-      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-      pre > code.sourceCode > span:empty { height: 1.2em; }
-      .sourceCode { overflow: visible; }
-      code.sourceCode > span { color: inherit; text-decoration: inherit; }
-      div.sourceCode { margin: 1em 0; }
-      pre.sourceCode { margin: 0; }
-      @media screen {
-      div.sourceCode { overflow: auto; }
-      }
-      @media print {
-      pre > code.sourceCode { white-space: pre-wrap; }
-      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-      }
-      pre.numberSource code
-        { counter-reset: source-line 0; }
-      pre.numberSource code > span
-        { position: relative; left: -4em; counter-increment: source-line; }
-      pre.numberSource code > span > a:first-child::before
-        { content: counter(source-line);
-          position: relative; left: -1em; text-align: right; vertical-align: baseline;
-          border: none; display: inline-block;
-          -webkit-touch-callout: none; -webkit-user-select: none;
-          -khtml-user-select: none; -moz-user-select: none;
-          -ms-user-select: none; user-select: none;
-          padding: 0 4px; width: 4em;
-          color: #aaaaaa;
-        }
-      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-      div.sourceCode
-        {   }
-      @media screen {
-      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-      }
-      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-      code span.at { color: #7d9029; } /* Attribute */
-      code span.bn { color: #40a070; } /* BaseN */
-      code span.bu { color: #008000; } /* BuiltIn */
-      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-      code span.ch { color: #4070a0; } /* Char */
-      code span.cn { color: #880000; } /* Constant */
-      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-      code span.dt { color: #902000; } /* DataType */
-      code span.dv { color: #40a070; } /* DecVal */
-      code span.er { color: #ff0000; font-weight: bold; } /* Error */
-      code span.ex { } /* Extension */
-      code span.fl { color: #40a070; } /* Float */
-      code span.fu { color: #06287e; } /* Function */
-      code span.im { color: #008000; font-weight: bold; } /* Import */
-      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-      code span.op { color: #666666; } /* Operator */
-      code span.ot { color: #007020; } /* Other */
-      code span.pp { color: #bc7a00; } /* Preprocessor */
-      code span.sc { color: #4070a0; } /* SpecialChar */
-      code span.ss { color: #bb6688; } /* SpecialString */
-      code span.st { color: #4070a0; } /* String */
-      code span.va { color: #19177c; } /* Variable */
-      code span.vs { color: #4070a0; } /* VerbatimString */
-      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    </style>
-  <style>
-    :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
-    * { box-sizing:border-box; }
-    body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
-    header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
-    header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-    header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
-    main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
-    h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
-    h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
-    h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
-    h3 { font-size:1.12rem; margin-top:1.8rem; }
-    a { color:#4b3f9e; }
-    code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
-    pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
-    pre code { background:none; color:inherit; padding:0; }
-    table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
-    th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
-    th { background:#eceee9; font-weight:600; }
-    blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
-    figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
-    figure.diagram svg { max-width:100%; height:auto; }
-    nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
-    footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
-    </style>
+<style>/* SDJ submission documents — screen and A4-portrait print.
+   Print is the primary target: these are assessed on paper or as PDF. */
+
+:root {
+  --blue: #002855;
+  --gold: #fdb515;
+  --ink: #14181d;
+  --muted: #5a6068;
+  --rule: #d3d8d2;
+  --paper: #f7f8f6;
+  --measure: 46rem;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font: 16px/1.62 "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ---------- page chrome ---------- */
+
+header.site {
+  background: var(--blue);
+  color: #fff;
+  border-bottom: 3px solid var(--gold);
+  padding: 1.5rem 1.2rem 1.2rem;
+}
+header.site .inner,
+main,
+footer.site .inner { max-width: var(--measure); margin: 0 auto; }
+
+header.site .eyebrow {
+  font: 600 10.5px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+header.site .title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-top: .4rem;
+  letter-spacing: -.01em;
+}
+
+main { padding: 2.4rem 1.2rem 4rem; }
+
+nav.docnav { font-size: .85rem; margin-bottom: 2rem; }
+
+footer.site {
+  border-top: 1px solid var(--rule);
+  padding: 1.2rem;
+  text-align: center;
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+/* ---------- typography ---------- */
+
+h1, h2, h3, h4, h5 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
+  line-height: 1.22;
+  letter-spacing: -.01em;
+}
+h1 {
+  font-size: 1.95rem;
+  margin: 0 0 1.4rem;
+  padding-bottom: .45rem;
+  border-bottom: 2px solid var(--blue);
+}
+h2 {
+  font-size: 1.38rem;
+  margin: 2.6rem 0 .9rem;
+  padding-bottom: .3rem;
+  border-bottom: 1px solid var(--rule);
+}
+h3 { font-size: 1.1rem; margin: 1.9rem 0 .6rem; }
+h4 { font-size: .98rem; margin: 1.4rem 0 .5rem; }
+
+p { margin: 0 0 1rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.4rem; }
+li { margin: .3rem 0; }
+li > p { margin-bottom: .5rem; }
+
+a { color: #3f3596; text-underline-offset: 2px; }
+
+strong { font-weight: 600; }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.2rem 0; }
+
+/* Long identifiers and URLs must never push the page wider than the paper. */
+code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: .855em;
+  background: #ebeee9;
+  padding: .1em .32em;
+  border-radius: 3px;
+  overflow-wrap: break-word;
+}
+pre {
+  background: #f2f4f0;
+  color: #1b2027;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--blue);
+  padding: .9rem 1.1rem;
+  border-radius: 3px;
+  overflow-x: auto;
+  font-size: .86rem;
+  line-height: 1.5;
+}
+pre code { background: none; padding: 0; font-size: 1em; }
+
+blockquote {
+  border-left: 3px solid var(--gold);
+  margin: 1.2rem 0;
+  padding: .35rem 1rem;
+  color: #3c4148;
+  background: #fff;
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- metadata panel ---------- */
+
+dl.docmeta {
+  margin: 0 0 2rem;
+  padding: 1rem 1.1rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--gold);
+  border-radius: 3px;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .35rem .9rem;
+  font-size: .93rem;
+}
+dl.docmeta dt {
+  font-weight: 600;
+  color: var(--blue);
+  white-space: nowrap;
+}
+dl.docmeta dd { margin: 0; overflow-wrap: break-word; }
+
+/* ---------- tables ----------
+   Not `display:block`: that detaches the table from normal flow, so it cannot
+   break across printed pages and its header cannot repeat. A wrapper scrolls
+   on screen instead, and unwraps for print. */
+
+.tablewrap { overflow-x: auto; margin: 1.2rem 0; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: .42rem .6rem;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+th { background: #eaeee8; font-weight: 600; }
+tbody tr:nth-child(even) { background: #fbfcfa; }
+
+/* ---------- diagrams ---------- */
+
+figure.diagram {
+  margin: 1.6rem 0;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  text-align: center;
+  overflow-x: auto;
+}
+figure.diagram svg { max-width: 100%; height: auto; }
+
+/* Pandoc emits its own title block; the page chrome already carries the title. */
+#title-block-header { display: none; }
+
+/* ---------- print: A4 portrait ---------- */
+
+@page {
+  size: A4 portrait;
+  margin: 17mm 14mm 16mm;
+}
+
+@media print {
+  html, body {
+    background: #fff;
+    font-size: 10pt;
+    line-height: 1.42;
+  }
+
+  main { max-width: none; padding: 0; }
+  header.site .inner, footer.site .inner { max-width: none; }
+
+  nav.docnav { display: none; }
+
+  /* The masthead prints once, at the top of the first page. */
+  header.site {
+    padding: 0 0 .5rem;
+    background: #fff;
+    color: var(--ink);
+    border-bottom: 2pt solid var(--blue);
+    margin-bottom: 1rem;
+  }
+  header.site .eyebrow { color: var(--blue); font-size: 7pt; letter-spacing: .16em; }
+  header.site .title { font-size: 14pt; margin-top: .2rem; }
+
+  footer.site {
+    border-top: .5pt solid var(--rule);
+    font-size: 7.5pt;
+    padding: .5rem 0 0;
+    margin-top: 1.2rem;
+  }
+
+  h1 { font-size: 17pt; margin: 0 0 .8rem; }
+  h2 { font-size: 12.5pt; margin: 1.3rem 0 .5rem; }
+  h3 { font-size: 10.8pt; margin: 1rem 0 .35rem; }
+  h4 { font-size: 10pt; }
+
+  /* Never leave a heading stranded at the foot of a page. */
+  h1, h2, h3, h4 { break-after: avoid-page; page-break-after: avoid; }
+  h2 { break-before: auto; }
+
+  p, li { orphans: 3; widows: 3; }
+
+  /* Keep atomic blocks whole where they plausibly fit on one page. */
+  figure.diagram, blockquote, pre, dl.docmeta {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Tables may span pages, but a row may not be split and the header repeats. */
+  .tablewrap { overflow: visible; }
+  /* Fixed layout plus the generated colgroup: a wide matrix wraps to fit the page
+     instead of overflowing it and losing its right-hand column off the paper. */
+  table { font-size: 8pt; page-break-inside: auto; table-layout: fixed; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  th, td { padding: .28rem .38rem; }
+  tbody tr:nth-child(even) { background: #fafbf9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  th { background: #ecefe9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  pre {
+    font-size: 8pt;
+    background: #f6f7f4;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  code { background: #f2f3f0; font-size: 8.6pt; }
+
+  a { color: var(--ink); text-decoration: none; }
+
+  figure.diagram { padding: .5rem; border: .5pt solid var(--rule); }
+  figure.diagram svg { max-height: 190mm; }
+
+  hr { margin: 1.2rem 0; }
+}
+</style>
 </head>
 <body>
 <header class="site">
-  <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
-  <div class="title">02 · Software Requirements Specification</div>
+  <div class="inner">
+    <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
+    <div class="title">02 · Software Requirements Specification</div>
+  </div>
 </header>
 <main>
 <nav class="docnav"><a href="index.html">← All documents</a></nav>
-<header id="title-block-header">
-<h1 class="title">02 · Software Requirements Specification</h1>
-</header>
 <h1 id="software-requirements-specification">Software Requirements
 Specification</h1>
-<p><strong>Project:</strong> SDJ Editorial Portal — an editorial portal
-for the Science and Development Journal (SDJ), published by the College
-of Basic and Applied Sciences (CBAS), University of Ghana
-<strong>Document:</strong> 02 — Software Requirements Specification
-<strong>Author:</strong> Roger Koranteng Obeng, student ID 22424140
-<strong>Assessor:</strong> Prof. Solomon Mensah <strong>Date:</strong>
-2026-08-12 <strong>Conformance:</strong> Adapted from IEEE 830-1998 and
-ISO/IEC/IEEE 29148:2018 <strong>Status:</strong> Authoritative. Where
-this document and the implementation disagree, the implementation
-governs and the disagreement is recorded (section 4.1, section 7).</p>
+<dl class="docmeta">
+  <dt>Project</dt>
+  <dd>SDJ Editorial Portal — an editorial portal for the Science and Development Journal (SDJ), published by the College of Basic and Applied Sciences (CBAS), University of Ghana</dd>
+  <dt>Document</dt>
+  <dd>02 — Software Requirements Specification</dd>
+  <dt>Author</dt>
+  <dd>Roger Koranteng Obeng, student ID 22424140</dd>
+  <dt>Assessor</dt>
+  <dd>Prof. Solomon Mensah</dd>
+  <dt>Date</dt>
+  <dd>2026-08-12</dd>
+  <dt>Conformance</dt>
+  <dd>Adapted from IEEE 830-1998 and ISO/IEC/IEEE 29148:2018</dd>
+  <dt>Status</dt>
+  <dd>Authoritative. Where this document and the implementation disagree, the implementation governs and the disagreement is recorded (section 4.1, section 7).</dd>
+</dl>
+
 <p><strong>Naming.</strong> The product specified here is the
 <strong>SDJ Editorial Portal</strong>. The repository
 (<code>github.com/rogerkorantenng/ugjcs</code>), hosting URLs, package
@@ -356,7 +443,7 @@ functional boundary is enumerated in section 5 of that specification and
 restated as testable requirements in section 3 of this document.</p>
 <h3 id="13-definitions-acronyms-and-abbreviations">1.3 Definitions,
 acronyms and abbreviations</h3>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:21.32%" /><col style="width:78.68%" /></colgroup>
 <thead>
 <tr>
 <th>Term</th>
@@ -458,7 +545,7 @@ format</td>
 predecessor's hash and its own payload</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="14-references">1.4 References</h3>
 <ul>
 <li>Design specification —
@@ -559,7 +646,7 @@ today. Of the bullets above, asynchronous processing (section 2.1) and
 OAI-PMH harvesting (FR-22) are the two that are not built.</em></p>
 <h3 id="23-user-classes-and-characteristics">2.3 User classes and
 characteristics</h3>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:19.11%" /><col style="width:34.72%" /><col style="width:25.13%" /><col style="width:21.03%" /></colgroup>
 <thead>
 <tr>
 <th>User class</th>
@@ -619,7 +706,7 @@ configuration</td>
 <td>N/A — machine actor</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>A single account may hold multiple roles simultaneously (design
 specification section 3); this is a deliberate design choice with a
 direct security consequence recorded in section 4.3 and Section 7 (an
@@ -694,7 +781,7 @@ gating who may invoke that transition), a gap the original requirement
 not anticipate.</p>
 <h3 id="31-functional-requirements">3.1 Functional requirements</h3>
 <h4 id="group-a--identity-and-access">Group A — Identity and access</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.24%" /><col style="width:22.73%" /><col style="width:8.69%" /><col style="width:8.24%" /><col style="width:11.28%" /><col style="width:18.89%" /><col style="width:21.93%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -743,10 +830,10 @@ user may hold several roles concurrently.</td>
 re-evaluate against the updated set on the next request</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-b--submission-intake-and-processing">Group B — Submission
 intake and processing</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.03%" /><col style="width:22.53%" /><col style="width:8.03%" /><col style="width:8.03%" /><col style="width:13.06%" /><col style="width:17.21%" /><col style="width:23.11%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -809,10 +896,10 @@ match; unrelated submissions produce no false positive on the seeded
 corpus</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-c--screening-and-reviewer-assignment">Group C — Screening
 and reviewer assignment</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.04%" /><col style="width:22.9%" /><col style="width:8.04%" /><col style="width:8.04%" /><col style="width:14.01%" /><col style="width:18.27%" /><col style="width:20.7%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -866,9 +953,9 @@ state</td>
 invited</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-d--review-and-revision">Group D — Review and revision</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.03%" /><col style="width:23.21%" /><col style="width:8.03%" /><col style="width:8.03%" /><col style="width:14.16%" /><col style="width:17.1%" /><col style="width:21.44%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -923,10 +1010,10 @@ discretion</td>
 letter is attached to the new version</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-e--editorial-decision-and-withdrawal">Group E — Editorial
 decision and withdrawal</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.34%" /><col style="width:22.03%" /><col style="width:8.34%" /><col style="width:8.34%" /><col style="width:18.31%" /><col style="width:16.22%" /><col style="width:18.4%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -984,10 +1071,10 @@ cannot invoke the transition regardless of role</td>
 attempting withdrawal is denied</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-f--publication-and-public-archive">Group F — Publication
 and public archive</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.16%" /><col style="width:20.92%" /><col style="width:8.16%" /><col style="width:8.16%" /><col style="width:12.96%" /><col style="width:20.04%" /><col style="width:21.59%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1083,10 +1170,10 @@ tokens honoured correctly</td>
 error</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-g--transparency-and-communication">Group G — Transparency
 and communication</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.14%" /><col style="width:21.25%" /><col style="width:8.14%" /><col style="width:8.14%" /><col style="width:13.67%" /><col style="width:18.59%" /><col style="width:22.08%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1135,10 +1222,10 @@ message is queued for delivery</td>
 affected author within the same request cycle</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-h--administration-configuration-and-analytics">Group H —
 Administration, configuration and analytics</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.04%" /><col style="width:22.23%" /><col style="width:8.04%" /><col style="width:8.04%" /><col style="width:13.29%" /><col style="width:18.17%" /><col style="width:22.19%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1213,10 +1300,10 @@ flag</td>
 assignment with no deadline is never flagged overdue</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="group-i--publication-economics-and-scholarly-record">Group I —
 Publication economics and scholarly record</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.06%" /><col style="width:22.66%" /><col style="width:8.06%" /><col style="width:8.06%" /><col style="width:14.12%" /><col style="width:18.58%" /><col style="width:20.47%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1281,14 +1368,14 @@ signed in</td>
 under any request body</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="32-non-functional-requirements">3.2 Non-functional
 requirements</h3>
 <p>Each non-functional requirement carries a stated <strong>verification
 method</strong> so that "non-functional" does not collapse into
 "unverifiable."</p>
 <h4 id="security">Security</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:11.72%" /><col style="width:40.56%" /><col style="width:47.72%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1338,9 +1425,9 @@ present at release.</td>
 <td><code>pip-audit</code> and <code>npm audit</code> as CI gates</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="integrity">Integrity</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.94%" /><col style="width:28.56%" /><col style="width:62.5%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1364,9 +1451,9 @@ rejecting <code>UPDATE</code>/<code>DELETE</code>/<code>TRUNCATE</code>
 on the event table (technical debt register TD-13)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="performance">Performance</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:15.7%" /><col style="width:49.46%" /><col style="width:34.85%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1387,9 +1474,9 @@ load.</td>
 <td>k6 smoke test</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="reliability">Reliability</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:11.81%" /><col style="width:39.84%" /><col style="width:48.35%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1406,9 +1493,9 @@ on failure.</td>
 content checksum and asserting no duplicate side effect</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="availability">Availability</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:12.6%" /><col style="width:45.63%" /><col style="width:41.77%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1425,9 +1512,9 @@ are replaced automatically.</td>
 configuration</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="usability">Usability</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:13.26%" /><col style="width:48.94%" /><col style="width:37.8%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1444,9 +1531,9 @@ and meets WCAG 2.1 AA contrast.</td>
 CI</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="maintainability">Maintainability</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:9.56%" /><col style="width:27.98%" /><col style="width:62.46%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1465,19 +1552,19 @@ CI</td>
 <td>The domain and application layers hold at least 85% line
 coverage.</td>
 <td>CI coverage gate. <strong>The delivered domain and application
-layers report 88.24%</strong> against the 85% gate, confirmed directly
+layers report 90.03%</strong> against the 85% gate, confirmed directly
 (<code>pytest -m "not integration" --cov=src/ugjcs/domain --cov=src/ugjcs/application</code>,
-run against this commit): 275 unit tests pass, and a separate run
-collects 60 integration tests against a real PostgreSQL container.
+run against this commit): 402 unit tests pass, and a separate run
+collects 84 integration tests against a real PostgreSQL container.
 Technical debt register TD-10 records the 85% figure as a floor, not a
 target, and TD-11 records that coverage alone is a weak signal — four
 mutations survived a 100%-covered suite until closed by targeted
 tests</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="observability">Observability</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:14.61%" /><col style="width:44.73%" /><col style="width:40.67%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1493,9 +1580,9 @@ exported.</td>
 <td>Manual verification against a deployed environment</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="portability">Portability</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:14.47%" /><col style="width:40.62%" /><col style="width:44.91%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1511,9 +1598,9 @@ exported.</td>
 <code>terraform destroy</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h4 id="compliance">Compliance</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:13.27%" /><col style="width:44.51%" /><col style="width:42.22%" /></colgroup>
 <thead>
 <tr>
 <th>ID</th>
@@ -1530,7 +1617,7 @@ where required.</td>
 8)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <hr />
 <h2 id="4-system-models">4. System models</h2>
 <h3 id="41-manuscript-lifecycle">4.1 Manuscript lifecycle</h3>
@@ -1539,7 +1626,7 @@ where required.</td>
 <code>LEGAL_TRANSITIONS</code> mapping is the executable, tested source
 of truth, not the narrative description in the design specification.</p>
 <h4 id="411-state-table">4.1.1 State table</h4>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:35.04%" /><col style="width:47.33%" /><col style="width:17.63%" /></colgroup>
 <thead>
 <tr>
 <th>Source state</th>
@@ -1616,7 +1703,7 @@ of truth, not the narrative description in the design specification.</p>
 <td><strong>Yes</strong></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>No transition is legal out of a terminal state; this is asserted
 directly by <code>assert_legal</code>, which raises
 <code>IllegalTransitionError</code> for any pair not present in
@@ -1647,7 +1734,7 @@ diagram. This is a genuine, load-bearing disagreement between the two
 documents and is recorded here rather than silently resolved in one
 direction without comment.</p>
 <h3 id="42-actoruse-case-mapping">4.2 Actor/use-case mapping</h3>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:32.54%" /><col style="width:67.46%" /></colgroup>
 <thead>
 <tr>
 <th>Actor</th>
@@ -1695,7 +1782,7 @@ view), UC20 (indirectly, as the harvested party), UC25</td>
 <td>UC5, UC7 (computation), UC21 (dispatch)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><em>Note:</em> UC3 ("manage roles") is an Administrator-only use case
 per FR-03's actor column; it is listed once and not duplicated against
 Editor.</p>
@@ -1707,7 +1794,7 @@ Editor.</p>
 that also depend on the actor's relationship to a specific manuscript,
 and the policy module's own docstring for the one action
 (<code>REVIEW</code>) that is deliberately under-specified today.</p>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:19.46%" /><col style="width:20.38%" /><col style="width:20.38%" /><col style="width:9.96%" /><col style="width:11.82%" /><col style="width:17.99%" /></colgroup>
 <thead>
 <tr>
 <th>Action</th>
@@ -1811,7 +1898,7 @@ tested</strong></td>
 <td>—</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>FR-25a is closed.</strong> <code>Action.WITHDRAW</code> now
 exists in <code>_OWNERSHIP_ACTIONS</code> alongside
 <code>RESUBMIT</code> (<code>policies.py</code>), and
@@ -1881,7 +1968,7 @@ built and tested but a named, specific piece is missing — never "mostly
 done" without saying what the remainder is); <strong>Not
 implemented</strong> (no code exists for this requirement's behaviour,
 stated as such rather than described euphemistically).</p>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:8.45%" /><col style="width:8.45%" /><col style="width:22.09%" /><col style="width:26.67%" /><col style="width:34.35%" /></colgroup>
 <thead>
 <tr>
 <th>FR</th>
@@ -2623,7 +2710,7 @@ invitation lifecycle does not exist, so no reviewer has ever declined
 anything to compute a rate from.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>Reading this matrix honestly.</strong> Of the 35 requirement
 lines (FR-01 to FR-34 plus FR-25a), <strong>24 are implemented and
 tested end to end</strong> (FR-02, FR-04, FR-05, FR-06, FR-07, FR-08,
@@ -2644,7 +2731,7 @@ prioritisation</h2>
 <p>Prioritisation uses MoSCoW, carried unchanged from the design
 specification (section 5) and made authoritative by the effort
 estimation document's scope decision (section 8):</p>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:20.85%" /><col style="width:26.08%" /><col style="width:53.07%" /></colgroup>
 <thead>
 <tr>
 <th>Priority</th>
@@ -2669,7 +2756,7 @@ estimation document's scope decision (section 8):</p>
 <td>Deferred; recorded as technical debt with a repayment plan</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p><strong>How the estimate drove the cut.</strong> Use Case Points
 sized the Must-have subset alone at 188 UUCP → 125.7 UCP → 2,514
 person-hours (effort estimation section 6), against a 48-hour
@@ -2782,8 +2869,8 @@ could in principle diverge if that discipline is ever broken
 <li><strong>Coverage is a floor, not a proof of correctness.</strong>
 The CI gate at 85% (NFR-14) is a regression floor, not a target
 (<strong>TD-10</strong>); <code>make check</code> reports
-<strong>88.24%</strong> on the current commit against that 85% gate —
-275 unit tests pass, plus 60 integration tests against a real PostgreSQL
+<strong>90.03%</strong> on the current commit against that 85% gate —
+402 unit tests pass, plus 84 integration tests against a real PostgreSQL
 container, run separately (confirmed directly against this commit; see
 NFR-14). Separately, mutation testing during final review found defects
 surviving a suite at 100% line coverage — including deletion of the

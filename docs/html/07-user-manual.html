@@ -1,156 +1,11 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>07 · User Manual</title>
-  <style>
-    html {
-      color: #1a1a1a;
-      background-color: #fdfdfd;
-    }
-    body {
-      margin: 0 auto;
-      max-width: 36em;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 50px;
-      padding-bottom: 50px;
-      hyphens: auto;
-      overflow-wrap: break-word;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-    }
-    @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-        padding: 12px;
-      }
-      h1 {
-        font-size: 1.8em;
-      }
-    }
-    @media print {
-      html {
-        background-color: white;
-      }
-      body {
-        background-color: transparent;
-        color: black;
-        font-size: 12pt;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
-    p {
-      margin: 1em 0;
-    }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
-    }
-    img {
-      max-width: 100%;
-    }
-    svg {
-      height: auto;
-      max-width: 100%;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.4em;
-    }
-    h5, h6 {
-      font-size: 1em;
-      font-style: italic;
-    }
-    h6 {
-      font-weight: normal;
-    }
-    ol, ul {
-      padding-left: 1.7em;
-      margin-top: 1em;
-    }
-    li > ol, li > ul {
-      margin-top: 0;
-    }
-    blockquote {
-      margin: 1em 0 1em 1.7em;
-      padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
-      color: #606060;
-    }
-    code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
-      font-size: 85%;
-      margin: 0;
-      hyphens: manual;
-    }
-    pre {
-      margin: 1em 0;
-      overflow: auto;
-    }
-    pre code {
-      padding: 0;
-      overflow: visible;
-      overflow-wrap: normal;
-    }
-    .sourceCode {
-     background-color: transparent;
-     overflow: visible;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid #1a1a1a;
-      height: 1px;
-      margin: 1em 0;
-    }
-    table {
-      margin: 1em 0;
-      border-collapse: collapse;
-      width: 100%;
-      overflow-x: auto;
-      display: block;
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    table caption {
-      margin-bottom: 0.75em;
-    }
-    tbody {
-      margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    th {
-      border-top: 1px solid #1a1a1a;
-      padding: 0.25em 0.5em 0.25em 0.5em;
-    }
-    td {
-      padding: 0.125em 0.5em 0.25em 0.5em;
-    }
-    header {
-      margin-bottom: 4em;
-      text-align: center;
-    }
-    #TOC li {
-      list-style: none;
-    }
-    #TOC ul {
-      padding-left: 1.3em;
-    }
-    #TOC > ul {
-      padding-left: 0;
-    }
-    #TOC a:not(:hover) {
-      text-decoration: none;
-    }
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>07 · User Manual</title>
+<style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
     div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -166,139 +21,365 @@
       vertical-align: middle;
     }
     .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
   </style>
-  <style>
-      code{white-space: pre-wrap;}
-      span.smallcaps{font-variant: small-caps;}
-      div.columns{display: flex; gap: min(4vw, 1.5em);}
-      div.column{flex: auto; overflow-x: auto;}
-      div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-      /* The extra [class] is a hack that increases specificity enough to
-         override a similar rule in reveal.js */
-      ul.task-list[class]{list-style: none;}
-      ul.task-list li input[type="checkbox"] {
-        font-size: inherit;
-        width: 0.8em;
-        margin: 0 0.8em 0.2em -1.6em;
-        vertical-align: middle;
-      }
-      .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-      /* CSS for syntax highlighting */
-      html { -webkit-text-size-adjust: 100%; }
-      pre > code.sourceCode { white-space: pre; position: relative; }
-      pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-      pre > code.sourceCode > span:empty { height: 1.2em; }
-      .sourceCode { overflow: visible; }
-      code.sourceCode > span { color: inherit; text-decoration: inherit; }
-      div.sourceCode { margin: 1em 0; }
-      pre.sourceCode { margin: 0; }
-      @media screen {
-      div.sourceCode { overflow: auto; }
-      }
-      @media print {
-      pre > code.sourceCode { white-space: pre-wrap; }
-      pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-      }
-      pre.numberSource code
-        { counter-reset: source-line 0; }
-      pre.numberSource code > span
-        { position: relative; left: -4em; counter-increment: source-line; }
-      pre.numberSource code > span > a:first-child::before
-        { content: counter(source-line);
-          position: relative; left: -1em; text-align: right; vertical-align: baseline;
-          border: none; display: inline-block;
-          -webkit-touch-callout: none; -webkit-user-select: none;
-          -khtml-user-select: none; -moz-user-select: none;
-          -ms-user-select: none; user-select: none;
-          padding: 0 4px; width: 4em;
-          color: #aaaaaa;
-        }
-      pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-      div.sourceCode
-        {   }
-      @media screen {
-      pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-      }
-      code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-      code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-      code span.at { color: #7d9029; } /* Attribute */
-      code span.bn { color: #40a070; } /* BaseN */
-      code span.bu { color: #008000; } /* BuiltIn */
-      code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-      code span.ch { color: #4070a0; } /* Char */
-      code span.cn { color: #880000; } /* Constant */
-      code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-      code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-      code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-      code span.dt { color: #902000; } /* DataType */
-      code span.dv { color: #40a070; } /* DecVal */
-      code span.er { color: #ff0000; font-weight: bold; } /* Error */
-      code span.ex { } /* Extension */
-      code span.fl { color: #40a070; } /* Float */
-      code span.fu { color: #06287e; } /* Function */
-      code span.im { color: #008000; font-weight: bold; } /* Import */
-      code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-      code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-      code span.op { color: #666666; } /* Operator */
-      code span.ot { color: #007020; } /* Other */
-      code span.pp { color: #bc7a00; } /* Preprocessor */
-      code span.sc { color: #4070a0; } /* SpecialChar */
-      code span.ss { color: #bb6688; } /* SpecialString */
-      code span.st { color: #4070a0; } /* String */
-      code span.va { color: #19177c; } /* Variable */
-      code span.vs { color: #4070a0; } /* VerbatimString */
-      code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-    </style>
-  <style>
-    :root { --blue:#002855; --gold:#fdb515; --ink:#12151a; --rule:#d8dcd6; }
-    * { box-sizing:border-box; }
-    body { margin:0; font:16px/1.65 "Public Sans","Segoe UI",system-ui,sans-serif; color:var(--ink); background:#f6f7f5; }
-    header.site { background:var(--blue); color:#fff; padding:1.4rem 1rem 1.1rem; border-bottom:3px solid var(--gold); }
-    header.site .eyebrow { font:600 11px/1 ui-monospace,monospace; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); }
-    header.site .title { font-family:Georgia,serif; font-size:1.25rem; font-weight:600; margin-top:.35rem; }
-    main { max-width:54rem; margin:0 auto; padding:2.2rem 1.2rem 4rem; }
-    h1,h2,h3,h4 { font-family:Georgia,serif; color:var(--ink); line-height:1.25; }
-    h1 { font-size:1.9rem; border-bottom:2px solid var(--rule); padding-bottom:.4rem; }
-    h2 { font-size:1.4rem; margin-top:2.4rem; border-bottom:1px solid var(--rule); padding-bottom:.3rem; }
-    h3 { font-size:1.12rem; margin-top:1.8rem; }
-    a { color:#4b3f9e; }
-    code { font-family:ui-monospace,Consolas,monospace; font-size:.86em; background:#ecefe9; padding:.1em .35em; border-radius:3px; }
-    pre { background:#0f172a; color:#e2e8f0; padding:1rem 1.2rem; border-radius:4px; overflow-x:auto; }
-    pre code { background:none; color:inherit; padding:0; }
-    table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem; display:block; overflow-x:auto; }
-    th,td { border:1px solid var(--rule); padding:.45rem .7rem; text-align:left; vertical-align:top; }
-    th { background:#eceee9; font-weight:600; }
-    blockquote { border-left:3px solid var(--gold); margin:1.2rem 0; padding:.2rem 1rem; color:#3c4148; background:#fff; }
-    figure.diagram { margin:1.6rem 0; padding:1rem; background:#fff; border:1px solid var(--rule); border-radius:4px; overflow-x:auto; text-align:center; }
-    figure.diagram svg { max-width:100%; height:auto; }
-    nav.docnav { font-size:.85rem; margin-bottom:1.6rem; }
-    footer.site { border-top:1px solid var(--rule); padding:1.2rem; text-align:center; font-size:.8rem; color:#5a6068; }
-    </style>
+<style>/* SDJ submission documents — screen and A4-portrait print.
+   Print is the primary target: these are assessed on paper or as PDF. */
+
+:root {
+  --blue: #002855;
+  --gold: #fdb515;
+  --ink: #14181d;
+  --muted: #5a6068;
+  --rule: #d3d8d2;
+  --paper: #f7f8f6;
+  --measure: 46rem;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font: 16px/1.62 "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+/* ---------- page chrome ---------- */
+
+header.site {
+  background: var(--blue);
+  color: #fff;
+  border-bottom: 3px solid var(--gold);
+  padding: 1.5rem 1.2rem 1.2rem;
+}
+header.site .inner,
+main,
+footer.site .inner { max-width: var(--measure); margin: 0 auto; }
+
+header.site .eyebrow {
+  font: 600 10.5px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+header.site .title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-top: .4rem;
+  letter-spacing: -.01em;
+}
+
+main { padding: 2.4rem 1.2rem 4rem; }
+
+nav.docnav { font-size: .85rem; margin-bottom: 2rem; }
+
+footer.site {
+  border-top: 1px solid var(--rule);
+  padding: 1.2rem;
+  text-align: center;
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+/* ---------- typography ---------- */
+
+h1, h2, h3, h4, h5 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--ink);
+  line-height: 1.22;
+  letter-spacing: -.01em;
+}
+h1 {
+  font-size: 1.95rem;
+  margin: 0 0 1.4rem;
+  padding-bottom: .45rem;
+  border-bottom: 2px solid var(--blue);
+}
+h2 {
+  font-size: 1.38rem;
+  margin: 2.6rem 0 .9rem;
+  padding-bottom: .3rem;
+  border-bottom: 1px solid var(--rule);
+}
+h3 { font-size: 1.1rem; margin: 1.9rem 0 .6rem; }
+h4 { font-size: .98rem; margin: 1.4rem 0 .5rem; }
+
+p { margin: 0 0 1rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.4rem; }
+li { margin: .3rem 0; }
+li > p { margin-bottom: .5rem; }
+
+a { color: #3f3596; text-underline-offset: 2px; }
+
+strong { font-weight: 600; }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: 2.2rem 0; }
+
+/* Long identifiers and URLs must never push the page wider than the paper. */
+code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: .855em;
+  background: #ebeee9;
+  padding: .1em .32em;
+  border-radius: 3px;
+  overflow-wrap: break-word;
+}
+pre {
+  background: #f2f4f0;
+  color: #1b2027;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--blue);
+  padding: .9rem 1.1rem;
+  border-radius: 3px;
+  overflow-x: auto;
+  font-size: .86rem;
+  line-height: 1.5;
+}
+pre code { background: none; padding: 0; font-size: 1em; }
+
+blockquote {
+  border-left: 3px solid var(--gold);
+  margin: 1.2rem 0;
+  padding: .35rem 1rem;
+  color: #3c4148;
+  background: #fff;
+}
+blockquote p:last-child { margin-bottom: 0; }
+
+/* ---------- metadata panel ---------- */
+
+dl.docmeta {
+  margin: 0 0 2rem;
+  padding: 1rem 1.1rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--gold);
+  border-radius: 3px;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .35rem .9rem;
+  font-size: .93rem;
+}
+dl.docmeta dt {
+  font-weight: 600;
+  color: var(--blue);
+  white-space: nowrap;
+}
+dl.docmeta dd { margin: 0; overflow-wrap: break-word; }
+
+/* ---------- tables ----------
+   Not `display:block`: that detaches the table from normal flow, so it cannot
+   break across printed pages and its header cannot repeat. A wrapper scrolls
+   on screen instead, and unwraps for print. */
+
+.tablewrap { overflow-x: auto; margin: 1.2rem 0; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: .88rem;
+  line-height: 1.45;
+}
+th, td {
+  border: 1px solid var(--rule);
+  padding: .42rem .6rem;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+th { background: #eaeee8; font-weight: 600; }
+tbody tr:nth-child(even) { background: #fbfcfa; }
+
+/* ---------- diagrams ---------- */
+
+figure.diagram {
+  margin: 1.6rem 0;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  text-align: center;
+  overflow-x: auto;
+}
+figure.diagram svg { max-width: 100%; height: auto; }
+
+/* Pandoc emits its own title block; the page chrome already carries the title. */
+#title-block-header { display: none; }
+
+/* ---------- print: A4 portrait ---------- */
+
+@page {
+  size: A4 portrait;
+  margin: 17mm 14mm 16mm;
+}
+
+@media print {
+  html, body {
+    background: #fff;
+    font-size: 10pt;
+    line-height: 1.42;
+  }
+
+  main { max-width: none; padding: 0; }
+  header.site .inner, footer.site .inner { max-width: none; }
+
+  nav.docnav { display: none; }
+
+  /* The masthead prints once, at the top of the first page. */
+  header.site {
+    padding: 0 0 .5rem;
+    background: #fff;
+    color: var(--ink);
+    border-bottom: 2pt solid var(--blue);
+    margin-bottom: 1rem;
+  }
+  header.site .eyebrow { color: var(--blue); font-size: 7pt; letter-spacing: .16em; }
+  header.site .title { font-size: 14pt; margin-top: .2rem; }
+
+  footer.site {
+    border-top: .5pt solid var(--rule);
+    font-size: 7.5pt;
+    padding: .5rem 0 0;
+    margin-top: 1.2rem;
+  }
+
+  h1 { font-size: 17pt; margin: 0 0 .8rem; }
+  h2 { font-size: 12.5pt; margin: 1.3rem 0 .5rem; }
+  h3 { font-size: 10.8pt; margin: 1rem 0 .35rem; }
+  h4 { font-size: 10pt; }
+
+  /* Never leave a heading stranded at the foot of a page. */
+  h1, h2, h3, h4 { break-after: avoid-page; page-break-after: avoid; }
+  h2 { break-before: auto; }
+
+  p, li { orphans: 3; widows: 3; }
+
+  /* Keep atomic blocks whole where they plausibly fit on one page. */
+  figure.diagram, blockquote, pre, dl.docmeta {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Tables may span pages, but a row may not be split and the header repeats. */
+  .tablewrap { overflow: visible; }
+  /* Fixed layout plus the generated colgroup: a wide matrix wraps to fit the page
+     instead of overflowing it and losing its right-hand column off the paper. */
+  table { font-size: 8pt; page-break-inside: auto; table-layout: fixed; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  th, td { padding: .28rem .38rem; }
+  tbody tr:nth-child(even) { background: #fafbf9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  th { background: #ecefe9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  pre {
+    font-size: 8pt;
+    background: #f6f7f4;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  code { background: #f2f3f0; font-size: 8.6pt; }
+
+  a { color: var(--ink); text-decoration: none; }
+
+  figure.diagram { padding: .5rem; border: .5pt solid var(--rule); }
+  figure.diagram svg { max-height: 190mm; }
+
+  hr { margin: 1.2rem 0; }
+}
+</style>
 </head>
 <body>
 <header class="site">
-  <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
-  <div class="title">07 · User Manual</div>
+  <div class="inner">
+    <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
+    <div class="title">07 · User Manual</div>
+  </div>
 </header>
 <main>
 <nav class="docnav"><a href="index.html">← All documents</a></nav>
-<header id="title-block-header">
-<h1 class="title">07 · User Manual</h1>
-</header>
 <h1 id="sdj-editorial-portal--user-manual">SDJ Editorial Portal — User
 Manual</h1>
-<p><strong>Project:</strong> SDJ Editorial Portal — an editorial portal
-for the Science and Development Journal (SDJ), published by the College
-of Basic and Applied Sciences, University of Ghana
-<strong>Author:</strong> Roger Koranteng Obeng (22424140)
-<strong>Assessor:</strong> Prof. Solomon Mensah <strong>Date:</strong>
-2026-08-12 <strong>Status:</strong> Written from the live, deployed
-system, not from the source code. Every screen, label, button caption
-and error message described below was observed by signing in as each
-role in turn — author, reviewer, editor, Editor-in-Chief and
-administrator — and operating the real application at the addresses
-below. Where a screen does not exist, this manual says so rather than
-describing one that would be convenient.</p>
+<dl class="docmeta">
+  <dt>Project</dt>
+  <dd>SDJ Editorial Portal — an editorial portal for the Science and Development Journal (SDJ), published by the College of Basic and Applied Sciences, University of Ghana</dd>
+  <dt>Author</dt>
+  <dd>Roger Koranteng Obeng (22424140)</dd>
+  <dt>Assessor</dt>
+  <dd>Prof. Solomon Mensah</dd>
+  <dt>Date</dt>
+  <dd>2026-08-12</dd>
+  <dt>Status</dt>
+  <dd>Written from the live, deployed system, not from the source code. Every screen, label, button caption and error message described below was observed by signing in as each role in turn — author, reviewer, editor, Editor-in-Chief and administrator — and operating the real application at the addresses below. Where a screen does not exist, this manual says so rather than describing one that would be convenient.</dd>
+</dl>
+
 <p><strong>Application:</strong>
 <code>https://ugjcs-frontend.vercel.app</code> <strong>API:</strong>
 <code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code></p>
@@ -316,7 +397,7 @@ this manual is a prototype built for an Advanced Software Engineering
 exam, not SDJ's official production system.</p>
 <p>The system recognises five kinds of user, and a person may hold more
 than one role at once:</p>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:21.15%" /><col style="width:78.85%" /></colgroup>
 <thead>
 <tr>
 <th>Role</th>
@@ -357,7 +438,7 @@ publish it, and to waive an article processing charge.</td>
 reviewer may hold at once, and deactivates accounts. See section 8.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Every manuscript's progress is described entirely by its
 <strong>status</strong> (Submitted, Under screening, Under review, and
 so on). Section 10 explains every status in plain language.</p>
@@ -367,7 +448,7 @@ this prototype</h3>
 <code>&lt;role&gt;@sdj.test</code>. The sign-in page's role chips fill
 these addresses for you (section 2.3); the passwords are typed by
 hand.</p>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:27.75%" /><col style="width:34.92%" /><col style="width:37.33%" /></colgroup>
 <thead>
 <tr>
 <th>Role</th>
@@ -414,7 +495,7 @@ hand.</p>
 <td><code>Sdj-Admin-2026!</code></td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Seven reviewer accounts exist rather than one because the
 reviewer-candidate screen (section 6.3) only demonstrates its
 conflict-of-interest and capacity rules if there are enough people to
@@ -438,7 +519,7 @@ archive</strong> from the sign-in page, or go directly to
 <code>/search</code>, to read published papers without an account.</p>
 <h3 id="22-what-is-public-and-what-needs-an-account">2.2 What is public
 and what needs an account</h3>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:47.8%" /><col style="width:52.2%" /></colgroup>
 <thead>
 <tr>
 <th>Without signing in</th>
@@ -475,7 +556,7 @@ and what needs an account</h3>
 <td>Managing accounts (Administrator only)</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <h3 id="23-signing-in">2.3 Signing in</h3>
 <ol type="1">
 <li><p>Go to <code>https://ugjcs-frontend.vercel.app</code>, which opens
@@ -889,7 +970,7 @@ submission, during screening, or while a manuscript is under review.</p>
 <p><strong>As an author.</strong> Open your accepted manuscript. Below
 the manuscript details is an <strong>Article processing charge</strong>
 panel showing the amount and one of three states:</p>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:23.79%" /><col style="width:76.21%" /></colgroup>
 <thead>
 <tr>
 <th>Status</th>
@@ -912,7 +993,7 @@ if you have to reconcile a card statement.</td>
 <td>The Editor-in-Chief has cancelled the charge. Nothing is owed.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>Click <strong>Pay</strong> and one of two things happens, depending
 on how the deployment is configured.</p>
 <p>In the default configuration the portal uses a <strong>mock payment
@@ -937,7 +1018,7 @@ coloured badge throughout the application. The table below explains each
 one in plain language: what it means, who can act on it next, and what
 they can do. ("Terminal" means the manuscript stays there permanently —
 nothing in the application can move it any further.)</p>
-<table>
+<div class="tablewrap"><table><colgroup><col style="width:14.39%" /><col style="width:41.97%" /><col style="width:10.3%" /><col style="width:33.34%" /></colgroup>
 <thead>
 <tr>
 <th>Status badge</th>
@@ -1049,7 +1130,7 @@ Reviews complete, or Revision requested.</td>
 <td>Nothing further happens to this manuscript.</td>
 </tr>
 </tbody>
-</table>
+</table></div>
 <p>A manuscript that reaches <strong>Accepted</strong> cannot be
 withdrawn through the application — once it is accepted, the only paths
 forward are scheduling and publishing.</p>

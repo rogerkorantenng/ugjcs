@@ -1,438 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="generator" content="pandoc" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>01 · Project Documentation</title>
-<style>
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
-<style>
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-  </style>
-<style>/* SDJ submission documents — screen and A4-portrait print.
-   Print is the primary target: these are assessed on paper or as PDF. */
+# SDJ Editorial Portal — Project Documentation
 
-:root {
-  --blue: #002855;
-  --gold: #fdb515;
-  --ink: #14181d;
-  --muted: #5a6068;
-  --rule: #d3d8d2;
-  --paper: #f7f8f6;
-  --measure: 46rem;
-}
-
-* { box-sizing: border-box; }
-
-html { -webkit-text-size-adjust: 100%; }
-
-body {
-  margin: 0;
-  font: 16px/1.62 "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
-  color: var(--ink);
-  background: var(--paper);
-}
-
-/* ---------- page chrome ---------- */
-
-header.site {
-  background: var(--blue);
-  color: #fff;
-  border-bottom: 3px solid var(--gold);
-  padding: 1.5rem 1.2rem 1.2rem;
-}
-header.site .inner,
-main,
-footer.site .inner { max-width: var(--measure); margin: 0 auto; }
-
-header.site .eyebrow {
-  font: 600 10.5px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--gold);
-}
-header.site .title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.45rem;
-  font-weight: 600;
-  margin-top: .4rem;
-  letter-spacing: -.01em;
-}
-
-main { padding: 2.4rem 1.2rem 4rem; }
-
-nav.docnav { font-size: .85rem; margin-bottom: 2rem; }
-
-footer.site {
-  border-top: 1px solid var(--rule);
-  padding: 1.2rem;
-  text-align: center;
-  font-size: .8rem;
-  color: var(--muted);
-}
-
-/* ---------- typography ---------- */
-
-h1, h2, h3, h4, h5 {
-  font-family: Georgia, "Times New Roman", serif;
-  color: var(--ink);
-  line-height: 1.22;
-  letter-spacing: -.01em;
-}
-h1 {
-  font-size: 1.95rem;
-  margin: 0 0 1.4rem;
-  padding-bottom: .45rem;
-  border-bottom: 2px solid var(--blue);
-}
-h2 {
-  font-size: 1.38rem;
-  margin: 2.6rem 0 .9rem;
-  padding-bottom: .3rem;
-  border-bottom: 1px solid var(--rule);
-}
-h3 { font-size: 1.1rem; margin: 1.9rem 0 .6rem; }
-h4 { font-size: .98rem; margin: 1.4rem 0 .5rem; }
-
-p { margin: 0 0 1rem; }
-ul, ol { margin: 0 0 1rem; padding-left: 1.4rem; }
-li { margin: .3rem 0; }
-li > p { margin-bottom: .5rem; }
-
-a { color: #3f3596; text-underline-offset: 2px; }
-
-strong { font-weight: 600; }
-
-hr { border: 0; border-top: 1px solid var(--rule); margin: 2.2rem 0; }
-
-/* Long identifiers and URLs must never push the page wider than the paper. */
-code {
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: .855em;
-  background: #ebeee9;
-  padding: .1em .32em;
-  border-radius: 3px;
-  overflow-wrap: break-word;
-}
-pre {
-  background: #f2f4f0;
-  color: #1b2027;
-  border: 1px solid var(--rule);
-  border-left: 3px solid var(--blue);
-  padding: .9rem 1.1rem;
-  border-radius: 3px;
-  overflow-x: auto;
-  font-size: .86rem;
-  line-height: 1.5;
-}
-pre code { background: none; padding: 0; font-size: 1em; }
-
-blockquote {
-  border-left: 3px solid var(--gold);
-  margin: 1.2rem 0;
-  padding: .35rem 1rem;
-  color: #3c4148;
-  background: #fff;
-}
-blockquote p:last-child { margin-bottom: 0; }
-
-/* ---------- metadata panel ---------- */
-
-dl.docmeta {
-  margin: 0 0 2rem;
-  padding: 1rem 1.1rem;
-  background: #fff;
-  border: 1px solid var(--rule);
-  border-left: 3px solid var(--gold);
-  border-radius: 3px;
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: .35rem .9rem;
-  font-size: .93rem;
-}
-dl.docmeta dt {
-  font-weight: 600;
-  color: var(--blue);
-  white-space: nowrap;
-}
-dl.docmeta dd { margin: 0; overflow-wrap: break-word; }
-
-/* ---------- tables ----------
-   Not `display:block`: that detaches the table from normal flow, so it cannot
-   break across printed pages and its header cannot repeat. A wrapper scrolls
-   on screen instead, and unwraps for print. */
-
-.tablewrap { overflow-x: auto; margin: 1.2rem 0; }
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: .88rem;
-  line-height: 1.45;
-}
-th, td {
-  border: 1px solid var(--rule);
-  padding: .42rem .6rem;
-  text-align: left;
-  vertical-align: top;
-  overflow-wrap: break-word;
-}
-th { background: #eaeee8; font-weight: 600; }
-tbody tr:nth-child(even) { background: #fbfcfa; }
-
-/* ---------- diagrams ---------- */
-
-figure.diagram {
-  margin: 1.6rem 0;
-  padding: 1rem;
-  background: #fff;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  text-align: center;
-  overflow-x: auto;
-}
-figure.diagram svg { max-width: 100%; height: auto; }
-
-/* Pandoc emits its own title block; the page chrome already carries the title. */
-#title-block-header { display: none; }
-
-/* ---------- print: A4 portrait ---------- */
-
-@page {
-  size: A4 portrait;
-  margin: 17mm 14mm 16mm;
-}
-
-@media print {
-  html, body {
-    background: #fff;
-    font-size: 10pt;
-    line-height: 1.42;
-  }
-
-  main { max-width: none; padding: 0; }
-  header.site .inner, footer.site .inner { max-width: none; }
-
-  nav.docnav { display: none; }
-
-  /* The masthead prints once, at the top of the first page. */
-  header.site {
-    padding: 0 0 .5rem;
-    background: #fff;
-    color: var(--ink);
-    border-bottom: 2pt solid var(--blue);
-    margin-bottom: 1rem;
-  }
-  header.site .eyebrow { color: var(--blue); font-size: 7pt; letter-spacing: .16em; }
-  header.site .title { font-size: 14pt; margin-top: .2rem; }
-
-  footer.site {
-    border-top: .5pt solid var(--rule);
-    font-size: 7.5pt;
-    padding: .5rem 0 0;
-    margin-top: 1.2rem;
-  }
-
-  h1 { font-size: 17pt; margin: 0 0 .8rem; }
-  h2 { font-size: 12.5pt; margin: 1.3rem 0 .5rem; }
-  h3 { font-size: 10.8pt; margin: 1rem 0 .35rem; }
-  h4 { font-size: 10pt; }
-
-  /* Never leave a heading stranded at the foot of a page. */
-  h1, h2, h3, h4 { break-after: avoid-page; page-break-after: avoid; }
-  h2 { break-before: auto; }
-
-  p, li { orphans: 3; widows: 3; }
-
-  /* Keep atomic blocks whole where they plausibly fit on one page. */
-  figure.diagram, blockquote, pre, dl.docmeta {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  /* Tables may span pages, but a row may not be split and the header repeats. */
-  .tablewrap { overflow: visible; }
-  /* Fixed layout plus the generated colgroup: a wide matrix wraps to fit the page
-     instead of overflowing it and losing its right-hand column off the paper. */
-  table { font-size: 8pt; page-break-inside: auto; table-layout: fixed; }
-  thead { display: table-header-group; }
-  tr { break-inside: avoid; page-break-inside: avoid; }
-  th, td { padding: .28rem .38rem; }
-  tbody tr:nth-child(even) { background: #fafbf9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  th { background: #ecefe9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-  pre {
-    font-size: 8pt;
-    background: #f6f7f4;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-  }
-  code { background: #f2f3f0; font-size: 8.6pt; }
-
-  a { color: var(--ink); text-decoration: none; }
-
-  figure.diagram { padding: .5rem; border: .5pt solid var(--rule); }
-  figure.diagram svg { max-height: 190mm; }
-
-  hr { margin: 1.2rem 0; }
-}
-</style>
-</head>
-<body>
-<header class="site">
-  <div class="inner">
-    <div class="eyebrow">Science and Development Journal (SDJ) — Editorial Portal · Submission Documentation</div>
-    <div class="title">01 · Project Documentation</div>
-  </div>
-</header>
-<main>
-<nav class="docnav"><a href="index.html">← All documents</a></nav>
-<h1 id="sdj-editorial-portal--project-documentation">SDJ Editorial
-Portal — Project Documentation</h1>
 <dl class="docmeta">
   <dt>Document</dt>
   <dd>01 — Consolidated project documentation (main submission document)</dd>
@@ -452,1899 +19,1156 @@ Portal — Project Documentation</h1>
   <dd><code>Project_Documentation.pdf</code></dd>
 </dl>
 
-<p><strong>Naming.</strong> The product documented here is the
-<strong>SDJ Editorial Portal</strong>, built for the <strong>Science and
-Development Journal (SDJ)</strong>, an established journal published by
-the College of Basic and Applied Sciences (CBAS), University of Ghana.
-The repository (<code>github.com/rogerkorantenng/ugjcs</code>), hosting
-URLs, package names and infrastructure resource names predate this
-naming and retain the pilot's internal codename <strong>UGJCS</strong>;
-wherever <code>ugjcs</code> appears in a path, URL or identifier in this
-document set, it is that codename, not a separate system. The deployed
-system is a prototype built for an Advanced Software Engineering exam —
-it is not SDJ's official production system.</p>
-<p><strong>Status of this document.</strong> This is a consolidating
-document. It summarises and cross-references six authoritative
-supporting documents and the codebase itself rather than duplicating
-them; where a figure, table, or claim has a fuller treatment elsewhere,
-that document is named and the reader is pointed to it. Nothing here
-should be taken to override what those documents say — where a
-discrepancy exists between two of them, it is recorded rather than
-silently resolved in one direction (see section 10.4).</p>
-<p><strong>Referenced source documents</strong></p>
-<div class="tablewrap"><table><colgroup><col style="width:9.39%" /><col style="width:38.0%" /><col style="width:52.61%" /></colgroup>
-<thead>
-<tr>
-<th>#</th>
-<th>Document</th>
-<th>Role</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>02</td>
-<td><code>docs/02-srs.md</code></td>
-<td>Software Requirements Specification, traceability matrix</td>
-</tr>
-<tr>
-<td>03</td>
-<td><code>docs/03-effort-estimation.md</code></td>
-<td>Use Case Points, COCOMO II cross-check, MoSCoW cut</td>
-</tr>
-<tr>
-<td>04</td>
-<td><code>docs/04-technical-debt-register.md</code></td>
-<td>Fourteen debt entries, Debt→Cause→Impact→Priority→Resolution</td>
-</tr>
-<tr>
-<td>05</td>
-<td><code>docs/05-api-contract.md</code></td>
-<td>HTTP boundary contract between backend and frontend</td>
-</tr>
-<tr>
-<td>06</td>
-<td><code>docs/06-testing-report.md</code></td>
-<td>Test strategy, test cases, defects found, UAT</td>
-</tr>
-<tr>
-<td>—</td>
-<td><code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code></td>
-<td>Design specification (problem, architecture, data model)</td>
-</tr>
-<tr>
-<td>—</td>
-<td><code>backend/src/ugjcs/domain/</code></td>
-<td>The implemented domain — source of truth for lifecycle and
-rules</td>
-</tr>
-<tr>
-<td>—</td>
-<td><code>infra/</code></td>
-<td>Terraform — source of truth for the deployed topology</td>
-</tr>
-</tbody>
-</table></div>
-<hr />
-<h2 id="1-project-title">1. Project title</h2>
-<p><strong>SDJ Editorial Portal</strong> — a double-blind peer-review
-and editorial management platform built for the Science and Development
-Journal (SDJ), published by the College of Basic and Applied Sciences
-(CBAS), University of Ghana, as an individual Advanced Software
-Engineering final project within a 48-hour development window.</p>
-<hr />
-<h2 id="2-problem-statement">2. Problem statement</h2>
-<p>The College of Basic and Applied Sciences (CBAS), University of Ghana
-publishes the Science and Development Journal (SDJ), but the journal has
-no dedicated system for managing its editorial process: submissions,
-reviews and decisions are coordinated manually over email, shared drives
-and spreadsheets. That approach fails in four specific ways (design
-specification section 1):</p>
-<ol type="1">
-<li><strong>Blinding is not enforceable.</strong> Double-blind review
-depends on a human remembering to strip identifying information from a
-document before forwarding it. Author names routinely survive in PDF
-metadata even when removed from the visible text.</li>
-<li><strong>There is no audit trail.</strong> When a rejected author
-appeals, there is no authoritative, tamper-evident record of who decided
-what, when, and on what evidence.</li>
-<li><strong>Reviewer assignment is ad hoc.</strong> Editors assign from
-memory, which concentrates load on a few willing reviewers and misses
-expertise matches entirely.</li>
-<li><strong>Published work is not discoverable.</strong> Accepted papers
-end up as files on a shared drive rather than in a citable, indexable,
-harvestable archive.</li>
-</ol>
-<p>The portal addresses all four as first-class system responsibilities
-— enforced by the system — rather than as procedural guidance that
-depends on a human remembering to follow it.</p>
-<hr />
-<h2 id="3-aim-and-objectives">3. Aim and objectives</h2>
-<p><strong>Aim.</strong> Deliver a deployed, production-quality
-editorial portal for SDJ that manages the complete scholarly publishing
-lifecycle from submission to public archival, with double-blind
-integrity and editorial auditability enforced by the system rather than
-by convention.</p>
-<p><strong>Objectives:</strong></p>
-<ul>
-<li><strong>O1.</strong> Enforce a guarded manuscript lifecycle in which
-no illegal state transition is reachable through any interface.</li>
-<li><strong>O2.</strong> Guarantee double-blind integrity structurally,
-including at the document level.</li>
-<li><strong>O3.</strong> Provide a tamper-evident editorial audit
-trail.</li>
-<li><strong>O4.</strong> Assist reviewer assignment with expertise
-matching, conflict-of-interest exclusion and workload balancing, leaving
-final authority with the editor.</li>
-<li><strong>O5.</strong> Publish accepted work to a public, searchable,
-citable and machine-harvestable archive.</li>
-<li><strong>O6.</strong> Demonstrate disciplined engineering practice:
-estimation-driven scope, automated quality gates, infrastructure as
-code, and an explicit technical debt register.</li>
-</ul>
-<p>Objectives O1–O3 are demonstrably met by the delivered domain layer
-(section 8, section 10); O4 is partially met (reviewer assignment is a
-persistence record without matching or a conflict check — TD-02, TD-03);
-O5 is met for the archive read path; O6 is the subject of section 7,
-section 11 and section 12, and is, on the evidence in section 11.7, the
-objective this project delivers most convincingly.</p>
-<hr />
-<h2 id="4-stakeholders">4. Stakeholders</h2>
-<p>The client is the editorial office of the Science and Development
-Journal at CBAS; the primary human actors are the journal's
-editor-in-chief, its handling editors, its reviewers and its
-authors.</p>
-<div class="tablewrap"><table><colgroup><col style="width:23.08%" /><col style="width:29.16%" /><col style="width:47.76%" /></colgroup>
-<thead>
-<tr>
-<th>Actor</th>
-<th>Type</th>
-<th>Primary concerns</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Author</td>
-<td>Primary, authenticated</td>
-<td>Submit work, track progress, respond to reviews</td>
-</tr>
-<tr>
-<td>Reviewer</td>
-<td>Primary, authenticated</td>
-<td>Accept/decline invitations, submit structured reviews, remain
-anonymous</td>
-</tr>
-<tr>
-<td>Editor</td>
-<td>Primary, authenticated</td>
-<td>Screen submissions, assign reviewers, record decisions</td>
-</tr>
-<tr>
-<td>Editor-in-Chief</td>
-<td>Primary, authenticated</td>
-<td>Compose issues, publish, configure journal policy, final
-authority</td>
-</tr>
-<tr>
-<td>Administrator</td>
-<td>Secondary, authenticated</td>
-<td>User accounts, role assignment, reviewer capacity</td>
-</tr>
-<tr>
-<td>Reader</td>
-<td>Primary, anonymous</td>
-<td>Discover, read, cite and download published papers</td>
-</tr>
-<tr>
-<td>CBAS college leadership</td>
-<td>Secondary</td>
-<td>Editorial throughput and workload analytics</td>
-</tr>
-<tr>
-<td>Indexing services</td>
-<td>External system</td>
-<td>Harvest metadata via OAI-PMH</td>
-</tr>
-</tbody>
-</table></div>
-<p>Non-human stakeholders: the AWS platform (cost and operability,
-section 13) and future maintainers, for whom the technical debt register
-(section 12) is written.</p>
-<p>A single account may hold multiple roles simultaneously — a
-deliberate design choice (design specification section 3, SRS section
-2.3) with a direct security consequence: the authorisation layer does
-not currently prevent an Author–Reviewer dual-role holder from reviewing
-their own manuscript (TD-02, section 12).</p>
-<hr />
-<h2 id="5-requirements-analysis">5. Requirements analysis</h2>
-<p>Requirements were elicited from the problem statement (section 2)
-rather than from structured interviews with SDJ's editorial office, and
-no real SDJ submissions or reviewer data were available to the project
-(SRS section 2.6) — a stated constraint, not a hidden one. The analysis
-proceeded in four steps, each of which left an artefact this
-consolidation points to rather than repeats:</p>
-<ol type="1">
-<li><strong>Actor and use-case inventory.</strong> Eight stakeholder
-classes (section 4) were mapped to 25 use cases spanning identity,
-submission, screening, review, decision, publication, archive and
-administration (effort estimation section 3; SRS section 4.2).</li>
-<li><strong>Functional requirements, stated testably.</strong> Each of
-28 functional requirements (plus one, FR-25a, added during this analysis
-— see below) is written as "the system shall …", with explicit
-preconditions, postconditions and an acceptance criterion, following
-IEEE 830-1998 and ISO/IEC/IEEE 29148:2018 (SRS section 1.1, section
-3.1).</li>
-<li><strong>Non-functional requirements, each with a verification
-method.</strong> Seventeen NFRs across security, integrity, performance,
-reliability, availability, usability, maintainability, observability,
-portability and compliance, each naming the test or check that verifies
-it (SRS section 3.2) — "non-functional" is deliberately not allowed to
-mean "unverifiable."</li>
-<li><strong>Prioritisation against an effort estimate, not against
-intuition.</strong> MoSCoW priorities were assigned per requirement in
-the design specification (section 5) and made authoritative once the
-effort estimate (section 7 below) confirmed the full system was roughly
-two orders of magnitude larger than the 48-hour window — the cut was a
-consequence of measurement, not a guess made in parallel with it.</li>
-</ol>
-<p><strong>A requirement discovered during analysis, not invented for
-the report.</strong> Comparing the implemented lifecycle guard
-(<code>transitions.py</code>, which permits <code>WITHDRAWN</code> as a
-target state) against the implemented authorisation layer
-(<code>policies.py</code>, which has no action gating who may invoke it)
-surfaced a live authorisation gap the original FR-25 did not anticipate.
-This was recorded as <strong>FR-25a</strong>, marked NEW, rather than
-silently patched — a demonstration that requirements analysis did not
-stop once the SRS was signed off (SRS section 3.1, Group E).</p>
-<p>The full requirement set, with preconditions, postconditions and
-acceptance criteria, is in <code>docs/02-srs.md</code> section 3; this
-section summarises the <em>process</em>, that document contains the
-<em>content</em>.</p>
-<hr />
-<h2 id="6-software-requirements-specification-srs">6. Software
-Requirements Specification (SRS)</h2>
-<p>The authoritative SRS is <code>docs/02-srs.md</code>, conformant to
-IEEE 830-1998 and ISO/IEC/IEEE 29148:2018. It is structured in seven
-sections: introduction and scope (section 1), overall description and
-operating environment (section 2), specific functional and
-non-functional requirements (section 3), system models — lifecycle,
-actor mapping, authorisation matrix (section 4), the requirements
-traceability matrix (section 5), MoSCoW prioritisation (section 6), and
-constraints/limitations (section 7). This section summarises its content
-and states plainly where it is now stale relative to the delivered
-system (section 10.4).</p>
-<h3 id="61-requirement-counts">6.1 Requirement counts</h3>
-<div class="tablewrap"><table><colgroup><col style="width:26.29%" /><col style="width:23.92%" /><col style="width:49.79%" /></colgroup>
-<thead>
-<tr>
-<th>Category</th>
-<th>Count</th>
-<th>Priority split</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Functional requirements</td>
-<td>34 (FR-01…FR-34) + FR-25a</td>
-<td>19 Must, 12 Should, 3 Could</td>
-</tr>
-<tr>
-<td>Non-functional requirements</td>
-<td>17 (NFR-01…NFR-17)</td>
-<td>Security (6), Integrity (1), Performance (2), Reliability (1),
-Availability (1), Usability (1), Maintainability (2), Observability (1),
-Portability (1), Compliance (1)</td>
-</tr>
-</tbody>
-</table></div>
-<p>FR-29 to FR-34 cover capabilities the first requirement set never
-anticipated: article processing charges, the administrator console,
-decision certificates, anonymisation preflight, review deadlines, and
-self-service author registration. They were written after their
-implementation, by reading the delivered routes and tests, so they
-describe what exists rather than what was intended.</p>
-<h3 id="62-the-manuscript-lifecycle-is-the-srss-executable-core">6.2 The
-manuscript lifecycle is the SRS's executable core</h3>
-<p>SRS section 4.1 transcribes the lifecycle directly from
-<code>backend/src/ugjcs/domain/transitions.py</code>'s
-<code>LEGAL_TRANSITIONS</code> mapping — stated explicitly as the tested
-source of truth, not the narrative diagram in the design specification.
-The full state table and diagram are reproduced and explained in section
-8.2 of this document, since the lifecycle is equally central to system
-analysis.</p>
-<h3
-id="63-a-recorded-load-bearing-disagreement-between-two-authoritative-documents">6.3
-A recorded, load-bearing disagreement between two authoritative
-documents</h3>
-<p>SRS section 4.1.3 records that the design specification's own
-lifecycle diagram (section 6.2 of that document) draws
-<code>RESUBMITTED</code> flowing directly into
-<code>REVIEWS_COMPLETE</code>, implying a resubmission automatically
-closes the review round. The implemented <code>LEGAL_TRANSITIONS</code>
-table instead routes <code>RESUBMITTED</code> to <strong>either</strong>
-<code>UNDER_REVIEW</code> <strong>or</strong>
-<code>UNDER_SCREENING</code>, at editorial discretion, and never closes
-the round by itself. Per this project's stated rule — the implementation
-governs, and the disagreement is recorded rather than hidden — the SRS
-and this document both follow the code.</p>
-<h3 id="64-traceability-matrix--read-honestly-not-optimistically">6.4
-Traceability matrix — read honestly, not optimistically</h3>
-<p>SRS section 5 has been reconciled against the running code twice:
-once when the <code>api/</code> layer and frontend first existed, and
-again after the two feature waves. The second pass corrected rows that
-had drifted in the opposite direction, recording expertise-ranked
-matching, structured reviews, public document download, audit-chain
-exposure, citation export and analytics as unbuilt when all six had
-shipped. A matrix that understates the system is as much a defect as one
-that overstates it.</p>
-<p>Current totals: 24 of 35 requirement lines implemented and tested end
-to end, 5 partially implemented with a named remainder, 6 unbuilt.
-<code>docs/05-api-contract.md</code> and
-<code>docs/06-testing-report.md</code> are the authorities on what is
-reachable by route and proven by test; section 10.4 reconciles the
-three.</p>
-<h3 id="65-authorisation-matrix--the-registers-origin-point">6.5
-Authorisation matrix — the register's origin point</h3>
-<p>SRS section 4.3 derives the authorisation matrix directly from
-<code>policies.py</code>'s <code>_ROLE_GRANTS</code> and
-<code>_OWNERSHIP_ACTIONS</code>, and names the two critical gaps that
-became TD-02 and TD-03 (section 12) before the technical debt register
-existed as a separate document — the SRS is where those gaps were first
-written down.</p>
-<hr />
-<h2 id="7-software-effort-estimation">7. Software effort estimation</h2>
-<p>Full arithmetic, every intermediate figure, and the estimation method
-are in <code>docs/03-effort-estimation.md</code>. This section
-summarises the method, the headline figures and why they matter, without
-repeating the derivation.</p>
-<h3 id="71-method">7.1 Method</h3>
-<p><strong>Use Case Points (UCP)</strong> is the primary technique —
-actor and use-case weights are read directly off the functional
-requirements table rather than guessed. <strong>COCOMO II Early
-Design</strong> serves as an independent cross-check on different inputs
-(source lines of code, process/product ratings) rather than
-actor/transaction counts. Agreement between two methods driven by
-different inputs is stronger evidence than precision from either
-alone.</p>
-<h3 id="72-headline-figures">7.2 Headline figures</h3>
-<div class="tablewrap"><table><colgroup><col style="width:37.08%" /><col style="width:26.12%" /><col style="width:36.8%" /></colgroup>
-<thead>
-<tr>
-<th>Quantity</th>
-<th>Value</th>
-<th>Basis</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Unadjusted actor weight (UAW)</td>
-<td>19</td>
-<td>6 GUI actors × 3 + 1 API actor × 1</td>
-</tr>
-<tr>
-<td>Unadjusted use-case weight (UUCW)</td>
-<td>225</td>
-<td>25 use cases, Karner transaction-count classes</td>
-</tr>
-<tr>
-<td>UUCP</td>
-<td>244</td>
-<td>UAW + UUCW</td>
-</tr>
-<tr>
-<td>Technical complexity factor (TCF)</td>
-<td>1.105</td>
-<td>13 technical factors, ΣT = 50.5</td>
-</tr>
-<tr>
-<td>Environmental complexity factor (ECF)</td>
-<td>0.605</td>
-<td>8 environmental factors, ΣE = 26.5</td>
-</tr>
-<tr>
-<td><strong>UCP (full system)</strong></td>
-<td><strong>163.1</strong></td>
-<td>UUCP × TCF × ECF</td>
-</tr>
-<tr>
-<td><strong>Effort, full system</strong></td>
-<td><strong>≈ 3,262 person-hours</strong> (≈ 1.8 person-years)</td>
-<td>UCP × PF (20 h/UCP)</td>
-</tr>
-<tr>
-<td><strong>UCP (Must-have subset, UC1–UC18)</strong></td>
-<td><strong>125.7</strong></td>
-<td>Same method, 18 use cases only</td>
-</tr>
-<tr>
-<td><strong>Effort, Must-have subset</strong></td>
-<td><strong>≈ 2,514 person-hours</strong></td>
-<td>UCP × 20</td>
-</tr>
-<tr>
-<td>COCOMO II Early Design (full system)</td>
-<td>≈ 7,170 person-hours (47.2 person-months)</td>
-<td>12 KSLOC, ΣSF = 14.36, ∏EM = 1.1699</td>
-</tr>
-</tbody>
-</table></div>
-<p><code>PF = 20 h/UCP</code> follows Karner's productivity-factor rule:
-the count of E1–E6 rated below 3, plus the count of E7–E8 rated above 3,
-sums to 0 here — within the ≤2 threshold for PF = 20, not a default
-assumption (effort estimation section 6).</p>
-<h3 id="73-reconciliation-not-convergence">7.3 Reconciliation, not
-convergence</h3>
-<p>The two methods differ by roughly 2.2× (7,170 ÷ 3,262). This is
-explained, not dismissed: COCOMO II is calibrated on projects carrying
-formal verification and management overhead this project does not incur,
-and its <code>SCED</code> (schedule-compression) penalty compounds
-multiplicatively with <code>RCPX</code> and <code>PDIF</code> for an
-extreme-compression solo project. UCP, conversely, counts only
-externally visible actor transactions and is structurally blind to
-platform work — Terraform, CI/CD, the hash chain's internals — of which
-this project has a disproportionate amount relative to its use-case
-count. The two methods <strong>bound the answer from the same
-side</strong>: both place the full system in the one-to-four-person-year
-range, nearly two orders of magnitude beyond the 48-hour window. That
-agreement on <em>scale</em>, not either figure's precision, is what
-forces the MoSCoW cut.</p>
-<h3 id="74-the-moscow-cut-this-estimate-produced">7.4 The MoSCoW cut
-this estimate produced</h3>
-<div class="tablewrap"><table><colgroup><col style="width:21.23%" /><col style="width:26.57%" /><col style="width:52.2%" /></colgroup>
-<thead>
-<tr>
-<th>Priority</th>
-<th>Use cases</th>
-<th>Decision</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Must</td>
-<td>UC1–UC18</td>
-<td>Implemented to production quality</td>
-</tr>
-<tr>
-<td>Should</td>
-<td>UC19–UC23</td>
-<td>Implemented only if Must-have work completed early</td>
-</tr>
-<tr>
-<td>Could</td>
-<td>UC24, UC25</td>
-<td>Deferred; entered in the technical debt register</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="75-why-the-realised-effort-does-not-invalidate-the-estimate">7.5
-Why the realised effort does not invalidate the estimate</h3>
-<p>The Must-have estimate of 2,514 person-hours assumes Karner's PF = 20
-h/UCP, calibrated on manual development. This build used AI-assisted
-development — Claude Code (Anthropic) pair-programming the
-implementation under the author's direction and review — which the
-estimation document treats as a change of development
-<strong>method</strong>, not merely of pace (effort estimation section
-9). Three consequences follow, and each is load-bearing for how this
-document's conclusion (section 18) should be read:</p>
-<ol type="1">
-<li><strong>UCP still correctly sized the problem.</strong> What changes
-under AI assistance is the rate at which a chosen method converts
-problem-size into elapsed hours (the productivity factor), not the size
-of the problem itself. The MoSCoW cut in section 7.4 was decided before
-the realised productivity was known, and remains the correct basis for
-it.</li>
-<li><strong>The realised productivity factor is a local calibration, not
-a general claim</strong> — evidence about this developer, this tool,
-this domain and this window, computed formally by the method in effort
-estimation section 10.3 (actual session-hours from commit history ÷
-delivered UCP). It does not generalise to other developers or
-tools.</li>
-<li><strong>The gap between estimated and realised hours is not free
-capacity.</strong> It is capacity that was not spent on activities the
-classical estimate priced in: test depth beyond the 85% coverage floor,
-architecture decision records and onboarding documentation, and security
-hardening beyond the NFR-01–NFR-06 baseline. This connects directly to
-the limitations recorded in section 17.</li>
-</ol>
-<hr />
-<h2 id="8-system-analysis">8. System analysis</h2>
-<p>This section and section 9 are original to this consolidation.
-Section 8 analyses the problem domain as modelled — the aggregates, the
-manuscript lifecycle as a state machine, the double-blind projection,
-the audit mechanism's design rationale, and the persisted data model.
-Section 9 covers the architectural design decisions that realise that
-analysis — the hexagonal layering, its two mechanically enforced
-contracts, the API design, and the deployment topology.</p>
-<h3 id="81-domain-model">8.1 Domain model</h3>
-<p><code>Manuscript</code> is the aggregate root; it owns its
-authorship, status, version and review count, and nothing outside the
-aggregate mutates them directly. <code>User</code> (implemented as
-<code>Account</code> in code — <code>domain/account.py</code>),
-<code>Issue</code> and the editorial event log are separate aggregates
-referenced by identity. Value objects (<code>domain/ids.py</code>) give
-every identifier — <code>TrackingCode</code>, <code>ManuscriptId</code>,
-<code>UserId</code> — its own type rather than a bare <code>UUID</code>
-or <code>str</code>, so a tracking code and a user id cannot be
-interchanged by a type error that would otherwise compile.</p>
-<p>The eight domain modules and their responsibilities:</p>
-<div class="tablewrap"><table><colgroup><col style="width:29.6%" /><col style="width:70.4%" /></colgroup>
-<thead>
-<tr>
-<th>Module</th>
-<th>Responsibility</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>manuscript.py</code></td>
-<td>The <code>Manuscript</code> aggregate: lifecycle transitions,
-review-quorum counting, resubmission versioning</td>
-</tr>
-<tr>
-<td><code>transitions.py</code></td>
-<td><code>LEGAL_TRANSITIONS</code> — the exhaustive state table and
-<code>assert_legal</code> guard</td>
-</tr>
-<tr>
-<td><code>policies.py</code></td>
-<td><code>can(actor, action, resource)</code> — role-based and
-ownership-based authorisation, deny by default</td>
-</tr>
-<tr>
-<td><code>blinding.py</code></td>
-<td><code>blind()</code> — the structural double-blind projection
-(section 8.4)</td>
-</tr>
-<tr>
-<td><code>hashchain.py</code></td>
-<td><code>append</code>/<code>verify</code> — the tamper-evident audit
-chain (section 8.5)</td>
-</tr>
-<tr>
-<td><code>events.py</code></td>
-<td><code>EditorialEvent</code> — the audit record's canonical, hashable
-representation</td>
-</tr>
-<tr>
-<td><code>account.py</code></td>
-<td><code>Account</code> aggregate: identity, roles, credentials (role
-vocabulary only — no registration flow in the domain layer)</td>
-</tr>
-<tr>
-<td><code>enums.py</code>, <code>ids.py</code>,
-<code>errors.py</code></td>
-<td>Shared vocabulary, typed identifiers, the <code>DomainError</code>
-hierarchy</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="82-the-manuscript-lifecycle-as-a-state-machine">8.2 The
-manuscript lifecycle as a state machine</h3>
-<p>The lifecycle below is transcribed from <code>transitions.py</code>'s
-<code>LEGAL_TRANSITIONS</code> mapping — the executable, tested source
-of truth (SRS section 4.1), reproduced here because it is the single
-most important artefact in the system's analysis.</p>
-<div class="tablewrap"><table><colgroup><col style="width:37.03%" /><col style="width:46.93%" /><col style="width:16.04%" /></colgroup>
-<thead>
-<tr>
-<th>Source state</th>
-<th>Legal targets</th>
-<th>Terminal?</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>DRAFT</code></td>
-<td><code>SUBMITTED</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>SUBMITTED</code></td>
-<td><code>UNDER_SCREENING</code>, <code>WITHDRAWN</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>UNDER_SCREENING</code></td>
-<td><code>DESK_REJECTED</code>, <code>UNDER_REVIEW</code>,
-<code>REVISION_REQUESTED</code>, <code>WITHDRAWN</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>UNDER_REVIEW</code></td>
-<td><code>REVIEWS_COMPLETE</code>, <code>WITHDRAWN</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>REVIEWS_COMPLETE</code></td>
-<td><code>ACCEPTED</code>, <code>REJECTED</code>,
-<code>REVISION_REQUESTED</code>, <code>WITHDRAWN</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>REVISION_REQUESTED</code></td>
-<td><code>RESUBMITTED</code>, <code>WITHDRAWN</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>RESUBMITTED</code></td>
-<td><code>UNDER_REVIEW</code>, <code>UNDER_SCREENING</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>ACCEPTED</code></td>
-<td><code>SCHEDULED</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>SCHEDULED</code></td>
-<td><code>PUBLISHED</code></td>
-<td>No</td>
-</tr>
-<tr>
-<td><code>DESK_REJECTED</code>, <code>REJECTED</code>,
-<code>PUBLISHED</code>, <code>WITHDRAWN</code></td>
-<td><em>(none)</em></td>
-<td><strong>Yes</strong></td>
-</tr>
-</tbody>
-</table></div>
+**Naming.** The product documented here is the **SDJ Editorial Portal**, built for the
+**Science and Development Journal (SDJ)**, an established journal published by the College of
+Basic and Applied Sciences (CBAS), University of Ghana. The repository
+(`github.com/rogerkorantenng/ugjcs`), hosting URLs, package names and infrastructure resource
+names predate this naming and retain the pilot's internal codename **UGJCS**; wherever `ugjcs`
+appears in a path, URL or identifier in this document set, it is that codename, not a separate
+system. The deployed system is a prototype built for an Advanced Software Engineering exam —
+it is not SDJ's official production system.
+
+**Status of this document.** This is a consolidating document. It summarises and
+cross-references six authoritative supporting documents and the codebase itself rather than
+duplicating them; where a figure, table, or claim has a fuller treatment elsewhere, that
+document is named and the reader is pointed to it. Nothing here should be taken to override
+what those documents say — where a discrepancy exists between two of them, it is recorded
+rather than silently resolved in one direction (see section 10.4).
+
+**Referenced source documents**
+
+| # | Document | Role |
+|---|---|---|
+| 02 | `docs/02-srs.md` | Software Requirements Specification, traceability matrix |
+| 03 | `docs/03-effort-estimation.md` | Use Case Points, COCOMO II cross-check, MoSCoW cut |
+| 04 | `docs/04-technical-debt-register.md` | Fourteen debt entries, Debt→Cause→Impact→Priority→Resolution |
+| 05 | `docs/05-api-contract.md` | HTTP boundary contract between backend and frontend |
+| 06 | `docs/06-testing-report.md` | Test strategy, test cases, defects found, UAT |
+| — | `docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md` | Design specification (problem, architecture, data model) |
+| — | `backend/src/ugjcs/domain/` | The implemented domain — source of truth for lifecycle and rules |
+| — | `infra/` | Terraform — source of truth for the deployed topology |
+
+---
+
+## 1. Project title
+
+**SDJ Editorial Portal** — a double-blind peer-review and editorial management platform built
+for the Science and Development Journal (SDJ), published by the College of Basic and Applied
+Sciences (CBAS), University of Ghana, as an individual Advanced Software Engineering final project
+within a 48-hour development window.
+
+---
+
+## 2. Problem statement
+
+The College of Basic and Applied Sciences (CBAS), University of Ghana publishes the Science
+and Development Journal (SDJ), but the journal has no dedicated system for managing its
+editorial process: submissions, reviews and decisions are coordinated manually over email,
+shared drives and spreadsheets. That approach fails in four specific ways (design
+specification section 1):
+
+1. **Blinding is not enforceable.** Double-blind review depends on a human remembering to strip
+   identifying information from a document before forwarding it. Author names routinely survive
+   in PDF metadata even when removed from the visible text.
+2. **There is no audit trail.** When a rejected author appeals, there is no authoritative,
+   tamper-evident record of who decided what, when, and on what evidence.
+3. **Reviewer assignment is ad hoc.** Editors assign from memory, which concentrates load on a
+   few willing reviewers and misses expertise matches entirely.
+4. **Published work is not discoverable.** Accepted papers end up as files on a shared drive
+   rather than in a citable, indexable, harvestable archive.
+
+The portal addresses all four as first-class system responsibilities — enforced by the system
+— rather than as procedural guidance that depends on a human remembering to follow it.
+
+---
+
+## 3. Aim and objectives
+
+**Aim.** Deliver a deployed, production-quality editorial portal for SDJ that manages the
+complete scholarly publishing lifecycle from submission to public archival, with double-blind
+integrity and editorial auditability enforced by the system rather than by convention.
+
+**Objectives:**
+
+- **O1.** Enforce a guarded manuscript lifecycle in which no illegal state transition is
+  reachable through any interface.
+- **O2.** Guarantee double-blind integrity structurally, including at the document level.
+- **O3.** Provide a tamper-evident editorial audit trail.
+- **O4.** Assist reviewer assignment with expertise matching, conflict-of-interest exclusion and
+  workload balancing, leaving final authority with the editor.
+- **O5.** Publish accepted work to a public, searchable, citable and machine-harvestable
+  archive.
+- **O6.** Demonstrate disciplined engineering practice: estimation-driven scope, automated
+  quality gates, infrastructure as code, and an explicit technical debt register.
+
+Objectives O1–O3 are demonstrably met by the delivered domain layer (section 8, section 10); O4 is partially
+met (reviewer assignment is a persistence record without matching or a conflict check — TD-02,
+TD-03); O5 is met for the archive read path; O6 is the subject of section 7, section 11 and section 12, and is, on
+the evidence in section 11.7, the objective this project delivers most convincingly.
+
+---
+
+## 4. Stakeholders
+
+The client is the editorial office of the Science and Development Journal at CBAS; the primary
+human actors are the journal's editor-in-chief, its handling editors, its reviewers and its
+authors.
+
+| Actor | Type | Primary concerns |
+|---|---|---|
+| Author | Primary, authenticated | Submit work, track progress, respond to reviews |
+| Reviewer | Primary, authenticated | Accept/decline invitations, submit structured reviews, remain anonymous |
+| Editor | Primary, authenticated | Screen submissions, assign reviewers, record decisions |
+| Editor-in-Chief | Primary, authenticated | Compose issues, publish, configure journal policy, final authority |
+| Administrator | Secondary, authenticated | User accounts, role assignment, reviewer capacity |
+| Reader | Primary, anonymous | Discover, read, cite and download published papers |
+| CBAS college leadership | Secondary | Editorial throughput and workload analytics |
+| Indexing services | External system | Harvest metadata via OAI-PMH |
+
+Non-human stakeholders: the AWS platform (cost and operability, section 13) and future maintainers,
+for whom the technical debt register (section 12) is written.
+
+A single account may hold multiple roles simultaneously — a deliberate design choice (design
+specification section 3, SRS section 2.3) with a direct security consequence: the authorisation layer does
+not currently prevent an Author–Reviewer dual-role holder from reviewing their own manuscript
+(TD-02, section 12).
+
+---
+
+## 5. Requirements analysis
+
+Requirements were elicited from the problem statement (section 2) rather than from structured
+interviews with SDJ's editorial office, and no real SDJ submissions or reviewer data were
+available to the project (SRS section 2.6) — a stated constraint, not a hidden one. The analysis proceeded in four steps, each of which left an artefact this
+consolidation points to rather than repeats:
+
+1. **Actor and use-case inventory.** Eight stakeholder classes (section 4) were mapped to 25 use cases
+   spanning identity, submission, screening, review, decision, publication, archive and
+   administration (effort estimation section 3; SRS section 4.2).
+2. **Functional requirements, stated testably.** Each of 28 functional requirements (plus one,
+   FR-25a, added during this analysis — see below) is written as "the system shall …", with
+   explicit preconditions, postconditions and an acceptance criterion, following IEEE 830-1998
+   and ISO/IEC/IEEE 29148:2018 (SRS section 1.1, section 3.1).
+3. **Non-functional requirements, each with a verification method.** Seventeen NFRs across
+   security, integrity, performance, reliability, availability, usability, maintainability,
+   observability, portability and compliance, each naming the test or check that verifies it
+   (SRS section 3.2) — "non-functional" is deliberately not allowed to mean "unverifiable."
+4. **Prioritisation against an effort estimate, not against intuition.** MoSCoW priorities were
+   assigned per requirement in the design specification (section 5) and made authoritative once the
+   effort estimate (section 7 below) confirmed the full system was roughly two orders of magnitude
+   larger than the 48-hour window — the cut was a consequence of measurement, not a guess made
+   in parallel with it.
+
+**A requirement discovered during analysis, not invented for the report.** Comparing the
+implemented lifecycle guard (`transitions.py`, which permits `WITHDRAWN` as a target state) against
+the implemented authorisation layer (`policies.py`, which has no action gating who may invoke
+it) surfaced a live authorisation gap the original FR-25 did not anticipate. This was recorded as
+**FR-25a**, marked NEW, rather than silently patched — a demonstration that requirements analysis
+did not stop once the SRS was signed off (SRS section 3.1, Group E).
+
+The full requirement set, with preconditions, postconditions and acceptance criteria, is in
+`docs/02-srs.md` section 3; this section summarises the *process*, that document contains the *content*.
+
+---
+
+## 6. Software Requirements Specification (SRS)
+
+The authoritative SRS is `docs/02-srs.md`, conformant to IEEE 830-1998 and ISO/IEC/IEEE
+29148:2018. It is structured in seven sections: introduction and scope (section 1), overall
+description and operating environment (section 2), specific functional and non-functional
+requirements (section 3), system models — lifecycle, actor mapping, authorisation matrix (section 4), the
+requirements traceability matrix (section 5), MoSCoW prioritisation (section 6), and constraints/limitations
+(section 7). This section summarises its content and states plainly where it is now stale relative to
+the delivered system (section 10.4).
+
+### 6.1 Requirement counts
+
+| Category | Count | Priority split |
+|---|---|---|
+| Functional requirements | 34 (FR-01…FR-34) + FR-25a | 19 Must, 12 Should, 3 Could |
+| Non-functional requirements | 17 (NFR-01…NFR-17) | Security (6), Integrity (1), Performance (2), Reliability (1), Availability (1), Usability (1), Maintainability (2), Observability (1), Portability (1), Compliance (1) |
+
+FR-29 to FR-34 cover capabilities the first requirement set never anticipated: article
+processing charges, the administrator console, decision certificates, anonymisation
+preflight, review deadlines, and self-service author registration. They were written after
+their implementation, by reading the delivered routes and tests, so they describe what
+exists rather than what was intended.
+
+### 6.2 The manuscript lifecycle is the SRS's executable core
+
+SRS section 4.1 transcribes the lifecycle directly from `backend/src/ugjcs/domain/transitions.py`'s
+`LEGAL_TRANSITIONS` mapping — stated explicitly as the tested source of truth, not the narrative
+diagram in the design specification. The full state table and diagram are reproduced and
+explained in section 8.2 of this document, since the lifecycle is equally central to system analysis.
+
+### 6.3 A recorded, load-bearing disagreement between two authoritative documents
+
+SRS section 4.1.3 records that the design specification's own lifecycle diagram (section 6.2 of that document)
+draws `RESUBMITTED` flowing directly into `REVIEWS_COMPLETE`, implying a resubmission
+automatically closes the review round. The implemented `LEGAL_TRANSITIONS` table instead routes
+`RESUBMITTED` to **either** `UNDER_REVIEW` **or** `UNDER_SCREENING`, at editorial discretion,
+and never closes the round by itself. Per this project's stated rule — the implementation
+governs, and the disagreement is recorded rather than hidden — the SRS and this document both
+follow the code.
+
+### 6.4 Traceability matrix — read honestly, not optimistically
+
+SRS section 5 has been reconciled against the running code twice: once when the `api/` layer
+and frontend first existed, and again after the two feature waves. The second pass corrected
+rows that had drifted in the opposite direction, recording expertise-ranked matching,
+structured reviews, public document download, audit-chain exposure, citation export and
+analytics as unbuilt when all six had shipped. A matrix that understates the system is as
+much a defect as one that overstates it.
+
+Current totals: 24 of 35 requirement lines implemented and tested end to end, 5 partially
+implemented with a named remainder, 6 unbuilt. `docs/05-api-contract.md` and
+`docs/06-testing-report.md` are the authorities on what is reachable by route and proven by
+test; section 10.4 reconciles the three.
+
+### 6.5 Authorisation matrix — the register's origin point
+
+SRS section 4.3 derives the authorisation matrix directly from `policies.py`'s `_ROLE_GRANTS` and
+`_OWNERSHIP_ACTIONS`, and names the two critical gaps that became TD-02 and TD-03 (section 12) before
+the technical debt register existed as a separate document — the SRS is where those gaps were
+first written down.
+
+---
+
+## 7. Software effort estimation
+
+Full arithmetic, every intermediate figure, and the estimation method are in
+`docs/03-effort-estimation.md`. This section summarises the method, the headline figures and
+why they matter, without repeating the derivation.
+
+### 7.1 Method
+
+**Use Case Points (UCP)** is the primary technique — actor and use-case weights are read
+directly off the functional requirements table rather than guessed. **COCOMO II Early Design**
+serves as an independent cross-check on different inputs (source lines of code, process/product
+ratings) rather than actor/transaction counts. Agreement between two methods driven by different
+inputs is stronger evidence than precision from either alone.
+
+### 7.2 Headline figures
+
+| Quantity | Value | Basis |
+|---|---|---|
+| Unadjusted actor weight (UAW) | 19 | 6 GUI actors × 3 + 1 API actor × 1 |
+| Unadjusted use-case weight (UUCW) | 225 | 25 use cases, Karner transaction-count classes |
+| UUCP | 244 | UAW + UUCW |
+| Technical complexity factor (TCF) | 1.105 | 13 technical factors, ΣT = 50.5 |
+| Environmental complexity factor (ECF) | 0.605 | 8 environmental factors, ΣE = 26.5 |
+| **UCP (full system)** | **163.1** | UUCP × TCF × ECF |
+| **Effort, full system** | **≈ 3,262 person-hours** (≈ 1.8 person-years) | UCP × PF (20 h/UCP) |
+| **UCP (Must-have subset, UC1–UC18)** | **125.7** | Same method, 18 use cases only |
+| **Effort, Must-have subset** | **≈ 2,514 person-hours** | UCP × 20 |
+| COCOMO II Early Design (full system) | ≈ 7,170 person-hours (47.2 person-months) | 12 KSLOC, ΣSF = 14.36, ∏EM = 1.1699 |
+
+`PF = 20 h/UCP` follows Karner's productivity-factor rule: the count of E1–E6 rated below 3, plus
+the count of E7–E8 rated above 3, sums to 0 here — within the ≤2 threshold for PF = 20, not a
+default assumption (effort estimation section 6).
+
+### 7.3 Reconciliation, not convergence
+
+The two methods differ by roughly 2.2× (7,170 ÷ 3,262). This is explained, not dismissed: COCOMO
+II is calibrated on projects carrying formal verification and management overhead this project
+does not incur, and its `SCED` (schedule-compression) penalty compounds multiplicatively with
+`RCPX` and `PDIF` for an extreme-compression solo project. UCP, conversely, counts only
+externally visible actor transactions and is structurally blind to platform work — Terraform,
+CI/CD, the hash chain's internals — of which this project has a disproportionate amount relative
+to its use-case count. The two methods **bound the answer from the same side**: both place the
+full system in the one-to-four-person-year range, nearly two orders of magnitude beyond the
+48-hour window. That agreement on *scale*, not either figure's precision, is what forces the
+MoSCoW cut.
+
+### 7.4 The MoSCoW cut this estimate produced
+
+| Priority | Use cases | Decision |
+|---|---|---|
+| Must | UC1–UC18 | Implemented to production quality |
+| Should | UC19–UC23 | Implemented only if Must-have work completed early |
+| Could | UC24, UC25 | Deferred; entered in the technical debt register |
+
+### 7.5 Why the realised effort does not invalidate the estimate
+
+The Must-have estimate of 2,514 person-hours assumes Karner's PF = 20 h/UCP, calibrated on manual
+development. This build used AI-assisted development — Claude Code (Anthropic) pair-programming
+the implementation under the author's direction and review — which the estimation document
+treats as a change of development **method**, not merely of pace (effort estimation section 9). Three
+consequences follow, and each is load-bearing for how this document's conclusion (section 18) should be
+read:
+
+1. **UCP still correctly sized the problem.** What changes under AI assistance is the rate at
+   which a chosen method converts problem-size into elapsed hours (the productivity factor), not
+   the size of the problem itself. The MoSCoW cut in section 7.4 was decided before the realised
+   productivity was known, and remains the correct basis for it.
+2. **The realised productivity factor is a local calibration, not a general claim** — evidence
+   about this developer, this tool, this domain and this window, computed formally by the method
+   in effort estimation section 10.3 (actual session-hours from commit history ÷ delivered UCP). It does
+   not generalise to other developers or tools.
+3. **The gap between estimated and realised hours is not free capacity.** It is capacity that was
+   not spent on activities the classical estimate priced in: test depth beyond the 85% coverage
+   floor, architecture decision records and onboarding documentation, and security hardening
+   beyond the NFR-01–NFR-06 baseline. This connects directly to the limitations recorded in section 17.
+
+---
+
+## 8. System analysis
+
+This section and section 9 are original to this consolidation. Section 8 analyses the problem domain as
+modelled — the aggregates, the manuscript lifecycle as a state machine, the double-blind
+projection, the audit mechanism's design rationale, and the persisted data model. Section 9 covers the
+architectural design decisions that realise that analysis — the hexagonal layering, its two
+mechanically enforced contracts, the API design, and the deployment topology.
+
+### 8.1 Domain model
+
+`Manuscript` is the aggregate root; it owns its authorship, status, version and review count, and
+nothing outside the aggregate mutates them directly. `User` (implemented as `Account` in code —
+`domain/account.py`), `Issue` and the editorial event log are separate aggregates referenced by
+identity. Value objects (`domain/ids.py`) give every identifier — `TrackingCode`,
+`ManuscriptId`, `UserId` — its own type rather than a bare `UUID` or `str`, so a tracking code and
+a user id cannot be interchanged by a type error that would otherwise compile.
+
+The eight domain modules and their responsibilities:
+
+| Module | Responsibility |
+|---|---|
+| `manuscript.py` | The `Manuscript` aggregate: lifecycle transitions, review-quorum counting, resubmission versioning |
+| `transitions.py` | `LEGAL_TRANSITIONS` — the exhaustive state table and `assert_legal` guard |
+| `policies.py` | `can(actor, action, resource)` — role-based and ownership-based authorisation, deny by default |
+| `blinding.py` | `blind()` — the structural double-blind projection (section 8.4) |
+| `hashchain.py` | `append`/`verify` — the tamper-evident audit chain (section 8.5) |
+| `events.py` | `EditorialEvent` — the audit record's canonical, hashable representation |
+| `account.py` | `Account` aggregate: identity, roles, credentials (role vocabulary only — no registration flow in the domain layer) |
+| `enums.py`, `ids.py`, `errors.py` | Shared vocabulary, typed identifiers, the `DomainError` hierarchy |
+
+### 8.2 The manuscript lifecycle as a state machine
+
+The lifecycle below is transcribed from `transitions.py`'s `LEGAL_TRANSITIONS` mapping — the
+executable, tested source of truth (SRS section 4.1), reproduced here because it is the single most
+important artefact in the system's analysis.
+
+| Source state | Legal targets | Terminal? |
+|---|---|---|
+| `DRAFT` | `SUBMITTED` | No |
+| `SUBMITTED` | `UNDER_SCREENING`, `WITHDRAWN` | No |
+| `UNDER_SCREENING` | `DESK_REJECTED`, `UNDER_REVIEW`, `REVISION_REQUESTED`, `WITHDRAWN` | No |
+| `UNDER_REVIEW` | `REVIEWS_COMPLETE`, `WITHDRAWN` | No |
+| `REVIEWS_COMPLETE` | `ACCEPTED`, `REJECTED`, `REVISION_REQUESTED`, `WITHDRAWN` | No |
+| `REVISION_REQUESTED` | `RESUBMITTED`, `WITHDRAWN` | No |
+| `RESUBMITTED` | `UNDER_REVIEW`, `UNDER_SCREENING` | No |
+| `ACCEPTED` | `SCHEDULED` | No |
+| `SCHEDULED` | `PUBLISHED` | No |
+| `DESK_REJECTED`, `REJECTED`, `PUBLISHED`, `WITHDRAWN` | *(none)* | **Yes** |
+
 <figure class="diagram"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="statediagram" style="max-width: 1539.88px; background-color: transparent;" viewBox="0 0 1539.87890625 982" role="graphics-document document" aria-roledescription="stateDiagram"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg defs [id$="-barbEnd"]{fill:#333333;stroke:#333333;}#my-svg g.stateGroup text{fill:#9370DB;stroke:none;font-size:10px;}#my-svg g.stateGroup text{fill:#333;stroke:none;font-size:10px;}#my-svg g.stateGroup .state-title{font-weight:bolder;fill:#131300;}#my-svg g.stateGroup rect{fill:#ECECFF;stroke:#9370DB;}#my-svg g.stateGroup line{stroke:#333333;stroke-width:1;}#my-svg .transition{stroke:#333333;stroke-width:1;fill:none;}#my-svg .stateGroup .composit{fill:white;border-bottom:1px;}#my-svg .stateGroup .alt-composit{fill:#e0e0e0;border-bottom:1px;}#my-svg .state-note{stroke:#aaaa33;fill:#fff5ad;}#my-svg .state-note text{fill:black;stroke:none;font-size:10px;}#my-svg .stateLabel .box{stroke:none;stroke-width:0;fill:#ECECFF;opacity:0.5;}#my-svg .edgeLabel .label rect{fill:#ECECFF;opacity:0.5;}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .edgeLabel .label text{fill:#333;}#my-svg .label div .edgeLabel{color:#333;}#my-svg .stateLabel text{fill:#131300;font-size:10px;font-weight:bold;}#my-svg .node circle.state-start{fill:#333333;stroke:#333333;}#my-svg .node .fork-join{fill:#333333;stroke:#333333;}#my-svg .node circle.state-end{fill:#9370DB;stroke:white;stroke-width:1.5;}#my-svg .end-state-inner{fill:white;stroke-width:1.5;}#my-svg .node rect{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .node polygon{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg [id$="-barbEnd"]{fill:#333333;}#my-svg .statediagram-cluster rect{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .cluster-label,#my-svg .nodeLabel{color:#131300;}#my-svg .statediagram-cluster rect.outer{rx:5px;ry:5px;}#my-svg .statediagram-state .divider{stroke:#9370DB;}#my-svg .statediagram-state .title-state{rx:5px;ry:5px;}#my-svg .statediagram-cluster.statediagram-cluster .inner{fill:white;}#my-svg .statediagram-cluster.statediagram-cluster-alt .inner{fill:#f0f0f0;}#my-svg .statediagram-cluster .inner{rx:0;ry:0;}#my-svg .statediagram-state rect.basic{rx:5px;ry:5px;}#my-svg .statediagram-state rect.divider{stroke-dasharray:10,10;fill:#f0f0f0;}#my-svg .note-edge{stroke-dasharray:5;}#my-svg .statediagram-note rect{fill:#fff5ad;stroke:#aaaa33;stroke-width:1px;rx:0;ry:0;}#my-svg .statediagram-note rect{fill:#fff5ad;stroke:#aaaa33;stroke-width:1px;rx:0;ry:0;}#my-svg .statediagram-note text{fill:black;}#my-svg .statediagram-note .nodeLabel{color:black;}#my-svg .statediagram .edgeLabel{color:red;}#my-svg [id$="-dependencyStart"],#my-svg [id$="-dependencyEnd"]{fill:#333333;stroke:#333333;stroke-width:1;}#my-svg .statediagramTitleText{text-anchor:middle;font-size:18px;fill:#333;}#my-svg [data-look="neo"].statediagram-cluster rect{fill:#ECECFF;stroke:#9370DB;stroke-width:1;}#my-svg [data-look="neo"].statediagram-cluster rect.outer{rx:5px;ry:5px;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><defs><marker id="my-svg_stateDiagram-barbEnd" refX="19" refY="7" markerWidth="20" markerHeight="14" markerUnits="userSpaceOnUse" orient="auto"><path d="M 19,7 L9,13 L14,7 L9,1 Z"/></marker></defs><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M1229.344,22L1229.344,26.167C1229.344,30.333,1229.344,38.667,1229.344,47C1229.344,55.333,1229.344,63.667,1229.344,67.833L1229.344,72" id="my-svg-edge0" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge0" data-points="W3sieCI6MTIyOS4zNDM3NSwieSI6MjJ9LHsieCI6MTIyOS4zNDM3NSwieSI6NDd9LHsieCI6MTIyOS4zNDM3NSwieSI6NzJ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1229.344,112L1229.344,118.167C1229.344,124.333,1229.344,136.667,1229.344,149C1229.344,161.333,1229.344,173.667,1229.344,179.833L1229.344,186" id="my-svg-edge1" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge1" data-points="W3sieCI6MTIyOS4zNDM3NSwieSI6MTEyfSx7IngiOjEyMjkuMzQzNzUsInkiOjE0OX0seyJ4IjoxMjI5LjM0Mzc1LCJ5IjoxODZ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1181.398,220.431L1157.826,227.526C1134.254,234.621,1087.109,248.81,1063.537,262.072C1039.965,275.333,1039.965,287.667,1039.965,293.833L1039.965,300" id="my-svg-edge2" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge2" data-points="W3sieCI6MTE4MS4zOTg0Mzc1LCJ5IjoyMjAuNDMwNzY2NjkyMTA2MTh9LHsieCI6MTAzOS45NjQ4NDM3NSwieSI6MjYzfSx7IngiOjEwMzkuOTY0ODQzNzUsInkiOjMwMH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1277.289,216.158L1314.137,223.965C1350.986,231.772,1424.682,247.386,1461.531,264.693C1498.379,282,1498.379,301,1498.379,320C1498.379,339,1498.379,358,1498.379,377C1498.379,396,1498.379,415,1498.379,434C1498.379,453,1498.379,472,1498.379,491C1498.379,510,1498.379,529,1498.379,548C1498.379,567,1498.379,586,1498.379,605C1498.379,624,1498.379,643,1498.379,662C1498.379,681,1498.379,700,1399.078,718.232C1299.777,736.463,1101.176,753.927,1001.875,762.659L902.574,771.39" id="my-svg-edge3" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge3" data-points="W3sieCI6MTI3Ny4yODkwNjI1LCJ5IjoyMTYuMTU4MDg4MDc1MTUyODJ9LHsieCI6MTQ5OC4zNzg5MDYyNSwieSI6MjYzfSx7IngiOjE0OTguMzc4OTA2MjUsInkiOjMyMH0seyJ4IjoxNDk4LjM3ODkwNjI1LCJ5IjozNzd9LHsieCI6MTQ5OC4zNzg5MDYyNSwieSI6NDM0fSx7IngiOjE0OTguMzc4OTA2MjUsInkiOjQ5MX0seyJ4IjoxNDk4LjM3ODkwNjI1LCJ5Ijo1NDh9LHsieCI6MTQ5OC4zNzg5MDYyNSwieSI6NjA1fSx7IngiOjE0OTguMzc4OTA2MjUsInkiOjY2Mn0seyJ4IjoxNDk4LjM3ODkwNjI1LCJ5Ijo3MTl9LHsieCI6OTAyLjU3NDIxODc1LCJ5Ijo3NzEuMzkwNDI4MjExNTg2OX1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M963.918,324.485L815.515,333.238C667.112,341.99,370.306,359.495,221.903,377.748C73.5,396,73.5,415,73.5,434C73.5,453,73.5,472,73.5,491C73.5,510,73.5,529,73.5,548C73.5,567,73.5,586,73.5,605C73.5,624,73.5,643,73.5,662C73.5,681,73.5,700,73.5,719C73.5,738,73.5,757,73.5,776C73.5,795,73.5,814,73.5,829.667C73.5,845.333,73.5,857.667,73.5,863.833L73.5,870" id="my-svg-edge4" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge4" data-points="W3sieCI6OTYzLjkxNzk2ODc1LCJ5IjozMjQuNDg1MDc5NzI0MzQ5NzZ9LHsieCI6NzMuNSwieSI6Mzc3fSx7IngiOjczLjUsInkiOjQzNH0seyJ4Ijo3My41LCJ5Ijo0OTF9LHsieCI6NzMuNSwieSI6NTQ4fSx7IngiOjczLjUsInkiOjYwNX0seyJ4Ijo3My41LCJ5Ijo2NjJ9LHsieCI6NzMuNSwieSI6NzE5fSx7IngiOjczLjUsInkiOjc3Nn0seyJ4Ijo3My41LCJ5Ijo4MzN9LHsieCI6NzMuNSwieSI6ODcwfV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M963.918,336.954L933.979,343.628C904.04,350.302,844.163,363.651,814.224,376.492C784.285,389.333,784.285,401.667,784.285,407.833L784.285,414" id="my-svg-edge5" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge5" data-points="W3sieCI6OTYzLjkxNzk2ODc1LCJ5IjozMzYuOTUzNTI0NjEyNzA1MX0seyJ4Ijo3ODQuMjg1MTU2MjUsInkiOjM3N30seyJ4Ijo3ODQuMjg1MTU2MjUsInkiOjQxNH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1067.914,340L1076.532,346.167C1085.15,352.333,1102.386,364.667,1111.003,380.333C1119.621,396,1119.621,415,1119.621,434C1119.621,453,1119.621,472,1119.621,491C1119.621,510,1119.621,529,1119.621,548C1119.621,567,1119.621,586,1063.008,603.078C1006.395,620.156,893.168,635.313,836.555,642.891L779.941,650.469" id="my-svg-edge6" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge6" data-points="W3sieCI6MTA2Ny45MTQ0MDUxNTM1MDg4LCJ5IjozNDB9LHsieCI6MTExOS42MjEwOTM3NSwieSI6Mzc3fSx7IngiOjExMTkuNjIxMDkzNzUsInkiOjQzNH0seyJ4IjoxMTE5LjYyMTA5Mzc1LCJ5Ijo0OTF9LHsieCI6MTExOS42MjEwOTM3NSwieSI6NTQ4fSx7IngiOjExMTkuNjIxMDkzNzUsInkiOjYwNX0seyJ4Ijo3NzkuOTQxNDA2MjUsInkiOjY1MC40NjkyNzgwNDc4ODU1fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1109.765,340L1131.286,346.167C1152.808,352.333,1195.851,364.667,1217.373,380.333C1238.895,396,1238.895,415,1238.895,434C1238.895,453,1238.895,472,1238.895,491C1238.895,510,1238.895,529,1238.895,548C1238.895,567,1238.895,586,1238.895,605C1238.895,624,1238.895,643,1238.895,662C1238.895,681,1238.895,700,1182.841,717.719C1126.788,735.438,1014.681,751.876,958.628,760.095L902.574,768.314" id="my-svg-edge7" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge7" data-points="W3sieCI6MTEwOS43NjQ3MzQxMDA4NzcxLCJ5IjozNDB9LHsieCI6MTIzOC44OTQ1MzEyNSwieSI6Mzc3fSx7IngiOjEyMzguODk0NTMxMjUsInkiOjQzNH0seyJ4IjoxMjM4Ljg5NDUzMTI1LCJ5Ijo0OTF9LHsieCI6MTIzOC44OTQ1MzEyNSwieSI6NTQ4fSx7IngiOjEyMzguODk0NTMxMjUsInkiOjYwNX0seyJ4IjoxMjM4Ljg5NDUzMTI1LCJ5Ijo2NjJ9LHsieCI6MTIzOC44OTQ1MzEyNSwieSI6NzE5fSx7IngiOjkwMi41NzQyMTg3NSwieSI6NzY4LjMxMzU1MTMxNzM0OTZ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M720.98,442.244L658.581,450.37C596.182,458.496,471.384,474.748,408.985,489.041C346.586,503.333,346.586,515.667,346.586,521.833L346.586,528" id="my-svg-edge8" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge8" data-points="W3sieCI6NzIwLjk4MDQ2ODc1LCJ5Ijo0NDIuMjQzOTQyNDkwNDczMX0seyJ4IjozNDYuNTg1OTM3NSwieSI6NDkxfSx7IngiOjM0Ni41ODU5Mzc1LCJ5Ijo1Mjh9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M807.396,454L814.522,460.167C821.648,466.333,835.9,478.667,843.026,494.333C850.152,510,850.152,529,850.152,548C850.152,567,850.152,586,850.152,605C850.152,624,850.152,643,850.152,662C850.152,681,850.152,700,850.152,715.667C850.152,731.333,850.152,743.667,850.152,749.833L850.152,756" id="my-svg-edge9" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge9" data-points="W3sieCI6ODA3LjM5NjQ1MDEwOTY0OTEsInkiOjQ1NH0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjQ5MX0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjU0OH0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjYwNX0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjY2Mn0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjcxOX0seyJ4Ijo4NTAuMTUyMzQzNzUsInkiOjc1Nn1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M307.688,568L295.694,574.167C283.701,580.333,259.714,592.667,247.72,605C235.727,617.333,235.727,629.667,235.727,635.833L235.727,642" id="my-svg-edge10" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge10" data-points="W3sieCI6MzA3LjY4NzkxMTE4NDIxMDUsInkiOjU2OH0seyJ4IjoyMzUuNzI2NTYyNSwieSI6NjA1fSx7IngiOjIzNS43MjY1NjI1LCJ5Ijo2NDJ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M356.948,568L360.143,574.167C363.338,580.333,369.727,592.667,372.922,608.333C376.117,624,376.117,643,376.117,662C376.117,681,376.117,700,376.117,719C376.117,738,376.117,757,376.117,776C376.117,795,376.117,814,376.117,829.667C376.117,845.333,376.117,857.667,376.117,863.833L376.117,870" id="my-svg-edge11" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge11" data-points="W3sieCI6MzU2Ljk0Nzc3OTYwNTI2MzIsInkiOjU2OH0seyJ4IjozNzYuMTE3MTg3NSwieSI6NjA1fSx7IngiOjM3Ni4xMTcxODc1LCJ5Ijo2NjJ9LHsieCI6Mzc2LjExNzE4NzUsInkiOjcxOX0seyJ4IjozNzYuMTE3MTg3NSwieSI6Nzc2fSx7IngiOjM3Ni4xMTcxODc1LCJ5Ijo4MzN9LHsieCI6Mzc2LjExNzE4NzUsInkiOjg3MH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M384.086,568L395.648,574.167C407.211,580.333,430.336,592.667,467.9,605C505.464,617.333,557.468,629.667,583.469,635.833L609.471,642" id="my-svg-edge12" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge12" data-points="W3sieCI6Mzg0LjA4NTkzNzUsInkiOjU2OH0seyJ4Ijo0NTMuNDYwOTM3NSwieSI6NjA1fSx7IngiOjYwOS40NzEwMTE1MTMxNTc5LCJ5Ijo2NDJ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M411.224,568L431.154,574.167C451.084,580.333,490.944,592.667,510.875,608.333C530.805,624,530.805,643,530.805,662C530.805,681,530.805,700,575.292,717.441C619.78,734.881,708.755,750.762,753.243,758.703L797.73,766.643" id="my-svg-edge13" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge13" data-points="W3sieCI6NDExLjIyNDA5NTM5NDczNjgsInkiOjU2OH0seyJ4Ijo1MzAuODA0Njg3NSwieSI6NjA1fSx7IngiOjUzMC44MDQ2ODc1LCJ5Ijo2NjJ9LHsieCI6NTMwLjgwNDY4NzUsInkiOjcxOX0seyJ4Ijo3OTcuNzMwNDY4NzUsInkiOjc2Ni42NDMyNzkxNDU3MTk1fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M677.915,682L673.017,688.167C668.119,694.333,658.323,706.667,704.1,720.836C749.876,735.005,851.225,751.01,901.9,759.013L952.574,767.016" id="my-svg-edge14" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge14" data-points="W3sieCI6Njc3LjkxNTM2NDU4MzMzMzQsInkiOjY4Mn0seyJ4Ijo2NDguNTI3MzQzNzUsInkiOjcxOX0seyJ4Ijo5NTIuNTc0MjE4NzUsInkiOjc2Ny4wMTU3MTQyODU3MTQyfV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M718.022,682L725.491,688.167C732.959,694.333,747.895,706.667,764.811,719C781.726,731.333,800.62,743.667,810.067,749.833L819.514,756" id="my-svg-edge15" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge15" data-points="W3sieCI6NzE4LjAyMjI3MjQ3ODA3MDEsInkiOjY4Mn0seyJ4Ijo3NjIuODMyMDMxMjUsInkiOjcxOX0seyJ4Ijo4MTkuNTEzNjM3NjA5NjQ5MSwieSI6NzU2fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1006.266,756L1005.279,749.833C1004.293,743.667,1002.32,731.333,1001.334,715.667C1000.348,700,1000.348,681,1000.348,662C1000.348,643,1000.348,624,1000.348,605C1000.348,586,1000.348,567,1000.348,548C1000.348,529,1000.348,510,974.888,493.783C949.428,477.567,898.509,464.134,873.049,457.417L847.59,450.701" id="my-svg-edge16" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge16" data-points="W3sieCI6MTAwNi4yNjU4MzA1OTIxMDUzLCJ5Ijo3NTZ9LHsieCI6MTAwMC4zNDc2NTYyNSwieSI6NzE5fSx7IngiOjEwMDAuMzQ3NjU2MjUsInkiOjY2Mn0seyJ4IjoxMDAwLjM0NzY1NjI1LCJ5Ijo2MDV9LHsieCI6MTAwMC4zNDc2NTYyNSwieSI6NTQ4fSx7IngiOjEwMDAuMzQ3NjU2MjUsInkiOjQ5MX0seyJ4Ijo4NDcuNTg5ODQzNzUsInkiOjQ1MC43MDA1NzEzMDQ1OTkzNX1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M1066.355,767.374L1119.527,759.312C1172.699,751.249,1279.043,735.125,1332.215,717.562C1385.387,700,1385.387,681,1385.387,662C1385.387,643,1385.387,624,1385.387,605C1385.387,586,1385.387,567,1385.387,548C1385.387,529,1385.387,510,1385.387,491C1385.387,472,1385.387,453,1385.387,434C1385.387,415,1385.387,396,1340.491,379.091C1295.595,362.183,1205.803,347.366,1160.908,339.957L1116.012,332.549" id="my-svg-edge17" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge17" data-points="W3sieCI6MTA2Ni4zNTU0Njg3NSwieSI6NzY3LjM3MzgzMDk5ODc5NDZ9LHsieCI6MTM4NS4zODY3MTg3NSwieSI6NzE5fSx7IngiOjEzODUuMzg2NzE4NzUsInkiOjY2Mn0seyJ4IjoxMzg1LjM4NjcxODc1LCJ5Ijo2MDV9LHsieCI6MTM4NS4zODY3MTg3NSwieSI6NTQ4fSx7IngiOjEzODUuMzg2NzE4NzUsInkiOjQ5MX0seyJ4IjoxMzg1LjM4NjcxODc1LCJ5Ijo0MzR9LHsieCI6MTM4NS4zODY3MTg3NSwieSI6Mzc3fSx7IngiOjExMTYuMDExNzE4NzUsInkiOjMzMi41NDg5MjExNTYxOTQ4N31d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M235.727,682L235.727,688.167C235.727,694.333,235.727,706.667,235.727,719C235.727,731.333,235.727,743.667,235.727,749.833L235.727,756" id="my-svg-edge18" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge18" data-points="W3sieCI6MjM1LjcyNjU2MjUsInkiOjY4Mn0seyJ4IjoyMzUuNzI2NTYyNSwieSI6NzE5fSx7IngiOjIzNS43MjY1NjI1LCJ5Ijo3NTZ9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M235.727,796L235.727,802.167C235.727,808.333,235.727,820.667,235.727,833C235.727,845.333,235.727,857.667,235.727,863.833L235.727,870" id="my-svg-edge19" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge19" data-points="W3sieCI6MjM1LjcyNjU2MjUsInkiOjc5Nn0seyJ4IjoyMzUuNzI2NTYyNSwieSI6ODMzfSx7IngiOjIzNS43MjY1NjI1LCJ5Ijo4NzB9XQ==" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M73.5,910L73.5,914.167C73.5,918.333,73.5,926.667,111.08,936.007C148.66,945.348,223.82,955.696,261.401,960.87L298.981,966.044" id="my-svg-edge20" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge20" data-points="W3sieCI6NzMuNSwieSI6OTEwfSx7IngiOjczLjUsInkiOjkzNX0seyJ4IjoyOTguOTgwNzA3Nzg3MjgwMjcsInkiOjk2Ni4wNDQzMzU0MzE4MjE5fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M376.117,910L376.117,914.167C376.117,918.333,376.117,926.667,365.481,935.682C354.844,944.698,333.571,954.396,322.934,959.245L312.297,964.094" id="my-svg-edge21" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge21" data-points="W3sieCI6Mzc2LjExNzE4NzUsInkiOjkxMH0seyJ4IjozNzYuMTE3MTg3NSwieSI6OTM1fSx7IngiOjMxMi4yOTczMDQwNTM0NjI4LCJ5Ijo5NjQuMDkzNjI3NDQ1NDEwOH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M235.727,910L235.727,914.167C235.727,918.333,235.727,926.667,246.363,935.682C257,944.698,278.273,954.396,288.91,959.245L299.546,964.094" id="my-svg-edge22" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge22" data-points="W3sieCI6MjM1LjcyNjU2MjUsInkiOjkxMH0seyJ4IjoyMzUuNzI2NTYyNSwieSI6OTM1fSx7IngiOjI5OS41NDY0NDU5NDY1MzcyLCJ5Ijo5NjQuMDkzNjI3NDQ1NDEwOH1d" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/><path d="M850.152,796L850.152,802.167C850.152,808.333,850.152,820.667,850.152,836.333C850.152,852,850.152,871,850.152,888C850.152,905,850.152,920,760.613,932.765C671.074,945.53,491.995,956.059,402.456,961.324L312.916,966.589" id="my-svg-edge23" class="edge-thickness-normal edge-pattern-solid transition" style="fill:none;;;fill:none" data-edge="true" data-et="edge" data-id="edge23" data-points="W3sieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo3OTZ9LHsieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo4MzN9LHsieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo4OTB9LHsieCI6ODUwLjE1MjM0Mzc1LCJ5Ijo5MzV9LHsieCI6MzEyLjkxNjQ0MDk4NzUxODEsInkiOjk2Ni41ODg3MjkxNzkxNzU0fV0=" data-look="classic" marker-end="url(#my-svg_stateDiagram-barbEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="edge0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1229.34375, 149)"><g class="label" data-id="edge1" transform="translate(-24.1640625, -12)"><foreignObject width="48.328125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>submit</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1039.96484375, 263)"><g class="label" data-id="edge2" transform="translate(-55.9765625, -12)"><foreignObject width="111.953125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>begin screening</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1498.37890625, 491)"><g class="label" data-id="edge3" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(73.5, 605)"><g class="label" data-id="edge4" transform="translate(-40.40625, -12)"><foreignObject width="80.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>desk reject</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(784.28515625, 377)"><g class="label" data-id="edge5" transform="translate(-52.703125, -12)"><foreignObject width="105.40625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>send to review</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1119.62109375, 491)"><g class="label" data-id="edge6" transform="translate(-99.2734375, -12)"><foreignObject width="198.546875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>request pre-review changes</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1238.89453125, 548)"><g class="label" data-id="edge7" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(346.5859375, 491)"><g class="label" data-id="edge8" transform="translate(-58.484375, -12)"><foreignObject width="116.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>quorum reached</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(850.15234375, 605)"><g class="label" data-id="edge9" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(235.7265625, 605)"><g class="label" data-id="edge10" transform="translate(-24.1171875, -12)"><foreignObject width="48.234375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>accept</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(376.1171875, 719)"><g class="label" data-id="edge11" transform="translate(-21.90625, -12)"><foreignObject width="43.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>reject</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(453.4609375, 605)"><g class="label" data-id="edge12" transform="translate(-57.34375, -12)"><foreignObject width="114.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>request revision</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(530.8046875, 662)"><g class="label" data-id="edge13" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(777.21449, 739.32254)"><g class="label" data-id="edge14" transform="translate(-60.8046875, -12)"><foreignObject width="121.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>author resubmits</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(762.83203125, 719)"><g class="label" data-id="edge15" transform="translate(-33.5, -12)"><foreignObject width="67" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>withdraw</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1000.34765625, 605)"><g class="label" data-id="edge16" transform="translate(-82.90625, -12)"><foreignObject width="165.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>editor routes to review</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1385.38671875, 548)"><g class="label" data-id="edge17" transform="translate(-92.9921875, -12)"><foreignObject width="185.984375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>editor routes to screening</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(235.7265625, 719)"><g class="label" data-id="edge18" transform="translate(-51.125, -12)"><foreignObject width="102.25" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>assign to issue</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(235.7265625, 833)"><g class="label" data-id="edge19" transform="translate(-54.2578125, -12)"><foreignObject width="108.515625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>issue published</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge20" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge21" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge22" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="edge23" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-state-root_start-0" data-look="classic" transform="translate(1229.34375, 15)"><circle class="state-start" r="7" width="14" height="14"/></g><g class="node  statediagram-state" id="my-svg-state-DRAFT-1" data-look="classic" transform="translate(1229.34375, 92)"><rect class="basic label-container" style="" rx="5" ry="5" x="-31.125" y="-20" width="62.25" height="40"/><g class="label" style="" transform="translate(-23.125, -12)"><rect/><foreignObject width="46.25" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>DRAFT</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-SUBMITTED-3" data-look="classic" transform="translate(1229.34375, 206)"><rect class="basic label-container" style="" rx="5" ry="5" x="-47.9453125" y="-20" width="95.890625" height="40"/><g class="label" style="" transform="translate(-39.9453125, -12)"><rect/><foreignObject width="79.890625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>SUBMITTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-UNDER_SCREENING-17" data-look="classic" transform="translate(1039.96484375, 320)"><rect class="basic label-container" style="" rx="5" ry="5" x="-76.046875" y="-20" width="152.09375" height="40"/><g class="label" style="" transform="translate(-68.046875, -12)"><rect/><foreignObject width="136.09375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>UNDER_SCREENING</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-WITHDRAWN-23" data-look="classic" transform="translate(850.15234375, 776)"><rect class="basic label-container" style="" rx="5" ry="5" x="-52.421875" y="-20" width="104.84375" height="40"/><g class="label" style="" transform="translate(-44.421875, -12)"><rect/><foreignObject width="88.84375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>WITHDRAWN</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-DESK_REJECTED-20" data-look="classic" transform="translate(73.5, 890)"><rect class="basic label-container" style="" rx="5" ry="5" x="-65.5" y="-20" width="131" height="40"/><g class="label" style="" transform="translate(-57.5, -12)"><rect/><foreignObject width="115" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>DESK_REJECTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-UNDER_REVIEW-16" data-look="classic" transform="translate(784.28515625, 434)"><rect class="basic label-container" style="" rx="5" ry="5" x="-63.3046875" y="-20" width="126.609375" height="40"/><g class="label" style="" transform="translate(-55.3046875, -12)"><rect/><foreignObject width="110.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>UNDER_REVIEW</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-REVISION_REQUESTED-15" data-look="classic" transform="translate(693.80078125, 662)"><rect class="basic label-container" style="" rx="5" ry="5" x="-86.140625" y="-20" width="172.28125" height="40"/><g class="label" style="" transform="translate(-78.140625, -12)"><rect/><foreignObject width="156.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>REVISION_REQUESTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-REVIEWS_COMPLETE-13" data-look="classic" transform="translate(346.5859375, 548)"><rect class="basic label-container" style="" rx="5" ry="5" x="-80.59375" y="-20" width="161.1875" height="40"/><g class="label" style="" transform="translate(-72.59375, -12)"><rect/><foreignObject width="145.1875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>REVIEWS_COMPLETE</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-ACCEPTED-18" data-look="classic" transform="translate(235.7265625, 662)"><rect class="basic label-container" style="" rx="5" ry="5" x="-44.875" y="-20" width="89.75" height="40"/><g class="label" style="" transform="translate(-36.875, -12)"><rect/><foreignObject width="73.75" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>ACCEPTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-REJECTED-21" data-look="classic" transform="translate(376.1171875, 890)"><rect class="basic label-container" style="" rx="5" ry="5" x="-43.6640625" y="-20" width="87.328125" height="40"/><g class="label" style="" transform="translate(-35.6640625, -12)"><rect/><foreignObject width="71.328125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>REJECTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-RESUBMITTED-17" data-look="classic" transform="translate(1009.46484375, 776)"><rect class="basic label-container" style="" rx="5" ry="5" x="-56.890625" y="-20" width="113.78125" height="40"/><g class="label" style="" transform="translate(-48.890625, -12)"><rect/><foreignObject width="97.78125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>RESUBMITTED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-SCHEDULED-19" data-look="classic" transform="translate(235.7265625, 776)"><rect class="basic label-container" style="" rx="5" ry="5" x="-49.4921875" y="-20" width="98.984375" height="40"/><g class="label" style="" transform="translate(-41.4921875, -12)"><rect/><foreignObject width="82.984375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>SCHEDULED</p></span></div></foreignObject></g></g><g class="node  statediagram-state" id="my-svg-state-PUBLISHED-22" data-look="classic" transform="translate(235.7265625, 890)"><rect class="basic label-container" style="" rx="5" ry="5" x="-46.7265625" y="-20" width="93.453125" height="40"/><g class="label" style="" transform="translate(-38.7265625, -12)"><rect/><foreignObject width="77.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel markdown-node-label"><p>PUBLISHED</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-state-root_end-23" data-look="classic" transform="translate(305.921875, 967)"><g class="outer-path"><path d="M7 0 C7 0.40517908122283747, 6.964012880168563 0.816513743121899, 6.893654271085456 1.2155372436685123 C6.823295662002349 1.6145607442151257, 6.716427752933756 2.013397210557766, 6.5778483455013586 2.394141003279681 C6.439268938068961 2.7748847960015954, 6.26476736710249 3.149104622578984, 6.062177826491071 3.4999999999999996 C5.859588285879653 3.8508953774210153, 5.622755194947063 4.189128084166967, 5.362311101832846 4.499513267805774 C5.10186700871863 4.809898451444582, 4.809898451444583 5.10186700871863, 4.499513267805775 5.362311101832846 C4.189128084166968 5.622755194947063, 3.8508953774210166 5.859588285879652, 3.500000000000001 6.06217782649107 C3.149104622578985 6.264767367102489, 2.7748847960015963 6.439268938068961, 2.3941410032796817 6.5778483455013586 C2.013397210557767 6.716427752933756, 1.6145607442151264 6.823295662002349, 1.2155372436685128 6.893654271085456 C0.8165137431218992 6.964012880168563, 0.4051790812228379 7, 4.286263797015736e-16 7 C-0.405179081222837 7, -0.8165137431218985 6.964012880168563, -1.2155372436685121 6.893654271085456 C-1.6145607442151257 6.823295662002349, -2.0133972105577667 6.716427752933756, -2.394141003279681 6.5778483455013586 C-2.774884796001595 6.439268938068961, -3.149104622578983 6.26476736710249, -3.4999999999999982 6.062177826491071 C-3.8508953774210135 5.859588285879653, -4.189128084166966 5.6227551949470636, -4.499513267805773 5.362311101832848 C-4.809898451444581 5.101867008718632, -5.101867008718628 4.809898451444586, -5.3623111018328435 4.499513267805779 C-5.622755194947059 4.189128084166971, -5.859588285879649 3.8508953774210206, -6.062177826491068 3.5000000000000053 C-6.264767367102486 3.14910462257899, -6.439268938068958 2.774884796001602, -6.577848345501356 2.394141003279688 C-6.716427752933754 2.0133972105577738, -6.823295662002347 1.614560744215134, -6.893654271085454 1.215537243668521 C-6.9640128801685615 0.816513743121908, -6.999999999999999 0.4051790812228472, -7 1.0183126166254463e-14 C-7.000000000000001 -0.40517908122282686, -6.964012880168565 -0.8165137431218878, -6.893654271085459 -1.215537243668501 C-6.823295662002352 -1.6145607442151142, -6.716427752933759 -2.0133972105577542, -6.577848345501363 -2.394141003279669 C-6.439268938068967 -2.7748847960015834, -6.264767367102496 -3.149104622578972, -6.062177826491078 -3.4999999999999876 C-5.859588285879661 -3.8508953774210033, -5.6227551949470715 -4.1891280841669545, -5.362311101832856 -4.499513267805763 C-5.10186700871864 -4.809898451444571, -4.809898451444594 -5.10186700871862, -4.499513267805787 -5.362311101832836 C-4.189128084166979 -5.622755194947053, -3.850895377421028 -5.859588285879643, -3.5000000000000133 -6.062177826491062 C-3.1491046225789985 -6.264767367102482, -2.774884796001611 -6.439268938068954, -2.3941410032796973 -6.577848345501353 C-2.0133972105577835 -6.716427752933752, -1.6145607442151435 -6.823295662002345, -1.2155372436685306 -6.893654271085453 C-0.8165137431219176 -6.9640128801685615, -0.40517908122285695 -6.999999999999999, -1.9937625952807352e-14 -7 C0.4051790812228171 -7.000000000000001, 0.8165137431218781 -6.964012880168565, 1.2155372436684913 -6.89365427108546 C1.6145607442151044 -6.823295662002354, 2.013397210557745 -6.716427752933763, 2.3941410032796595 -6.5778483455013665 C2.774884796001574 -6.43926893806897, 3.149104622578963 -6.2647673671025, 3.499999999999979 -6.062177826491083 C3.8508953774209953 -5.859588285879665, 4.189128084166947 -5.622755194947077, 4.499513267805756 -5.362311101832862 C4.809898451444564 -5.1018670087186475, 5.101867008718613 -4.809898451444602, 5.362311101832829 -4.499513267805796 C5.622755194947046 -4.189128084166989, 5.859588285879637 -3.8508953774210393, 6.062177826491056 -3.500000000000025 C6.2647673671024755 -3.1491046225790105, 6.439268938068949 -2.774884796001623, 6.577848345501348 -2.3941410032797092 C6.716427752933747 -2.0133972105577955, 6.823295662002342 -1.6145607442151562, 6.893654271085451 -1.2155372436685434 C6.96401288016856 -0.8165137431219307, 6.982275711847575 -0.2025895406114567, 7 -3.2800750208310675e-14 C7.017724288152425 0.2025895406113911, 7.017724288152424 -0.2025895406114242, 7 0" stroke="none" stroke-width="0" fill="#ECECFF" style=""/><path d="M7 0 C7 0.40517908122283747, 6.964012880168563 0.816513743121899, 6.893654271085456 1.2155372436685123 C6.823295662002349 1.6145607442151257, 6.716427752933756 2.013397210557766, 6.5778483455013586 2.394141003279681 C6.439268938068961 2.7748847960015954, 6.26476736710249 3.149104622578984, 6.062177826491071 3.4999999999999996 C5.859588285879653 3.8508953774210153, 5.622755194947063 4.189128084166967, 5.362311101832846 4.499513267805774 C5.10186700871863 4.809898451444582, 4.809898451444583 5.10186700871863, 4.499513267805775 5.362311101832846 C4.189128084166968 5.622755194947063, 3.8508953774210166 5.859588285879652, 3.500000000000001 6.06217782649107 C3.149104622578985 6.264767367102489, 2.7748847960015963 6.439268938068961, 2.3941410032796817 6.5778483455013586 C2.013397210557767 6.716427752933756, 1.6145607442151264 6.823295662002349, 1.2155372436685128 6.893654271085456 C0.8165137431218992 6.964012880168563, 0.4051790812228379 7, 4.286263797015736e-16 7 C-0.405179081222837 7, -0.8165137431218985 6.964012880168563, -1.2155372436685121 6.893654271085456 C-1.6145607442151257 6.823295662002349, -2.0133972105577667 6.716427752933756, -2.394141003279681 6.5778483455013586 C-2.774884796001595 6.439268938068961, -3.149104622578983 6.26476736710249, -3.4999999999999982 6.062177826491071 C-3.8508953774210135 5.859588285879653, -4.189128084166966 5.6227551949470636, -4.499513267805773 5.362311101832848 C-4.809898451444581 5.101867008718632, -5.101867008718628 4.809898451444586, -5.3623111018328435 4.499513267805779 C-5.622755194947059 4.189128084166971, -5.859588285879649 3.8508953774210206, -6.062177826491068 3.5000000000000053 C-6.264767367102486 3.14910462257899, -6.439268938068958 2.774884796001602, -6.577848345501356 2.394141003279688 C-6.716427752933754 2.0133972105577738, -6.823295662002347 1.614560744215134, -6.893654271085454 1.215537243668521 C-6.9640128801685615 0.816513743121908, -6.999999999999999 0.4051790812228472, -7 1.0183126166254463e-14 C-7.000000000000001 -0.40517908122282686, -6.964012880168565 -0.8165137431218878, -6.893654271085459 -1.215537243668501 C-6.823295662002352 -1.6145607442151142, -6.716427752933759 -2.0133972105577542, -6.577848345501363 -2.394141003279669 C-6.439268938068967 -2.7748847960015834, -6.264767367102496 -3.149104622578972, -6.062177826491078 -3.4999999999999876 C-5.859588285879661 -3.8508953774210033, -5.6227551949470715 -4.1891280841669545, -5.362311101832856 -4.499513267805763 C-5.10186700871864 -4.809898451444571, -4.809898451444594 -5.10186700871862, -4.499513267805787 -5.362311101832836 C-4.189128084166979 -5.622755194947053, -3.850895377421028 -5.859588285879643, -3.5000000000000133 -6.062177826491062 C-3.1491046225789985 -6.264767367102482, -2.774884796001611 -6.439268938068954, -2.3941410032796973 -6.577848345501353 C-2.0133972105577835 -6.716427752933752, -1.6145607442151435 -6.823295662002345, -1.2155372436685306 -6.893654271085453 C-0.8165137431219176 -6.9640128801685615, -0.40517908122285695 -6.999999999999999, -1.9937625952807352e-14 -7 C0.4051790812228171 -7.000000000000001, 0.8165137431218781 -6.964012880168565, 1.2155372436684913 -6.89365427108546 C1.6145607442151044 -6.823295662002354, 2.013397210557745 -6.716427752933763, 2.3941410032796595 -6.5778483455013665 C2.774884796001574 -6.43926893806897, 3.149104622578963 -6.2647673671025, 3.499999999999979 -6.062177826491083 C3.8508953774209953 -5.859588285879665, 4.189128084166947 -5.622755194947077, 4.499513267805756 -5.362311101832862 C4.809898451444564 -5.1018670087186475, 5.101867008718613 -4.809898451444602, 5.362311101832829 -4.499513267805796 C5.622755194947046 -4.189128084166989, 5.859588285879637 -3.8508953774210393, 6.062177826491056 -3.500000000000025 C6.2647673671024755 -3.1491046225790105, 6.439268938068949 -2.774884796001623, 6.577848345501348 -2.3941410032797092 C6.716427752933747 -2.0133972105577955, 6.823295662002342 -1.6145607442151562, 6.893654271085451 -1.2155372436685434 C6.96401288016856 -0.8165137431219307, 6.982275711847575 -0.2025895406114567, 7 -3.2800750208310675e-14 C7.017724288152425 0.2025895406113911, 7.017724288152424 -0.2025895406114242, 7 0" stroke="#333333" stroke-width="2" fill="none" stroke-dasharray="0 0" style=""/><g><path d="M2.5 0 C2.5 0.14470681472244193, 2.487147457203058 0.29161205111496386, 2.46201938253052 0.4341204441673258 C2.436891307857982 0.5766288372196877, 2.3987241974763416 0.7190704323420595, 2.3492315519647713 0.8550503583141718 C2.299738906453201 0.991030284286284, 2.2374169168223177 1.124680222349637, 2.165063509461097 1.2499999999999998 C2.092710102099876 1.3753197776503625, 2.0081268553382365 1.496117172916774, 1.915111107797445 1.6069690242163481 C1.8220953602566536 1.7178208755159223, 1.7178208755159226 1.8220953602566536, 1.6069690242163484 1.915111107797445 C1.4961171729167742 2.0081268553382365, 1.375319777650363 2.0927101020998755, 1.2500000000000002 2.1650635094610964 C1.1246802223496375 2.2374169168223172, 0.9910302842862845 2.2997389064532, 0.8550503583141721 2.349231551964771 C0.7190704323420597 2.3987241974763416, 0.576628837219688 2.436891307857982, 0.43412044416732604 2.46201938253052 C0.291612051114964 2.487147457203058, 0.14470681472244212 2.5, 1.5308084989341916e-16 2.5 C-0.1447068147224418 2.5, -0.2916120511149638 2.487147457203058, -0.43412044416732576 2.46201938253052 C-0.5766288372196877 2.436891307857982, -0.7190704323420595 2.3987241974763416, -0.8550503583141718 2.3492315519647713 C-0.991030284286284 2.299738906453201, -1.124680222349637 2.2374169168223177, -1.2499999999999996 2.165063509461097 C-1.375319777650362 2.092710102099876, -1.4961171729167733 2.008126855338237, -1.6069690242163475 1.9151111077974459 C-1.7178208755159217 1.8220953602566548, -1.822095360256653 1.7178208755159234, -1.9151111077974443 1.6069690242163495 C-2.0081268553382357 1.4961171729167755, -2.0927101020998746 1.3753197776503645, -2.1650635094610955 1.250000000000002 C-2.2374169168223164 1.1246802223496395, -2.2997389064531992 0.9910302842862865, -2.34923155196477 0.8550503583141743 C-2.3987241974763407 0.7190704323420621, -2.436891307857981 0.5766288372196907, -2.4620193825305194 0.434120444167329 C-2.487147457203058 0.29161205111496724, -2.5 0.14470681472244545, -2.5 3.636830773662308e-15 C-2.5 -0.14470681472243818, -2.4871474572030587 -0.2916120511149599, -2.4620193825305208 -0.4341204441673218 C-2.436891307857983 -0.5766288372196837, -2.398724197476343 -0.7190704323420553, -2.3492315519647726 -0.8550503583141675 C-2.2997389064532023 -0.9910302842862798, -2.23741691682232 -1.1246802223496328, -2.165063509461099 -1.2499999999999956 C-2.092710102099878 -1.3753197776503583, -2.00812685533824 -1.4961171729167695, -1.9151111077974488 -1.606969024216344 C-1.8220953602566576 -1.7178208755159183, -1.7178208755159263 -1.82209536025665, -1.6069690242163523 -1.9151111077974416 C-1.4961171729167784 -2.0081268553382334, -1.3753197776503672 -2.0927101020998724, -1.2500000000000047 -2.1650635094610937 C-1.1246802223496422 -2.237416916822315, -0.9910302842862897 -2.299738906453198, -0.8550503583141776 -2.3492315519647686 C-0.7190704323420656 -2.3987241974763394, -0.5766288372196942 -2.4368913078579806, -0.43412044416733236 -2.462019382530519 C-0.29161205111497057 -2.4871474572030574, -0.1447068147224489 -2.4999999999999996, -7.120580697431198e-15 -2.5 C0.14470681472243463 -2.5000000000000004, 0.29161205111495647 -2.487147457203059, 0.4341204441673183 -2.4620193825305217 C0.5766288372196802 -2.436891307857984, 0.7190704323420518 -2.3987241974763442, 0.8550503583141642 -2.349231551964774 C0.9910302842862766 -2.2997389064532037, 1.1246802223496295 -2.2374169168223212, 1.2499999999999925 -2.165063509461101 C1.3753197776503554 -2.0927101020998804, 1.4961171729167668 -2.008126855338242, 1.6069690242163412 -1.915111107797451 C1.7178208755159157 -1.82209536025666, 1.8220953602566472 -1.7178208755159294, 1.915111107797439 -1.6069690242163557 C2.0081268553382308 -1.496117172916782, 2.09271010209987 -1.3753197776503712, 2.1650635094610915 -1.2500000000000089 C2.237416916822313 -1.1246802223496466, 2.299738906453196 -0.9910302842862939, 2.3492315519647673 -0.855050358314182 C2.3987241974763385 -0.71907043234207, 2.4368913078579792 -0.5766288372196986, 2.462019382530518 -0.4341204441673369 C2.487147457203057 -0.29161205111497523, 2.4936698970884197 -0.07235340736123454, 2.5 -1.1714553645825241e-14 C2.5063301029115803 0.07235340736121111, 2.50633010291158 -0.07235340736122292, 2.5 0" stroke="none" stroke-width="0" fill="#9370DB" style=""/><path d="M2.5 0 C2.5 0.14470681472244193, 2.487147457203058 0.29161205111496386, 2.46201938253052 0.4341204441673258 C2.436891307857982 0.5766288372196877, 2.3987241974763416 0.7190704323420595, 2.3492315519647713 0.8550503583141718 C2.299738906453201 0.991030284286284, 2.2374169168223177 1.124680222349637, 2.165063509461097 1.2499999999999998 C2.092710102099876 1.3753197776503625, 2.0081268553382365 1.496117172916774, 1.915111107797445 1.6069690242163481 C1.8220953602566536 1.7178208755159223, 1.7178208755159226 1.8220953602566536, 1.6069690242163484 1.915111107797445 C1.4961171729167742 2.0081268553382365, 1.375319777650363 2.0927101020998755, 1.2500000000000002 2.1650635094610964 C1.1246802223496375 2.2374169168223172, 0.9910302842862845 2.2997389064532, 0.8550503583141721 2.349231551964771 C0.7190704323420597 2.3987241974763416, 0.576628837219688 2.436891307857982, 0.43412044416732604 2.46201938253052 C0.291612051114964 2.487147457203058, 0.14470681472244212 2.5, 1.5308084989341916e-16 2.5 C-0.1447068147224418 2.5, -0.2916120511149638 2.487147457203058, -0.43412044416732576 2.46201938253052 C-0.5766288372196877 2.436891307857982, -0.7190704323420595 2.3987241974763416, -0.8550503583141718 2.3492315519647713 C-0.991030284286284 2.299738906453201, -1.124680222349637 2.2374169168223177, -1.2499999999999996 2.165063509461097 C-1.375319777650362 2.092710102099876, -1.4961171729167733 2.008126855338237, -1.6069690242163475 1.9151111077974459 C-1.7178208755159217 1.8220953602566548, -1.822095360256653 1.7178208755159234, -1.9151111077974443 1.6069690242163495 C-2.0081268553382357 1.4961171729167755, -2.0927101020998746 1.3753197776503645, -2.1650635094610955 1.250000000000002 C-2.2374169168223164 1.1246802223496395, -2.2997389064531992 0.9910302842862865, -2.34923155196477 0.8550503583141743 C-2.3987241974763407 0.7190704323420621, -2.436891307857981 0.5766288372196907, -2.4620193825305194 0.434120444167329 C-2.487147457203058 0.29161205111496724, -2.5 0.14470681472244545, -2.5 3.636830773662308e-15 C-2.5 -0.14470681472243818, -2.4871474572030587 -0.2916120511149599, -2.4620193825305208 -0.4341204441673218 C-2.436891307857983 -0.5766288372196837, -2.398724197476343 -0.7190704323420553, -2.3492315519647726 -0.8550503583141675 C-2.2997389064532023 -0.9910302842862798, -2.23741691682232 -1.1246802223496328, -2.165063509461099 -1.2499999999999956 C-2.092710102099878 -1.3753197776503583, -2.00812685533824 -1.4961171729167695, -1.9151111077974488 -1.606969024216344 C-1.8220953602566576 -1.7178208755159183, -1.7178208755159263 -1.82209536025665, -1.6069690242163523 -1.9151111077974416 C-1.4961171729167784 -2.0081268553382334, -1.3753197776503672 -2.0927101020998724, -1.2500000000000047 -2.1650635094610937 C-1.1246802223496422 -2.237416916822315, -0.9910302842862897 -2.299738906453198, -0.8550503583141776 -2.3492315519647686 C-0.7190704323420656 -2.3987241974763394, -0.5766288372196942 -2.4368913078579806, -0.43412044416733236 -2.462019382530519 C-0.29161205111497057 -2.4871474572030574, -0.1447068147224489 -2.4999999999999996, -7.120580697431198e-15 -2.5 C0.14470681472243463 -2.5000000000000004, 0.29161205111495647 -2.487147457203059, 0.4341204441673183 -2.4620193825305217 C0.5766288372196802 -2.436891307857984, 0.7190704323420518 -2.3987241974763442, 0.8550503583141642 -2.349231551964774 C0.9910302842862766 -2.2997389064532037, 1.1246802223496295 -2.2374169168223212, 1.2499999999999925 -2.165063509461101 C1.3753197776503554 -2.0927101020998804, 1.4961171729167668 -2.008126855338242, 1.6069690242163412 -1.915111107797451 C1.7178208755159157 -1.82209536025666, 1.8220953602566472 -1.7178208755159294, 1.915111107797439 -1.6069690242163557 C2.0081268553382308 -1.496117172916782, 2.09271010209987 -1.3753197776503712, 2.1650635094610915 -1.2500000000000089 C2.237416916822313 -1.1246802223496466, 2.299738906453196 -0.9910302842862939, 2.3492315519647673 -0.855050358314182 C2.3987241974763385 -0.71907043234207, 2.4368913078579792 -0.5766288372196986, 2.462019382530518 -0.4341204441673369 C2.487147457203057 -0.29161205111497523, 2.4936698970884197 -0.07235340736123454, 2.5 -1.1714553645825241e-14 C2.5063301029115803 0.07235340736121111, 2.50633010291158 -0.07235340736122292, 2.5 0" stroke="#9370DB" stroke-width="2" fill="none" stroke-dasharray="0 0" style=""/></g></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg></figure>
 
-<p>No transition is legal out of a terminal state —
-<code>assert_legal</code> raises <code>IllegalTransitionError</code> for
-any pair absent from <code>LEGAL_TRANSITIONS</code>, checked
-exhaustively over all 121 (source × target) status pairs by a property
-test (<code>test_lifecycle_permits_expected_transitions</code>,
-<code>test_lifecycle_forbids_shortcut_transitions</code>, testing report
-section 3.1–section 3.2). <code>ACCEPTED</code> and
-<code>SCHEDULED</code> are deliberately excluded from the withdrawable
-set: retracting an accepted paper is editorial retraction, with its own
-notice obligations, and is not modelled as author withdrawal.</p>
-<h3
-id="83-authorisation-as-an-explicit-relation-not-scattered-checks">8.3
-Authorisation as an explicit relation, not scattered checks</h3>
-<p><code>policies.can(actor, action, resource)</code> is a single
-function computing every access decision in the system, called as a
-FastAPI dependency so no route can omit it (section 9.3). It composes
-two kinds of rule: <code>_ROLE_GRANTS</code> (an action is available to
-any actor holding a given role — e.g. <code>SCREEN</code> requires
-<code>editor</code> or <code>editor_in_chief</code>) and
-<code>_OWNERSHIP_ACTIONS</code> (an action additionally requires the
-actor's identity to match a predicate over the resource — e.g.
-<code>RESUBMIT</code> and <code>WITHDRAW</code> require the actor to be
-the manuscript's corresponding author). Two of this matrix's known gaps
-— <code>REVIEW</code> granted on role alone with no ownership predicate
-excluding an author reviewing their own work — are TD-02 and TD-03
-(section 12); they are gaps in the <em>matrix</em>, found by asking
-whether every action that should be ownership-checked is, not gaps in
-the mechanism that enforces it.</p>
-<h3 id="84-double-blind-integrity-as-a-projection-not-a-filter">8.4
-Double-blind integrity as a projection, not a filter</h3>
-<p>The core design decision: blinding is <strong>structural</strong>,
-not procedural. <code>blind(manuscript)</code>
-(<code>blinding.py</code>) does not filter a full
-<code>Manuscript</code> object and hope every caller remembers to call
-it — it returns a distinct type, <code>BlindedManuscript</code>, that
-has no author-identifying field at all:</p>
-<div class="sourceCode" id="cb1"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span>(frozen<span class="op">=</span><span class="va">True</span>, slots<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BlindedManuscript:</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    tracking_code: <span class="bu">str</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    title: <span class="bu">str</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    abstract: <span class="bu">str</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    keywords: <span class="bu">tuple</span>[<span class="bu">str</span>, ...]</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    version: <span class="bu">int</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    status: <span class="bu">str</span></span></code></pre></div>
-<p>There is no field a future change could accidentally repopulate with
-an author id, because the type has nowhere to put one. This is verified
-by a property test asserting the author id is absent from the serialised
-projection for every generated title/abstract/keyword combination
-(testing report section 3.2), and by sentinel-based leak tests over
-every reviewer-facing endpoint (testing report section 3.5). The
-documented limit — <code>title</code>, <code>abstract</code> and
-<code>keywords</code> are copied <strong>verbatim</strong>, so
-self-identifying text in the body is not scrubbed — is TD-05 and is
-restated in Section 17.</p>
-<h3 id="85-the-hash-chained-audit-log">8.5 The hash-chained audit
-log</h3>
-<p>Each <code>EditorialEvent</code> records its sequence number, type,
-payload, actor, timestamp, its predecessor's hash, and its own SHA-256
-digest over <code>previous_hash ‖ canonical_bytes(event)</code>:</p>
-<div class="sourceCode" id="cb2"><pre
-class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> chain_hash(event: EditorialEvent, previous_hash: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    digest <span class="op">=</span> hashlib.sha256()</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    digest.update(previous_hash.encode(<span class="st">&quot;ascii&quot;</span>))</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    digest.update(event.canonical_bytes())</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> digest.hexdigest()</span></code></pre></div>
-<p><code>append</code> links a new event onto a chain tail in O(1) — it
-reads only the last link, not the whole history (TD-08 records that this
-capability is unverified by a dedicated test). <code>verify</code> walks
-the chain from the genesis hash (<code>"0" × 64</code>) and raises
-<code>ChainBrokenError</code> at the first inconsistency in sequence,
-predecessor hash, or digest. This detects <strong>alteration, reordering
-and removal within the chain</strong> — it is deliberately, and
-explicitly in the module's own docstring, <strong>not</strong> a defence
-against tail truncation, a forged event appended through the legitimate
-API, or a wholly rebuilt history from genesis: all three require an
-external anchor the domain layer does not provide (TD-04, restated in
-section 17). A PostgreSQL trigger closes the most direct way to defeat
-this at the database layer for <code>UPDATE</code>/<code>DELETE</code>;
-a second, statement-level trigger closes <code>TRUNCATE</code>, which
-the first trigger did not — see section 11.4's account of how that gap
-was found.</p>
-<h3 id="86-data-model--entity-relationship-diagram">8.6 Data model —
-entity-relationship diagram</h3>
-<p>The tables below are the delivered PostgreSQL schema
-(<code>backend/src/ugjcs/infrastructure/db/models.py</code>), not the
-fuller schema sketched in the design specification (section 8 of that
-document) — <code>reviews</code>, <code>editorial_decisions</code>,
-<code>issues</code>, <code>issue_papers</code>,
-<code>similarity_reports</code>, <code>notifications</code> and a
-dedicated roles table are specified there but not present in the
-delivered database; roles are a <code>user_roles</code> join table, and
-the review outcome is folded into <code>review_assignments</code>.</p>
+No transition is legal out of a terminal state — `assert_legal` raises `IllegalTransitionError`
+for any pair absent from `LEGAL_TRANSITIONS`, checked exhaustively over all 121 (source × target)
+status pairs by a property test (`test_lifecycle_permits_expected_transitions`,
+`test_lifecycle_forbids_shortcut_transitions`, testing report section 3.1–section 3.2). `ACCEPTED` and
+`SCHEDULED` are deliberately excluded from the withdrawable set: retracting an accepted paper is
+editorial retraction, with its own notice obligations, and is not modelled as author withdrawal.
+
+### 8.3 Authorisation as an explicit relation, not scattered checks
+
+`policies.can(actor, action, resource)` is a single function computing every access decision in
+the system, called as a FastAPI dependency so no route can omit it (section 9.3). It composes two kinds
+of rule: `_ROLE_GRANTS` (an action is available to any actor holding a given role — e.g. `SCREEN`
+requires `editor` or `editor_in_chief`) and `_OWNERSHIP_ACTIONS` (an action additionally requires
+the actor's identity to match a predicate over the resource — e.g. `RESUBMIT` and `WITHDRAW`
+require the actor to be the manuscript's corresponding author). Two of this matrix's known gaps
+— `REVIEW` granted on role alone with no ownership predicate excluding an author reviewing their
+own work — are TD-02 and TD-03 (section 12); they are gaps in the *matrix*, found by asking whether every
+action that should be ownership-checked is, not gaps in the mechanism that enforces it.
+
+### 8.4 Double-blind integrity as a projection, not a filter
+
+The core design decision: blinding is **structural**, not procedural. `blind(manuscript)`
+(`blinding.py`) does not filter a full `Manuscript` object and hope every caller remembers to
+call it — it returns a distinct type, `BlindedManuscript`, that has no author-identifying field
+at all:
+
+```python
+@dataclass(frozen=True, slots=True)
+class BlindedManuscript:
+    tracking_code: str
+    title: str
+    abstract: str
+    keywords: tuple[str, ...]
+    version: int
+    status: str
+```
+
+There is no field a future change could accidentally repopulate with an author id, because the
+type has nowhere to put one. This is verified by a property test asserting the author id is
+absent from the serialised projection for every generated title/abstract/keyword combination
+(testing report section 3.2), and by sentinel-based leak tests over every reviewer-facing endpoint
+(testing report section 3.5). The documented limit — `title`, `abstract` and `keywords` are copied
+**verbatim**, so self-identifying text in the body is not scrubbed — is TD-05 and is restated in
+Section 17.
+
+### 8.5 The hash-chained audit log
+
+Each `EditorialEvent` records its sequence number, type, payload, actor, timestamp, its
+predecessor's hash, and its own SHA-256 digest over `previous_hash ‖ canonical_bytes(event)`:
+
+```python
+def chain_hash(event: EditorialEvent, previous_hash: str) -> str:
+    digest = hashlib.sha256()
+    digest.update(previous_hash.encode("ascii"))
+    digest.update(event.canonical_bytes())
+    return digest.hexdigest()
+```
+
+`append` links a new event onto a chain tail in O(1) — it reads only the last link, not the whole
+history (TD-08 records that this capability is unverified by a dedicated test). `verify` walks
+the chain from the genesis hash (`"0" × 64`) and raises `ChainBrokenError` at the first
+inconsistency in sequence, predecessor hash, or digest. This detects **alteration, reordering and
+removal within the chain** — it is deliberately, and explicitly in the module's own docstring,
+**not** a defence against tail truncation, a forged event appended through the legitimate API, or
+a wholly rebuilt history from genesis: all three require an external anchor the domain layer does
+not provide (TD-04, restated in section 17). A PostgreSQL trigger closes the most direct way to defeat
+this at the database layer for `UPDATE`/`DELETE`; a second, statement-level trigger closes
+`TRUNCATE`, which the first trigger did not — see section 11.4's account of how that gap was found.
+
+### 8.6 Data model — entity-relationship diagram
+
+The tables below are the delivered PostgreSQL schema (`backend/src/ugjcs/infrastructure/db/models.py`),
+not the fuller schema sketched in the design specification (section 8 of that document) — `reviews`,
+`editorial_decisions`, `issues`, `issue_papers`, `similarity_reports`, `notifications` and a
+dedicated roles table are specified there but not present in the delivered database; roles are a
+`user_roles` join table, and the review outcome is folded into `review_assignments`.
+
 <figure class="diagram"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="erDiagram" style="max-width: 1919.59px; background-color: transparent;" viewBox="0 0 1919.59375 1100.25" role="graphics-document document" aria-roledescription="er"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .entityBox{fill:#ECECFF;stroke:#9370DB;}#my-svg .relationshipLabelBox{fill:hsl(80, 100%, 96.2745098039%);opacity:0.7;background-color:hsl(80, 100%, 96.2745098039%);}#my-svg .relationshipLabelBox rect{opacity:0.5;}#my-svg .labelBkg{background-color:rgba(248.6666666666, 255, 235.9999999999, 0.5);}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel .label rect{fill:rgba(232,232,232, 0.8);}#my-svg .edgeLabel .label text{fill:#333;}#my-svg .edgeLabel .label{fill:#9370DB;font-size:14px;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#my-svg .edge-pattern-dashed{stroke-dasharray:8,8;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .relationshipLine{stroke:#333333;stroke-width:1px;fill:none;}#my-svg .marker{fill:none!important;stroke:#333333!important;stroke-width:1;}#my-svg [data-look=neo].labelBkg{background-color:rgba(248.6666666666, 255, 235.9999999999, 0.5);}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><defs><marker id="my-svg_er-onlyOneStart" class="marker onlyOne er" refX="0" refY="9" markerWidth="18" markerHeight="18" orient="auto"><path d="M9,0 L9,18 M15,0 L15,18"/></marker></defs><defs><marker id="my-svg_er-onlyOneEnd" class="marker onlyOne er" refX="18" refY="9" markerWidth="18" markerHeight="18" orient="auto"><path d="M3,0 L3,18 M9,0 L9,18"/></marker></defs><defs><marker id="my-svg_er-zeroOrOneStart" class="marker zeroOrOne er" refX="0" refY="9" markerWidth="30" markerHeight="18" orient="auto"><circle fill="white" cx="21" cy="9" r="6"/><path d="M9,0 L9,18"/></marker></defs><defs><marker id="my-svg_er-zeroOrOneEnd" class="marker zeroOrOne er" refX="30" refY="9" markerWidth="30" markerHeight="18" orient="auto"><circle fill="white" cx="9" cy="9" r="6"/><path d="M21,0 L21,18"/></marker></defs><defs><marker id="my-svg_er-oneOrMoreStart" class="marker oneOrMore er" refX="18" refY="18" markerWidth="45" markerHeight="36" orient="auto"><path d="M0,18 Q 18,0 36,18 Q 18,36 0,18 M42,9 L42,27"/></marker></defs><defs><marker id="my-svg_er-oneOrMoreEnd" class="marker oneOrMore er" refX="27" refY="18" markerWidth="45" markerHeight="36" orient="auto"><path d="M3,9 L3,27 M9,18 Q27,0 45,18 Q27,36 9,18"/></marker></defs><defs><marker id="my-svg_er-zeroOrMoreStart" class="marker zeroOrMore er" refX="18" refY="18" markerWidth="57" markerHeight="36" orient="auto"><circle fill="white" cx="48" cy="18" r="6"/><path d="M0,18 Q18,0 36,18 Q18,36 0,18"/></marker></defs><defs><marker id="my-svg_er-zeroOrMoreEnd" class="marker zeroOrMore er" refX="39" refY="18" markerWidth="57" markerHeight="36" orient="auto"><circle fill="white" cx="9" cy="18" r="6"/><path d="M21,18 Q39,0 57,18 Q39,36 21,18"/></marker></defs><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M186.558,521L174.218,543.667C161.877,566.333,137.196,611.667,124.856,664.125C112.516,716.583,112.516,776.167,112.516,805.958L112.516,835.75" id="my-svg-id_entity-USERS-0_entity-USER_ROLES-1_0" class="edge-thickness-normal edge-pattern-solid relationshipLine" style="undefined;;;undefined" data-edge="true" data-et="edge" data-id="id_entity-USERS-0_entity-USER_ROLES-1_0" data-points="W3sieCI6MTg2LjU1Nzk3NjY3OTc3MTMsInkiOjUyMX0seyJ4IjoxMTIuNTE1NjI1LCJ5Ijo2NTd9LHsieCI6MTEyLjUxNTYyNSwieSI6ODM1Ljc1fV0=" data-look="classic" marker-start="url(#my-svg_er-onlyOneStart)" marker-end="url(#my-svg_er-zeroOrMoreEnd)"/><path d="M419.301,521L431.642,543.667C443.982,566.333,468.663,611.667,481.003,642.75C493.344,673.833,493.344,690.667,493.344,699.083L493.344,707.5" id="my-svg-id_entity-USERS-0_entity-REFRESH_TOKENS-2_1" class="edge-thickness-normal edge-pattern-solid relationshipLine" style="undefined;;;undefined" data-edge="true" data-et="edge" data-id="id_entity-USERS-0_entity-REFRESH_TOKENS-2_1" data-points="W3sieCI6NDE5LjMwMTM5ODMyMDIyODcsInkiOjUyMX0seyJ4Ijo0OTMuMzQzNzUsInkiOjY1N30seyJ4Ijo0OTMuMzQzNzUsInkiOjcwNy41fV0=" data-look="classic" marker-start="url(#my-svg_er-onlyOneStart)" marker-end="url(#my-svg_er-zeroOrMoreEnd)"/><path d="M1129.617,460.363L1090.38,493.136C1051.143,525.908,972.669,591.454,933.432,650.456C894.195,709.458,894.195,761.917,894.195,788.146L894.195,814.375" id="my-svg-id_entity-MANUSCRIPTS-3_entity-MANUSCRIPT_AUTHORS-4_2" class="edge-thickness-normal edge-pattern-solid relationshipLine" style="undefined;;;undefined" data-edge="true" data-et="edge" data-id="id_entity-MANUSCRIPTS-3_entity-MANUSCRIPT_AUTHORS-4_2" data-points="W3sieCI6MTEyOS42MTcxODc1LCJ5Ijo0NjAuMzYyNjkwNzcyMDQzN30seyJ4Ijo4OTQuMTk1MzEyNSwieSI6NjU3fSx7IngiOjg5NC4xOTUzMTI1LCJ5Ijo4MTQuMzc1fV0=" data-look="classic" marker-start="url(#my-svg_er-onlyOneStart)" marker-end="url(#my-svg_er-zeroOrMoreEnd)"/><path d="M1312.93,606.5L1312.93,614.917C1312.93,623.333,1312.93,640.167,1312.93,657C1312.93,673.833,1312.93,690.667,1312.93,699.083L1312.93,707.5" id="my-svg-id_entity-MANUSCRIPTS-3_entity-EDITORIAL_EVENTS-5_3" class="edge-thickness-normal edge-pattern-solid relationshipLine" style="undefined;;;undefined" data-edge="true" data-et="edge" data-id="id_entity-MANUSCRIPTS-3_entity-EDITORIAL_EVENTS-5_3" data-points="W3sieCI6MTMxMi45Mjk2ODc1LCJ5Ijo2MDYuNX0seyJ4IjoxMzEyLjkyOTY4NzUsInkiOjY1N30seyJ4IjoxMzEyLjkyOTY4NzUsInkiOjcwNy41fV0=" data-look="classic" marker-start="url(#my-svg_er-onlyOneStart)" marker-end="url(#my-svg_er-zeroOrMoreEnd)"/><path d="M1496.242,450.864L1540.095,485.22C1583.948,519.576,1671.654,588.288,1715.507,631.061C1759.359,673.833,1759.359,690.667,1759.359,699.083L1759.359,707.5" id="my-svg-id_entity-MANUSCRIPTS-3_entity-REVIEW_ASSIGNMENTS-6_4" class="edge-thickness-normal edge-pattern-solid relationshipLine" style="undefined;;;undefined" data-edge="true" data-et="edge" data-id="id_entity-MANUSCRIPTS-3_entity-REVIEW_ASSIGNMENTS-6_4" data-points="W3sieCI6MTQ5Ni4yNDIxODc1LCJ5Ijo0NTAuODYzOTg1OTY1MDM1MX0seyJ4IjoxNzU5LjM1OTM3NSwieSI6NjU3fSx7IngiOjE3NTkuMzU5Mzc1LCJ5Ijo3MDcuNX1d" data-look="classic" marker-start="url(#my-svg_er-onlyOneStart)" marker-end="url(#my-svg_er-zeroOrMoreEnd)"/></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(112.515625, 657)"><g class="label" data-id="id_entity-USERS-0_entity-USER_ROLES-1_0" transform="translate(-10.3359375, -10.5)"><foreignObject width="20.671875" height="21"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>has</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(493.34375, 657)"><g class="label" data-id="id_entity-USERS-0_entity-REFRESH_TOKENS-2_1" transform="translate(-18.140625, -10.5)"><foreignObject width="36.28125" height="21"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>issues</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(894.1953125, 657)"><g class="label" data-id="id_entity-MANUSCRIPTS-3_entity-MANUSCRIPT_AUTHORS-4_2" transform="translate(-10.3359375, -10.5)"><foreignObject width="20.671875" height="21"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>has</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1312.9296875, 657)"><g class="label" data-id="id_entity-MANUSCRIPTS-3_entity-EDITORIAL_EVENTS-5_3" transform="translate(-31.5234375, -10.5)"><foreignObject width="63.046875" height="21"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>audit trail</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1759.359375, 657)"><g class="label" data-id="id_entity-MANUSCRIPTS-3_entity-REVIEW_ASSIGNMENTS-6_4" transform="translate(-10.3359375, -10.5)"><foreignObject width="20.671875" height="21"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>has</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-entity-USERS-0" data-look="classic" transform="translate(302.9296875, 307.25)"><g class="outer-path" style=""><path d="M-150.625 -213.75 L150.625 -213.75 L150.625 213.75 L-150.625 213.75" stroke="none" stroke-width="0" fill="#ECECFF"/><path d="M-150.625 -213.75 C-71.20287055193313 -213.75, 8.219258896133738 -213.75, 150.625 -213.75 M-150.625 -213.75 C-66.19008194174418 -213.75, 18.244836116511635 -213.75, 150.625 -213.75 M150.625 -213.75 C150.625 -116.40325091703089, 150.625 -19.056501834061777, 150.625 213.75 M150.625 -213.75 C150.625 -72.89140426543844, 150.625 67.96719146912312, 150.625 213.75 M150.625 213.75 C70.68307476080203 213.75, -9.258850478395942 213.75, -150.625 213.75 M150.625 213.75 C37.21962690749703 213.75, -76.18574618500594 213.75, -150.625 213.75 M-150.625 213.75 C-150.625 63.989240406855885, -150.625 -85.77151918628823, -150.625 -213.75 M-150.625 213.75 C-150.625 58.707048450222544, -150.625 -96.33590309955491, -150.625 -213.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-150.625 -171 L150.625 -171 L150.625 -128.25 L-150.625 -128.25" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-150.625 -171 C-76.30460174127735 -171, -1.9842034825547046 -171, 150.625 -171 M-150.625 -171 C-90.22360525729863 -171, -29.82221051459726 -171, 150.625 -171 M150.625 -171 C150.625 -158.83467999552587, 150.625 -146.66935999105172, 150.625 -128.25 M150.625 -171 C150.625 -160.1186597290407, 150.625 -149.2373194580814, 150.625 -128.25 M150.625 -128.25 C61.439700346187294 -128.25, -27.74559930762541 -128.25, -150.625 -128.25 M150.625 -128.25 C55.351078958929676 -128.25, -39.92284208214065 -128.25, -150.625 -128.25 M-150.625 -128.25 C-150.625 -141.37526726824362, -150.625 -154.50053453648727, -150.625 -171 M-150.625 -128.25 C-150.625 -144.94090052660619, -150.625 -161.63180105321234, -150.625 -171" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-150.625 -128.25 L150.625 -128.25 L150.625 -85.5 L-150.625 -85.5" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-150.625 -128.25 C-77.56170530887462 -128.25, -4.498410617749244 -128.25, 150.625 -128.25 M-150.625 -128.25 C-54.522504770000666 -128.25, 41.57999045999867 -128.25, 150.625 -128.25 M150.625 -128.25 C150.625 -111.93764034674554, 150.625 -95.62528069349108, 150.625 -85.5 M150.625 -128.25 C150.625 -112.36803099208697, 150.625 -96.48606198417396, 150.625 -85.5 M150.625 -85.5 C41.2535453191298 -85.5, -68.1179093617404 -85.5, -150.625 -85.5 M150.625 -85.5 C43.50170188887755 -85.5, -63.621596222244904 -85.5, -150.625 -85.5 M-150.625 -85.5 C-150.625 -95.94257700711896, -150.625 -106.3851540142379, -150.625 -128.25 M-150.625 -85.5 C-150.625 -98.5313099139295, -150.625 -111.562619827859, -150.625 -128.25" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-150.625 -85.5 L150.625 -85.5 L150.625 -42.75 L-150.625 -42.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-150.625 -85.5 C-64.94935892236285 -85.5, 20.726282155274305 -85.5, 150.625 -85.5 M-150.625 -85.5 C-72.61478615638819 -85.5, 5.395427687223616 -85.5, 150.625 -85.5 M150.625 -85.5 C150.625 -71.60077633631462, 150.625 -57.701552672629234, 150.625 -42.75 M150.625 -85.5 C150.625 -75.4790575856349, 150.625 -65.45811517126981, 150.625 -42.75 M150.625 -42.75 C66.0138894479692 -42.75, -18.59722110406159 -42.75, -150.625 -42.75 M150.625 -42.75 C40.06563212040666 -42.75, -70.49373575918668 -42.75, -150.625 -42.75 M-150.625 -42.75 C-150.625 -54.541523096296324, -150.625 -66.33304619259265, -150.625 -85.5 M-150.625 -42.75 C-150.625 -55.7800940748495, -150.625 -68.810188149699, -150.625 -85.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-150.625 -42.75 L150.625 -42.75 L150.625 0 L-150.625 0" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-150.625 -42.75 C-69.0686718318208 -42.75, 12.487656336358413 -42.75, 150.625 -42.75 M-150.625 -42.75 C-66.39798579958448 -42.75, 17.82902840083105 -42.75, 150.625 -42.75 M150.625 -42.75 C150.625 -27.423522998466247, 150.625 -12.09704599693249, 150.625 0 M150.625 -42.75 C150.625 -34.18766078414416, 150.625 -25.62532156828832, 150.625 0 M150.625 0 C70.56806604321983 0, -9.488867913560341 0, -150.625 0 M150.625 0 C33.779185051201495 0, -83.06662989759701 0, -150.625 0 M-150.625 0 C-150.625 -12.317988802579206, -150.625 -24.635977605158413, -150.625 -42.75 M-150.625 0 C-150.625 -13.599438018849833, -150.625 -27.198876037699666, -150.625 -42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-150.625 0 L150.625 0 L150.625 42.75 L-150.625 42.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-150.625 0 C-80.28427142026565 0, -9.943542840531308 0, 150.625 0 M-150.625 0 C-53.74662797634208 0, 43.131744047315834 0, 150.625 0 M150.625 0 C150.625 9.90410005972481, 150.625 19.80820011944962, 150.625 42.75 M150.625 0 C150.625 16.908665969319724, 150.625 33.81733193863945, 150.625 42.75 M150.625 42.75 C55.35582106597876 42.75, -39.91335786804248 42.75, -150.625 42.75 M150.625 42.75 C46.15943401209206 42.75, -58.30613197581587 42.75, -150.625 42.75 M-150.625 42.75 C-150.625 27.377642652640272, -150.625 12.005285305280545, -150.625 0 M-150.625 42.75 C-150.625 32.64134381424241, -150.625 22.532687628484823, -150.625 0" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-150.625 42.75 L150.625 42.75 L150.625 85.5 L-150.625 85.5" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-150.625 42.75 C-31.00852761841948 42.75, 88.60794476316104 42.75, 150.625 42.75 M-150.625 42.75 C-74.92655612878723 42.75, 0.7718877424255481 42.75, 150.625 42.75 M150.625 42.75 C150.625 59.43496379549188, 150.625 76.11992759098376, 150.625 85.5 M150.625 42.75 C150.625 51.54819094520481, 150.625 60.34638189040962, 150.625 85.5 M150.625 85.5 C50.67918701297599 85.5, -49.266625974048026 85.5, -150.625 85.5 M150.625 85.5 C72.8591850692673 85.5, -4.9066298614654045 85.5, -150.625 85.5 M-150.625 85.5 C-150.625 72.8175461684633, -150.625 60.135092336926576, -150.625 42.75 M-150.625 85.5 C-150.625 72.16800633963294, -150.625 58.83601267926589, -150.625 42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-150.625 85.5 L150.625 85.5 L150.625 128.25 L-150.625 128.25" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-150.625 85.5 C-70.97172826084149 85.5, 8.681543478317025 85.5, 150.625 85.5 M-150.625 85.5 C-36.02989143316037 85.5, 78.56521713367925 85.5, 150.625 85.5 M150.625 85.5 C150.625 99.90948098041531, 150.625 114.3189619608306, 150.625 128.25 M150.625 85.5 C150.625 94.38615915832494, 150.625 103.27231831664987, 150.625 128.25 M150.625 128.25 C53.01946019127874 128.25, -44.58607961744252 128.25, -150.625 128.25 M150.625 128.25 C58.8133034950977 128.25, -32.9983930098046 128.25, -150.625 128.25 M-150.625 128.25 C-150.625 117.3591146013896, -150.625 106.46822920277923, -150.625 85.5 M-150.625 128.25 C-150.625 111.22593237996442, -150.625 94.20186475992884, -150.625 85.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-150.625 128.25 L150.625 128.25 L150.625 171 L-150.625 171" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-150.625 128.25 C-59.014917337501586 128.25, 32.59516532499683 128.25, 150.625 128.25 M-150.625 128.25 C-68.62651684057911 128.25, 13.371966318841771 128.25, 150.625 128.25 M150.625 128.25 C150.625 142.87707171411392, 150.625 157.50414342822785, 150.625 171 M150.625 128.25 C150.625 144.9475612059828, 150.625 161.6451224119656, 150.625 171 M150.625 171 C32.221526866341364 171, -86.18194626731727 171, -150.625 171 M150.625 171 C74.72384326321365 171, -1.1773134735726956 171, -150.625 171 M-150.625 171 C-150.625 158.24018107967945, -150.625 145.48036215935892, -150.625 128.25 M-150.625 171 C-150.625 161.70605397655703, -150.625 152.4121079531141, -150.625 128.25" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-150.625 171 L150.625 171 L150.625 213.75 L-150.625 213.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-150.625 171 C-36.16228374965628 171, 78.30043250068744 171, 150.625 171 M-150.625 171 C-49.78918671931193 171, 51.046626561376144 171, 150.625 171 M150.625 171 C150.625 182.18309350190563, 150.625 193.3661870038113, 150.625 213.75 M150.625 171 C150.625 187.7910905502989, 150.625 204.58218110059775, 150.625 213.75 M150.625 213.75 C37.99554705992601 213.75, -74.63390588014798 213.75, -150.625 213.75 M150.625 213.75 C84.5626674296598 213.75, 18.500334859319594 213.75, -150.625 213.75 M-150.625 213.75 C-150.625 202.00101442373855, -150.625 190.2520288474771, -150.625 171 M-150.625 213.75 C-150.625 200.8615975236022, -150.625 187.97319504720443, -150.625 171" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="label name" transform="translate(-21.828125, -204.375)" style=""><foreignObject width="43.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 150px; text-align: start;"><span class="nodeLabel"><p>USERS</p></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, -161.625)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, -161.625)" style=""><foreignObject width="13.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 113px; text-align: start;"><span class="nodeLabel"><p>id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, -161.625)" style=""><foreignObject width="18.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>PK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, -161.625)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, -118.875)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, -118.875)" style=""><foreignObject width="39.703125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>email</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, -118.875)" style=""><foreignObject width="19.59375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 124px; text-align: start;"><span class="nodeLabel"><p>UK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, -118.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, -76.125)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, -76.125)" style=""><foreignObject width="106.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 199px; text-align: start;"><span class="nodeLabel"><p>password_hash</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, -76.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, -76.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, -33.375)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, -33.375)" style=""><foreignObject width="71.640625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 165px; text-align: start;"><span class="nodeLabel"><p>full_name</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, -33.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, -33.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, 9.375)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, 9.375)" style=""><foreignObject width="70.71875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 163px; text-align: start;"><span class="nodeLabel"><p>affiliation</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, 9.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, 9.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, 52.125)" style=""><foreignObject width="74.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 165px; text-align: start;"><span class="nodeLabel"><p>text_array</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, 52.125)" style=""><foreignObject width="66.71875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 158px; text-align: start;"><span class="nodeLabel"><p>expertise</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, 52.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, 52.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, 94.875)" style=""><foreignObject width="19.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 117px; text-align: start;"><span class="nodeLabel"><p>int</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, 94.875)" style=""><foreignObject width="131.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 217px; text-align: start;"><span class="nodeLabel"><p>reviewer_capacity</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, 94.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, 94.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, 137.625)" style=""><foreignObject width="30.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 130px; text-align: start;"><span class="nodeLabel"><p>bool</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, 137.625)" style=""><foreignObject width="74.890625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 169px; text-align: start;"><span class="nodeLabel"><p>is_verified</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, 137.625)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, 137.625)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-138.125, 180.375)" style=""><foreignObject width="30.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 130px; text-align: start;"><span class="nodeLabel"><p>bool</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-38.15625, 180.375)" style=""><foreignObject width="63.234375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 157px; text-align: start;"><span class="nodeLabel"><p>is_active</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(118.53125, 180.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(163.125, 180.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="divider"><path d="M-150.625 -171.00005 L-150.625 -170.99995 L150.625 -170.99995 L150.625 -171.00005" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-150.625 -171.00005 C-150.625 -171.00001774207306, -150.625 -170.99998548414612, -150.625 -170.99995 M-150.625 -171.00005 C-150.625 -171.0000293737779, -150.625 -171.0000087475558, -150.625 -170.99995 M-150.625 -170.99995 C-39.95538626752399 -170.99995, 70.71422746495202 -170.99995, 150.625 -170.99995 M-150.625 -170.99995 C-48.7574816974342 -170.99995, 53.1100366051316 -170.99995, 150.625 -170.99995 M150.625 -170.99995 C150.625 -170.99997737940396, 150.625 -171.0000047588079, 150.625 -171.00005 M150.625 -170.99995 C150.625 -170.99998609683243, 150.625 -171.00002219366482, 150.625 -171.00005 M150.625 -171.00005 C75.80268443189735 -171.00005, 0.9803688637946948 -171.00005, -150.625 -171.00005 M150.625 -171.00005 C44.43011901684147 -171.00005, -61.76476196631705 -171.00005, -150.625 -171.00005" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-50.6563 -171 L-50.6562 -171 L-50.6562 213.75 L-50.6563 213.75" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-50.6563 -171 C-50.65627222977996 -171, -50.65624445955992 -171, -50.6562 -171 M-50.6563 -171 C-50.656279511988174 -171, -50.656259023976354 -171, -50.6562 -171 M-50.6562 -171 C-50.6562 -79.32335459741381, -50.6562 12.353290805172378, -50.6562 213.75 M-50.6562 -171 C-50.6562 -68.46836709151681, -50.6562 34.06326581696638, -50.6562 213.75 M-50.6562 213.75 C-50.656237535944726 213.75, -50.65627507188946 213.75, -50.6563 213.75 M-50.6562 213.75 C-50.65623776972513 213.75, -50.65627553945026 213.75, -50.6563 213.75 M-50.6563 213.75 C-50.6563 61.11213517327238, -50.6563 -91.52572965345524, -50.6563 -171 M-50.6563 213.75 C-50.6563 98.10507047088088, -50.6563 -17.53985905823825, -50.6563 -171" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M106.0312 -171 L106.0313 -171 L106.0313 213.75 L106.0312 213.75" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M106.0312 -171 C106.03123415925512 -171, 106.03126831851024 -171, 106.0313 -171 M106.0312 -171 C106.03122045620238 -171, 106.03124091240477 -171, 106.0313 -171 M106.0313 -171 C106.0313 -31.82919716065527, 106.0313 107.34160567868946, 106.0313 213.75 M106.0313 -171 C106.0313 -75.228296069852, 106.0313 20.543407860296014, 106.0313 213.75 M106.0313 213.75 C106.03126027966141 213.75, 106.03122055932283 213.75, 106.0312 213.75 M106.0313 213.75 C106.03126489966002 213.75, 106.03122979932003 213.75, 106.0312 213.75 M106.0312 213.75 C106.0312 91.68979766202582, 106.0312 -30.37040467594835, 106.0312 -171 M106.0312 213.75 C106.0312 121.8197374551268, 106.0312 29.889474910253597, 106.0312 -171" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-150.625 -171.00005 L-150.625 -170.99995 L150.625 -170.99995 L150.625 -171.00005" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-150.625 -171.00005 C-150.625 -171.00002906516616, -150.625 -171.00000813033233, -150.625 -170.99995 M-150.625 -171.00005 C-150.625 -171.0000262195248, -150.625 -171.00000243904964, -150.625 -170.99995 M-150.625 -170.99995 C-67.06584440470641 -170.99995, 16.49331119058718 -170.99995, 150.625 -170.99995 M-150.625 -170.99995 C-57.342230868840204 -170.99995, 35.94053826231959 -170.99995, 150.625 -170.99995 M150.625 -170.99995 C150.625 -170.9999773832564, 150.625 -171.00000476651283, 150.625 -171.00005 M150.625 -170.99995 C150.625 -170.9999889664942, 150.625 -171.0000279329884, 150.625 -171.00005 M150.625 -171.00005 C78.64628157894151 -171.00005, 6.6675631578830235 -171.00005, -150.625 -171.00005 M150.625 -171.00005 C55.18708221612775 -171.00005, -40.2508355677445 -171.00005, -150.625 -171.00005" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g></g><g class="node default" id="my-svg-entity-USER_ROLES-1" data-look="classic" transform="translate(112.515625, 899.875)"><g class="outer-path" style=""><path d="M-104.515625 -64.125 L104.515625 -64.125 L104.515625 64.125 L-104.515625 64.125" stroke="none" stroke-width="0" fill="#ECECFF"/><path d="M-104.515625 -64.125 C-40.792935635036436 -64.125, 22.92975372992713 -64.125, 104.515625 -64.125 M-104.515625 -64.125 C-51.153153813162646 -64.125, 2.2093173736747076 -64.125, 104.515625 -64.125 M104.515625 -64.125 C104.515625 -25.428536198539646, 104.515625 13.267927602920707, 104.515625 64.125 M104.515625 -64.125 C104.515625 -26.256173030077022, 104.515625 11.612653939845956, 104.515625 64.125 M104.515625 64.125 C28.234437967724745 64.125, -48.04674906455051 64.125, -104.515625 64.125 M104.515625 64.125 C60.723092386490954 64.125, 16.93055977298191 64.125, -104.515625 64.125 M-104.515625 64.125 C-104.515625 28.246007211351838, -104.515625 -7.632985577296324, -104.515625 -64.125 M-104.515625 64.125 C-104.515625 13.898086762472438, -104.515625 -36.32882647505512, -104.515625 -64.125" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-104.515625 -21.375 L104.515625 -21.375 L104.515625 21.375 L-104.515625 21.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-104.515625 -21.375 C-32.13218902035956 -21.375, 40.25124695928088 -21.375, 104.515625 -21.375 M-104.515625 -21.375 C-32.66113668021451 -21.375, 39.19335163957098 -21.375, 104.515625 -21.375 M104.515625 -21.375 C104.515625 -10.54670237793163, 104.515625 0.28159524413673864, 104.515625 21.375 M104.515625 -21.375 C104.515625 -8.533708257304347, 104.515625 4.307583485391305, 104.515625 21.375 M104.515625 21.375 C62.66315415898965 21.375, 20.810683317979297 21.375, -104.515625 21.375 M104.515625 21.375 C22.985583199863996 21.375, -58.54445860027201 21.375, -104.515625 21.375 M-104.515625 21.375 C-104.515625 4.704049502490996, -104.515625 -11.966900995018008, -104.515625 -21.375 M-104.515625 21.375 C-104.515625 10.36766588460114, -104.515625 -0.6396682307977208, -104.515625 -21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-104.515625 21.375 L104.515625 21.375 L104.515625 64.125 L-104.515625 64.125" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-104.515625 21.375 C-54.33175548609168 21.375, -4.14788597218336 21.375, 104.515625 21.375 M-104.515625 21.375 C-28.641493428862816 21.375, 47.23263814227437 21.375, 104.515625 21.375 M104.515625 21.375 C104.515625 32.31977959884399, 104.515625 43.264559197687994, 104.515625 64.125 M104.515625 21.375 C104.515625 37.99550968498316, 104.515625 54.61601936996633, 104.515625 64.125 M104.515625 64.125 C28.760736394517338 64.125, -46.994152210965325 64.125, -104.515625 64.125 M104.515625 64.125 C44.38845328870113 64.125, -15.738718422597742 64.125, -104.515625 64.125 M-104.515625 64.125 C-104.515625 48.815952935628054, -104.515625 33.50690587125611, -104.515625 21.375 M-104.515625 64.125 C-104.515625 52.30312081160741, -104.515625 40.481241623214814, -104.515625 21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="label name" transform="translate(-44.40625, -54.75)" style=""><foreignObject width="88.8125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: start;"><span class="nodeLabel"><p>USER_ROLES</p></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-92.015625, -12)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.640625, -12)" style=""><foreignObject width="52.03125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 148px; text-align: start;"><span class="nodeLabel"><p>user_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(50.390625, -12)" style=""><foreignObject width="41.625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 145px; text-align: start;"><span class="nodeLabel"><p>PK,FK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(117.015625, -12)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-92.015625, 30.75)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.640625, 30.75)" style=""><foreignObject width="28.25" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 125px; text-align: start;"><span class="nodeLabel"><p>role</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(50.390625, 30.75)" style=""><foreignObject width="18.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>PK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(117.015625, 30.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="divider"><path d="M-104.515625 -21.37505 L-104.515625 -21.37495 L104.515625 -21.37495 L104.515625 -21.37505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-104.515625 -21.37505 C-104.515625 -21.375022217829713, -104.515625 -21.374994435659424, -104.515625 -21.37495 M-104.515625 -21.37505 C-104.515625 -21.375020111432594, -104.515625 -21.374990222865183, -104.515625 -21.37495 M-104.515625 -21.37495 C-60.29251654688123 -21.37495, -16.069408093762462 -21.37495, 104.515625 -21.37495 M-104.515625 -21.37495 C-59.34860688488901 -21.37495, -14.181588769778017 -21.37495, 104.515625 -21.37495 M104.515625 -21.37495 C104.515625 -21.37497090272725, 104.515625 -21.3749918054545, 104.515625 -21.37505 M104.515625 -21.37495 C104.515625 -21.374973143030537, 104.515625 -21.374996286061076, 104.515625 -21.37505 M104.515625 -21.37505 C42.948053216574685 -21.37505, -18.61951856685063 -21.37505, -104.515625 -21.37505 M104.515625 -21.37505 C60.37443712104323 -21.37505, 16.23324924208646 -21.37505, -104.515625 -21.37505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-39.140675 -21.375 L-39.140575 -21.375 L-39.140575 64.125 L-39.140675 64.125" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-39.140675 -21.375 C-39.14063782697496 -21.375, -39.14060065394992 -21.375, -39.140575 -21.375 M-39.140675 -21.375 C-39.14065066133978 -21.375, -39.14062632267956 -21.375, -39.140575 -21.375 M-39.140575 -21.375 C-39.140575 1.850149536698499, -39.140575 25.075299073396998, -39.140575 64.125 M-39.140575 -21.375 C-39.140575 6.466209317828827, -39.140575 34.307418635657655, -39.140575 64.125 M-39.140575 64.125 C-39.14060447753654 64.125, -39.140633955073085 64.125, -39.140675 64.125 M-39.140575 64.125 C-39.140599476913394 64.125, -39.1406239538268 64.125, -39.140675 64.125 M-39.140675 64.125 C-39.140675 39.67171428791594, -39.140675 15.21842857583188, -39.140675 -21.375 M-39.140675 64.125 C-39.140675 35.05254231889074, -39.140675 5.980084637781474, -39.140675 -21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M37.890575 -21.375 L37.890675 -21.375 L37.890675 64.125 L37.890575 64.125" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M37.890575 -21.375 C37.89059976417856 -21.375, 37.89062452835712 -21.375, 37.890675 -21.375 M37.890575 -21.375 C37.890608060810216 -21.375, 37.89064112162044 -21.375, 37.890675 -21.375 M37.890675 -21.375 C37.890675 9.40567420168091, 37.890675 40.18634840336182, 37.890675 64.125 M37.890675 -21.375 C37.890675 9.831471964140047, 37.890675 41.03794392828009, 37.890675 64.125 M37.890675 64.125 C37.890650556683774 64.125, 37.890626113367546 64.125, 37.890575 64.125 M37.890675 64.125 C37.890635576975065 64.125, 37.89059615395013 64.125, 37.890575 64.125 M37.890575 64.125 C37.890575 44.35506220117405, 37.890575 24.585124402348093, 37.890575 -21.375 M37.890575 64.125 C37.890575 31.807151564837184, 37.890575 -0.5106968703256314, 37.890575 -21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-104.515625 -21.37505 L-104.515625 -21.37495 L104.515625 -21.37495 L104.515625 -21.37505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-104.515625 -21.37505 C-104.515625 -21.375027589340597, -104.515625 -21.375005178681196, -104.515625 -21.37495 M-104.515625 -21.37505 C-104.515625 -21.375013528469044, -104.515625 -21.374977056938086, -104.515625 -21.37495 M-104.515625 -21.37495 C-26.4532695057068 -21.37495, 51.6090859885864 -21.37495, 104.515625 -21.37495 M-104.515625 -21.37495 C-44.29197791083642 -21.37495, 15.931669178327155 -21.37495, 104.515625 -21.37495 M104.515625 -21.37495 C104.515625 -21.374979721281495, 104.515625 -21.37500944256299, 104.515625 -21.37505 M104.515625 -21.37495 C104.515625 -21.37498194221827, 104.515625 -21.375013884436544, 104.515625 -21.37505 M104.515625 -21.37505 C24.009009193167074 -21.37505, -56.49760661366585 -21.37505, -104.515625 -21.37505 M104.515625 -21.37505 C25.529226601826963 -21.37505, -53.457171796346074 -21.37505, -104.515625 -21.37505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g></g><g class="node default" id="my-svg-entity-REFRESH_TOKENS-2" data-look="classic" transform="translate(493.34375, 899.875)"><g class="outer-path" style=""><path d="M-136.3125 -192.375 L136.3125 -192.375 L136.3125 192.375 L-136.3125 192.375" stroke="none" stroke-width="0" fill="#ECECFF"/><path d="M-136.3125 -192.375 C-76.31395958666812 -192.375, -16.315419173336224 -192.375, 136.3125 -192.375 M-136.3125 -192.375 C-47.743419854954354 -192.375, 40.82566029009129 -192.375, 136.3125 -192.375 M136.3125 -192.375 C136.3125 -96.03177426522407, 136.3125 0.3114514695518551, 136.3125 192.375 M136.3125 -192.375 C136.3125 -79.61994841621292, 136.3125 33.13510316757416, 136.3125 192.375 M136.3125 192.375 C75.0291331461363 192.375, 13.745766292272606 192.375, -136.3125 192.375 M136.3125 192.375 C55.29725905050144 192.375, -25.717981898997124 192.375, -136.3125 192.375 M-136.3125 192.375 C-136.3125 42.16851056494892, -136.3125 -108.03797887010217, -136.3125 -192.375 M-136.3125 192.375 C-136.3125 44.36541657222594, -136.3125 -103.64416685554812, -136.3125 -192.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-136.3125 -149.625 L136.3125 -149.625 L136.3125 -106.875 L-136.3125 -106.875" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-136.3125 -149.625 C-70.8153251294645 -149.625, -5.318150258928995 -149.625, 136.3125 -149.625 M-136.3125 -149.625 C-48.367445503225355 -149.625, 39.57760899354929 -149.625, 136.3125 -149.625 M136.3125 -149.625 C136.3125 -136.84489355922295, 136.3125 -124.06478711844593, 136.3125 -106.875 M136.3125 -149.625 C136.3125 -138.16933521666036, 136.3125 -126.71367043332069, 136.3125 -106.875 M136.3125 -106.875 C59.100563082077954 -106.875, -18.11137383584409 -106.875, -136.3125 -106.875 M136.3125 -106.875 C76.28483987674352 -106.875, 16.257179753487037 -106.875, -136.3125 -106.875 M-136.3125 -106.875 C-136.3125 -120.6472966833508, -136.3125 -134.4195933667016, -136.3125 -149.625 M-136.3125 -106.875 C-136.3125 -116.27968750085849, -136.3125 -125.68437500171697, -136.3125 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-136.3125 -106.875 L136.3125 -106.875 L136.3125 -64.125 L-136.3125 -64.125" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-136.3125 -106.875 C-32.77531051228419 -106.875, 70.76187897543161 -106.875, 136.3125 -106.875 M-136.3125 -106.875 C-72.72242596174291 -106.875, -9.132351923485842 -106.875, 136.3125 -106.875 M136.3125 -106.875 C136.3125 -92.38297597293405, 136.3125 -77.89095194586811, 136.3125 -64.125 M136.3125 -106.875 C136.3125 -93.09944555961535, 136.3125 -79.3238911192307, 136.3125 -64.125 M136.3125 -64.125 C45.47088553470239 -64.125, -45.37072893059522 -64.125, -136.3125 -64.125 M136.3125 -64.125 C76.88291127205761 -64.125, 17.453322544115224 -64.125, -136.3125 -64.125 M-136.3125 -64.125 C-136.3125 -74.16354920987268, -136.3125 -84.20209841974537, -136.3125 -106.875 M-136.3125 -64.125 C-136.3125 -75.21708507216354, -136.3125 -86.30917014432707, -136.3125 -106.875" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-136.3125 -64.125 L136.3125 -64.125 L136.3125 -21.375 L-136.3125 -21.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-136.3125 -64.125 C-45.13456867473393 -64.125, 46.043362650532146 -64.125, 136.3125 -64.125 M-136.3125 -64.125 C-28.647882225284647 -64.125, 79.0167355494307 -64.125, 136.3125 -64.125 M136.3125 -64.125 C136.3125 -54.11061831652017, 136.3125 -44.096236633040334, 136.3125 -21.375 M136.3125 -64.125 C136.3125 -49.196268553154475, 136.3125 -34.26753710630895, 136.3125 -21.375 M136.3125 -21.375 C71.73493982337732 -21.375, 7.1573796467546345 -21.375, -136.3125 -21.375 M136.3125 -21.375 C28.052020357837065 -21.375, -80.20845928432587 -21.375, -136.3125 -21.375 M-136.3125 -21.375 C-136.3125 -31.911230366214795, -136.3125 -42.44746073242959, -136.3125 -64.125 M-136.3125 -21.375 C-136.3125 -34.84022204066214, -136.3125 -48.305444081324275, -136.3125 -64.125" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-136.3125 -21.375 L136.3125 -21.375 L136.3125 21.375 L-136.3125 21.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-136.3125 -21.375 C-31.044548809515604 -21.375, 74.22340238096879 -21.375, 136.3125 -21.375 M-136.3125 -21.375 C-55.5068307814966 -21.375, 25.298838437006793 -21.375, 136.3125 -21.375 M136.3125 -21.375 C136.3125 -6.003473871213382, 136.3125 9.368052257573236, 136.3125 21.375 M136.3125 -21.375 C136.3125 -4.459468370479257, 136.3125 12.456063259041485, 136.3125 21.375 M136.3125 21.375 C57.241688307652595 21.375, -21.82912338469481 21.375, -136.3125 21.375 M136.3125 21.375 C59.82379130657209 21.375, -16.66491738685582 21.375, -136.3125 21.375 M-136.3125 21.375 C-136.3125 8.392172059461117, -136.3125 -4.590655881077765, -136.3125 -21.375 M-136.3125 21.375 C-136.3125 9.217365215523765, -136.3125 -2.94026956895247, -136.3125 -21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-136.3125 21.375 L136.3125 21.375 L136.3125 64.125 L-136.3125 64.125" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-136.3125 21.375 C-80.21911168520674 21.375, -24.125723370413482 21.375, 136.3125 21.375 M-136.3125 21.375 C-28.769716457145577 21.375, 78.77306708570885 21.375, 136.3125 21.375 M136.3125 21.375 C136.3125 30.394483609147716, 136.3125 39.41396721829543, 136.3125 64.125 M136.3125 21.375 C136.3125 33.85059326866313, 136.3125 46.326186537326265, 136.3125 64.125 M136.3125 64.125 C41.751266164105346 64.125, -52.80996767178931 64.125, -136.3125 64.125 M136.3125 64.125 C45.21555498242061 64.125, -45.88139003515877 64.125, -136.3125 64.125 M-136.3125 64.125 C-136.3125 54.07486873125128, -136.3125 44.02473746250256, -136.3125 21.375 M-136.3125 64.125 C-136.3125 55.5186716432671, -136.3125 46.9123432865342, -136.3125 21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-136.3125 64.125 L136.3125 64.125 L136.3125 106.875 L-136.3125 106.875" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-136.3125 64.125 C-66.15040879811698 64.125, 4.011682403766031 64.125, 136.3125 64.125 M-136.3125 64.125 C-74.35753104169756 64.125, -12.402562083395111 64.125, 136.3125 64.125 M136.3125 64.125 C136.3125 78.35628317282445, 136.3125 92.58756634564888, 136.3125 106.875 M136.3125 64.125 C136.3125 76.6232778722091, 136.3125 89.12155574441822, 136.3125 106.875 M136.3125 106.875 C73.3570562988265 106.875, 10.401612597653013 106.875, -136.3125 106.875 M136.3125 106.875 C70.54959033290508 106.875, 4.786680665810167 106.875, -136.3125 106.875 M-136.3125 106.875 C-136.3125 89.88361508641259, -136.3125 72.89223017282518, -136.3125 64.125 M-136.3125 106.875 C-136.3125 96.6097274252729, -136.3125 86.34445485054579, -136.3125 64.125" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-136.3125 106.875 L136.3125 106.875 L136.3125 149.625 L-136.3125 149.625" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-136.3125 106.875 C-64.5518899084831 106.875, 7.20872018303379 106.875, 136.3125 106.875 M-136.3125 106.875 C-51.00097867979572 106.875, 34.310542640408556 106.875, 136.3125 106.875 M136.3125 106.875 C136.3125 123.60678882547688, 136.3125 140.33857765095377, 136.3125 149.625 M136.3125 106.875 C136.3125 117.99832482615099, 136.3125 129.12164965230198, 136.3125 149.625 M136.3125 149.625 C59.810530131895305 149.625, -16.69143973620939 149.625, -136.3125 149.625 M136.3125 149.625 C65.97389049827895 149.625, -4.364719003442104 149.625, -136.3125 149.625 M-136.3125 149.625 C-136.3125 137.76293254502264, -136.3125 125.90086509004529, -136.3125 106.875 M-136.3125 149.625 C-136.3125 132.61212948185033, -136.3125 115.59925896370063, -136.3125 106.875" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-136.3125 149.625 L136.3125 149.625 L136.3125 192.375 L-136.3125 192.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-136.3125 149.625 C-53.208195061045316 149.625, 29.896109877909367 149.625, 136.3125 149.625 M-136.3125 149.625 C-36.399957669427195 149.625, 63.51258466114561 149.625, 136.3125 149.625 M136.3125 149.625 C136.3125 164.11021844968946, 136.3125 178.5954368993789, 136.3125 192.375 M136.3125 149.625 C136.3125 158.22192711395837, 136.3125 166.81885422791677, 136.3125 192.375 M136.3125 192.375 C31.800531859091777 192.375, -72.71143628181645 192.375, -136.3125 192.375 M136.3125 192.375 C67.91254142036362 192.375, -0.4874171592727521 192.375, -136.3125 192.375 M-136.3125 192.375 C-136.3125 181.17252504685922, -136.3125 169.97005009371847, -136.3125 149.625 M-136.3125 192.375 C-136.3125 176.01808293007554, -136.3125 159.66116586015104, -136.3125 149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="label name" transform="translate(-62.796875, -183)" style=""><foreignObject width="125.59375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 241px; text-align: start;"><span class="nodeLabel"><p>REFRESH_TOKENS</p></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, -140.25)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, -140.25)" style=""><foreignObject width="13.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 113px; text-align: start;"><span class="nodeLabel"><p>id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, -140.25)" style=""><foreignObject width="18.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>PK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, -140.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, -97.5)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, -97.5)" style=""><foreignObject width="52.03125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 148px; text-align: start;"><span class="nodeLabel"><p>user_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, -97.5)" style=""><foreignObject width="17.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>FK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, -97.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, -54.75)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, -54.75)" style=""><foreignObject width="66.640625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 163px; text-align: start;"><span class="nodeLabel"><p>family_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, -54.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, -54.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, -12)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, -12)" style=""><foreignObject width="81.234375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 173px; text-align: start;"><span class="nodeLabel"><p>token_hash</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, -12)" style=""><foreignObject width="19.59375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 124px; text-align: start;"><span class="nodeLabel"><p>UK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, -12)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, 30.75)" style=""><foreignObject width="90.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 178px; text-align: start;"><span class="nodeLabel"><p>timestamptz</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, 30.75)" style=""><foreignObject width="67.046875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 160px; text-align: start;"><span class="nodeLabel"><p>issued_at</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, 30.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, 30.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, 73.5)" style=""><foreignObject width="90.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 178px; text-align: start;"><span class="nodeLabel"><p>timestamptz</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, 73.5)" style=""><foreignObject width="74.78125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 166px; text-align: start;"><span class="nodeLabel"><p>expires_at</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, 73.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, 73.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, 116.25)" style=""><foreignObject width="90.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 178px; text-align: start;"><span class="nodeLabel"><p>timestamptz</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, 116.25)" style=""><foreignObject width="80.21875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 172px; text-align: start;"><span class="nodeLabel"><p>revoked_at</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, 116.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, 116.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-123.8125, 159)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-8.53125, 159)" style=""><foreignObject width="87.75" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 178px; text-align: start;"><span class="nodeLabel"><p>replaced_by</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(104.21875, 159)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(148.8125, 159)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="divider"><path d="M-136.3125 -149.62505 L-136.3125 -149.62495 L136.3125 -149.62495 L136.3125 -149.62505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-136.3125 -149.62505 C-136.3125 -149.6250228272771, -136.3125 -149.6249956545542, -136.3125 -149.62495 M-136.3125 -149.62505 C-136.3125 -149.62501808247268, -136.3125 -149.62498616494537, -136.3125 -149.62495 M-136.3125 -149.62495 C-34.96731729567479 -149.62495, 66.37786540865042 -149.62495, 136.3125 -149.62495 M-136.3125 -149.62495 C-58.9578074100088 -149.62495, 18.396885179982405 -149.62495, 136.3125 -149.62495 M136.3125 -149.62495 C136.3125 -149.62497799703584, 136.3125 -149.62500599407167, 136.3125 -149.62505 M136.3125 -149.62495 C136.3125 -149.6249889154287, 136.3125 -149.62502783085736, 136.3125 -149.62505 M136.3125 -149.62505 C68.51869948188056 -149.62505, 0.7248989637611203 -149.62505, -136.3125 -149.62505 M136.3125 -149.62505 C54.661737698387014 -149.62505, -26.98902460322597 -149.62505, -136.3125 -149.62505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-21.0313 -149.625 L-21.0312 -149.625 L-21.0312 192.375 L-21.0313 192.375" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-21.0313 -149.625 C-21.031262543129998 -149.625, -21.031225086259994 -149.625, -21.0312 -149.625 M-21.0313 -149.625 C-21.031277844094735 -149.625, -21.03125568818947 -149.625, -21.0312 -149.625 M-21.0312 -149.625 C-21.0312 -76.82017981233562, -21.0312 -4.015359624671248, -21.0312 192.375 M-21.0312 -149.625 C-21.0312 -27.116258888241788, -21.0312 95.39248222351642, -21.0312 192.375 M-21.0312 192.375 C-21.031237034770193 192.375, -21.031274069540387 192.375, -21.0313 192.375 M-21.0312 192.375 C-21.031222823081713 192.375, -21.031245646163423 192.375, -21.0313 192.375 M-21.0313 192.375 C-21.0313 101.78941168615265, -21.0313 11.203823372305294, -21.0313 -149.625 M-21.0313 192.375 C-21.0313 85.42641302453912, -21.0313 -21.52217395092177, -21.0313 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M91.7187 -149.625 L91.7188 -149.625 L91.7188 192.375 L91.7187 192.375" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M91.7187 -149.625 C91.71873429676253 -149.625, 91.71876859352508 -149.625, 91.7188 -149.625 M91.7187 -149.625 C91.71873291793196 -149.625, 91.71876583586392 -149.625, 91.7188 -149.625 M91.7188 -149.625 C91.7188 -17.72380484745122, 91.7188 114.17739030509756, 91.7188 192.375 M91.7188 -149.625 C91.7188 -63.22124147783015, 91.7188 23.182517044339704, 91.7188 192.375 M91.7188 192.375 C91.71877077236418 192.375, 91.71874154472836 192.375, 91.7187 192.375 M91.7188 192.375 C91.71877196870865 192.375, 91.7187439374173 192.375, 91.7187 192.375 M91.7187 192.375 C91.7187 70.54982712847435, 91.7187 -51.275345743051304, 91.7187 -149.625 M91.7187 192.375 C91.7187 69.5585171695854, 91.7187 -53.2579656608292, 91.7187 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-136.3125 -149.62505 L-136.3125 -149.62495 L136.3125 -149.62495 L136.3125 -149.62505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-136.3125 -149.62505 C-136.3125 -149.625018513148, -136.3125 -149.62498702629605, -136.3125 -149.62495 M-136.3125 -149.62505 C-136.3125 -149.62501895028257, -136.3125 -149.62498790056515, -136.3125 -149.62495 M-136.3125 -149.62495 C-66.48039207554736 -149.62495, 3.351715848905286 -149.62495, 136.3125 -149.62495 M-136.3125 -149.62495 C-30.721200894831043 -149.62495, 74.87009821033791 -149.62495, 136.3125 -149.62495 M136.3125 -149.62495 C136.3125 -149.62497495758998, 136.3125 -149.62499991517998, 136.3125 -149.62505 M136.3125 -149.62495 C136.3125 -149.62498075449636, 136.3125 -149.6250115089927, 136.3125 -149.62505 M136.3125 -149.62505 C74.82496062523374 -149.62505, 13.337421250467486 -149.62505, -136.3125 -149.62505 M136.3125 -149.62505 C59.605966977073805 -149.62505, -17.10056604585239 -149.62505, -136.3125 -149.62505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g></g><g class="node default" id="my-svg-entity-MANUSCRIPTS-3" data-look="classic" transform="translate(1312.9296875, 307.25)"><g class="outer-path" style=""><path d="M-183.3125 -299.25 L183.3125 -299.25 L183.3125 299.25 L-183.3125 299.25" stroke="none" stroke-width="0" fill="#ECECFF"/><path d="M-183.3125 -299.25 C-72.7049111843641 -299.25, 37.902677631271814 -299.25, 183.3125 -299.25 M-183.3125 -299.25 C-96.38785144117773 -299.25, -9.46320288235546 -299.25, 183.3125 -299.25 M183.3125 -299.25 C183.3125 -94.17835138760131, 183.3125 110.89329722479738, 183.3125 299.25 M183.3125 -299.25 C183.3125 -170.56437785571404, 183.3125 -41.878755711428084, 183.3125 299.25 M183.3125 299.25 C46.21773137770796 299.25, -90.87703724458407 299.25, -183.3125 299.25 M183.3125 299.25 C50.85084043269066 299.25, -81.61081913461868 299.25, -183.3125 299.25 M-183.3125 299.25 C-183.3125 78.68640563691747, -183.3125 -141.87718872616506, -183.3125 -299.25 M-183.3125 299.25 C-183.3125 119.8903667261034, -183.3125 -59.46926654779321, -183.3125 -299.25" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-183.3125 -256.5 L183.3125 -256.5 L183.3125 -213.75 L-183.3125 -213.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-183.3125 -256.5 C-102.82795153707397 -256.5, -22.343403074147943 -256.5, 183.3125 -256.5 M-183.3125 -256.5 C-108.59448041472119 -256.5, -33.87646082944238 -256.5, 183.3125 -256.5 M183.3125 -256.5 C183.3125 -242.21682447749484, 183.3125 -227.9336489549897, 183.3125 -213.75 M183.3125 -256.5 C183.3125 -246.61649369358196, 183.3125 -236.73298738716394, 183.3125 -213.75 M183.3125 -213.75 C54.48750217196249 -213.75, -74.33749565607502 -213.75, -183.3125 -213.75 M183.3125 -213.75 C90.797373101025 -213.75, -1.717753797949996 -213.75, -183.3125 -213.75 M-183.3125 -213.75 C-183.3125 -227.7233488917568, -183.3125 -241.69669778351366, -183.3125 -256.5 M-183.3125 -213.75 C-183.3125 -224.0150346550338, -183.3125 -234.2800693100676, -183.3125 -256.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-183.3125 -213.75 L183.3125 -213.75 L183.3125 -171 L-183.3125 -171" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-183.3125 -213.75 C-92.25070220479331 -213.75, -1.1889044095866268 -213.75, 183.3125 -213.75 M-183.3125 -213.75 C-90.8520456053132 -213.75, 1.6084087893736125 -213.75, 183.3125 -213.75 M183.3125 -213.75 C183.3125 -202.4109464473551, 183.3125 -191.07189289471017, 183.3125 -171 M183.3125 -213.75 C183.3125 -201.59085408066383, 183.3125 -189.43170816132766, 183.3125 -171 M183.3125 -171 C63.71820274959062 -171, -55.876094500818766 -171, -183.3125 -171 M183.3125 -171 C44.936578163823356 -171, -93.43934367235329 -171, -183.3125 -171 M-183.3125 -171 C-183.3125 -180.41529114430438, -183.3125 -189.83058228860875, -183.3125 -213.75 M-183.3125 -171 C-183.3125 -182.3442584561762, -183.3125 -193.68851691235238, -183.3125 -213.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-183.3125 -171 L183.3125 -171 L183.3125 -128.25 L-183.3125 -128.25" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-183.3125 -171 C-105.64364067854231 -171, -27.974781357084623 -171, 183.3125 -171 M-183.3125 -171 C-52.204187226272865 -171, 78.90412554745427 -171, 183.3125 -171 M183.3125 -171 C183.3125 -156.5701723521826, 183.3125 -142.1403447043652, 183.3125 -128.25 M183.3125 -171 C183.3125 -156.61100788117773, 183.3125 -142.22201576235548, 183.3125 -128.25 M183.3125 -128.25 C88.96347271394238 -128.25, -5.38555457211524 -128.25, -183.3125 -128.25 M183.3125 -128.25 C66.6726588580333 -128.25, -49.9671822839334 -128.25, -183.3125 -128.25 M-183.3125 -128.25 C-183.3125 -141.3582193707475, -183.3125 -154.46643874149495, -183.3125 -171 M-183.3125 -128.25 C-183.3125 -140.42772554755922, -183.3125 -152.60545109511844, -183.3125 -171" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-183.3125 -128.25 L183.3125 -128.25 L183.3125 -85.5 L-183.3125 -85.5" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-183.3125 -128.25 C-91.95301576174624 -128.25, -0.5935315234924872 -128.25, 183.3125 -128.25 M-183.3125 -128.25 C-55.51048237337183 -128.25, 72.29153525325634 -128.25, 183.3125 -128.25 M183.3125 -128.25 C183.3125 -114.80868391309694, 183.3125 -101.36736782619388, 183.3125 -85.5 M183.3125 -128.25 C183.3125 -113.19701082943824, 183.3125 -98.14402165887648, 183.3125 -85.5 M183.3125 -85.5 C37.999058218421226 -85.5, -107.31438356315755 -85.5, -183.3125 -85.5 M183.3125 -85.5 C81.33354164905468 -85.5, -20.64541670189064 -85.5, -183.3125 -85.5 M-183.3125 -85.5 C-183.3125 -98.53981264761019, -183.3125 -111.57962529522037, -183.3125 -128.25 M-183.3125 -85.5 C-183.3125 -99.6084913510887, -183.3125 -113.7169827021774, -183.3125 -128.25" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-183.3125 -85.5 L183.3125 -85.5 L183.3125 -42.75 L-183.3125 -42.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-183.3125 -85.5 C-54.59460708776356 -85.5, 74.12328582447287 -85.5, 183.3125 -85.5 M-183.3125 -85.5 C-81.49349275451573 -85.5, 20.325514490968544 -85.5, 183.3125 -85.5 M183.3125 -85.5 C183.3125 -69.5264731368993, 183.3125 -53.55294627379861, 183.3125 -42.75 M183.3125 -85.5 C183.3125 -69.65122823172506, 183.3125 -53.802456463450106, 183.3125 -42.75 M183.3125 -42.75 C77.09977782232485 -42.75, -29.112944355350294 -42.75, -183.3125 -42.75 M183.3125 -42.75 C92.81110436846248 -42.75, 2.3097087369249607 -42.75, -183.3125 -42.75 M-183.3125 -42.75 C-183.3125 -53.696438795071316, -183.3125 -64.64287759014263, -183.3125 -85.5 M-183.3125 -42.75 C-183.3125 -56.296678514298776, -183.3125 -69.84335702859755, -183.3125 -85.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-183.3125 -42.75 L183.3125 -42.75 L183.3125 0 L-183.3125 0" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-183.3125 -42.75 C-44.05556841988442 -42.75, 95.20136316023115 -42.75, 183.3125 -42.75 M-183.3125 -42.75 C-101.84082086759922 -42.75, -20.36914173519844 -42.75, 183.3125 -42.75 M183.3125 -42.75 C183.3125 -33.0167700573475, 183.3125 -23.283540114695008, 183.3125 0 M183.3125 -42.75 C183.3125 -27.735384273212453, 183.3125 -12.72076854642491, 183.3125 0 M183.3125 0 C87.13761287011121 0, -9.037274259777575 0, -183.3125 0 M183.3125 0 C91.45750670636642 0, -0.3974865872671671 0, -183.3125 0 M-183.3125 0 C-183.3125 -13.481162400623749, -183.3125 -26.962324801247497, -183.3125 -42.75 M-183.3125 0 C-183.3125 -16.127036066008245, -183.3125 -32.25407213201649, -183.3125 -42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-183.3125 0 L183.3125 0 L183.3125 42.75 L-183.3125 42.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-183.3125 0 C-43.61083643034661 0, 96.09082713930678 0, 183.3125 0 M-183.3125 0 C-101.93021467129715 0, -20.5479293425943 0, 183.3125 0 M183.3125 0 C183.3125 16.17256838466893, 183.3125 32.34513676933786, 183.3125 42.75 M183.3125 0 C183.3125 16.606762764914258, 183.3125 33.213525529828516, 183.3125 42.75 M183.3125 42.75 C73.08355649449982 42.75, -37.145387011000366 42.75, -183.3125 42.75 M183.3125 42.75 C58.04961493932207 42.75, -67.21327012135586 42.75, -183.3125 42.75 M-183.3125 42.75 C-183.3125 29.967789835711912, -183.3125 17.185579671423827, -183.3125 0 M-183.3125 42.75 C-183.3125 33.6971639716415, -183.3125 24.64432794328301, -183.3125 0" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-183.3125 42.75 L183.3125 42.75 L183.3125 85.5 L-183.3125 85.5" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-183.3125 42.75 C-42.93856591995191 42.75, 97.43536816009617 42.75, 183.3125 42.75 M-183.3125 42.75 C-66.35450906160958 42.75, 50.60348187678085 42.75, 183.3125 42.75 M183.3125 42.75 C183.3125 59.179961828443055, 183.3125 75.60992365688611, 183.3125 85.5 M183.3125 42.75 C183.3125 59.009050151582834, 183.3125 75.26810030316567, 183.3125 85.5 M183.3125 85.5 C51.30791525858541 85.5, -80.69666948282918 85.5, -183.3125 85.5 M183.3125 85.5 C98.63257844300357 85.5, 13.952656886007134 85.5, -183.3125 85.5 M-183.3125 85.5 C-183.3125 71.33570749352508, -183.3125 57.171414987050156, -183.3125 42.75 M-183.3125 85.5 C-183.3125 71.16900195392185, -183.3125 56.8380039078437, -183.3125 42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-183.3125 85.5 L183.3125 85.5 L183.3125 128.25 L-183.3125 128.25" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-183.3125 85.5 C-56.67404440128051 85.5, 69.96441119743898 85.5, 183.3125 85.5 M-183.3125 85.5 C-78.4135570985584 85.5, 26.4853858028832 85.5, 183.3125 85.5 M183.3125 85.5 C183.3125 101.58846233826495, 183.3125 117.67692467652991, 183.3125 128.25 M183.3125 85.5 C183.3125 102.1733432053932, 183.3125 118.84668641078638, 183.3125 128.25 M183.3125 128.25 C55.34077751866447 128.25, -72.63094496267107 128.25, -183.3125 128.25 M183.3125 128.25 C97.05298241193115 128.25, 10.793464823862308 128.25, -183.3125 128.25 M-183.3125 128.25 C-183.3125 119.1368182797712, -183.3125 110.0236365595424, -183.3125 85.5 M-183.3125 128.25 C-183.3125 112.10636356573009, -183.3125 95.96272713146018, -183.3125 85.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-183.3125 128.25 L183.3125 128.25 L183.3125 171 L-183.3125 171" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-183.3125 128.25 C-92.18110750049674 128.25, -1.0497150009934728 128.25, 183.3125 128.25 M-183.3125 128.25 C-104.32268975691225 128.25, -25.33287951382451 128.25, 183.3125 128.25 M183.3125 128.25 C183.3125 143.5639867624407, 183.3125 158.87797352488138, 183.3125 171 M183.3125 128.25 C183.3125 143.07834234574358, 183.3125 157.90668469148713, 183.3125 171 M183.3125 171 C83.75034004183622 171, -15.81181991632755 171, -183.3125 171 M183.3125 171 C81.15423393088359 171, -21.004032138232816 171, -183.3125 171 M-183.3125 171 C-183.3125 158.25727040923158, -183.3125 145.51454081846313, -183.3125 128.25 M-183.3125 171 C-183.3125 157.46185872804855, -183.3125 143.9237174560971, -183.3125 128.25" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-183.3125 171 L183.3125 171 L183.3125 213.75 L-183.3125 213.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-183.3125 171 C-105.93872504076013 171, -28.564950081520266 171, 183.3125 171 M-183.3125 171 C-69.21114917672158 171, 44.89020164655685 171, 183.3125 171 M183.3125 171 C183.3125 184.16789152280268, 183.3125 197.33578304560538, 183.3125 213.75 M183.3125 171 C183.3125 183.87578367423066, 183.3125 196.7515673484613, 183.3125 213.75 M183.3125 213.75 C108.93947326395133 213.75, 34.566446527902656 213.75, -183.3125 213.75 M183.3125 213.75 C39.20468725956184 213.75, -104.90312548087633 213.75, -183.3125 213.75 M-183.3125 213.75 C-183.3125 201.01481539783353, -183.3125 188.27963079566706, -183.3125 171 M-183.3125 213.75 C-183.3125 201.39649226950922, -183.3125 189.04298453901845, -183.3125 171" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-183.3125 213.75 L183.3125 213.75 L183.3125 256.5 L-183.3125 256.5" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-183.3125 213.75 C-52.88905603515565 213.75, 77.5343879296887 213.75, 183.3125 213.75 M-183.3125 213.75 C-85.37340005097516 213.75, 12.565699898049672 213.75, 183.3125 213.75 M183.3125 213.75 C183.3125 229.7569987422183, 183.3125 245.7639974844366, 183.3125 256.5 M183.3125 213.75 C183.3125 229.4402767535563, 183.3125 245.13055350711264, 183.3125 256.5 M183.3125 256.5 C66.90637922472644 256.5, -49.49974155054713 256.5, -183.3125 256.5 M183.3125 256.5 C92.47028827334255 256.5, 1.6280765466850937 256.5, -183.3125 256.5 M-183.3125 256.5 C-183.3125 245.86245670482833, -183.3125 235.22491340965666, -183.3125 213.75 M-183.3125 256.5 C-183.3125 245.8967897658968, -183.3125 235.29357953179363, -183.3125 213.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-183.3125 256.5 L183.3125 256.5 L183.3125 299.25 L-183.3125 299.25" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-183.3125 256.5 C-95.17091157897322 256.5, -7.029323157946436 256.5, 183.3125 256.5 M-183.3125 256.5 C-96.8856062270475 256.5, -10.458712454095007 256.5, 183.3125 256.5 M183.3125 256.5 C183.3125 271.1798461397134, 183.3125 285.8596922794267, 183.3125 299.25 M183.3125 256.5 C183.3125 268.94608955089745, 183.3125 281.3921791017949, 183.3125 299.25 M183.3125 299.25 C65.58663372199672 299.25, -52.13923255600656 299.25, -183.3125 299.25 M183.3125 299.25 C42.96246367429035 299.25, -97.3875726514193 299.25, -183.3125 299.25 M-183.3125 299.25 C-183.3125 287.7208232221906, -183.3125 276.19164644438115, -183.3125 256.5 M-183.3125 299.25 C-183.3125 282.6510947929327, -183.3125 266.0521895858655, -183.3125 256.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="label name" transform="translate(-49.15625, -289.875)" style=""><foreignObject width="98.3125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 212px; text-align: start;"><span class="nodeLabel"><p>MANUSCRIPTS</p></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, -247.125)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, -247.125)" style=""><foreignObject width="13.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 113px; text-align: start;"><span class="nodeLabel"><p>id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, -247.125)" style=""><foreignObject width="18.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>PK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, -247.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, -204.375)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, -204.375)" style=""><foreignObject width="100.84375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 191px; text-align: start;"><span class="nodeLabel"><p>tracking_code</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, -204.375)" style=""><foreignObject width="19.59375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 124px; text-align: start;"><span class="nodeLabel"><p>UK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, -204.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, -161.625)" style=""><foreignObject width="29.4375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 125px; text-align: start;"><span class="nodeLabel"><p>text</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, -161.625)" style=""><foreignObject width="30.703125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 125px; text-align: start;"><span class="nodeLabel"><p>title</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, -161.625)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, -161.625)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, -118.875)" style=""><foreignObject width="29.4375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 125px; text-align: start;"><span class="nodeLabel"><p>text</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, -118.875)" style=""><foreignObject width="59.03125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 150px; text-align: start;"><span class="nodeLabel"><p>abstract</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, -118.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, -118.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, -76.125)" style=""><foreignObject width="74.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 165px; text-align: start;"><span class="nodeLabel"><p>text_array</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, -76.125)" style=""><foreignObject width="66.796875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 162px; text-align: start;"><span class="nodeLabel"><p>keywords</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, -76.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, -76.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, -33.375)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, -33.375)" style=""><foreignObject width="177.9375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 262px; text-align: start;"><span class="nodeLabel"><p>corresponding_author_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, -33.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, -33.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, 9.375)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, 9.375)" style=""><foreignObject width="42.796875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>status</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, 9.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, 9.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, 52.125)" style=""><foreignObject width="19.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 117px; text-align: start;"><span class="nodeLabel"><p>int</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, 52.125)" style=""><foreignObject width="51.15625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 147px; text-align: start;"><span class="nodeLabel"><p>version</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, 52.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, 52.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, 94.875)" style=""><foreignObject width="19.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 117px; text-align: start;"><span class="nodeLabel"><p>int</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, 94.875)" style=""><foreignObject width="129.296875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 220px; text-align: start;"><span class="nodeLabel"><p>minimum_reviews</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, 94.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, 94.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, 137.625)" style=""><foreignObject width="19.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 117px; text-align: start;"><span class="nodeLabel"><p>int</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, 137.625)" style=""><foreignObject width="135.15625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 221px; text-align: start;"><span class="nodeLabel"><p>submitted_reviews</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, 137.625)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, 137.625)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, 180.375)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, 180.375)" style=""><foreignObject width="56.859375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 153px; text-align: start;"><span class="nodeLabel"><p>issue_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, 180.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, 180.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, 223.125)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, 223.125)" style=""><foreignObject width="166.5625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 252px; text-align: start;"><span class="nodeLabel"><p>original_document_key</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, 223.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, 223.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-170.8125, 265.875)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-70.84375, 265.875)" style=""><foreignObject width="197.0625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 280px; text-align: start;"><span class="nodeLabel"><p>anonymised_document_key</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(151.21875, 265.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(195.8125, 265.875)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="divider"><path d="M-183.3125 -256.50005 L-183.3125 -256.49995 L183.3125 -256.49995 L183.3125 -256.50005" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-183.3125 -256.50005 C-183.3125 -256.5000247211872, -183.3125 -256.4999994423743, -183.3125 -256.49995 M-183.3125 -256.50005 C-183.3125 -256.5000145138439, -183.3125 -256.49997902768774, -183.3125 -256.49995 M-183.3125 -256.49995 C-55.7220282858724 -256.49995, 71.8684434282552 -256.49995, 183.3125 -256.49995 M-183.3125 -256.49995 C-84.12925783756899 -256.49995, 15.053984324862029 -256.49995, 183.3125 -256.49995 M183.3125 -256.49995 C183.3125 -256.4999846181819, 183.3125 -256.50001923636376, 183.3125 -256.50005 M183.3125 -256.49995 C183.3125 -256.4999787091956, 183.3125 -256.5000074183912, 183.3125 -256.50005 M183.3125 -256.50005 C50.368419673045224 -256.50005, -82.57566065390955 -256.50005, -183.3125 -256.50005 M183.3125 -256.50005 C69.90237079932861 -256.50005, -43.507758401342784 -256.50005, -183.3125 -256.50005" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-83.3438 -256.5 L-83.3437 -256.5 L-83.3437 299.25 L-83.3438 299.25" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-83.3438 -256.5 C-83.34377133178144 -256.5, -83.34374266356288 -256.5, -83.3437 -256.5 M-83.3438 -256.5 C-83.34376186883107 -256.5, -83.34372373766212 -256.5, -83.3437 -256.5 M-83.3437 -256.5 C-83.3437 -36.66377902708837, -83.3437 183.17244194582327, -83.3437 299.25 M-83.3437 -256.5 C-83.3437 -40.779829047242515, -83.3437 174.94034190551497, -83.3437 299.25 M-83.3437 299.25 C-83.34372367552312 299.25, -83.34374735104625 299.25, -83.3438 299.25 M-83.3437 299.25 C-83.34372968778399 299.25, -83.34375937556798 299.25, -83.3438 299.25 M-83.3438 299.25 C-83.3438 125.47662858616852, -83.3438 -48.29674282766297, -83.3438 -256.5 M-83.3438 299.25 C-83.3438 112.77631491769708, -83.3438 -73.69737016460584, -83.3438 -256.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M138.7187 -256.5 L138.7188 -256.5 L138.7188 299.25 L138.7187 299.25" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M138.7187 -256.5 C138.71873964952042 -256.5, 138.7187792990408 -256.5, 138.7188 -256.5 M138.7187 -256.5 C138.71872225951097 -256.5, 138.71874451902193 -256.5, 138.7188 -256.5 M138.7188 -256.5 C138.7188 -86.41483579376316, 138.7188 83.67032841247368, 138.7188 299.25 M138.7188 -256.5 C138.7188 -99.95826189378855, 138.7188 56.58347621242291, 138.7188 299.25 M138.7188 299.25 C138.71877026851004 299.25, 138.7187405370201 299.25, 138.7187 299.25 M138.7188 299.25 C138.7187675665791 299.25, 138.7187351331582 299.25, 138.7187 299.25 M138.7187 299.25 C138.7187 143.5677108806073, 138.7187 -12.114578238785384, 138.7187 -256.5 M138.7187 299.25 C138.7187 158.06468989516915, 138.7187 16.879379790338305, 138.7187 -256.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-183.3125 -256.50005 L-183.3125 -256.49995 L183.3125 -256.49995 L183.3125 -256.50005" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-183.3125 -256.50005 C-183.3125 -256.5000183971782, -183.3125 -256.49998679435646, -183.3125 -256.49995 M-183.3125 -256.50005 C-183.3125 -256.50001713556395, -183.3125 -256.4999842711279, -183.3125 -256.49995 M-183.3125 -256.49995 C-64.05296070296217 -256.49995, 55.206578594075665 -256.49995, 183.3125 -256.49995 M-183.3125 -256.49995 C-51.12377409036071 -256.49995, 81.06495181927858 -256.49995, 183.3125 -256.49995 M183.3125 -256.49995 C183.3125 -256.49998247068396, 183.3125 -256.50001494136797, 183.3125 -256.50005 M183.3125 -256.49995 C183.3125 -256.49998065768006, 183.3125 -256.5000113153601, 183.3125 -256.50005 M183.3125 -256.50005 C39.251438208115815 -256.50005, -104.80962358376837 -256.50005, -183.3125 -256.50005 M183.3125 -256.50005 C48.79392487582666 -256.50005, -85.72465024834668 -256.50005, -183.3125 -256.50005" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g></g><g class="node default" id="my-svg-entity-MANUSCRIPT_AUTHORS-4" data-look="classic" transform="translate(894.1953125, 899.875)"><g class="outer-path" style=""><path d="M-124.5390625 -85.5 L124.5390625 -85.5 L124.5390625 85.5 L-124.5390625 85.5" stroke="none" stroke-width="0" fill="#ECECFF"/><path d="M-124.5390625 -85.5 C-31.351830292402028 -85.5, 61.835401915195945 -85.5, 124.5390625 -85.5 M-124.5390625 -85.5 C-50.374032794008016 -85.5, 23.790996911983967 -85.5, 124.5390625 -85.5 M124.5390625 -85.5 C124.5390625 -47.487343409637184, 124.5390625 -9.474686819274368, 124.5390625 85.5 M124.5390625 -85.5 C124.5390625 -24.808884431658868, 124.5390625 35.882231136682265, 124.5390625 85.5 M124.5390625 85.5 C41.099776226446664 85.5, -42.33951004710667 85.5, -124.5390625 85.5 M124.5390625 85.5 C57.77689266369303 85.5, -8.985277172613934 85.5, -124.5390625 85.5 M-124.5390625 85.5 C-124.5390625 31.399201522103503, -124.5390625 -22.701596955792994, -124.5390625 -85.5 M-124.5390625 85.5 C-124.5390625 30.518099023636758, -124.5390625 -24.463801952726485, -124.5390625 -85.5" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-124.5390625 -42.75 L124.5390625 -42.75 L124.5390625 0 L-124.5390625 0" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-124.5390625 -42.75 C-69.96192679700533 -42.75, -15.384791094010666 -42.75, 124.5390625 -42.75 M-124.5390625 -42.75 C-60.15392491453703 -42.75, 4.231212670925942 -42.75, 124.5390625 -42.75 M124.5390625 -42.75 C124.5390625 -31.6144758296932, 124.5390625 -20.478951659386396, 124.5390625 0 M124.5390625 -42.75 C124.5390625 -25.975782180230514, 124.5390625 -9.201564360461028, 124.5390625 0 M124.5390625 0 C65.53764633727133 0, 6.536230174542666 0, -124.5390625 0 M124.5390625 0 C34.02944946217879 0, -56.48016357564242 0, -124.5390625 0 M-124.5390625 0 C-124.5390625 -10.242251852281962, -124.5390625 -20.484503704563924, -124.5390625 -42.75 M-124.5390625 0 C-124.5390625 -16.331210449142745, -124.5390625 -32.66242089828549, -124.5390625 -42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-124.5390625 0 L124.5390625 0 L124.5390625 42.75 L-124.5390625 42.75" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-124.5390625 0 C-54.79935750378155 0, 14.9403474924369 0, 124.5390625 0 M-124.5390625 0 C-65.27195022660882 0, -6.0048379532176455 0, 124.5390625 0 M124.5390625 0 C124.5390625 12.189263059774099, 124.5390625 24.378526119548198, 124.5390625 42.75 M124.5390625 0 C124.5390625 13.513188736435495, 124.5390625 27.02637747287099, 124.5390625 42.75 M124.5390625 42.75 C59.3385853187083 42.75, -5.8618918625834056 42.75, -124.5390625 42.75 M124.5390625 42.75 C31.942187696666537 42.75, -60.65468710666693 42.75, -124.5390625 42.75 M-124.5390625 42.75 C-124.5390625 28.131320482156358, -124.5390625 13.512640964312716, -124.5390625 0 M-124.5390625 42.75 C-124.5390625 31.11870919029497, -124.5390625 19.487418380589943, -124.5390625 0" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-124.5390625 42.75 L124.5390625 42.75 L124.5390625 85.5 L-124.5390625 85.5" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-124.5390625 42.75 C-34.50126013476408 42.75, 55.53654223047184 42.75, 124.5390625 42.75 M-124.5390625 42.75 C-46.81035898353636 42.75, 30.91834453292728 42.75, 124.5390625 42.75 M124.5390625 42.75 C124.5390625 56.91306807776611, 124.5390625 71.07613615553223, 124.5390625 85.5 M124.5390625 42.75 C124.5390625 56.79957193018673, 124.5390625 70.84914386037346, 124.5390625 85.5 M124.5390625 85.5 C54.61212827220341 85.5, -15.314805955593187 85.5, -124.5390625 85.5 M124.5390625 85.5 C32.83561875955829 85.5, -58.86782498088343 85.5, -124.5390625 85.5 M-124.5390625 85.5 C-124.5390625 70.99642977203038, -124.5390625 56.492859544060764, -124.5390625 42.75 M-124.5390625 85.5 C-124.5390625 75.01822046035267, -124.5390625 64.53644092070535, -124.5390625 42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="label name" transform="translate(-83.1875, -76.125)" style=""><foreignObject width="166.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 287px; text-align: start;"><span class="nodeLabel"><p>MANUSCRIPT_AUTHORS</p></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-112.0390625, -33.375)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-56.0703125, -33.375)" style=""><foreignObject width="101.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 193px; text-align: start;"><span class="nodeLabel"><p>manuscript_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(70.4140625, -33.375)" style=""><foreignObject width="41.625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 145px; text-align: start;"><span class="nodeLabel"><p>PK,FK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(137.0390625, -33.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-112.0390625, 9.375)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-56.0703125, 9.375)" style=""><foreignObject width="68.90625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 162px; text-align: start;"><span class="nodeLabel"><p>author_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(70.4140625, 9.375)" style=""><foreignObject width="18.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>PK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(137.0390625, 9.375)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-112.0390625, 52.125)" style=""><foreignObject width="19.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 117px; text-align: start;"><span class="nodeLabel"><p>int</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-56.0703125, 52.125)" style=""><foreignObject width="56.78125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 153px; text-align: start;"><span class="nodeLabel"><p>position</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(70.4140625, 52.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(137.0390625, 52.125)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="divider"><path d="M-124.5390625 -42.75005 L-124.5390625 -42.74995 L124.5390625 -42.74995 L124.5390625 -42.75005" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-124.5390625 -42.75005 C-124.5390625 -42.75001232365133, -124.5390625 -42.74997464730266, -124.5390625 -42.74995 M-124.5390625 -42.75005 C-124.5390625 -42.75002296670796, -124.5390625 -42.74999593341591, -124.5390625 -42.74995 M-124.5390625 -42.74995 C-52.35811750117287 -42.74995, 19.82282749765426 -42.74995, 124.5390625 -42.74995 M-124.5390625 -42.74995 C-37.908439214437806 -42.74995, 48.72218407112439 -42.74995, 124.5390625 -42.74995 M124.5390625 -42.74995 C124.5390625 -42.74997867067645, 124.5390625 -42.7500073413529, 124.5390625 -42.75005 M124.5390625 -42.74995 C124.5390625 -42.74997615775367, 124.5390625 -42.750002315507345, 124.5390625 -42.75005 M124.5390625 -42.75005 C73.78894828271243 -42.75005, 23.03883406542485 -42.75005, -124.5390625 -42.75005 M124.5390625 -42.75005 C66.97319771124046 -42.75005, 9.407332922480933 -42.75005, -124.5390625 -42.75005" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-68.5703625 -42.75 L-68.5702625 -42.75 L-68.5702625 85.5 L-68.5703625 85.5" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-68.5703625 -42.75 C-68.57034073556859 -42.75, -68.5703189711372 -42.75, -68.5702625 -42.75 M-68.5703625 -42.75 C-68.57032420039879 -42.75, -68.57028590079757 -42.75, -68.5702625 -42.75 M-68.5702625 -42.75 C-68.5702625 -14.371218691527886, -68.5702625 14.007562616944227, -68.5702625 85.5 M-68.5702625 -42.75 C-68.5702625 -14.964127341897015, -68.5702625 12.82174531620597, -68.5702625 85.5 M-68.5702625 85.5 C-68.57028878678348 85.5, -68.57031507356695 85.5, -68.5703625 85.5 M-68.5702625 85.5 C-68.57029182534885 85.5, -68.5703211506977 85.5, -68.5703625 85.5 M-68.5703625 85.5 C-68.5703625 45.22311051704035, -68.5703625 4.946221034080693, -68.5703625 -42.75 M-68.5703625 85.5 C-68.5703625 49.10536561641211, -68.5703625 12.710731232824216, -68.5703625 -42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M57.9140125 -42.75 L57.9141125 -42.75 L57.9141125 85.5 L57.9140125 85.5" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M57.9140125 -42.75 C57.91405109192085 -42.75, 57.9140896838417 -42.75, 57.9141125 -42.75 M57.9140125 -42.75 C57.91404557953671 -42.75, 57.914078659073425 -42.75, 57.9141125 -42.75 M57.9141125 -42.75 C57.9141125 2.6217562660883758, 57.9141125 47.99351253217675, 57.9141125 85.5 M57.9141125 -42.75 C57.9141125 2.687753258698841, 57.9141125 48.12550651739768, 57.9141125 85.5 M57.9141125 85.5 C57.914079310486315 85.5, 57.914046120972635 85.5, 57.9140125 85.5 M57.9141125 85.5 C57.914075376200714 85.5, 57.91403825240143 85.5, 57.9140125 85.5 M57.9140125 85.5 C57.9140125 46.48890345521134, 57.9140125 7.477806910422686, 57.9140125 -42.75 M57.9140125 85.5 C57.9140125 49.750712252852395, 57.9140125 14.00142450570479, 57.9140125 -42.75" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-124.5390625 -42.75005 L-124.5390625 -42.74995 L124.5390625 -42.74995 L124.5390625 -42.75005" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-124.5390625 -42.75005 C-124.5390625 -42.750025606790444, -124.5390625 -42.75000121358088, -124.5390625 -42.74995 M-124.5390625 -42.75005 C-124.5390625 -42.75002988286827, -124.5390625 -42.750009765736536, -124.5390625 -42.74995 M-124.5390625 -42.74995 C-48.13077800084008 -42.74995, 28.277506498319838 -42.74995, 124.5390625 -42.74995 M-124.5390625 -42.74995 C-43.80048814373221 -42.74995, 36.93808621253558 -42.74995, 124.5390625 -42.74995 M124.5390625 -42.74995 C124.5390625 -42.74997989989315, 124.5390625 -42.75000979978629, 124.5390625 -42.75005 M124.5390625 -42.74995 C124.5390625 -42.74998729627946, 124.5390625 -42.750024592558916, 124.5390625 -42.75005 M124.5390625 -42.75005 C30.845054005619744 -42.75005, -62.84895448876051 -42.75005, -124.5390625 -42.75005 M124.5390625 -42.75005 C25.165634498434798 -42.75005, -74.2077935031304 -42.75005, -124.5390625 -42.75005" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g></g><g class="node default" id="my-svg-entity-EDITORIAL_EVENTS-5" data-look="classic" transform="translate(1312.9296875, 899.875)"><g class="outer-path" style=""><path d="M-154.1953125 -192.375 L154.1953125 -192.375 L154.1953125 192.375 L-154.1953125 192.375" stroke="none" stroke-width="0" fill="#ECECFF"/><path d="M-154.1953125 -192.375 C-60.46057577067744 -192.375, 33.274160958645126 -192.375, 154.1953125 -192.375 M-154.1953125 -192.375 C-36.028483270273554 -192.375, 82.13834595945289 -192.375, 154.1953125 -192.375 M154.1953125 -192.375 C154.1953125 -51.4088438680204, 154.1953125 89.5573122639592, 154.1953125 192.375 M154.1953125 -192.375 C154.1953125 -45.82072652722374, 154.1953125 100.73354694555252, 154.1953125 192.375 M154.1953125 192.375 C65.64779928331527 192.375, -22.89971393336947 192.375, -154.1953125 192.375 M154.1953125 192.375 C88.51570915650663 192.375, 22.836105813013262 192.375, -154.1953125 192.375 M-154.1953125 192.375 C-154.1953125 102.31369037736053, -154.1953125 12.25238075472106, -154.1953125 -192.375 M-154.1953125 192.375 C-154.1953125 63.361033765626075, -154.1953125 -65.65293246874785, -154.1953125 -192.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-154.1953125 -149.625 L154.1953125 -149.625 L154.1953125 -106.875 L-154.1953125 -106.875" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-154.1953125 -149.625 C-58.22236938270572 -149.625, 37.750573734588556 -149.625, 154.1953125 -149.625 M-154.1953125 -149.625 C-81.19905966936153 -149.625, -8.202806838723063 -149.625, 154.1953125 -149.625 M154.1953125 -149.625 C154.1953125 -138.18797498242733, 154.1953125 -126.75094996485468, 154.1953125 -106.875 M154.1953125 -149.625 C154.1953125 -134.96066502895758, 154.1953125 -120.29633005791516, 154.1953125 -106.875 M154.1953125 -106.875 C75.8980600414282 -106.875, -2.3991924171436096 -106.875, -154.1953125 -106.875 M154.1953125 -106.875 C34.39402013777173 -106.875, -85.40727222445653 -106.875, -154.1953125 -106.875 M-154.1953125 -106.875 C-154.1953125 -123.11323272853663, -154.1953125 -139.35146545707326, -154.1953125 -149.625 M-154.1953125 -106.875 C-154.1953125 -116.40108070610798, -154.1953125 -125.92716141221595, -154.1953125 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-154.1953125 -106.875 L154.1953125 -106.875 L154.1953125 -64.125 L-154.1953125 -64.125" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-154.1953125 -106.875 C-48.14992542274439 -106.875, 57.89546165451122 -106.875, 154.1953125 -106.875 M-154.1953125 -106.875 C-71.83145644158947 -106.875, 10.532399616821067 -106.875, 154.1953125 -106.875 M154.1953125 -106.875 C154.1953125 -95.81759607172388, 154.1953125 -84.76019214344778, 154.1953125 -64.125 M154.1953125 -106.875 C154.1953125 -97.00567046829114, 154.1953125 -87.13634093658229, 154.1953125 -64.125 M154.1953125 -64.125 C57.94213210047508 -64.125, -38.311048299049844 -64.125, -154.1953125 -64.125 M154.1953125 -64.125 C62.01568309358362 -64.125, -30.163946312832763 -64.125, -154.1953125 -64.125 M-154.1953125 -64.125 C-154.1953125 -78.96701259100979, -154.1953125 -93.80902518201958, -154.1953125 -106.875 M-154.1953125 -64.125 C-154.1953125 -78.83112892917062, -154.1953125 -93.53725785834123, -154.1953125 -106.875" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-154.1953125 -64.125 L154.1953125 -64.125 L154.1953125 -21.375 L-154.1953125 -21.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-154.1953125 -64.125 C-48.056473810615856 -64.125, 58.08236487876829 -64.125, 154.1953125 -64.125 M-154.1953125 -64.125 C-87.96431237367331 -64.125, -21.733312247346618 -64.125, 154.1953125 -64.125 M154.1953125 -64.125 C154.1953125 -48.37058035280285, 154.1953125 -32.61616070560569, 154.1953125 -21.375 M154.1953125 -64.125 C154.1953125 -51.04320262079498, 154.1953125 -37.96140524158996, 154.1953125 -21.375 M154.1953125 -21.375 C30.979635679200086 -21.375, -92.23604114159983 -21.375, -154.1953125 -21.375 M154.1953125 -21.375 C88.71908755455839 -21.375, 23.24286260911677 -21.375, -154.1953125 -21.375 M-154.1953125 -21.375 C-154.1953125 -31.872058480871985, -154.1953125 -42.36911696174397, -154.1953125 -64.125 M-154.1953125 -21.375 C-154.1953125 -37.21013076777204, -154.1953125 -53.04526153554409, -154.1953125 -64.125" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-154.1953125 -21.375 L154.1953125 -21.375 L154.1953125 21.375 L-154.1953125 21.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-154.1953125 -21.375 C-66.06135401275179 -21.375, 22.072604474496416 -21.375, 154.1953125 -21.375 M-154.1953125 -21.375 C-55.50694582886328 -21.375, 43.18142084227344 -21.375, 154.1953125 -21.375 M154.1953125 -21.375 C154.1953125 -5.948497025028722, 154.1953125 9.478005949942556, 154.1953125 21.375 M154.1953125 -21.375 C154.1953125 -10.327428746915041, 154.1953125 0.7201425061699176, 154.1953125 21.375 M154.1953125 21.375 C61.08192744744062 21.375, -32.03145760511876 21.375, -154.1953125 21.375 M154.1953125 21.375 C64.8534592443496 21.375, -24.488394011300812 21.375, -154.1953125 21.375 M-154.1953125 21.375 C-154.1953125 10.17824258482083, -154.1953125 -1.0185148303583382, -154.1953125 -21.375 M-154.1953125 21.375 C-154.1953125 10.66610748337797, -154.1953125 -0.04278503324405847, -154.1953125 -21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-154.1953125 21.375 L154.1953125 21.375 L154.1953125 64.125 L-154.1953125 64.125" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-154.1953125 21.375 C-61.681727387395 21.375, 30.83185772521 21.375, 154.1953125 21.375 M-154.1953125 21.375 C-39.658683849777645 21.375, 74.87794480044471 21.375, 154.1953125 21.375 M154.1953125 21.375 C154.1953125 31.65399127311141, 154.1953125 41.93298254622282, 154.1953125 64.125 M154.1953125 21.375 C154.1953125 34.878970506836126, 154.1953125 48.38294101367225, 154.1953125 64.125 M154.1953125 64.125 C38.23262198541072 64.125, -77.73006852917857 64.125, -154.1953125 64.125 M154.1953125 64.125 C42.43128399239576 64.125, -69.33274451520847 64.125, -154.1953125 64.125 M-154.1953125 64.125 C-154.1953125 48.457614505473515, -154.1953125 32.79022901094704, -154.1953125 21.375 M-154.1953125 64.125 C-154.1953125 52.50412275738052, -154.1953125 40.88324551476104, -154.1953125 21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-154.1953125 64.125 L154.1953125 64.125 L154.1953125 106.875 L-154.1953125 106.875" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-154.1953125 64.125 C-79.14233335292087 64.125, -4.089354205841744 64.125, 154.1953125 64.125 M-154.1953125 64.125 C-68.46413297649795 64.125, 17.2670465470041 64.125, 154.1953125 64.125 M154.1953125 64.125 C154.1953125 73.47351606481762, 154.1953125 82.82203212963523, 154.1953125 106.875 M154.1953125 64.125 C154.1953125 76.59567562765693, 154.1953125 89.06635125531386, 154.1953125 106.875 M154.1953125 106.875 C67.6275573538638 106.875, -18.940197792272386 106.875, -154.1953125 106.875 M154.1953125 106.875 C58.96383331497755 106.875, -36.2676458700449 106.875, -154.1953125 106.875 M-154.1953125 106.875 C-154.1953125 98.19853415469895, -154.1953125 89.5220683093979, -154.1953125 64.125 M-154.1953125 106.875 C-154.1953125 97.52651694539526, -154.1953125 88.17803389079053, -154.1953125 64.125" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-154.1953125 106.875 L154.1953125 106.875 L154.1953125 149.625 L-154.1953125 149.625" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-154.1953125 106.875 C-38.40412748895045 106.875, 77.3870575220991 106.875, 154.1953125 106.875 M-154.1953125 106.875 C-85.26767854416809 106.875, -16.340044588336184 106.875, 154.1953125 106.875 M154.1953125 106.875 C154.1953125 118.33331620250821, 154.1953125 129.79163240501643, 154.1953125 149.625 M154.1953125 106.875 C154.1953125 121.41963468556408, 154.1953125 135.96426937112815, 154.1953125 149.625 M154.1953125 149.625 C50.27665022973049 149.625, -53.642012040539015 149.625, -154.1953125 149.625 M154.1953125 149.625 C53.525702859427625 149.625, -47.14390678114475 149.625, -154.1953125 149.625 M-154.1953125 149.625 C-154.1953125 133.42631220811458, -154.1953125 117.22762441622916, -154.1953125 106.875 M-154.1953125 149.625 C-154.1953125 139.92595746015422, -154.1953125 130.22691492030845, -154.1953125 106.875" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-154.1953125 149.625 L154.1953125 149.625 L154.1953125 192.375 L-154.1953125 192.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-154.1953125 149.625 C-89.40771877619002 149.625, -24.620125052380047 149.625, 154.1953125 149.625 M-154.1953125 149.625 C-43.72621914922621 149.625, 66.74287420154758 149.625, 154.1953125 149.625 M154.1953125 149.625 C154.1953125 165.86600945400525, 154.1953125 182.1070189080105, 154.1953125 192.375 M154.1953125 149.625 C154.1953125 163.4915902658736, 154.1953125 177.35818053174725, 154.1953125 192.375 M154.1953125 192.375 C52.98838646219848 192.375, -48.218539575603046 192.375, -154.1953125 192.375 M154.1953125 192.375 C33.62367234188504 192.375, -86.94796781622992 192.375, -154.1953125 192.375 M-154.1953125 192.375 C-154.1953125 183.2662520550401, -154.1953125 174.1575041100802, -154.1953125 149.625 M-154.1953125 192.375 C-154.1953125 179.4103781958021, -154.1953125 166.44575639160422, -154.1953125 149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="label name" transform="translate(-67.7265625, -183)" style=""><foreignObject width="135.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 254px; text-align: start;"><span class="nodeLabel"><p>EDITORIAL_EVENTS</p></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, -140.25)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, -140.25)" style=""><foreignObject width="101.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 193px; text-align: start;"><span class="nodeLabel"><p>manuscript_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, -140.25)" style=""><foreignObject width="41.625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 145px; text-align: start;"><span class="nodeLabel"><p>PK,FK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, -140.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, -97.5)" style=""><foreignObject width="19.65625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 117px; text-align: start;"><span class="nodeLabel"><p>int</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, -97.5)" style=""><foreignObject width="66.984375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 159px; text-align: start;"><span class="nodeLabel"><p>sequence</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, -97.5)" style=""><foreignObject width="18.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>PK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, -97.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, -54.75)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, -54.75)" style=""><foreignObject width="80.640625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 170px; text-align: start;"><span class="nodeLabel"><p>event_type</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, -54.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, -54.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, -12)" style=""><foreignObject width="29.671875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>json</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, -12)" style=""><foreignObject width="55.84375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 153px; text-align: start;"><span class="nodeLabel"><p>payload</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, -12)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, -12)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, 30.75)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, 30.75)" style=""><foreignObject width="59.34375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 153px; text-align: start;"><span class="nodeLabel"><p>actor_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, 30.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, 30.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, 73.5)" style=""><foreignObject width="90.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 178px; text-align: start;"><span class="nodeLabel"><p>timestamptz</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, 73.5)" style=""><foreignObject width="86.390625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 176px; text-align: start;"><span class="nodeLabel"><p>occurred_at</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, 73.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, 73.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, 116.25)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, 116.25)" style=""><foreignObject width="100.828125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 193px; text-align: start;"><span class="nodeLabel"><p>previous_hash</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, 116.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, 116.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-141.6953125, 159)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-26.4140625, 159)" style=""><foreignObject width="81.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 172px; text-align: start;"><span class="nodeLabel"><p>event_hash</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(100.0703125, 159)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(166.6953125, 159)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="divider"><path d="M-154.1953125 -149.62505 L-154.1953125 -149.62495 L154.1953125 -149.62495 L154.1953125 -149.62505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-154.1953125 -149.62505 C-154.1953125 -149.62501909103528, -154.1953125 -149.62498818207055, -154.1953125 -149.62495 M-154.1953125 -149.62505 C-154.1953125 -149.62501728545507, -154.1953125 -149.62498457091013, -154.1953125 -149.62495 M-154.1953125 -149.62495 C-64.0497188559858 -149.62495, 26.095874788028397 -149.62495, 154.1953125 -149.62495 M-154.1953125 -149.62495 C-42.54932672075758 -149.62495, 69.09665905848485 -149.62495, 154.1953125 -149.62495 M154.1953125 -149.62495 C154.1953125 -149.62497540093406, 154.1953125 -149.62500080186808, 154.1953125 -149.62505 M154.1953125 -149.62495 C154.1953125 -149.62498722369259, 154.1953125 -149.6250244473852, 154.1953125 -149.62505 M154.1953125 -149.62505 C31.043888695102822 -149.62505, -92.10753510979436 -149.62505, -154.1953125 -149.62505 M154.1953125 -149.62505 C90.49620378876105 -149.62505, 26.797095077522087 -149.62505, -154.1953125 -149.62505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-38.9141125 -149.625 L-38.9140125 -149.625 L-38.9140125 192.375 L-38.9141125 192.375" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-38.9141125 -149.625 C-38.91407546199753 -149.625, -38.91403842399506 -149.625, -38.9140125 -149.625 M-38.9141125 -149.625 C-38.91407791053869 -149.625, -38.91404332107737 -149.625, -38.9140125 -149.625 M-38.9140125 -149.625 C-38.9140125 -35.24996258803037, -38.9140125 79.12507482393926, -38.9140125 192.375 M-38.9140125 -149.625 C-38.9140125 -71.48362468617142, -38.9140125 6.657750627657151, -38.9140125 192.375 M-38.9140125 192.375 C-38.91404748277294 192.375, -38.91408246554589 192.375, -38.9141125 192.375 M-38.9140125 192.375 C-38.914042321710646 192.375, -38.91407214342129 192.375, -38.9141125 192.375 M-38.9141125 192.375 C-38.9141125 88.37888584375757, -38.9141125 -15.617228312484855, -38.9141125 -149.625 M-38.9141125 192.375 C-38.9141125 123.93467812877275, -38.9141125 55.49435625754549, -38.9141125 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M87.5702625 -149.625 L87.5703625 -149.625 L87.5703625 192.375 L87.5702625 192.375" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M87.5702625 -149.625 C87.570290101157 -149.625, 87.570317702314 -149.625, 87.5703625 -149.625 M87.5702625 -149.625 C87.5702868486564 -149.625, 87.57031119731279 -149.625, 87.5703625 -149.625 M87.5703625 -149.625 C87.5703625 -44.173343444156174, 87.5703625 61.27831311168765, 87.5703625 192.375 M87.5703625 -149.625 C87.5703625 -35.76477764236739, 87.5703625 78.09544471526522, 87.5703625 192.375 M87.5703625 192.375 C87.57033674740582 192.375, 87.57031099481163 192.375, 87.5702625 192.375 M87.5703625 192.375 C87.57033482407031 192.375, 87.57030714814061 192.375, 87.5702625 192.375 M87.5702625 192.375 C87.5702625 70.90872831402606, 87.5702625 -50.55754337194787, 87.5702625 -149.625 M87.5702625 192.375 C87.5702625 96.15768359464231, 87.5702625 -0.059632810715385176, 87.5702625 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-154.1953125 -149.62505 L-154.1953125 -149.62495 L154.1953125 -149.62495 L154.1953125 -149.62505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-154.1953125 -149.62505 C-154.1953125 -149.62501727259675, -154.1953125 -149.62498454519354, -154.1953125 -149.62495 M-154.1953125 -149.62505 C-154.1953125 -149.6250261175743, -154.1953125 -149.62500223514863, -154.1953125 -149.62495 M-154.1953125 -149.62495 C-83.1182482009565 -149.62495, -12.041183901913001 -149.62495, 154.1953125 -149.62495 M-154.1953125 -149.62495 C-77.13084205309856 -149.62495, -0.0663716061971229 -149.62495, 154.1953125 -149.62495 M154.1953125 -149.62495 C154.1953125 -149.62498018477186, 154.1953125 -149.6250103695437, 154.1953125 -149.62505 M154.1953125 -149.62495 C154.1953125 -149.62498851347735, 154.1953125 -149.6250270269547, 154.1953125 -149.62505 M154.1953125 -149.62505 C63.28454262624325 -149.62505, -27.626227247513498 -149.62505, -154.1953125 -149.62505 M154.1953125 -149.62505 C91.14667401399045 -149.62505, 28.098035527980898 -149.62505, -154.1953125 -149.62505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g></g><g class="node default" id="my-svg-entity-REVIEW_ASSIGNMENTS-6" data-look="classic" transform="translate(1759.359375, 899.875)"><g class="outer-path" style=""><path d="M-152.234375 -192.375 L152.234375 -192.375 L152.234375 192.375 L-152.234375 192.375" stroke="none" stroke-width="0" fill="#ECECFF"/><path d="M-152.234375 -192.375 C-87.1955971553838 -192.375, -22.156819310767588 -192.375, 152.234375 -192.375 M-152.234375 -192.375 C-85.0262928153565 -192.375, -17.818210630712997 -192.375, 152.234375 -192.375 M152.234375 -192.375 C152.234375 -104.72609227984715, 152.234375 -17.077184559694302, 152.234375 192.375 M152.234375 -192.375 C152.234375 -84.99044909852265, 152.234375 22.394101802954708, 152.234375 192.375 M152.234375 192.375 C68.690747714644 192.375, -14.852879570711991 192.375, -152.234375 192.375 M152.234375 192.375 C76.94927335168578 192.375, 1.6641717033715508 192.375, -152.234375 192.375 M-152.234375 192.375 C-152.234375 78.82917023234056, -152.234375 -34.71665953531888, -152.234375 -192.375 M-152.234375 192.375 C-152.234375 110.994167480234, -152.234375 29.613334960467995, -152.234375 -192.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-152.234375 -149.625 L152.234375 -149.625 L152.234375 -106.875 L-152.234375 -106.875" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-152.234375 -149.625 C-46.67710666966845 -149.625, 58.880161660663106 -149.625, 152.234375 -149.625 M-152.234375 -149.625 C-46.32569331936372 -149.625, 59.582988361272555 -149.625, 152.234375 -149.625 M152.234375 -149.625 C152.234375 -137.55702535151778, 152.234375 -125.48905070303556, 152.234375 -106.875 M152.234375 -149.625 C152.234375 -140.11709511967848, 152.234375 -130.60919023935696, 152.234375 -106.875 M152.234375 -106.875 C81.04109868194453 -106.875, 9.847822363889065 -106.875, -152.234375 -106.875 M152.234375 -106.875 C61.31648057431134 -106.875, -29.601413851377316 -106.875, -152.234375 -106.875 M-152.234375 -106.875 C-152.234375 -121.49008472299042, -152.234375 -136.10516944598083, -152.234375 -149.625 M-152.234375 -106.875 C-152.234375 -119.14353778423776, -152.234375 -131.41207556847553, -152.234375 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-152.234375 -106.875 L152.234375 -106.875 L152.234375 -64.125 L-152.234375 -64.125" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-152.234375 -106.875 C-88.42041188951043 -106.875, -24.606448779020866 -106.875, 152.234375 -106.875 M-152.234375 -106.875 C-81.61489045211776 -106.875, -10.995405904235525 -106.875, 152.234375 -106.875 M152.234375 -106.875 C152.234375 -97.1313920068378, 152.234375 -87.3877840136756, 152.234375 -64.125 M152.234375 -106.875 C152.234375 -94.76690670165085, 152.234375 -82.6588134033017, 152.234375 -64.125 M152.234375 -64.125 C61.56234098949858 -64.125, -29.10969302100284 -64.125, -152.234375 -64.125 M152.234375 -64.125 C51.79595717101799 -64.125, -48.64246065796402 -64.125, -152.234375 -64.125 M-152.234375 -64.125 C-152.234375 -75.7576654486646, -152.234375 -87.3903308973292, -152.234375 -106.875 M-152.234375 -64.125 C-152.234375 -72.87453066863227, -152.234375 -81.62406133726455, -152.234375 -106.875" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-152.234375 -64.125 L152.234375 -64.125 L152.234375 -21.375 L-152.234375 -21.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-152.234375 -64.125 C-53.1805971889693 -64.125, 45.8731806220614 -64.125, 152.234375 -64.125 M-152.234375 -64.125 C-84.52484551743325 -64.125, -16.8153160348665 -64.125, 152.234375 -64.125 M152.234375 -64.125 C152.234375 -52.78586324382745, 152.234375 -41.44672648765491, 152.234375 -21.375 M152.234375 -64.125 C152.234375 -47.279490198372685, 152.234375 -30.433980396745376, 152.234375 -21.375 M152.234375 -21.375 C59.54048421419054 -21.375, -33.153406571618916 -21.375, -152.234375 -21.375 M152.234375 -21.375 C80.95305606271845 -21.375, 9.671737125436891 -21.375, -152.234375 -21.375 M-152.234375 -21.375 C-152.234375 -33.50717261448547, -152.234375 -45.63934522897093, -152.234375 -64.125 M-152.234375 -21.375 C-152.234375 -32.95119644552166, -152.234375 -44.52739289104332, -152.234375 -64.125" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-152.234375 -21.375 L152.234375 -21.375 L152.234375 21.375 L-152.234375 21.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-152.234375 -21.375 C-38.12056457493311 -21.375, 75.99324585013377 -21.375, 152.234375 -21.375 M-152.234375 -21.375 C-40.98129803472362 -21.375, 70.27177893055276 -21.375, 152.234375 -21.375 M152.234375 -21.375 C152.234375 -9.088530477005818, 152.234375 3.197939045988363, 152.234375 21.375 M152.234375 -21.375 C152.234375 -5.798004443811552, 152.234375 9.778991112376897, 152.234375 21.375 M152.234375 21.375 C36.03377566406742 21.375, -80.16682367186516 21.375, -152.234375 21.375 M152.234375 21.375 C51.35633502561748 21.375, -49.521704948765034 21.375, -152.234375 21.375 M-152.234375 21.375 C-152.234375 7.542008660769646, -152.234375 -6.290982678460708, -152.234375 -21.375 M-152.234375 21.375 C-152.234375 4.808765552673364, -152.234375 -11.757468894653272, -152.234375 -21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-152.234375 21.375 L152.234375 21.375 L152.234375 64.125 L-152.234375 64.125" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-152.234375 21.375 C-40.3382766690459 21.375, 71.5578216619082 21.375, 152.234375 21.375 M-152.234375 21.375 C-67.87910703387583 21.375, 16.476160932248348 21.375, 152.234375 21.375 M152.234375 21.375 C152.234375 36.52419753916886, 152.234375 51.67339507833772, 152.234375 64.125 M152.234375 21.375 C152.234375 34.86934694478254, 152.234375 48.363693889565084, 152.234375 64.125 M152.234375 64.125 C55.98759179525953 64.125, -40.259191409480934 64.125, -152.234375 64.125 M152.234375 64.125 C63.76912721423656 64.125, -24.696120571526876 64.125, -152.234375 64.125 M-152.234375 64.125 C-152.234375 50.23439211356179, -152.234375 36.34378422712358, -152.234375 21.375 M-152.234375 64.125 C-152.234375 51.0051793831905, -152.234375 37.885358766381, -152.234375 21.375" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-152.234375 64.125 L152.234375 64.125 L152.234375 106.875 L-152.234375 106.875" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-152.234375 64.125 C-74.99946474667263 64.125, 2.2354455066547416 64.125, 152.234375 64.125 M-152.234375 64.125 C-81.53955028332493 64.125, -10.844725566649856 64.125, 152.234375 64.125 M152.234375 64.125 C152.234375 79.91245934125601, 152.234375 95.699918682512, 152.234375 106.875 M152.234375 64.125 C152.234375 75.20000752846546, 152.234375 86.27501505693093, 152.234375 106.875 M152.234375 106.875 C41.36767963286174 106.875, -69.49901573427653 106.875, -152.234375 106.875 M152.234375 106.875 C54.6424319292076 106.875, -42.94951114158479 106.875, -152.234375 106.875 M-152.234375 106.875 C-152.234375 97.74044146435543, -152.234375 88.60588292871087, -152.234375 64.125 M-152.234375 106.875 C-152.234375 95.4998794024528, -152.234375 84.12475880490562, -152.234375 64.125" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-odd"><path d="M-152.234375 106.875 L152.234375 106.875 L152.234375 149.625 L-152.234375 149.625" stroke="none" stroke-width="0" fill="hsl(240, 100%, 100%)"/><path d="M-152.234375 106.875 C-67.44702600018795 106.875, 17.340322999624107 106.875, 152.234375 106.875 M-152.234375 106.875 C-90.4341098344407 106.875, -28.63384466888141 106.875, 152.234375 106.875 M152.234375 106.875 C152.234375 115.63642887856827, 152.234375 124.39785775713653, 152.234375 149.625 M152.234375 106.875 C152.234375 123.32952351699211, 152.234375 139.78404703398422, 152.234375 149.625 M152.234375 149.625 C33.35755927891353 149.625, -85.51925644217295 149.625, -152.234375 149.625 M152.234375 149.625 C36.42955631642177 149.625, -79.37526236715647 149.625, -152.234375 149.625 M-152.234375 149.625 C-152.234375 137.91162552574355, -152.234375 126.19825105148708, -152.234375 106.875 M-152.234375 149.625 C-152.234375 139.13986026519802, -152.234375 128.65472053039608, -152.234375 106.875" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g style="" class="row-rect-even"><path d="M-152.234375 149.625 L152.234375 149.625 L152.234375 192.375 L-152.234375 192.375" stroke="none" stroke-width="0" fill="hsl(240, 100%, 97.2745098039%)"/><path d="M-152.234375 149.625 C-87.20303312428857 149.625, -22.171691248577133 149.625, 152.234375 149.625 M-152.234375 149.625 C-87.70523913578234 149.625, -23.17610327156467 149.625, 152.234375 149.625 M152.234375 149.625 C152.234375 163.21623237528223, 152.234375 176.80746475056446, 152.234375 192.375 M152.234375 149.625 C152.234375 159.25532139059754, 152.234375 168.8856427811951, 152.234375 192.375 M152.234375 192.375 C68.45568343998526 192.375, -15.32300812002947 192.375, -152.234375 192.375 M152.234375 192.375 C89.90858061354993 192.375, 27.582786227099874 192.375, -152.234375 192.375 M-152.234375 192.375 C-152.234375 176.22050496316567, -152.234375 160.0660099263313, -152.234375 149.625 M-152.234375 192.375 C-152.234375 177.11611325825612, -152.234375 161.85722651651224, -152.234375 149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="label name" transform="translate(-79.8828125, -183)" style=""><foreignObject width="159.765625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 282px; text-align: start;"><span class="nodeLabel"><p>REVIEW_ASSIGNMENTS</p></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, -140.25)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, -140.25)" style=""><foreignObject width="13.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 113px; text-align: start;"><span class="nodeLabel"><p>id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, -140.25)" style=""><foreignObject width="18.140625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>PK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, -140.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, -97.5)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, -97.5)" style=""><foreignObject width="101.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 193px; text-align: start;"><span class="nodeLabel"><p>manuscript_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, -97.5)" style=""><foreignObject width="17.609375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 121px; text-align: start;"><span class="nodeLabel"><p>FK</p></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, -97.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, -54.75)" style=""><foreignObject width="30.96875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 129px; text-align: start;"><span class="nodeLabel"><p>uuid</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, -54.75)" style=""><foreignObject width="84.796875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 177px; text-align: start;"><span class="nodeLabel"><p>reviewer_id</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, -54.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, -54.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, -12)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, -12)" style=""><foreignObject width="42.796875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>status</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, -12)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, -12)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, 30.75)" style=""><foreignObject width="40.375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 136px; text-align: start;"><span class="nodeLabel"><p>string</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, 30.75)" style=""><foreignObject width="121.046875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 208px; text-align: start;"><span class="nodeLabel"><p>recommendation</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, 30.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, 30.75)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, 73.5)" style=""><foreignObject width="29.4375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 125px; text-align: start;"><span class="nodeLabel"><p>text</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, 73.5)" style=""><foreignObject width="73.359375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 166px; text-align: start;"><span class="nodeLabel"><p>comments</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, 73.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, 73.5)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, 116.25)" style=""><foreignObject width="90.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 178px; text-align: start;"><span class="nodeLabel"><p>timestamptz</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, 116.25)" style=""><foreignObject width="83.484375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 175px; text-align: start;"><span class="nodeLabel"><p>assigned_at</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, 116.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, 116.25)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-type" transform="translate(-139.734375, 159)" style=""><foreignObject width="90.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 178px; text-align: start;"><span class="nodeLabel"><p>timestamptz</p></span></div></foreignObject></g><g class="label attribute-name" transform="translate(-24.453125, 159)" style=""><foreignObject width="95.453125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 183px; text-align: start;"><span class="nodeLabel"><p>submitted_at</p></span></div></foreignObject></g><g class="label attribute-keys" transform="translate(121.59375, 159)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="label attribute-comment" transform="translate(164.734375, 159)" style=""><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 100px; text-align: start;"><span class="nodeLabel"></span></div></foreignObject></g><g class="divider"><path d="M-152.234375 -149.62505 L-152.234375 -149.62495 L152.234375 -149.62495 L152.234375 -149.62505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-152.234375 -149.62505 C-152.234375 -149.62502365496917, -152.234375 -149.62499730993835, -152.234375 -149.62495 M-152.234375 -149.62505 C-152.234375 -149.62502756587264, -152.234375 -149.62500513174527, -152.234375 -149.62495 M-152.234375 -149.62495 C-58.585142311854526 -149.62495, 35.06409037629095 -149.62495, 152.234375 -149.62495 M-152.234375 -149.62495 C-46.55944770467967 -149.62495, 59.11547959064066 -149.62495, 152.234375 -149.62495 M152.234375 -149.62495 C152.234375 -149.62497104644686, 152.234375 -149.62499209289368, 152.234375 -149.62505 M152.234375 -149.62495 C152.234375 -149.62497440645674, 152.234375 -149.62499881291347, 152.234375 -149.62505 M152.234375 -149.62505 C31.456678576403988 -149.62505, -89.32101784719202 -149.62505, -152.234375 -149.62505 M152.234375 -149.62505 C49.95284754284171 -149.62505, -52.32867991431658 -149.62505, -152.234375 -149.62505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-36.953175 -149.625 L-36.953075 -149.625 L-36.953075 192.375 L-36.953175 192.375" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-36.953175 -149.625 C-36.953144120089235 -149.625, -36.95311324017847 -149.625, -36.953075 -149.625 M-36.953175 -149.625 C-36.95314807525565 -149.625, -36.9531211505113 -149.625, -36.953075 -149.625 M-36.953075 -149.625 C-36.953075 -40.76735766495477, -36.953075 68.09028467009045, -36.953075 192.375 M-36.953075 -149.625 C-36.953075 -13.095454061000765, -36.953075 123.43409187799847, -36.953075 192.375 M-36.953075 192.375 C-36.953105263364115 192.375, -36.95313552672823 192.375, -36.953175 192.375 M-36.953075 192.375 C-36.953109095449605 192.375, -36.953143190899205 192.375, -36.953175 192.375 M-36.953175 192.375 C-36.953175 109.39142621084136, -36.953175 26.40785242168272, -36.953175 -149.625 M-36.953175 192.375 C-36.953175 56.849055717117096, -36.953175 -78.67688856576581, -36.953175 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M109.0937 -149.625 L109.0938 -149.625 L109.0938 192.375 L109.0937 192.375" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M109.0937 -149.625 C109.09373698587716 -149.625, 109.09377397175432 -149.625, 109.0938 -149.625 M109.0937 -149.625 C109.0937338189932 -149.625, 109.0937676379864 -149.625, 109.0938 -149.625 M109.0938 -149.625 C109.0938 -70.18062860635146, 109.0938 9.263742787297076, 109.0938 192.375 M109.0938 -149.625 C109.0938 -59.187966002184226, 109.0938 31.24906799563155, 109.0938 192.375 M109.0938 192.375 C109.09377562739897 192.375, 109.09375125479792 192.375, 109.0937 192.375 M109.0938 192.375 C109.09376700575419 192.375, 109.09373401150837 192.375, 109.0937 192.375 M109.0937 192.375 C109.0937 102.67727119439716, 109.0937 12.979542388794329, 109.0937 -149.625 M109.0937 192.375 C109.0937 56.84452673911463, 109.0937 -78.68594652177075, 109.0937 -149.625" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g><g class="divider"><path d="M-152.234375 -149.62505 L-152.234375 -149.62495 L152.234375 -149.62495 L152.234375 -149.62505" stroke="none" stroke-width="0" fill="#ECECFF" fill-rule="evenodd"/><path d="M-152.234375 -149.62505 C-152.234375 -149.6250214289607, -152.234375 -149.62499285792143, -152.234375 -149.62495 M-152.234375 -149.62505 C-152.234375 -149.62501756404765, -152.234375 -149.62498512809535, -152.234375 -149.62495 M-152.234375 -149.62495 C-31.058129113453006 -149.62495, 90.11811677309399 -149.62495, 152.234375 -149.62495 M-152.234375 -149.62495 C-64.8487804072865 -149.62495, 22.536814185427005 -149.62495, 152.234375 -149.62495 M152.234375 -149.62495 C152.234375 -149.62498149343352, 152.234375 -149.62501298686706, 152.234375 -149.62505 M152.234375 -149.62495 C152.234375 -149.6249861260927, 152.234375 -149.62502225218537, 152.234375 -149.62505 M152.234375 -149.62505 C34.19034124816126 -149.62505, -83.85369250367748 -149.62505, -152.234375 -149.62505 M152.234375 -149.62505 C39.81098290238084 -149.62505, -72.61240919523831 -149.62505, -152.234375 -149.62505" stroke="#9370DB" stroke-width="1.3" fill="none" stroke-dasharray="0 0"/></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg></figure>
 
-<p><strong>A design note worth stating rather than glossing
-over:</strong> <code>manuscript_authors.author_id</code> and
-<code>review_assignments.reviewer_id</code> are plain <code>UUID</code>
-columns, not declared foreign keys to <code>users.id</code> —
-referential integrity between authorship/reviewer assignment and the
-user table is an application-level guarantee, not a database-enforced
-one. <code>editorial_events.manuscript_id</code> <em>is</em> a declared
-foreign key with <code>ON DELETE RESTRICT</code>, so a manuscript with
-audit events cannot be deleted (verified: testing report section 3.3).
-<code>editorial_events</code> carries a unique constraint on
-<code>(manuscript_id, event_hash)</code> and no application code path
-issues <code>UPDATE</code> or <code>DELETE</code> against it; the
-database-level enforcement of that is described in section 8.5 and
-section 11.4.</p>
-<hr />
-<h2 id="9-system-design">9. System design</h2>
-<h3 id="91-architecture--hexagonal-backend">9.1 Architecture —
-hexagonal, backend</h3>
-<pre><code>backend/src/ugjcs/
+**A design note worth stating rather than glossing over:** `manuscript_authors.author_id` and
+`review_assignments.reviewer_id` are plain `UUID` columns, not declared foreign keys to `users.id`
+— referential integrity between authorship/reviewer assignment and the user table is an
+application-level guarantee, not a database-enforced one. `editorial_events.manuscript_id` *is* a
+declared foreign key with `ON DELETE RESTRICT`, so a manuscript with audit events cannot be
+deleted (verified: testing report section 3.3). `editorial_events` carries a unique constraint on
+`(manuscript_id, event_hash)` and no application code path issues `UPDATE` or `DELETE` against it;
+the database-level enforcement of that is described in section 8.5 and section 11.4.
+
+---
+
+## 9. System design
+
+### 9.1 Architecture — hexagonal, backend
+
+```
+backend/src/ugjcs/
 ├── domain/          entities, value objects, events, state machine, policies
 │                    NO framework imports (enforced by import-linter, section 9.2)
 ├── application/     use-case services, port protocols, DTOs, unit of work
 ├── infrastructure/  SQLAlchemy repositories, S3 storage, JWT, Argon2, email
-└── api/             FastAPI routers, request/response schemas, dependencies, wiring</code></pre>
-<p>Dependencies point inwards only. Concrete adapters (SQLAlchemy
-repositories, the S3 document store, JWT token service) implement port
-<em>protocols</em> declared in <code>application/ports.py</code> and are
-bound to them at a composition root (<code>api/wiring.py</code>), so the
-application and domain layers never import a concrete adapter. The
-payoff is directly demonstrable, not asserted: the entire domain test
-suite runs with no database, no network and no framework loaded (testing
-report section 1).</p>
+└── api/             FastAPI routers, request/response schemas, dependencies, wiring
+```
+
+Dependencies point inwards only. Concrete adapters (SQLAlchemy repositories, the S3 document
+store, JWT token service) implement port *protocols* declared in `application/ports.py` and are
+bound to them at a composition root (`api/wiring.py`), so the application and domain layers never
+import a concrete adapter. The payoff is directly demonstrable, not asserted: the entire domain
+test suite runs with no database, no network and no framework loaded (testing report section 1).
+
 <figure class="diagram"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1253.16px; background-color: transparent;" viewBox="0 0 1253.15625 1530.426513671875" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#my-svg .cluster-label text{fill:#333;}#my-svg .cluster-label span{color:#333;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#333;color:#333;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#my-svg .arrowheadPath{fill:#333333;}#my-svg .edgePath .path{stroke:#333333;stroke-width:1px;}#my-svg .flowchart-link{stroke:#333333;fill:none;}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#my-svg .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#my-svg .cluster text{fill:#333;}#my-svg .cluster span{color:#333;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"><g class="cluster" id="my-svg-data" data-look="classic"><rect style="" x="409.18359375" y="1338" width="491.296875" height="184.4264678955078"/><g class="cluster-label" transform="translate(616.18359375, 1338)"><foreignObject width="77.296875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Data plane</p></span></div></foreignObject></g></g><g class="cluster" id="my-svg-fe" data-look="classic"><rect style="" x="8" y="186" width="632.15625" height="224"/><g class="cluster-label" transform="translate(231.78125, 186)"><foreignObject width="184.59375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Next.js frontend — Vercel</p></span></div></foreignObject></g></g><g class="cluster" id="my-svg-ext" data-look="classic"><rect style="" x="31.234375" y="8" width="608.921875" height="128"/><g class="cluster-label" transform="translate(281.4375, 8)"><foreignObject width="108.515625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>External actors</p></span></div></foreignObject></g></g></g><g class="edgePaths"><path d="M169.078,99L169.078,105.167C169.078,111.333,169.078,123.667,169.078,134C169.078,144.333,169.078,152.667,169.078,161C169.078,169.333,169.078,177.667,169.078,193.333C169.078,209,169.078,232,169.078,243.5L169.078,255" id="my-svg-L_Reader_Pub_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Reader_Pub_0" data-points="W3sieCI6MTY5LjA3ODEyNSwieSI6OTl9LHsieCI6MTY5LjA3ODEyNSwieSI6MTM2fSx7IngiOjE2OS4wNzgxMjUsInkiOjE2MX0seyJ4IjoxNjkuMDc4MTI1LCJ5IjoxODZ9LHsieCI6MTY5LjA3ODEyNSwieSI6MjU5fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M475.156,111L475.156,115.167C475.156,119.333,475.156,127.667,475.156,136C475.156,144.333,475.156,152.667,475.156,161C475.156,169.333,475.156,177.667,475.156,191.333C475.156,205,475.156,224,475.156,233.5L475.156,243" id="my-svg-L_Actor_BFF_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Actor_BFF_0" data-points="W3sieCI6NDc1LjE1NjI1LCJ5IjoxMTF9LHsieCI6NDc1LjE1NjI1LCJ5IjoxMzZ9LHsieCI6NDc1LjE1NjI1LCJ5IjoxNjF9LHsieCI6NDc1LjE1NjI1LCJ5IjoxODZ9LHsieCI6NDc1LjE1NjI1LCJ5IjoyNDd9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M169.078,337L169.078,349.167C169.078,361.333,169.078,385.667,169.078,404C169.078,422.333,169.078,434.667,217.878,486.31C266.678,537.954,364.278,628.908,413.078,674.385L461.878,719.862" id="my-svg-L_Pub_API_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Pub_API_0" data-points="W3sieCI6MTY5LjA3ODEyNSwieSI6MzM3fSx7IngiOjE2OS4wNzgxMjUsInkiOjQxMH0seyJ4IjoxNjkuMDc4MTI1LCJ5Ijo0NDd9LHsieCI6NDY0LjgwNDY4NzUsInkiOjcyMi41ODkwMjQ1MTE1OTI1fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M475.156,349L475.156,359.167C475.156,369.333,475.156,389.667,475.156,406C475.156,422.333,475.156,434.667,477.239,446.376C479.323,458.085,483.489,469.17,485.572,474.713L487.656,480.256" id="my-svg-L_BFF_API_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_BFF_API_0" data-points="W3sieCI6NDc1LjE1NjI1LCJ5IjozNDl9LHsieCI6NDc1LjE1NjI1LCJ5Ijo0MTB9LHsieCI6NDc1LjE1NjI1LCJ5Ijo0NDd9LHsieCI6NDg5LjA2Mjg1NTkyMjU1MTI1LCJ5Ijo0ODR9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M529.23,1288L528.081,1292.167C526.931,1296.333,524.631,1304.667,523.482,1313C522.332,1321.333,522.332,1329.667,522.332,1339.814C522.332,1349.961,522.332,1361.921,522.332,1367.902L522.332,1373.882" id="my-svg-L_Infra_PG_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Infra_PG_0" data-points="W3sieCI6NTI5LjIzMDQwNDcxMzExNDcsInkiOjEyODh9LHsieCI6NTIyLjMzMjAzMTI1LCJ5IjoxMzEzfSx7IngiOjUyMi4zMzIwMzEyNSwieSI6MTMzOH0seyJ4Ijo1MjIuMzMyMDMxMjUsInkiOjEzNzcuODgxOTIzNjc1NTM3fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M751.082,1288L752.232,1292.167C753.382,1296.333,755.681,1304.667,756.831,1313C757.98,1321.333,757.98,1329.667,757.98,1337.333C757.98,1345,757.98,1352,757.98,1355.5L757.98,1359" id="my-svg-L_Infra_S3s_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Infra_S3s_0" data-points="W3sieCI6NzUxLjA4MjA5NTI4Njg4NTMsInkiOjEyODh9LHsieCI6NzU3Ljk4MDQ2ODc1LCJ5IjoxMzEzfSx7IngiOjc1Ny45ODA0Njg3NSwieSI6MTMzOH0seyJ4Ijo3NTcuOTgwNDY4NzUsInkiOjEzNjN9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M805.156,373L805.156,379.167C805.156,385.333,805.156,397.667,805.156,410C805.156,422.333,805.156,434.667,803.073,446.376C800.99,458.085,796.823,469.17,794.74,474.713L792.657,480.256" id="my-svg-L_C1_API_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C1_API_0" data-points="W3sieCI6ODA1LjE1NjI1LCJ5IjozNzN9LHsieCI6ODA1LjE1NjI1LCJ5Ijo0MTB9LHsieCI6ODA1LjE1NjI1LCJ5Ijo0NDd9LHsieCI6NzkxLjI0OTY0NDA3NzQ0ODcsInkiOjQ4NH1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1115.156,385L1115.156,389.167C1115.156,393.333,1115.156,401.667,1115.156,412C1115.156,422.333,1115.156,434.667,1065.704,486.537C1016.253,538.408,917.349,629.816,867.897,675.519L818.445,721.223" id="my-svg-L_C2_Dom_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C2_Dom_0" data-points="W3sieCI6MTExNS4xNTYyNSwieSI6Mzg1fSx7IngiOjExMTUuMTU2MjUsInkiOjQxMH0seyJ4IjoxMTE1LjE1NjI1LCJ5Ijo0NDd9LHsieCI6ODE1LjUwNzgxMjUsInkiOjcyMy45MzgyNDAxMzE1Nzg5fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_Reader_Pub_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Actor_BFF_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(169.078125, 447)"><g class="label" data-id="L_Pub_API_0" transform="translate(-77.5625, -12)"><foreignObject width="155.125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>GET, unauthenticated</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(475.15625, 447)"><g class="label" data-id="L_BFF_API_0" transform="translate(-95.140625, -12)"><foreignObject width="190.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>Authorization: Bearer JWT</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Infra_PG_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Infra_S3s_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(805.15625, 447)"><g class="label" data-id="L_C1_API_0" transform="translate(-30.65625, -12)"><foreignObject width="61.3125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>enforces</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1115.15625, 447)"><g class="label" data-id="L_C2_Dom_0" transform="translate(-30.65625, -12)"><foreignObject width="61.3125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>enforces</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="root" transform="translate(467.15625, 476)"><g class="clusters"><g class="cluster" id="my-svg-be" data-look="classic"><rect style="" x="-2.3515625" y="8" width="350.703125" height="804"/><g class="cluster-label" transform="translate(1.6484375, 8)"><foreignObject width="342.703125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>FastAPI backend — hexagonal (AWS App Runner)</p></span></div></foreignObject></g></g></g><g class="edgePaths"><path d="M173,147.5L173,153.75C173,160,173,172.5,173,184.333C173,196.167,173,207.333,173,212.917L173,218.5" id="my-svg-L_API_Infra_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_API_Infra_0" data-points="W3sieCI6MTczLCJ5IjoxNDcuNX0seyJ4IjoxNzMsInkiOjE4NX0seyJ4IjoxNzMsInkiOjIyMi41fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M173,348.5L173,354.75C173,361,173,373.5,173,385.333C173,397.167,173,408.333,173,413.917L173,419.5" id="my-svg-L_Infra_App_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Infra_App_0" data-points="W3sieCI6MTczLCJ5IjozNDguNX0seyJ4IjoxNzMsInkiOjM4Nn0seyJ4IjoxNzMsInkiOjQyMy41fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M173,549.5L173,555.75C173,562,173,574.5,173,586.333C173,598.167,173,609.333,173,614.917L173,620.5" id="my-svg-L_App_Dom_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_App_Dom_0" data-points="W3sieCI6MTczLCJ5Ijo1NDkuNX0seyJ4IjoxNzMsInkiOjU4N30seyJ4IjoxNzMsInkiOjYyNC41fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_API_Infra_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_Infra_App_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_App_Dom_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-API-4" data-look="classic" transform="translate(173, 96.5)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"/><g class="label" style="" transform="translate(-100, -36)"><rect/><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>api/<br />routers · schemas · errors · wiring</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-Infra-5" data-look="classic" transform="translate(173, 285.5)"><rect class="basic label-container" style="" x="-130" y="-63" width="260" height="126"/><g class="label" style="" transform="translate(-100, -48)"><rect/><foreignObject width="200" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>infrastructure/<br />SQLAlchemy repos · S3 store<br />JWT · Argon2 · email</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-App-6" data-look="classic" transform="translate(173, 486.5)"><rect class="basic label-container" style="" x="-130" y="-63" width="260" height="126"/><g class="label" style="" transform="translate(-100, -48)"><rect/><foreignObject width="200" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>application/<br />use-case services · port protocols<br />unit of work</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-Dom-7" data-look="classic" transform="translate(173, 699.5)"><rect class="basic label-container" style="" x="-130" y="-75" width="260" height="150"/><g class="label" style="" transform="translate(-100, -60)"><rect/><foreignObject width="200" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>domain/<br />Manuscript · transitions · policies<br />blinding · hashchain<br />— NO framework imports —</p></span></div></foreignObject></g></g></g></g><g class="node default" id="my-svg-flowchart-Reader-0" data-look="classic" transform="translate(169.078125, 72)"><rect class="basic label-container" style="" x="-102.84375" y="-27" width="205.6875" height="54"/><g class="label" style="" transform="translate(-72.84375, -12)"><rect/><foreignObject width="145.6875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Reader (anonymous)</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-Actor-1" data-look="classic" transform="translate(475.15625, 72)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"/><g class="label" style="" transform="translate(-100, -24)"><rect/><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Author / Reviewer / Editor / EiC / Administrator</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-Pub-2" data-look="classic" transform="translate(169.078125, 298)"><rect class="basic label-container" style="" x="-126.078125" y="-39" width="252.15625" height="78"/><g class="label" style="" transform="translate(-96.078125, -24)"><rect/><foreignObject width="192.15625" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Public archive pages<br />static + ISR, no credentials</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-BFF-3" data-look="classic" transform="translate(475.15625, 298)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"/><g class="label" style="" transform="translate(-100, -36)"><rect/><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Route Handlers (BFF)<br />httpOnly iron-session cookie</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-PG-8" data-look="classic" transform="translate(522.33203125, 1430.213233947754)"><path d="M0,13.890740432150197 a78.1484375,13.890740432150197 0,0,0 156.296875,0 a78.1484375,13.890740432150197 0,0,0 -156.296875,0 l0,76.8907404321502 a78.1484375,13.890740432150197 0,0,0 156.296875,0 l0,-76.8907404321502" class="basic label-container outer-path" style="" transform="translate(-78.1484375, -52.336110648225294)"/><g class="label" style="" transform="translate(-70.6484375, -14)"><rect/><foreignObject width="141.296875" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>PostgreSQL 16<br />RDS, private subnet</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-S3s-9" data-look="classic" transform="translate(757.98046875, 1430.213233947754)"><path d="M0,15.808823529411764 a107.5,15.808823529411764 0,0,0 215,0 a107.5,15.808823529411764 0,0,0 -215,0 l0,102.80882352941177 a107.5,15.808823529411764 0,0,0 215,0 l0,-102.80882352941177" class="basic label-container outer-path" style="" transform="translate(-107.5, -67.21323529411765)"/><g class="label" style="" transform="translate(-100, -26)"><rect/><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>S3<br />private, pre-signed URLs only</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C1-28" data-look="classic" transform="translate(805.15625, 298)"><rect class="basic label-container" style="" x="-130" y="-75" width="260" height="150"/><g class="label" style="" transform="translate(-100, -60)"><rect/><foreignObject width="200" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>import-linter contract: layers<br />api → infrastructure → application → domain<br />(imports point inward only)</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C2-29" data-look="classic" transform="translate(1115.15625, 298)"><rect class="basic label-container" style="" x="-130" y="-87" width="260" height="174"/><g class="label" style="" transform="translate(-100, -72)"><rect/><foreignObject width="200" height="144"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>import-linter contract: domain-purity<br />domain/ forbids fastapi, sqlalchemy, pydantic,<br />boto3, os, io, socket, logging, asyncio, ...</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg></figure>
 
-<h3
-id="92-the-two-import-linter-contracts-and-why-they-are-mechanical-rather-than-aspirational">9.2
-The two import-linter contracts, and why they are mechanical rather than
-aspirational</h3>
-<p><code>.importlinter</code> at the backend root defines two contracts,
-both run as a CI gate in <code>make check</code> (testing report section
-2):</p>
-<ul>
-<li><strong><code>layers</code></strong> —
-<code>ugjcs.api → ugjcs.infrastructure → ugjcs.application → ugjcs.domain</code>.
-A layer may import only the layers named after it in this list; an
-import running the other way fails the build. This is what makes
-"dependencies point inwards" a property CI checks on every commit, not a
-convention a reviewer might miss.</li>
-<li><strong><code>domain-purity</code></strong> — forbids
-<code>ugjcs.domain</code> from importing <code>fastapi</code>,
-<code>sqlalchemy</code>, <code>pydantic</code>, <code>boto3</code>,
-<code>arq</code>, <code>redis</code>, <code>httpx</code>,
-<code>requests</code>, and thirteen standard-library I/O/framework
-modules including <code>os</code>, <code>io</code>, <code>socket</code>,
-<code>logging</code>, <code>asyncio</code> and <code>subprocess</code>.
-A domain module that reaches for a timestamp via
-<code>datetime.now()</code> is permitted; one that reaches for a file, a
-socket, or a framework decorator is not, and the build fails before a
-test even runs.</li>
-</ul>
-<p>Both contracts are a direct, testable realisation of NFR-13 ("the
-domain layer imports no framework code") — the requirement is not merely
-documented, it is enforced the same way a type error is: at build time,
-unconditionally.</p>
-<h3 id="93-api-design">9.3 API design</h3>
-<p>The HTTP boundary is documented exhaustively in
-<code>docs/05-api-contract.md</code>; this section states its governing
-design decisions rather than repeating the endpoint table.</p>
-<ul>
-<li><strong>Bearer-token backend, cookie-sessioned frontend.</strong>
-The FastAPI backend is a pure bearer-token API — short-lived JWT access
-tokens (<code>HS256</code>) plus rotating, hash-stored refresh tokens.
-The Next.js frontend is a Backend-For-Frontend: Route Handlers under
-<code>frontend/src/app/api/**</code> unseal an httpOnly, Secure,
-<code>SameSite=Lax</code> cookie and attach the bearer token
-server-side. No browser-side JavaScript ever holds a token. This exists
-specifically to avoid third-party cookie blocking between the
-<code>*.vercel.app</code> and <code>*.awsapprunner.com</code> origins
-(design specification section 7.2).</li>
-<li><strong>Errors as RFC 9457 Problem Details</strong>, uniformly, from
-every endpoint — <code>{type, title, status, detail?, instance?}</code>
-served as <code>application/problem+json</code>, with a fixed
-exception→status mapping (<code>IllegalTransitionError→409</code>,
-<code>AuthorizationDeniedError→403</code>, etc.) so the frontend
-branches on structure, not on parsing a message string.</li>
-<li><strong>snake_case on the wire, unconditionally.</strong> No
-camelCase translation layer exists anywhere;
-<code>ugjcs.domain.enums</code> values are copied verbatim into the
-frontend's TypeScript types. This was a considered choice, recorded as
-such in the API contract, not an oversight.</li>
-<li><strong>No pagination anywhere.</strong> A deliberate scope decision
-for a demonstration-scale corpus, recorded so that adding it later is
-understood as an additive change, not a redesign.</li>
-<li><strong>Authorisation as a dependency, not a decorator
-convention.</strong> Every route's <code>Action</code> is resolved
-through <code>policies.can()</code> as a FastAPI dependency, and
-<code>test_route_audit.py</code> walks the <em>live</em> route table
-asserting every non-public route carries one — a defect a
-hand-maintained checklist would eventually miss (testing report section
-1).</li>
-</ul>
-<h3 id="94-sequence--submit-to-publish">9.4 Sequence — submit to
-publish</h3>
+### 9.2 The two import-linter contracts, and why they are mechanical rather than aspirational
+
+`.importlinter` at the backend root defines two contracts, both run as a CI gate in `make check`
+(testing report section 2):
+
+- **`layers`** — `ugjcs.api → ugjcs.infrastructure → ugjcs.application → ugjcs.domain`. A layer may
+  import only the layers named after it in this list; an import running the other way fails the
+  build. This is what makes "dependencies point inwards" a property CI checks on every commit,
+  not a convention a reviewer might miss.
+- **`domain-purity`** — forbids `ugjcs.domain` from importing `fastapi`, `sqlalchemy`, `pydantic`,
+  `boto3`, `arq`, `redis`, `httpx`, `requests`, and thirteen standard-library I/O/framework
+  modules including `os`, `io`, `socket`, `logging`, `asyncio` and `subprocess`. A domain module
+  that reaches for a timestamp via `datetime.now()` is permitted; one that reaches for a file, a
+  socket, or a framework decorator is not, and the build fails before a test even runs.
+
+Both contracts are a direct, testable realisation of NFR-13 ("the domain layer imports no
+framework code") — the requirement is not merely documented, it is enforced the same way a type
+error is: at build time, unconditionally.
+
+### 9.3 API design
+
+The HTTP boundary is documented exhaustively in `docs/05-api-contract.md`; this section states
+its governing design decisions rather than repeating the endpoint table.
+
+- **Bearer-token backend, cookie-sessioned frontend.** The FastAPI backend is a pure bearer-token
+  API — short-lived JWT access tokens (`HS256`) plus rotating, hash-stored refresh tokens. The
+  Next.js frontend is a Backend-For-Frontend: Route Handlers under `frontend/src/app/api/**`
+  unseal an httpOnly, Secure, `SameSite=Lax` cookie and attach the bearer token server-side. No
+  browser-side JavaScript ever holds a token. This exists specifically to avoid third-party
+  cookie blocking between the `*.vercel.app` and `*.awsapprunner.com` origins (design
+  specification section 7.2).
+- **Errors as RFC 9457 Problem Details**, uniformly, from every endpoint — `{type, title,
+  status, detail?, instance?}` served as `application/problem+json`, with a fixed exception→status
+  mapping (`IllegalTransitionError→409`, `AuthorizationDeniedError→403`, etc.) so the frontend
+  branches on structure, not on parsing a message string.
+- **snake_case on the wire, unconditionally.** No camelCase translation layer exists anywhere;
+  `ugjcs.domain.enums` values are copied verbatim into the frontend's TypeScript types. This was a
+  considered choice, recorded as such in the API contract, not an oversight.
+- **No pagination anywhere.** A deliberate scope decision for a demonstration-scale corpus,
+  recorded so that adding it later is understood as an additive change, not a redesign.
+- **Authorisation as a dependency, not a decorator convention.** Every route's `Action` is
+  resolved through `policies.can()` as a FastAPI dependency, and `test_route_audit.py` walks the
+  *live* route table asserting every non-public route carries one — a defect a hand-maintained
+  checklist would eventually miss (testing report section 1).
+
+### 9.4 Sequence — submit to publish
+
 <figure class="diagram"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="max-width: 2259px; background-color: transparent;" viewBox="-50 -10 2259 1733" role="graphics-document document" aria-roledescription="sequence"><g><rect x="2009" y="1647" fill="#eaeaea" stroke="#666" width="150" height="65" name="DB" rx="3" ry="3" class="actor actor-bottom"/><text x="2084" y="1679.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="2084" dy="0">PostgreSQL</tspan></text></g><g><rect x="1803" y="1647" fill="#eaeaea" stroke="#666" width="156" height="65" name="Dom" rx="3" ry="3" class="actor actor-bottom"/><text x="1881" y="1679.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="1881" dy="0">domain (Manuscript)</tspan></text></g><g><rect x="1306" y="1647" fill="#eaeaea" stroke="#666" width="150" height="65" name="API" rx="3" ry="3" class="actor actor-bottom"/><text x="1381" y="1679.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="1381" dy="0">FastAPI api/</tspan></text></g><g/><g/><g/><g/><g/><g><line id="actor7" x1="2084" y1="65" x2="2084" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="DB" data-et="life-line" data-id="DB"/><g id="root-7" data-et="participant" data-type="participant" data-id="DB"><rect x="2009" y="0" fill="#eaeaea" stroke="#666" width="150" height="65" name="DB" rx="3" ry="3" class="actor actor-top"/><text x="2084" y="32.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="2084" dy="0">PostgreSQL</tspan></text></g></g><g><line id="actor6" x1="1881" y1="65" x2="1881" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="Dom" data-et="life-line" data-id="Dom"/><g id="root-6" data-et="participant" data-type="participant" data-id="Dom"><rect x="1803" y="0" fill="#eaeaea" stroke="#666" width="156" height="65" name="Dom" rx="3" ry="3" class="actor actor-top"/><text x="1881" y="32.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="1881" dy="0">domain (Manuscript)</tspan></text></g></g><g><line id="actor5" x1="1381" y1="65" x2="1381" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="API" data-et="life-line" data-id="API"/><g id="root-5" data-et="participant" data-type="participant" data-id="API"><rect x="1306" y="0" fill="#eaeaea" stroke="#666" width="150" height="65" name="API" rx="3" ry="3" class="actor actor-top"/><text x="1381" y="32.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-box" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="1381" dy="0">FastAPI api/</tspan></text></g></g><g><line id="actor4" x1="993" y1="80" x2="993" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="Reader" data-et="life-line" data-id="Reader"/></g><g><line id="actor3" x1="793" y1="80" x2="793" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="EiC" data-et="life-line" data-id="EiC"/></g><g><line id="actor2" x1="475" y1="80" x2="475" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="Reviewer" data-et="life-line" data-id="Reviewer"/></g><g><line id="actor1" x1="275" y1="80" x2="275" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="Editor" data-et="life-line" data-id="Editor"/></g><g><line id="actor0" x1="75" y1="80" x2="75" y2="1647" class="actor-line 200" stroke-width="0.5px" stroke="#999" name="Author" data-et="life-line" data-id="Author"/></g><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .actor{stroke:#9370DB;fill:#ECECFF;stroke-width:1;}#my-svg rect.actor.outer-path[data-look="neo"]{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg rect.note[data-look="neo"]{stroke:#aaaa33;fill:#fff5ad;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg text.actor&gt;tspan{fill:black;stroke:none;}#my-svg .actor-line{stroke:#9370DB;}#my-svg .innerArc{stroke-width:1.5;stroke-dasharray:none;}#my-svg .messageLine0{stroke-width:1.5;stroke-dasharray:none;stroke:#333;}#my-svg .messageLine1{stroke-width:1.5;stroke-dasharray:2,2;stroke:#333;}#my-svg [id$="-arrowhead"] path{fill:#333;stroke:#333;}#my-svg .sequenceNumber{fill:white;}#my-svg [id$="-sequencenumber"]{fill:#333;}#my-svg [id$="-crosshead"] path{fill:#333;stroke:#333;}#my-svg .messageText{fill:#333;stroke:none;}#my-svg .labelBox{stroke:#9370DB;fill:#ECECFF;filter:none;}#my-svg .labelText,#my-svg .labelText&gt;tspan{fill:black;stroke:none;}#my-svg .loopText,#my-svg .loopText&gt;tspan{fill:black;stroke:none;}#my-svg .sectionTitle,#my-svg .sectionTitle&gt;tspan{fill:black;stroke:none;}#my-svg .loopLine{stroke-width:2px;stroke-dasharray:2,2;stroke:#9370DB;fill:#9370DB;}#my-svg .note{stroke:#aaaa33;fill:#fff5ad;}#my-svg .noteText,#my-svg .noteText&gt;tspan{fill:black;stroke:none;font-weight:normal;}#my-svg .activation0{fill:#f4f4f4;stroke:#666;}#my-svg .activation1{fill:#f4f4f4;stroke:#666;}#my-svg .activation2{fill:#f4f4f4;stroke:#666;}#my-svg .actorPopupMenu{position:absolute;}#my-svg .actorPopupMenuPanel{position:absolute;fill:#ECECFF;box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);filter:drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));}#my-svg .actor-man circle,#my-svg line{fill:#ECECFF;stroke-width:2px;}#my-svg g rect.rect{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));stroke:#9370DB;}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g/><defs><symbol id="my-svg-computer" width="24" height="24"><path transform="scale(.5)" d="M2 2v13h20v-13h-20zm18 11h-16v-9h16v9zm-10.228 6l.466-1h3.524l.467 1h-4.457zm14.228 3h-24l2-6h2.104l-1.33 4h18.45l-1.297-4h2.073l2 6zm-5-10h-14v-7h14v7z"/></symbol></defs><defs><symbol id="my-svg-database" fill-rule="evenodd" clip-rule="evenodd"><path transform="scale(.5)" d="M12.258.001l.256.004.255.005.253.008.251.01.249.012.247.015.246.016.242.019.241.02.239.023.236.024.233.027.231.028.229.031.225.032.223.034.22.036.217.038.214.04.211.041.208.043.205.045.201.046.198.048.194.05.191.051.187.053.183.054.18.056.175.057.172.059.168.06.163.061.16.063.155.064.15.066.074.033.073.033.071.034.07.034.069.035.068.035.067.035.066.035.064.036.064.036.062.036.06.036.06.037.058.037.058.037.055.038.055.038.053.038.052.038.051.039.05.039.048.039.047.039.045.04.044.04.043.04.041.04.04.041.039.041.037.041.036.041.034.041.033.042.032.042.03.042.029.042.027.042.026.043.024.043.023.043.021.043.02.043.018.044.017.043.015.044.013.044.012.044.011.045.009.044.007.045.006.045.004.045.002.045.001.045v17l-.001.045-.002.045-.004.045-.006.045-.007.045-.009.044-.011.045-.012.044-.013.044-.015.044-.017.043-.018.044-.02.043-.021.043-.023.043-.024.043-.026.043-.027.042-.029.042-.03.042-.032.042-.033.042-.034.041-.036.041-.037.041-.039.041-.04.041-.041.04-.043.04-.044.04-.045.04-.047.039-.048.039-.05.039-.051.039-.052.038-.053.038-.055.038-.055.038-.058.037-.058.037-.06.037-.06.036-.062.036-.064.036-.064.036-.066.035-.067.035-.068.035-.069.035-.07.034-.071.034-.073.033-.074.033-.15.066-.155.064-.16.063-.163.061-.168.06-.172.059-.175.057-.18.056-.183.054-.187.053-.191.051-.194.05-.198.048-.201.046-.205.045-.208.043-.211.041-.214.04-.217.038-.22.036-.223.034-.225.032-.229.031-.231.028-.233.027-.236.024-.239.023-.241.02-.242.019-.246.016-.247.015-.249.012-.251.01-.253.008-.255.005-.256.004-.258.001-.258-.001-.256-.004-.255-.005-.253-.008-.251-.01-.249-.012-.247-.015-.245-.016-.243-.019-.241-.02-.238-.023-.236-.024-.234-.027-.231-.028-.228-.031-.226-.032-.223-.034-.22-.036-.217-.038-.214-.04-.211-.041-.208-.043-.204-.045-.201-.046-.198-.048-.195-.05-.19-.051-.187-.053-.184-.054-.179-.056-.176-.057-.172-.059-.167-.06-.164-.061-.159-.063-.155-.064-.151-.066-.074-.033-.072-.033-.072-.034-.07-.034-.069-.035-.068-.035-.067-.035-.066-.035-.064-.036-.063-.036-.062-.036-.061-.036-.06-.037-.058-.037-.057-.037-.056-.038-.055-.038-.053-.038-.052-.038-.051-.039-.049-.039-.049-.039-.046-.039-.046-.04-.044-.04-.043-.04-.041-.04-.04-.041-.039-.041-.037-.041-.036-.041-.034-.041-.033-.042-.032-.042-.03-.042-.029-.042-.027-.042-.026-.043-.024-.043-.023-.043-.021-.043-.02-.043-.018-.044-.017-.043-.015-.044-.013-.044-.012-.044-.011-.045-.009-.044-.007-.045-.006-.045-.004-.045-.002-.045-.001-.045v-17l.001-.045.002-.045.004-.045.006-.045.007-.045.009-.044.011-.045.012-.044.013-.044.015-.044.017-.043.018-.044.02-.043.021-.043.023-.043.024-.043.026-.043.027-.042.029-.042.03-.042.032-.042.033-.042.034-.041.036-.041.037-.041.039-.041.04-.041.041-.04.043-.04.044-.04.046-.04.046-.039.049-.039.049-.039.051-.039.052-.038.053-.038.055-.038.056-.038.057-.037.058-.037.06-.037.061-.036.062-.036.063-.036.064-.036.066-.035.067-.035.068-.035.069-.035.07-.034.072-.034.072-.033.074-.033.151-.066.155-.064.159-.063.164-.061.167-.06.172-.059.176-.057.179-.056.184-.054.187-.053.19-.051.195-.05.198-.048.201-.046.204-.045.208-.043.211-.041.214-.04.217-.038.22-.036.223-.034.226-.032.228-.031.231-.028.234-.027.236-.024.238-.023.241-.02.243-.019.245-.016.247-.015.249-.012.251-.01.253-.008.255-.005.256-.004.258-.001.258.001zm-9.258 20.499v.01l.001.021.003.021.004.022.005.021.006.022.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.023.018.024.019.024.021.024.022.025.023.024.024.025.052.049.056.05.061.051.066.051.07.051.075.051.079.052.084.052.088.052.092.052.097.052.102.051.105.052.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.048.144.049.147.047.152.047.155.047.16.045.163.045.167.043.171.043.176.041.178.041.183.039.187.039.19.037.194.035.197.035.202.033.204.031.209.03.212.029.216.027.219.025.222.024.226.021.23.02.233.018.236.016.24.015.243.012.246.01.249.008.253.005.256.004.259.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.021.224-.024.22-.026.216-.027.212-.028.21-.031.205-.031.202-.034.198-.034.194-.036.191-.037.187-.039.183-.04.179-.04.175-.042.172-.043.168-.044.163-.045.16-.046.155-.046.152-.047.148-.048.143-.049.139-.049.136-.05.131-.05.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.053.083-.051.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.05.023-.024.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.023.01-.022.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.127l-.077.055-.08.053-.083.054-.085.053-.087.052-.09.052-.093.051-.095.05-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.045-.118.044-.12.043-.122.042-.124.042-.126.041-.128.04-.13.04-.132.038-.134.038-.135.037-.138.037-.139.035-.142.035-.143.034-.144.033-.147.032-.148.031-.15.03-.151.03-.153.029-.154.027-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.01-.179.008-.179.008-.181.006-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.006-.179-.008-.179-.008-.178-.01-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.027-.153-.029-.151-.03-.15-.03-.148-.031-.146-.032-.145-.033-.143-.034-.141-.035-.14-.035-.137-.037-.136-.037-.134-.038-.132-.038-.13-.04-.128-.04-.126-.041-.124-.042-.122-.042-.12-.044-.117-.043-.116-.045-.113-.045-.112-.046-.109-.047-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.05-.093-.052-.09-.051-.087-.052-.085-.053-.083-.054-.08-.054-.077-.054v4.127zm0-5.654v.011l.001.021.003.021.004.021.005.022.006.022.007.022.009.022.01.022.011.023.012.023.013.023.015.024.016.023.017.024.018.024.019.024.021.024.022.024.023.025.024.024.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.052.11.051.114.051.119.052.123.05.127.051.131.05.135.049.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.044.171.042.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.022.23.02.233.018.236.016.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.012.241-.015.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.048.139-.05.136-.049.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.051.051-.049.023-.025.023-.024.021-.025.02-.024.019-.024.018-.024.017-.024.015-.023.014-.023.013-.024.012-.022.01-.023.01-.023.008-.022.006-.022.006-.022.004-.021.004-.022.001-.021.001-.021v-4.139l-.077.054-.08.054-.083.054-.085.052-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.049-.105.048-.106.047-.109.047-.111.046-.114.045-.115.044-.118.044-.12.044-.122.042-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.035-.143.033-.144.033-.147.033-.148.031-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.025-.161.024-.162.023-.163.022-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.011-.178.009-.179.009-.179.007-.181.007-.182.005-.182.004-.184.003-.184.002h-.37l-.184-.002-.184-.003-.182-.004-.182-.005-.181-.007-.179-.007-.179-.009-.178-.009-.176-.011-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.022-.162-.023-.161-.024-.159-.025-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.031-.146-.033-.145-.033-.143-.033-.141-.035-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.04-.126-.041-.124-.042-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.047-.105-.048-.102-.049-.1-.049-.097-.05-.095-.051-.093-.051-.09-.051-.087-.053-.085-.052-.083-.054-.08-.054-.077-.054v4.139zm0-5.666v.011l.001.02.003.022.004.021.005.022.006.021.007.022.009.023.01.022.011.023.012.023.013.023.015.023.016.024.017.024.018.023.019.024.021.025.022.024.023.024.024.025.052.05.056.05.061.05.066.051.07.051.075.052.079.051.084.052.088.052.092.052.097.052.102.052.105.051.11.052.114.051.119.051.123.051.127.05.131.05.135.05.139.049.144.048.147.048.152.047.155.046.16.045.163.045.167.043.171.043.176.042.178.04.183.04.187.038.19.037.194.036.197.034.202.033.204.032.209.03.212.028.216.027.219.025.222.024.226.021.23.02.233.018.236.017.24.014.243.012.246.01.249.008.253.006.256.003.259.001.26-.001.257-.003.254-.006.25-.008.247-.01.244-.013.241-.014.237-.016.233-.018.231-.02.226-.022.224-.024.22-.025.216-.027.212-.029.21-.03.205-.032.202-.033.198-.035.194-.036.191-.037.187-.039.183-.039.179-.041.175-.042.172-.043.168-.044.163-.045.16-.045.155-.047.152-.047.148-.048.143-.049.139-.049.136-.049.131-.051.126-.05.123-.051.118-.052.114-.051.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.052.07-.051.065-.051.06-.051.056-.05.051-.049.023-.025.023-.025.021-.024.02-.024.019-.024.018-.024.017-.024.015-.023.014-.024.013-.023.012-.023.01-.022.01-.023.008-.022.006-.022.006-.022.004-.022.004-.021.001-.021.001-.021v-4.153l-.077.054-.08.054-.083.053-.085.053-.087.053-.09.051-.093.051-.095.051-.097.05-.1.049-.102.048-.105.048-.106.048-.109.046-.111.046-.114.046-.115.044-.118.044-.12.043-.122.043-.124.042-.126.041-.128.04-.13.039-.132.039-.134.038-.135.037-.138.036-.139.036-.142.034-.143.034-.144.033-.147.032-.148.032-.15.03-.151.03-.153.028-.154.028-.156.027-.158.026-.159.024-.161.024-.162.023-.163.023-.165.021-.166.02-.167.019-.169.018-.169.017-.171.016-.173.015-.173.014-.175.013-.175.012-.177.01-.178.01-.179.009-.179.007-.181.006-.182.006-.182.004-.184.003-.184.001-.185.001-.185-.001-.184-.001-.184-.003-.182-.004-.182-.006-.181-.006-.179-.007-.179-.009-.178-.01-.176-.01-.176-.012-.175-.013-.173-.014-.172-.015-.171-.016-.17-.017-.169-.018-.167-.019-.166-.02-.165-.021-.163-.023-.162-.023-.161-.024-.159-.024-.157-.026-.156-.027-.155-.028-.153-.028-.151-.03-.15-.03-.148-.032-.146-.032-.145-.033-.143-.034-.141-.034-.14-.036-.137-.036-.136-.037-.134-.038-.132-.039-.13-.039-.128-.041-.126-.041-.124-.041-.122-.043-.12-.043-.117-.044-.116-.044-.113-.046-.112-.046-.109-.046-.106-.048-.105-.048-.102-.048-.1-.05-.097-.049-.095-.051-.093-.051-.09-.052-.087-.052-.085-.053-.083-.053-.08-.054-.077-.054v4.153zm8.74-8.179l-.257.004-.254.005-.25.008-.247.011-.244.012-.241.014-.237.016-.233.018-.231.021-.226.022-.224.023-.22.026-.216.027-.212.028-.21.031-.205.032-.202.033-.198.034-.194.036-.191.038-.187.038-.183.04-.179.041-.175.042-.172.043-.168.043-.163.045-.16.046-.155.046-.152.048-.148.048-.143.048-.139.049-.136.05-.131.05-.126.051-.123.051-.118.051-.114.052-.11.052-.106.052-.101.052-.096.052-.092.052-.088.052-.083.052-.079.052-.074.051-.07.052-.065.051-.06.05-.056.05-.051.05-.023.025-.023.024-.021.024-.02.025-.019.024-.018.024-.017.023-.015.024-.014.023-.013.023-.012.023-.01.023-.01.022-.008.022-.006.023-.006.021-.004.022-.004.021-.001.021-.001.021.001.021.001.021.004.021.004.022.006.021.006.023.008.022.01.022.01.023.012.023.013.023.014.023.015.024.017.023.018.024.019.024.02.025.021.024.023.024.023.025.051.05.056.05.06.05.065.051.07.052.074.051.079.052.083.052.088.052.092.052.096.052.101.052.106.052.11.052.114.052.118.051.123.051.126.051.131.05.136.05.139.049.143.048.148.048.152.048.155.046.16.046.163.045.168.043.172.043.175.042.179.041.183.04.187.038.191.038.194.036.198.034.202.033.205.032.21.031.212.028.216.027.22.026.224.023.226.022.231.021.233.018.237.016.241.014.244.012.247.011.25.008.254.005.257.004.26.001.26-.001.257-.004.254-.005.25-.008.247-.011.244-.012.241-.014.237-.016.233-.018.231-.021.226-.022.224-.023.22-.026.216-.027.212-.028.21-.031.205-.032.202-.033.198-.034.194-.036.191-.038.187-.038.183-.04.179-.041.175-.042.172-.043.168-.043.163-.045.16-.046.155-.046.152-.048.148-.048.143-.048.139-.049.136-.05.131-.05.126-.051.123-.051.118-.051.114-.052.11-.052.106-.052.101-.052.096-.052.092-.052.088-.052.083-.052.079-.052.074-.051.07-.052.065-.051.06-.05.056-.05.051-.05.023-.025.023-.024.021-.024.02-.025.019-.024.018-.024.017-.023.015-.024.014-.023.013-.023.012-.023.01-.023.01-.022.008-.022.006-.023.006-.021.004-.022.004-.021.001-.021.001-.021-.001-.021-.001-.021-.004-.021-.004-.022-.006-.021-.006-.023-.008-.022-.01-.022-.01-.023-.012-.023-.013-.023-.014-.023-.015-.024-.017-.023-.018-.024-.019-.024-.02-.025-.021-.024-.023-.024-.023-.025-.051-.05-.056-.05-.06-.05-.065-.051-.07-.052-.074-.051-.079-.052-.083-.052-.088-.052-.092-.052-.096-.052-.101-.052-.106-.052-.11-.052-.114-.052-.118-.051-.123-.051-.126-.051-.131-.05-.136-.05-.139-.049-.143-.048-.148-.048-.152-.048-.155-.046-.16-.046-.163-.045-.168-.043-.172-.043-.175-.042-.179-.041-.183-.04-.187-.038-.191-.038-.194-.036-.198-.034-.202-.033-.205-.032-.21-.031-.212-.028-.216-.027-.22-.026-.224-.023-.226-.022-.231-.021-.233-.018-.237-.016-.241-.014-.244-.012-.247-.011-.25-.008-.254-.005-.257-.004-.26-.001-.26.001z"/></symbol></defs><defs><symbol id="my-svg-clock" width="24" height="24"><path transform="scale(.5)" d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.848 12.459c.202.038.202.333.001.372-1.907.361-6.045 1.111-6.547 1.111-.719 0-1.301-.582-1.301-1.301 0-.512.77-5.447 1.125-7.445.034-.192.312-.181.343.014l.985 6.238 5.394 1.011z"/></symbol></defs><defs><marker id="my-svg-arrowhead" refX="7.9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M -1 0 L 10 5 L 0 10 z"/></marker></defs><defs><marker id="my-svg-crosshead" markerWidth="15" markerHeight="8" orient="auto" refX="4" refY="4.5"><path fill="none" stroke="#000000" stroke-width="1pt" d="M 1,2 L 6,7 M 6,2 L 1,7" style="stroke-dasharray: 0, 0;"/></marker></defs><defs><marker id="my-svg-filled-head" refX="15.5" refY="7" markerWidth="20" markerHeight="28" orient="auto"><path d="M 18,7 L9,13 L14,7 L9,1 Z"/></marker></defs><defs><marker id="my-svg-sequencenumber" refX="15" refY="15" markerWidth="60" markerHeight="40" orient="auto"><circle cx="15" cy="15" r="6"/></marker></defs><defs><marker id="my-svg-solidTopArrowHead" refX="7.9" refY="7.25" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 10 8 L 0 8 z"/></marker></defs><defs><marker id="my-svg-solidBottomArrowHead" refX="7.9" refY="0.75" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 10 0 L 0 8 z"/></marker></defs><defs><marker id="my-svg-stickTopArrowHead" refX="7.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 0 L 7 7" stroke="black" stroke-width="1.5" fill="none"/></marker></defs><defs><marker id="my-svg-stickBottomArrowHead" refX="7.5" refY="0" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto-start-reverse"><path d="M 0 7 L 7 0" stroke="black" stroke-width="1.5" fill="none"/></marker></defs><g data-et="note" data-id="i17"><rect x="1739" y="853" fill="#EDF2AE" stroke="#666" width="284" height="39" class="note"/><text x="1881" y="858" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="noteText" dy="1em" style="font-size: 16px; font-weight: 400;"><tspan x="1881">quorum check against minimum_reviews</tspan></text></g><g data-et="note" data-id="i20"><rect x="450" y="992" fill="#EDF2AE" stroke="#666" width="956" height="39" class="note"/><text x="928" y="997" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="noteText" dy="1em" style="font-size: 16px; font-weight: 400;"><tspan x="928">second reviewer submits — quorum reached, status -&gt; REVIEWS_COMPLETE</tspan></text></g><g class="actor-man actor-top" name="Author" data-et="participant" data-type="actor" data-id="Author" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso0" x1="75" y1="25" x2="75" y2="45"/><line id="actor-man-arms0" x1="57" y1="33" x2="93" y2="33"/><line x1="57" y1="60" x2="75" y2="45"/><line x1="75" y1="45" x2="91" y2="60"/><circle cx="75" cy="10" r="15" width="150" height="65"/><text x="75" y="67.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="75" dy="0">Author</tspan></text></g><g class="actor-man actor-top" name="Editor" data-et="participant" data-type="actor" data-id="Editor" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso1" x1="275" y1="25" x2="275" y2="45"/><line id="actor-man-arms1" x1="257" y1="33" x2="293" y2="33"/><line x1="257" y1="60" x2="275" y2="45"/><line x1="275" y1="45" x2="291" y2="60"/><circle cx="275" cy="10" r="15" width="150" height="65"/><text x="275" y="67.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="275" dy="0">Editor</tspan></text></g><g class="actor-man actor-top" name="Reviewer" data-et="participant" data-type="actor" data-id="Reviewer" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso2" x1="475" y1="25" x2="475" y2="45"/><line id="actor-man-arms2" x1="457" y1="33" x2="493" y2="33"/><line x1="457" y1="60" x2="475" y2="45"/><line x1="475" y1="45" x2="491" y2="60"/><circle cx="475" cy="10" r="15" width="150" height="65"/><text x="475" y="67.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="475" dy="0">Reviewer</tspan></text></g><g class="actor-man actor-top" name="EiC" data-et="participant" data-type="actor" data-id="EiC" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso3" x1="793" y1="25" x2="793" y2="45"/><line id="actor-man-arms3" x1="775" y1="33" x2="811" y2="33"/><line x1="775" y1="60" x2="793" y2="45"/><line x1="793" y1="45" x2="809" y2="60"/><circle cx="793" cy="10" r="15" width="150" height="65"/><text x="793" y="67.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="793" dy="0">Editor-in-Chief</tspan></text></g><g class="actor-man actor-top" name="Reader" data-et="participant" data-type="actor" data-id="Reader" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso4" x1="993" y1="25" x2="993" y2="45"/><line id="actor-man-arms4" x1="975" y1="33" x2="1011" y2="33"/><line x1="975" y1="60" x2="993" y2="45"/><line x1="993" y1="45" x2="1009" y2="60"/><circle cx="993" cy="10" r="15" width="150" height="65"/><text x="993" y="67.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="993" dy="0">Reader</tspan></text></g><text x="727" y="80" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">POST /manuscripts {title, abstract, keywords}</text><line x1="76" y1="111" x2="1377" y2="111" class="messageLine0" data-et="message" data-id="i0" data-from="Author" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1630" y="126" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">create() — DRAFT -&gt; SUBMITTED</text><line x1="1382" y1="157" x2="1877" y2="157" class="messageLine0" data-et="message" data-id="i1" data-from="API" data-to="Dom" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1633" y="172" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">EditorialEvent appended (hash-chained)</text><line x1="1880" y1="203" x2="1385" y2="203" class="messageLine1" data-et="message" data-id="i2" data-from="Dom" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="1731" y="218" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">persist manuscript + event</text><line x1="1382" y1="249" x2="2080" y2="249" class="messageLine0" data-et="message" data-id="i3" data-from="API" data-to="DB" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="730" y="264" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">201 ManuscriptOut (status=submitted)</text><line x1="1380" y1="295" x2="79" y2="295" class="messageLine1" data-et="message" data-id="i4" data-from="API" data-to="Author" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="827" y="310" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">POST /editorial/{code}/screen</text><line x1="276" y1="341" x2="1377" y2="341" class="messageLine0" data-et="message" data-id="i5" data-from="Editor" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1630" y="356" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">assert_legal + can(Editor, SCREEN)</text><line x1="1382" y1="387" x2="1877" y2="387" class="messageLine0" data-et="message" data-id="i6" data-from="API" data-to="Dom" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1731" y="402" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">update status, append event</text><line x1="1382" y1="433" x2="2080" y2="433" class="messageLine0" data-et="message" data-id="i7" data-from="API" data-to="DB" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="830" y="448" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">200 (status=under_screening)</text><line x1="1380" y1="479" x2="279" y2="479" class="messageLine1" data-et="message" data-id="i8" data-from="API" data-to="Editor" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="827" y="494" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">POST /editorial/{code}/reviewers {reviewer_id}</text><line x1="276" y1="525" x2="1377" y2="525" class="messageLine0" data-et="message" data-id="i9" data-from="Editor" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1731" y="540" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">insert review_assignment</text><line x1="1382" y1="571" x2="2080" y2="571" class="messageLine0" data-et="message" data-id="i10" data-from="API" data-to="DB" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="830" y="586" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">204</text><line x1="1380" y1="615" x2="279" y2="615" class="messageLine1" data-et="message" data-id="i11" data-from="API" data-to="Editor" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="927" y="630" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">GET /reviews/mine</text><line x1="476" y1="659" x2="1377" y2="659" class="messageLine0" data-et="message" data-id="i12" data-from="Reviewer" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1630" y="674" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">blind(manuscript)</text><line x1="1382" y1="705" x2="1877" y2="705" class="messageLine0" data-et="message" data-id="i13" data-from="API" data-to="Dom" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="930" y="720" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">200 BlindedManuscript[] (no author fields)</text><line x1="1380" y1="751" x2="479" y2="751" class="messageLine1" data-et="message" data-id="i14" data-from="API" data-to="Reviewer" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="927" y="766" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">POST /reviews/{code}/submit {recommendation, comments}</text><line x1="476" y1="797" x2="1377" y2="797" class="messageLine0" data-et="message" data-id="i15" data-from="Reviewer" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1630" y="812" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">record_review() — submitted_reviews += 1</text><line x1="1382" y1="843" x2="1877" y2="843" class="messageLine0" data-et="message" data-id="i16" data-from="API" data-to="Dom" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1731" y="907" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">persist + append event</text><line x1="1382" y1="938" x2="2080" y2="938" class="messageLine0" data-et="message" data-id="i18" data-from="API" data-to="DB" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="930" y="953" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">204</text><line x1="1380" y1="982" x2="479" y2="982" class="messageLine1" data-et="message" data-id="i19" data-from="API" data-to="Reviewer" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="827" y="1046" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">POST /editorial/{code}/decision {decision: accept, rationale}</text><line x1="276" y1="1077" x2="1377" y2="1077" class="messageLine0" data-et="message" data-id="i21" data-from="Editor" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1630" y="1092" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">assert_legal + can(Editor, DECIDE)</text><line x1="1382" y1="1123" x2="1877" y2="1123" class="messageLine0" data-et="message" data-id="i22" data-from="API" data-to="Dom" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1731" y="1138" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">update status, append event</text><line x1="1382" y1="1169" x2="2080" y2="1169" class="messageLine0" data-et="message" data-id="i23" data-from="API" data-to="DB" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="830" y="1184" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">200 (status=accepted)</text><line x1="1380" y1="1215" x2="279" y2="1215" class="messageLine1" data-et="message" data-id="i24" data-from="API" data-to="Editor" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="1086" y="1230" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">schedule into issue</text><line x1="794" y1="1259" x2="1377" y2="1259" class="messageLine0" data-et="message" data-id="i25" data-from="EiC" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1630" y="1274" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">schedule() — ACCEPTED -&gt; SCHEDULED, can(EiC, PUBLISH)</text><line x1="1382" y1="1305" x2="1877" y2="1305" class="messageLine0" data-et="message" data-id="i26" data-from="API" data-to="Dom" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1731" y="1320" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">update status, append event</text><line x1="1382" y1="1351" x2="2080" y2="1351" class="messageLine0" data-et="message" data-id="i27" data-from="API" data-to="DB" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1086" y="1366" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">publish issue</text><line x1="794" y1="1397" x2="1377" y2="1397" class="messageLine0" data-et="message" data-id="i28" data-from="EiC" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1630" y="1412" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">publish() — SCHEDULED -&gt; PUBLISHED</text><line x1="1382" y1="1443" x2="1877" y2="1443" class="messageLine0" data-et="message" data-id="i29" data-from="API" data-to="Dom" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1731" y="1458" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">update status, append event</text><line x1="1382" y1="1489" x2="2080" y2="1489" class="messageLine0" data-et="message" data-id="i30" data-from="API" data-to="DB" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1089" y="1504" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">200 (status=published)</text><line x1="1380" y1="1535" x2="797" y2="1535" class="messageLine1" data-et="message" data-id="i31" data-from="API" data-to="EiC" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><text x="1186" y="1550" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">GET /archive/{code}</text><line x1="994" y1="1581" x2="1377" y2="1581" class="messageLine0" data-et="message" data-id="i32" data-from="Reader" data-to="API" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="fill: none;"/><text x="1189" y="1596" text-anchor="middle" dominant-baseline="middle" alignment-baseline="middle" class="messageText" dy="1em" style="font-size: 16px; font-weight: 400;">200 ArchivePaperOut (author_names, no UUIDs)</text><line x1="1380" y1="1627" x2="997" y2="1627" class="messageLine1" data-et="message" data-id="i33" data-from="API" data-to="Reader" stroke-width="2" stroke="none" marker-end="url(#my-svg-arrowhead)" style="stroke-dasharray: 3, 3; fill: none;"/><g class="actor-man actor-bottom" name="Author" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso7" x1="75" y1="1672" x2="75" y2="1692"/><line id="actor-man-arms7" x1="57" y1="1680" x2="93" y2="1680"/><line x1="57" y1="1707" x2="75" y2="1692"/><line x1="75" y1="1692" x2="91" y2="1707"/><circle cx="75" cy="1657" r="15" width="150" height="65"/><text x="75" y="1714.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="75" dy="0">Author</tspan></text></g><g class="actor-man actor-bottom" name="Editor" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso7" x1="275" y1="1672" x2="275" y2="1692"/><line id="actor-man-arms7" x1="257" y1="1680" x2="293" y2="1680"/><line x1="257" y1="1707" x2="275" y2="1692"/><line x1="275" y1="1692" x2="291" y2="1707"/><circle cx="275" cy="1657" r="15" width="150" height="65"/><text x="275" y="1714.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="275" dy="0">Editor</tspan></text></g><g class="actor-man actor-bottom" name="Reviewer" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso7" x1="475" y1="1672" x2="475" y2="1692"/><line id="actor-man-arms7" x1="457" y1="1680" x2="493" y2="1680"/><line x1="457" y1="1707" x2="475" y2="1692"/><line x1="475" y1="1692" x2="491" y2="1707"/><circle cx="475" cy="1657" r="15" width="150" height="65"/><text x="475" y="1714.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="475" dy="0">Reviewer</tspan></text></g><g class="actor-man actor-bottom" name="EiC" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso7" x1="793" y1="1672" x2="793" y2="1692"/><line id="actor-man-arms7" x1="775" y1="1680" x2="811" y2="1680"/><line x1="775" y1="1707" x2="793" y2="1692"/><line x1="793" y1="1692" x2="809" y2="1707"/><circle cx="793" cy="1657" r="15" width="150" height="65"/><text x="793" y="1714.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="793" dy="0">Editor-in-Chief</tspan></text></g><g class="actor-man actor-bottom" name="Reader" style="stroke: rgb(147, 112, 219);"><line id="actor-man-torso7" x1="993" y1="1672" x2="993" y2="1692"/><line id="actor-man-arms7" x1="975" y1="1680" x2="1011" y2="1680"/><line x1="975" y1="1707" x2="993" y2="1692"/><line x1="993" y1="1692" x2="1009" y2="1707"/><circle cx="993" cy="1657" r="15" width="150" height="65"/><text x="993" y="1714.5" dominant-baseline="central" alignment-baseline="central" class="actor actor-man" style="text-anchor: middle; font-size: 16px; font-weight: 400;"><tspan x="993" dy="0">Reader</tspan></text></g></svg></figure>
 
-<p>This flow is exercised end to end by the acceptance script in testing
-report section 5, and the <code>schedule</code>/<code>publish</code>
-steps are the specific ones that were, for a period, implemented and
-unit-tested but reachable by no route — the finding retold in section
-11.4 and cross-referenced from Section 10.4.</p>
-<h3 id="95-deployment-topology">9.5 Deployment topology</h3>
-<p>Covered fully in section 13; the topology is a component of the
-design and is diagrammed there once alongside its discrepancy from the
-design specification (TD-14) rather than twice.</p>
-<hr />
-<h2 id="10-implementation">10. Implementation</h2>
-<h3 id="101-technology-stack">10.1 Technology stack</h3>
-<div class="tablewrap"><table><colgroup><col style="width:17.42%" /><col style="width:30.58%" /><col style="width:52.0%" /></colgroup>
-<thead>
-<tr>
-<th>Layer</th>
-<th>Choice</th>
-<th>Rationale (design specification section 7.4)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Backend</td>
-<td>FastAPI, Python 3.13</td>
-<td>Native async I/O; Pydantic v2 gives validation and OpenAPI from one
-type</td>
-</tr>
-<tr>
-<td>ORM</td>
-<td>SQLAlchemy 2.0 + Alembic</td>
-<td>Mature migrations; mapping style keeps domain classes
-framework-free</td>
-</tr>
-<tr>
-<td>Database</td>
-<td>PostgreSQL 16</td>
-<td>Native full-text search and JSONB avoid a separate search
-engine</td>
-</tr>
-<tr>
-<td>Storage</td>
-<td>S3</td>
-<td>Durable, private, pre-signed access only</td>
-</tr>
-<tr>
-<td>Frontend</td>
-<td>Next.js 15, TypeScript, Tailwind</td>
-<td>Static public pages plus a server-side BFF in one deployment</td>
-</tr>
-<tr>
-<td>Testing</td>
-<td>pytest, Hypothesis, testcontainers, Vitest</td>
-<td>Layer-appropriate verification (section 11)</td>
-</tr>
-<tr>
-<td>IaC</td>
-<td>Terraform</td>
-<td>Reproducible, reviewable, destroyable</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="102-what-is-implemented-by-layer">10.2 What is implemented, by
-layer</h3>
-<p><strong>Domain</strong> (<code>backend/src/ugjcs/domain/</code>, 812
-lines across 11 modules) — complete: the manuscript lifecycle, RBAC
-policy, the double-blind projection, the hash chain, the account
-aggregate, typed identifiers. This is the layer with no external
-dependency and the highest test confidence (section 11).</p>
-<p><strong>Application</strong>
-(<code>backend/src/ugjcs/application/</code>, 487 lines) — port
-protocols (<code>ports.py</code>, 236 lines), identity-related use-case
-orchestration (<code>identity.py</code>, 186 lines) and document
-handling (<code>documents.py</code>, 65 lines).</p>
-<p><strong>Infrastructure</strong>
-(<code>backend/src/ugjcs/infrastructure/</code>) — SQLAlchemy
-repositories and unit of work (<code>infrastructure/db/</code>), an
-S3-backed document store with a demo-PDF generator for seeding
-(<code>infrastructure/storage/</code>), Argon2 password hashing and JWT
-issuance (<code>infrastructure/security/</code>), and a logging-only
-email sender (<code>infrastructure/email/logging_sender.py</code> — no
-live transactional provider is wired in this build, a limitation
-restated in section 17).</p>
-<p><strong>API</strong> (<code>backend/src/ugjcs/api/</code>, 966 lines)
-— five routers (<code>auth</code>, <code>manuscripts</code>,
-<code>editorial</code>, <code>reviews</code>, <code>archive</code>), RFC
-9457 error mapping (<code>errors.py</code>), and the composition-root
-wiring (<code>wiring.py</code>) that binds concrete adapters to the
-application's port protocols. This layer, and the frontend below it, are
-what SRS section 5 (written earlier in the project) records as "Planned"
-— Section 10.4 reconciles that.</p>
-<p><strong>Frontend</strong> (<code>frontend/src/app/</code>) — a public
-route group (<code>(public)/search</code>, <code>(public)/papers</code>)
-requiring no authentication, and role-scoped authenticated routes
-(<code>author/</code>, <code>author/submit/</code>,
-<code>author/[trackingCode]/</code>, <code>editor/</code>,
-<code>editor/[trackingCode]/</code>, <code>reviewer/</code>,
-<code>reviewer/[trackingCode]/</code>, <code>login/</code>), plus a
-<code>frontend/src/app/api/**</code> BFF layer mirroring the backend's
-resource groups. There is no dedicated Administrator UI — role
-management is verified only at the policy-test level (testing report
-section 5, section 6), consistent with FR-03's grant existing in
-<code>policies.py</code> without a corresponding administration
-screen.</p>
-<h3 id="103-domain-code-as-evidence-rather-than-assertion">10.3 Domain
-code, as evidence rather than assertion</h3>
-<p>The lifecycle guard and the hash chain shown in section 8.2 and
-section 8.5 are reproduced directly from source, not paraphrased,
-specifically so a reader can check this document's claims against the
-file it names. The same discipline extends to the authorisation layer
-(section 8.3) and the blinded projection (section 8.4): every mechanism
-described in this section has a named module, and every claim about its
-behaviour is backed by a named test in
-<code>docs/06-testing-report.md</code>.</p>
-<h3
-id="104-reconciling-three-documents-that-were-written-at-different-points-in-the-build">10.4
-Reconciling three documents that were written at different points in the
-build</h3>
-<p>This consolidation surfaced a genuine discrepancy between three of
-its own source documents, stated here rather than resolved silently in
-one direction, consistent with section 6.3's handling of the
-SRS-versus-specification lifecycle disagreement:</p>
-<ul>
-<li><strong><code>docs/02-srs.md</code> section 5</strong> (earliest)
-records almost the entire functional requirement set as "Planned," on
-the stated grounds that no <code>api/</code> directory and no frontend
-existed in the repository at the time it was written.</li>
-<li><strong><code>docs/05-api-contract.md</code></strong> (written once
-the API and frontend existed) documents a working <code>/auth</code>,
-<code>/manuscripts</code>, <code>/editorial</code>,
-<code>/reviews</code> and <code>/archive</code> surface — but explicitly
-states that
-<code>Action.PUBLISH</code>/<code>Manuscript.schedule</code>/<code>Manuscript.publish</code>
-have <strong>no corresponding route</strong>: "publication into the
-archive happens outside the HTTP boundary this plan builds."</li>
-<li><strong><code>docs/06-testing-report.md</code> section 3.4 and
-section 4.5</strong> (latest) records passing system tests named
-<code>test_the_editor_in_chief_can_schedule_an_accepted_manuscript</code>
-and
-<code>test_the_editor_in_chief_can_publish_a_scheduled_manuscript</code>,
-and states directly that these two routes, along with manuscript
-resubmission, were <strong>added after</strong> being found reachable by
-no route during manual use of the deployed system.</li>
-</ul>
-<p>Read together rather than in isolation, these three documents
-describe the same system at three successive points in its build, not
-three inconsistent descriptions of one static state: the SRS predates
-the API layer; the API contract predates the schedule/publish routes;
-the testing report postdates their addition and is the most current
-account of what the deployed system can do. This document treats the
-testing report as authoritative on current reachability, the API
-contract as authoritative on wire format for the routes it does
-describe, and the SRS as authoritative on requirement <em>content and
-traceability method</em> rather than current build status. A reader
-integrating all three should not conclude either that publication is
-unreachable (05, superseded) or that the majority of FRs remain unbuilt
-(02 section 5, superseded) — section 11.4's account of finding and
-closing that exact gap is the more current and more informative
-story.</p>
-<hr />
-<h2 id="11-testing">11. Testing</h2>
-<p>Full test-case tables, defect narratives and the UAT script are in
-<code>docs/06-testing-report.md</code>. This section summarises the
-strategy, headline numbers, and the finding this project treats as its
-most important methodological result (section 11.7, elaborated for the
-whole document in the introduction's through-line).</p>
-<h3 id="111-strategy--layered-to-match-the-architecture">11.1 Strategy —
-layered to match the architecture</h3>
-<div class="tablewrap"><table><colgroup><col style="width:26.0%" /><col style="width:45.26%" /><col style="width:28.74%" /></colgroup>
-<thead>
-<tr>
-<th>Layer</th>
-<th>What it tests</th>
-<th>Tooling</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Unit — domain</td>
-<td>Pure logic, no database/HTTP/mocks</td>
-<td>pytest</td>
-</tr>
-<tr>
-<td>Property-based</td>
-<td>Invariants over generated inputs (lifecycle, hash chain,
-blinding)</td>
-<td>Hypothesis</td>
-</tr>
-<tr>
-<td>Unit — application/API/db/security</td>
-<td>Adapter logic in isolation</td>
-<td>pytest, fakes</td>
-</tr>
-<tr>
-<td>Integration</td>
-<td>Real PostgreSQL via <code>testcontainers</code> — trigger firing,
-<code>timestamptz</code> normalisation, FK behaviour</td>
-<td>pytest, testcontainers</td>
-</tr>
-<tr>
-<td>Contract</td>
-<td>Architectural rules, not behaviour</td>
-<td>import-linter, <code>mypy --strict</code></td>
-</tr>
-<tr>
-<td>Route audit</td>
-<td>Every non-public route carries an authorisation dependency</td>
-<td>pytest walking the live route table</td>
-</tr>
-<tr>
-<td>End-to-end / manual acceptance</td>
-<td>Scripted, role-scoped scenarios against the <strong>live
-deployment</strong></td>
-<td>Playwright-driven browser session</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="112-headline-numbers-2026-08-14-ci-run-31791711326">11.2
-Headline numbers (2026-08-14, CI run 31791711326)</h3>
-<pre><code>make check       → 402 passed, 84 deselected. Coverage: 90.03% (gate: 85%)
+This flow is exercised end to end by the acceptance script in testing report section 5, and the
+`schedule`/`publish` steps are the specific ones that were, for a period, implemented and
+unit-tested but reachable by no route — the finding retold in section 11.4 and cross-referenced from
+Section 10.4.
+
+### 9.5 Deployment topology
+
+Covered fully in section 13; the topology is a component of the design and is diagrammed there once
+alongside its discrepancy from the design specification (TD-14) rather than twice.
+
+---
+
+## 10. Implementation
+
+### 10.1 Technology stack
+
+| Layer | Choice | Rationale (design specification section 7.4) |
+|---|---|---|
+| Backend | FastAPI, Python 3.13 | Native async I/O; Pydantic v2 gives validation and OpenAPI from one type |
+| ORM | SQLAlchemy 2.0 + Alembic | Mature migrations; mapping style keeps domain classes framework-free |
+| Database | PostgreSQL 16 | Native full-text search and JSONB avoid a separate search engine |
+| Storage | S3 | Durable, private, pre-signed access only |
+| Frontend | Next.js 15, TypeScript, Tailwind | Static public pages plus a server-side BFF in one deployment |
+| Testing | pytest, Hypothesis, testcontainers, Vitest | Layer-appropriate verification (section 11) |
+| IaC | Terraform | Reproducible, reviewable, destroyable |
+
+### 10.2 What is implemented, by layer
+
+**Domain** (`backend/src/ugjcs/domain/`, 812 lines across 11 modules) — complete: the manuscript
+lifecycle, RBAC policy, the double-blind projection, the hash chain, the account aggregate,
+typed identifiers. This is the layer with no external dependency and the highest test confidence
+(section 11).
+
+**Application** (`backend/src/ugjcs/application/`, 487 lines) — port protocols (`ports.py`, 236
+lines), identity-related use-case orchestration (`identity.py`, 186 lines) and document handling
+(`documents.py`, 65 lines).
+
+**Infrastructure** (`backend/src/ugjcs/infrastructure/`) — SQLAlchemy repositories and unit of
+work (`infrastructure/db/`), an S3-backed document store with a demo-PDF generator for seeding
+(`infrastructure/storage/`), Argon2 password hashing and JWT issuance
+(`infrastructure/security/`), and a logging-only email sender
+(`infrastructure/email/logging_sender.py` — no live transactional provider is wired in this
+build, a limitation restated in section 17).
+
+**API** (`backend/src/ugjcs/api/`, 966 lines) — five routers (`auth`, `manuscripts`, `editorial`,
+`reviews`, `archive`), RFC 9457 error mapping (`errors.py`), and the composition-root wiring
+(`wiring.py`) that binds concrete adapters to the application's port protocols. This layer, and
+the frontend below it, are what SRS section 5 (written earlier in the project) records as "Planned" —
+Section 10.4 reconciles that.
+
+**Frontend** (`frontend/src/app/`) — a public route group (`(public)/search`, `(public)/papers`)
+requiring no authentication, and role-scoped authenticated routes (`author/`, `author/submit/`,
+`author/[trackingCode]/`, `editor/`, `editor/[trackingCode]/`, `reviewer/`,
+`reviewer/[trackingCode]/`, `login/`), plus a `frontend/src/app/api/**` BFF layer mirroring the
+backend's resource groups. There is no dedicated Administrator UI — role management is verified
+only at the policy-test level (testing report section 5, section 6), consistent with FR-03's grant existing in
+`policies.py` without a corresponding administration screen.
+
+### 10.3 Domain code, as evidence rather than assertion
+
+The lifecycle guard and the hash chain shown in section 8.2 and section 8.5 are reproduced directly from source,
+not paraphrased, specifically so a reader can check this document's claims against the file it
+names. The same discipline extends to the authorisation layer (section 8.3) and the blinded projection
+(section 8.4): every mechanism described in this section has a named module, and every claim about its
+behaviour is backed by a named test in `docs/06-testing-report.md`.
+
+### 10.4 Reconciling three documents that were written at different points in the build
+
+This consolidation surfaced a genuine discrepancy between three of its own source documents,
+stated here rather than resolved silently in one direction, consistent with section 6.3's handling of
+the SRS-versus-specification lifecycle disagreement:
+
+- **`docs/02-srs.md` section 5** (earliest) records almost the entire functional requirement set as
+  "Planned," on the stated grounds that no `api/` directory and no frontend existed in the
+  repository at the time it was written.
+- **`docs/05-api-contract.md`** (written once the API and frontend existed) documents a working
+  `/auth`, `/manuscripts`, `/editorial`, `/reviews` and `/archive` surface — but explicitly states
+  that `Action.PUBLISH`/`Manuscript.schedule`/`Manuscript.publish` have **no corresponding
+  route**: "publication into the archive happens outside the HTTP boundary this plan builds."
+- **`docs/06-testing-report.md` section 3.4 and section 4.5** (latest) records passing system tests named
+  `test_the_editor_in_chief_can_schedule_an_accepted_manuscript` and
+  `test_the_editor_in_chief_can_publish_a_scheduled_manuscript`, and states directly that these
+  two routes, along with manuscript resubmission, were **added after** being found reachable by no
+  route during manual use of the deployed system.
+
+Read together rather than in isolation, these three documents describe the same system at three
+successive points in its build, not three inconsistent descriptions of one static state: the SRS
+predates the API layer; the API contract predates the schedule/publish routes; the testing report
+postdates their addition and is the most current account of what the deployed system can do. This
+document treats the testing report as authoritative on current reachability, the API contract as
+authoritative on wire format for the routes it does describe, and the SRS as authoritative on
+requirement *content and traceability method* rather than current build status. A reader
+integrating all three should not conclude either that publication is unreachable (05, superseded)
+or that the majority of FRs remain unbuilt (02 section 5, superseded) — section 11.4's account of finding and
+closing that exact gap is the more current and more informative story.
+
+---
+
+## 11. Testing
+
+Full test-case tables, defect narratives and the UAT script are in
+`docs/06-testing-report.md`. This section summarises the strategy, headline numbers, and the
+finding this project treats as its most important methodological result (section 11.7, elaborated for
+the whole document in the introduction's through-line).
+
+### 11.1 Strategy — layered to match the architecture
+
+| Layer | What it tests | Tooling |
+|---|---|---|
+| Unit — domain | Pure logic, no database/HTTP/mocks | pytest |
+| Property-based | Invariants over generated inputs (lifecycle, hash chain, blinding) | Hypothesis |
+| Unit — application/API/db/security | Adapter logic in isolation | pytest, fakes |
+| Integration | Real PostgreSQL via `testcontainers` — trigger firing, `timestamptz` normalisation, FK behaviour | pytest, testcontainers |
+| Contract | Architectural rules, not behaviour | import-linter, `mypy --strict` |
+| Route audit | Every non-public route carries an authorisation dependency | pytest walking the live route table |
+| End-to-end / manual acceptance | Scripted, role-scoped scenarios against the **live deployment** | Playwright-driven browser session |
+
+### 11.2 Headline numbers (2026-08-14, CI run 31791711326)
+
+```
+make check       → 402 passed, 84 deselected. Coverage: 90.03% (gate: 85%)
 make integration → 84 passed, 402 deselected
-npx vitest run   → 79 passed (20 files)</code></pre>
-<p>486 backend tests and 79 frontend tests, 565 in total. The backend
-figures are taken from a CI run rather than a local one, because the 84
-integration tests stand up a real PostgreSQL 16 through
-<code>testcontainers</code> and cannot run on a machine without Docker;
-there they error at setup instead of failing, which is a more honest
-signal than a false pass but not a result worth citing.</p>
-<p>Coverage is gated on <code>domain</code> and <code>application</code>
-only. That is a documented decision rather than an oversight: measuring
-infrastructure coverage in a run that has excluded the infrastructure
-tests would credit incidental import-time coverage, not genuine
-exercise.</p>
-<h3 id="113-ci-gates">11.3 CI gates</h3>
-<p><code>.github/workflows/backend-ci.yml</code> runs two jobs on every
-push/PR to <code>main</code>/<code>master</code>:
-<strong><code>check</code></strong> (ruff lint, ruff format, mypy
-strict, import-linter, unit suite at the 85% gate) and
-<strong><code>integration</code></strong> (a real
-<code>postgres:16</code> service container, Alembic migration applied
-<strong>up, then down, then up again</strong> to verify reversibility,
-then the integration suite). Neither job passing is optional for
-merge.</p>
-<h3 id="114-defects-found--the-section-with-the-most-to-learn-from">11.4
-Defects found — the section with the most to learn from</h3>
-<p>Six defects are recorded in testing report section 4, none found by a
-coverage number or a green test run alone:</p>
-<div class="tablewrap"><table><colgroup><col style="width:8.7%" /><col style="width:55.37%" /><col style="width:35.94%" /></colgroup>
-<thead>
-<tr>
-<th>#</th>
-<th>Defect</th>
-<th>Found by</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>Deleting the hash chain's chaining line left <strong>all tests
-passing</strong> at 100% coverage</td>
-<td>Manual mutation testing</td>
-</tr>
-<tr>
-<td>2</td>
-<td><code>canonical_bytes()</code> hashed a UTC-offset-bearing
-timestamp; PostgreSQL normalises offsets on storage, so a round trip
-would false-positive <code>verify()</code> as tampered</td>
-<td>Reasoning about the storage boundary, not any test</td>
-</tr>
-<tr>
-<td>3</td>
-<td>A row-level trigger blocked <code>UPDATE</code>/<code>DELETE</code>
-on the audit log but PostgreSQL never fires row-level triggers on
-<code>TRUNCATE</code> — one statement erased the log with no error</td>
-<td>Asking a broader question of an already-verified control</td>
-</tr>
-<tr>
-<td>4</td>
-<td>coverage.py does not model a ternary as a two-arm branch — "0
-branches missing" while one arm never ran</td>
-<td>Reading logic against the coverage report, not trusting it</td>
-</tr>
-<tr>
-<td>5</td>
-<td>Three domain lifecycle methods (<code>resubmit</code>,
-<code>schedule</code>, <code>publish</code>) were fully implemented and
-unit-tested but reachable by no API route</td>
-<td>The owner using the deployed system as an actual actor would</td>
-</tr>
-<tr>
-<td>6</td>
-<td>A container held IAM permission to reach S3 but no network route to
-it — uploads hung until the health check killed the instance</td>
-<td>Exercising the deployed upload feature against real
-infrastructure</td>
-</tr>
-</tbody>
-</table></div>
-<p>Defects 1–4 were found by review of code that had already passed
-linting, strict typing, an architecture contract and a 100%-covered test
-suite; defects 5–6 were found only by using the running system. This is
-the single clearest piece of evidence this project produced about
-software engineering practice, and it is why the technical debt register
-(section 12) and this report both state it directly rather than let it
-sit implicit in a defect table.</p>
-<h3 id="115-user-acceptance-testing">11.5 User acceptance testing</h3>
-<p>Run as scripted, role-scoped scenarios against the live deployment
-(<code>https://ugjcs-frontend.vercel.app</code>, backed by
-<code>https://tsxsbf9rzp.us-east-1.awsapprunner.com</code>), with five
-named judge accounts (author, reviewer, editor, editor-in-chief,
-administrator — see Section 14). Three scenarios were exercised live for
-the testing report (author login and dashboard, unauthenticated archive
-access, cross-role access denial redirecting to <code>/</code> rather
-than <code>/login</code> — a deliberate distinction in
-<code>frontend/middleware.ts</code>); the remaining role-scoped
-scenarios are documented against their automated backstop test.</p>
-<h3 id="116-what-testing-did-not-cover">11.6 What testing did not
-cover</h3>
-<p>Stated plainly in testing report section 6, not omitted: no load or
-performance testing (NFR-08/NFR-09 are unverified against the running
-system); no automated security scanning in CI (no SAST, DAST or
-dependency vulnerability scan); no mutation testing in CI (section
-11.4's finding #1 was a one-off manual pass); no browser-matrix testing
-(one Chromium-based session only); no committed automated end-to-end
-suite (<code>@playwright/test</code> is a declared dependency with no
-spec files committed). Each is restated as a limitation in section
-17.</p>
-<h3 id="117-evaluation">11.7 Evaluation</h3>
-<p>The testing report's own conclusion, reached independently from the
-test evidence, matches the technical debt register's closing observation
-exactly: <strong>automated gates establish a floor and catch
-regressions; they did not find the defects that mattered most.</strong>
-Every serious defect was found by a human or an agent reading code
-against what it claimed to do, by mutation testing designed specifically
-to distrust the coverage figure, or by using the running system as an
-actual actor would. This is elaborated once, fully, in section 12.6,
-since the two documents converge on one finding rather than two.</p>
-<hr />
-<h2 id="12-technical-debt">12. Technical debt</h2>
-<p>The full register — fourteen entries, each with Debt → Cause → Impact
-→ Priority → Proposed resolution — is
-<code>docs/04-technical-debt-register.md</code>. This section summarises
-it by priority and draws out its methodological finding.</p>
-<h3 id="121-summary">12.1 Summary</h3>
-<div class="tablewrap"><table><colgroup><col style="width:38.55%" /><col style="width:14.35%" /><col style="width:47.1%" /></colgroup>
-<thead>
-<tr>
-<th>Priority</th>
-<th>Count</th>
-<th>Entries</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Critical</td>
-<td>3</td>
-<td>TD-01, TD-02, TD-03</td>
-</tr>
-<tr>
-<td>Scheduled</td>
-<td>6</td>
-<td>TD-04, TD-05, TD-06, TD-07, TD-08, TD-14</td>
-</tr>
-<tr>
-<td>Acceptable</td>
-<td>3</td>
-<td>TD-09, TD-10, TD-11</td>
-</tr>
-<tr>
-<td>Resolved, retained as a record</td>
-<td>2</td>
-<td>TD-12, TD-13</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="122-critical--must-be-resolved-before-real-users">12.2 Critical
-— must be resolved before real users</h3>
-<div class="tablewrap"><table><colgroup><col style="width:10.25%" /><col style="width:36.12%" /><col style="width:53.62%" /></colgroup>
-<thead>
-<tr>
-<th>ID</th>
-<th>Debt</th>
-<th>Impact</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>TD-01</td>
-<td>AWS access uses root account credentials</td>
-<td>Cannot be scoped, rotated, or revoked without disrupting the whole
-account; compromise is unrecoverable within it. Mitigated: root keys are
-used only from the developer's workstation, never stored as a CI
-secret</td>
-</tr>
-<tr>
-<td>TD-02</td>
-<td><code>Action.REVIEW</code> is granted on the <code>REVIEWER</code>
-role alone, with no per-manuscript predicate</td>
-<td>An Author–Reviewer dual-role holder is not prevented from reviewing
-their own work — the central conflict-of-interest failure for a
-double-blind journal</td>
-</tr>
-<tr>
-<td>TD-03</td>
-<td>Submitted reviews are counted, not identity-checked against an
-accepted assignment</td>
-<td>One reviewer calling submit twice reaches quorum alone and can close
-a review round unilaterally</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="123-scheduled--accepted-now-with-a-named-repayment-point">12.3
-Scheduled — accepted now, with a named repayment point</h3>
-<div class="tablewrap"><table><colgroup><col style="width:11.99%" /><col style="width:48.09%" /><col style="width:39.93%" /></colgroup>
-<thead>
-<tr>
-<th>ID</th>
-<th>Debt</th>
-<th>Repayment point</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>TD-04</td>
-<td>The audit chain has no external anchor — tail truncation is
-undetectable by the application alone</td>
-<td>Next release after deployment</td>
-</tr>
-<tr>
-<td>TD-05</td>
-<td>Blinding does not scrub the manuscript body —
-<code>title</code>/<code>abstract</code>/<code>keywords</code> are
-verbatim</td>
-<td>Screening surfaces name matches to the editor; automated redaction
-is future evolution, not near-term</td>
-</tr>
-<tr>
-<td>TD-06</td>
-<td>The editorial event log has no blinded projection
-(<code>actor_id</code>, rationale text carried in full)</td>
-<td>Before any reviewer-facing audit view is built</td>
-</tr>
-<tr>
-<td>TD-07</td>
-<td>No <code>Action</code> connects <code>blind()</code> to
-<code>policies.can()</code> — an adapter must remember to call it</td>
-<td>Alongside TD-02</td>
-</tr>
-<tr>
-<td>TD-08</td>
-<td>The tail-append capability (section 8.5) is unverified by a
-dedicated test</td>
-<td>With the persistence work that first exploits it</td>
-</tr>
-<tr>
-<td>TD-14</td>
-<td>Deployed infrastructure is App Runner, not the ECS/ALB/CloudFront
-topology specified</td>
-<td>After submission — repayable once the pre-submission
-document/feature backlog is clear (section 13.3)</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="124-acceptable--a-conscious-revisitable-trade-off">12.4
-Acceptable — a conscious, revisitable trade-off</h3>
-<div class="tablewrap"><table><colgroup><col style="width:11.3%" /><col style="width:41.13%" /><col style="width:47.57%" /></colgroup>
-<thead>
-<tr>
-<th>ID</th>
-<th>Debt</th>
-<th>Condition that would change the judgement</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>TD-09</td>
-<td>A hybrid event log (materialised status + append-only log) rather
-than full event sourcing</td>
-<td>If projections multiply beyond one, or replay-to-a-past-state
-becomes a requirement</td>
-</tr>
-<tr>
-<td>TD-10</td>
-<td>The coverage gate sits at 85% while the code delivers 88–100%</td>
-<td>Cheap to raise; deliberately not set to the exact current figure so
-a legitimate refactor doesn't fail the build</td>
-</tr>
-<tr>
-<td>TD-11</td>
-<td>Coverage is a weak signal — the register's own evidence (section
-12.6)</td>
-<td>Compensated by mutation testing and review, not by the gate
-alone</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="125-resolved-retained-as-a-record">12.5 Resolved, retained as a
-record</h3>
-<p>TD-12 (a UTC-offset timestamp representation would have produced a
-false tamper alert) and TD-13 (<code>TRUNCATE</code> bypassed the
-row-level append-only trigger) are both closed, but kept in the register
-rather than deleted, because the <em>class</em> of defect — and how each
-was found — is the point (section 12.6, Section 11.4).</p>
-<h3
-id="126-the-registers-own-conclusion-and-this-documents-central-finding">12.6
-The register's own conclusion, and this document's central finding</h3>
-<p><code>docs/04-technical-debt-register.md</code> closes with a
-statement worth repeating verbatim in spirit rather than only citing:
-<strong>ten of its fourteen entries, and every serious defect in
-<code>docs/06-testing-report.md</code> section 4, were found by
-independent review of code that had already passed every automated gate
-available in this project — linting, strict type checking, an
-architecture contract, and a full test suite at 100% coverage — or by a
-person using the running system.</strong> Mutation testing showed the
-hash chain was, for a period, unprotected by any test that would notice
-its defining property being deleted. <code>TRUNCATE</code> bypassed a
-trigger that had been "confirmed firing against a live database" against
-the two statement types someone thought to check. Three lifecycle
-methods were implemented, unit-tested, type-checked and covered at 100%,
-and were still dead code from the system's perspective because no route
-called them. Passing every gate this project has was, in every one of
-these cases, necessary and not sufficient. That is this project's most
-defensible finding about software engineering practice, and it is the
-reason section 15's maintenance strategy treats the debt register as a
-<em>live</em> input to a repayment schedule rather than an inventory
-closed at submission.</p>
-<h3 id="127-repayment-sequence">12.7 Repayment sequence</h3>
-<p>TD-01 before any further infrastructure is provisioned. TD-02, TD-03
-and TD-07 are one piece of work — all three are consequences of reviewer
-assignment not existing as a first-class entity — and should be repaid
-together in the release that introduces it. TD-04 follows deployment.
-TD-05, TD-06 and TD-08 are independent and may be scheduled by
-convenience. TD-14 is repayable only after submission and is not on the
-pre-viva critical path.</p>
-<hr />
-<h2 id="13-deployment">13. Deployment</h2>
-<h3 id="131-what-is-actually-running">13.1 What is actually running</h3>
-<div class="tablewrap"><table><colgroup><col style="width:20.96%" /><col style="width:32.48%" /><col style="width:46.56%" /></colgroup>
-<thead>
-<tr>
-<th>Component</th>
-<th>Where</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Frontend</td>
-<td>Vercel, <code>ugjcs-frontend.vercel.app</code></td>
-<td>Next.js 15, Git-integrated deploys</td>
-</tr>
-<tr>
-<td>Backend API</td>
-<td>AWS App Runner,
-<code>tsxsbf9rzp.us-east-1.awsapprunner.com</code></td>
-<td><code>256</code> CPU units / <code>512</code> MB, VPC connector for
-egress</td>
-</tr>
-<tr>
-<td>Database</td>
-<td>RDS PostgreSQL 16, <code>db.t4g.micro</code></td>
-<td>Private, <code>publicly_accessible = false</code>, default VPC
-subnets, single-AZ</td>
-</tr>
-<tr>
-<td>Object storage</td>
-<td>S3, <code>ugjcs-manuscripts-&lt;random&gt;</code></td>
-<td>All public access blocked; versioned; SSE-AES256; documents reached
-only via pre-signed URLs</td>
-</tr>
-<tr>
-<td>Secrets</td>
-<td>AWS Secrets Manager</td>
-<td><code>ugjcs/jwt-secret</code>, <code>ugjcs/database-url</code> —
-both <code>random_password</code>-generated, never a literal in
-Terraform</td>
-</tr>
-<tr>
-<td>Container registry</td>
-<td>ECR</td>
-<td><code>ugjcs-backend</code> repository</td>
-</tr>
-</tbody>
-</table></div>
-<p>Infrastructure is defined entirely in <code>infra/</code>
-(Terraform): <code>network.tf</code>, <code>rds.tf</code>,
-<code>s3.tf</code>, <code>secrets.tf</code>, <code>iam.tf</code>,
-<code>apprunner.tf</code>/<code>apprunner_service.tf</code>,
-<code>ecr.tf</code>, <code>security_groups.tf</code>,
-<code>s3_endpoint.tf</code>, <code>outputs.tf</code>,
-<code>providers.tf</code>, <code>variables.tf</code> — satisfying NFR-16
-("the entire infrastructure is reproducible from code").</p>
-<h3 id="132-deployment-topology">13.2 Deployment topology</h3>
+npx vitest run   → 79 passed (20 files)
+```
+
+486 backend tests and 79 frontend tests, 565 in total. The backend figures are taken from a
+CI run rather than a local one, because the 84 integration tests stand up a real PostgreSQL
+16 through `testcontainers` and cannot run on a machine without Docker; there they error at
+setup instead of failing, which is a more honest signal than a false pass but not a result
+worth citing.
+
+Coverage is gated on `domain` and `application` only. That is a documented decision rather
+than an oversight: measuring infrastructure coverage in a run that has excluded the
+infrastructure tests would credit incidental import-time coverage, not genuine exercise.
+
+### 11.3 CI gates
+
+`.github/workflows/backend-ci.yml` runs two jobs on every push/PR to `main`/`master`: **`check`**
+(ruff lint, ruff format, mypy strict, import-linter, unit suite at the 85% gate) and
+**`integration`** (a real `postgres:16` service container, Alembic migration applied **up, then
+down, then up again** to verify reversibility, then the integration suite). Neither job passing
+is optional for merge.
+
+### 11.4 Defects found — the section with the most to learn from
+
+Six defects are recorded in testing report section 4, none found by a coverage number or a green test
+run alone:
+
+| # | Defect | Found by |
+|---|---|---|
+| 1 | Deleting the hash chain's chaining line left **all tests passing** at 100% coverage | Manual mutation testing |
+| 2 | `canonical_bytes()` hashed a UTC-offset-bearing timestamp; PostgreSQL normalises offsets on storage, so a round trip would false-positive `verify()` as tampered | Reasoning about the storage boundary, not any test |
+| 3 | A row-level trigger blocked `UPDATE`/`DELETE` on the audit log but PostgreSQL never fires row-level triggers on `TRUNCATE` — one statement erased the log with no error | Asking a broader question of an already-verified control |
+| 4 | coverage.py does not model a ternary as a two-arm branch — "0 branches missing" while one arm never ran | Reading logic against the coverage report, not trusting it |
+| 5 | Three domain lifecycle methods (`resubmit`, `schedule`, `publish`) were fully implemented and unit-tested but reachable by no API route | The owner using the deployed system as an actual actor would |
+| 6 | A container held IAM permission to reach S3 but no network route to it — uploads hung until the health check killed the instance | Exercising the deployed upload feature against real infrastructure |
+
+Defects 1–4 were found by review of code that had already passed linting, strict typing, an
+architecture contract and a 100%-covered test suite; defects 5–6 were found only by using the
+running system. This is the single clearest piece of evidence this project produced about
+software engineering practice, and it is why the technical debt register (section 12) and this report
+both state it directly rather than let it sit implicit in a defect table.
+
+### 11.5 User acceptance testing
+
+Run as scripted, role-scoped scenarios against the live deployment
+(`https://ugjcs-frontend.vercel.app`, backed by `https://tsxsbf9rzp.us-east-1.awsapprunner.com`),
+with five named judge accounts (author, reviewer, editor, editor-in-chief, administrator — see
+Section 14). Three scenarios were exercised live for the testing report (author login and dashboard,
+unauthenticated archive access, cross-role access denial redirecting to `/` rather than `/login`
+— a deliberate distinction in `frontend/middleware.ts`); the remaining role-scoped scenarios are
+documented against their automated backstop test.
+
+### 11.6 What testing did not cover
+
+Stated plainly in testing report section 6, not omitted: no load or performance testing (NFR-08/NFR-09
+are unverified against the running system); no automated security scanning in CI (no SAST, DAST
+or dependency vulnerability scan); no mutation testing in CI (section 11.4's finding #1 was a one-off
+manual pass); no browser-matrix testing (one Chromium-based session only); no committed automated
+end-to-end suite (`@playwright/test` is a declared dependency with no spec files committed). Each
+is restated as a limitation in section 17.
+
+### 11.7 Evaluation
+
+The testing report's own conclusion, reached independently from the test evidence, matches the
+technical debt register's closing observation exactly: **automated gates establish a floor and
+catch regressions; they did not find the defects that mattered most.** Every serious defect was
+found by a human or an agent reading code against what it claimed to do, by mutation testing
+designed specifically to distrust the coverage figure, or by using the running system as an
+actual actor would. This is elaborated once, fully, in section 12.6, since the two documents converge on
+one finding rather than two.
+
+---
+
+## 12. Technical debt
+
+The full register — fourteen entries, each with Debt → Cause → Impact → Priority → Proposed
+resolution — is `docs/04-technical-debt-register.md`. This section summarises it by priority and
+draws out its methodological finding.
+
+### 12.1 Summary
+
+| Priority | Count | Entries |
+|---|---|---|
+| Critical | 3 | TD-01, TD-02, TD-03 |
+| Scheduled | 6 | TD-04, TD-05, TD-06, TD-07, TD-08, TD-14 |
+| Acceptable | 3 | TD-09, TD-10, TD-11 |
+| Resolved, retained as a record | 2 | TD-12, TD-13 |
+
+### 12.2 Critical — must be resolved before real users
+
+| ID | Debt | Impact |
+|---|---|---|
+| TD-01 | AWS access uses root account credentials | Cannot be scoped, rotated, or revoked without disrupting the whole account; compromise is unrecoverable within it. Mitigated: root keys are used only from the developer's workstation, never stored as a CI secret |
+| TD-02 | `Action.REVIEW` is granted on the `REVIEWER` role alone, with no per-manuscript predicate | An Author–Reviewer dual-role holder is not prevented from reviewing their own work — the central conflict-of-interest failure for a double-blind journal |
+| TD-03 | Submitted reviews are counted, not identity-checked against an accepted assignment | One reviewer calling submit twice reaches quorum alone and can close a review round unilaterally |
+
+### 12.3 Scheduled — accepted now, with a named repayment point
+
+| ID | Debt | Repayment point |
+|---|---|---|
+| TD-04 | The audit chain has no external anchor — tail truncation is undetectable by the application alone | Next release after deployment |
+| TD-05 | Blinding does not scrub the manuscript body — `title`/`abstract`/`keywords` are verbatim | Screening surfaces name matches to the editor; automated redaction is future evolution, not near-term |
+| TD-06 | The editorial event log has no blinded projection (`actor_id`, rationale text carried in full) | Before any reviewer-facing audit view is built |
+| TD-07 | No `Action` connects `blind()` to `policies.can()` — an adapter must remember to call it | Alongside TD-02 |
+| TD-08 | The tail-append capability (section 8.5) is unverified by a dedicated test | With the persistence work that first exploits it |
+| TD-14 | Deployed infrastructure is App Runner, not the ECS/ALB/CloudFront topology specified | After submission — repayable once the pre-submission document/feature backlog is clear (section 13.3) |
+
+### 12.4 Acceptable — a conscious, revisitable trade-off
+
+| ID | Debt | Condition that would change the judgement |
+|---|---|---|
+| TD-09 | A hybrid event log (materialised status + append-only log) rather than full event sourcing | If projections multiply beyond one, or replay-to-a-past-state becomes a requirement |
+| TD-10 | The coverage gate sits at 85% while the code delivers 88–100% | Cheap to raise; deliberately not set to the exact current figure so a legitimate refactor doesn't fail the build |
+| TD-11 | Coverage is a weak signal — the register's own evidence (section 12.6) | Compensated by mutation testing and review, not by the gate alone |
+
+### 12.5 Resolved, retained as a record
+
+TD-12 (a UTC-offset timestamp representation would have produced a false tamper alert) and TD-13
+(`TRUNCATE` bypassed the row-level append-only trigger) are both closed, but kept in the register
+rather than deleted, because the *class* of defect — and how each was found — is the point (section 12.6,
+Section 11.4).
+
+### 12.6 The register's own conclusion, and this document's central finding
+
+`docs/04-technical-debt-register.md` closes with a statement worth repeating verbatim in spirit
+rather than only citing: **ten of its fourteen entries, and every serious defect in
+`docs/06-testing-report.md` section 4, were found by independent review of code that had already passed
+every automated gate available in this project — linting, strict type checking, an architecture
+contract, and a full test suite at 100% coverage — or by a person using the running system.**
+Mutation testing showed the hash chain was, for a period, unprotected by any test that would
+notice its defining property being deleted. `TRUNCATE` bypassed a trigger that had been "confirmed
+firing against a live database" against the two statement types someone thought to check.
+Three lifecycle methods were implemented, unit-tested, type-checked and covered at 100%, and were
+still dead code from the system's perspective because no route called them. Passing every gate
+this project has was, in every one of these cases, necessary and not sufficient. That is this
+project's most defensible finding about software engineering practice, and it is the reason section 15's
+maintenance strategy treats the debt register as a *live* input to a repayment schedule rather
+than an inventory closed at submission.
+
+### 12.7 Repayment sequence
+
+TD-01 before any further infrastructure is provisioned. TD-02, TD-03 and TD-07 are one piece of
+work — all three are consequences of reviewer assignment not existing as a first-class entity —
+and should be repaid together in the release that introduces it. TD-04 follows deployment. TD-05,
+TD-06 and TD-08 are independent and may be scheduled by convenience. TD-14 is repayable only after
+submission and is not on the pre-viva critical path.
+
+---
+
+## 13. Deployment
+
+### 13.1 What is actually running
+
+| Component | Where | Notes |
+|---|---|---|
+| Frontend | Vercel, `ugjcs-frontend.vercel.app` | Next.js 15, Git-integrated deploys |
+| Backend API | AWS App Runner, `tsxsbf9rzp.us-east-1.awsapprunner.com` | `256` CPU units / `512` MB, VPC connector for egress |
+| Database | RDS PostgreSQL 16, `db.t4g.micro` | Private, `publicly_accessible = false`, default VPC subnets, single-AZ |
+| Object storage | S3, `ugjcs-manuscripts-<random>` | All public access blocked; versioned; SSE-AES256; documents reached only via pre-signed URLs |
+| Secrets | AWS Secrets Manager | `ugjcs/jwt-secret`, `ugjcs/database-url` — both `random_password`-generated, never a literal in Terraform |
+| Container registry | ECR | `ugjcs-backend` repository |
+
+Infrastructure is defined entirely in `infra/` (Terraform): `network.tf`, `rds.tf`, `s3.tf`,
+`secrets.tf`, `iam.tf`, `apprunner.tf`/`apprunner_service.tf`, `ecr.tf`,
+`security_groups.tf`, `s3_endpoint.tf`, `outputs.tf`, `providers.tf`, `variables.tf` —
+satisfying NFR-16 ("the entire infrastructure is reproducible from code").
+
+### 13.2 Deployment topology
+
 <figure class="diagram"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1183.31px; background-color: transparent;" viewBox="0 0.00000762939453125 1183.3125 436.81781005859375" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#my-svg .cluster-label text{fill:#333;}#my-svg .cluster-label span{color:#333;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#333;color:#333;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#my-svg .arrowheadPath{fill:#333333;}#my-svg .edgePath .path{stroke:#333333;stroke-width:1px;}#my-svg .flowchart-link{stroke:#333333;fill:none;}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#my-svg .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#my-svg .cluster text{fill:#333;}#my-svg .cluster span{color:#333;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"/><g class="edgePaths"><path d="M128.313,170.565L132.479,170.565C136.646,170.565,144.979,170.565,155.305,170.565C165.63,170.565,177.948,170.565,184.107,170.565L190.266,170.565" id="my-svg-L_Reader_Vercel_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Reader_Vercel_0" data-points="W3sieCI6MTI4LjMxMjUsInkiOjE3MC41NjQ4ODAzNzEwOTM3NX0seyJ4IjoxNTMuMzEyNSwieSI6MTcwLjU2NDg4MDM3MTA5Mzc1fSx7IngiOjE5NC4yNjU2MjUsInkiOjE3MC41NjQ4ODAzNzEwOTM3NX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M372.797,170.565L391.212,170.565C409.628,170.565,446.458,170.565,479.997,175.567C513.536,180.568,543.783,190.572,558.907,195.573L574.03,200.575" id="my-svg-L_Vercel_AppRunner_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_Vercel_AppRunner_0" data-points="W3sieCI6MzcyLjc5Njg3NSwieSI6MTcwLjU2NDg4MDM3MTA5Mzc1fSx7IngiOjQ4My4yODkwNjI1LCJ5IjoxNzAuNTY0ODgwMzcxMDkzNzV9LHsieCI6NTc3LjgyODEyNSwieSI6MjAxLjgzMTA4OTQ5NTAzNH1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M730.693,183.565L751.898,163.497C773.103,143.429,815.512,103.292,851.545,83.224C887.578,63.156,917.234,63.156,932.063,63.156L946.891,63.156" id="my-svg-L_AppRunner_RDS_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_AppRunner_RDS_0" data-points="W3sieCI6NzMwLjY5MzIzNTMwOTQ1MTQsInkiOjE4My41NjQ4ODAzNzEwOTM3NX0seyJ4Ijo4NTcuOTIxODc1LCJ5Ijo2My4xNTU5ODI5NzExOTE0MDZ9LHsieCI6OTUwLjg5MDYyNSwieSI6NjMuMTU1OTgyOTcxMTkxNDA2fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M775.781,234.565L789.471,234.565C803.161,234.565,830.542,234.565,860.788,234.565C891.034,234.565,924.146,234.565,940.702,234.565L957.258,234.565" id="my-svg-L_AppRunner_S3b_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_AppRunner_S3b_0" data-points="W3sieCI6Nzc1Ljc4MTI1LCJ5IjoyMzQuNTY0ODgwMzcxMDkzNzV9LHsieCI6ODU3LjkyMTg3NSwieSI6MjM0LjU2NDg4MDM3MTA5Mzc1fSx7IngiOjk2MS4yNTc4MTI1LCJ5IjoyMzQuNTY0ODgwMzcxMDkzNzV9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M736.301,285.565L756.571,302.94C776.841,320.316,817.382,355.067,850.675,372.442C883.969,389.818,910.016,389.818,923.039,389.818L936.063,389.818" id="my-svg-L_AppRunner_SM_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_AppRunner_SM_0" data-points="W3sieCI6NzM2LjMwMTAwNDE4MTAwNzksInkiOjI4NS41NjQ4ODAzNzEwOTM3NX0seyJ4Ijo4NTcuOTIxODc1LCJ5IjozODkuODE3Nzk0Nzk5ODA0N30seyJ4Ijo5NDAuMDYyNSwieSI6Mzg5LjgxNzc5NDc5OTgwNDd9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M388.75,298.565L404.507,298.565C420.263,298.565,451.776,298.565,482.656,293.563C513.536,288.561,543.783,278.558,558.907,273.556L574.03,268.555" id="my-svg-L_ECR_AppRunner_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_ECR_AppRunner_0" data-points="W3sieCI6Mzg4Ljc1LCJ5IjoyOTguNTY0ODgwMzcxMDkzNzV9LHsieCI6NDgzLjI4OTA2MjUsInkiOjI5OC41NjQ4ODAzNzEwOTM3NX0seyJ4Ijo1NzcuODI4MTI1LCJ5IjoyNjcuMjk4NjcxMjQ3MTUzNX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel"><g class="label" data-id="L_Reader_Vercel_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(483.2890625, 170.56488037109375)"><g class="label" data-id="L_Vercel_AppRunner_0" transform="translate(-69.5390625, -12)"><foreignObject width="139.078125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>HTTPS, Bearer JWT</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(857.921875, 63.155982971191406)"><g class="label" data-id="L_AppRunner_RDS_0" transform="translate(-52.25, -12)"><foreignObject width="104.5" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>VPC connector</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(857.921875, 234.56488037109375)"><g class="label" data-id="L_AppRunner_S3b_0" transform="translate(-57.140625, -12)"><foreignObject width="114.28125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>pre-signed URLs</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(857.921875, 389.8177947998047)"><g class="label" data-id="L_AppRunner_SM_0" transform="translate(-55.1328125, -12)"><foreignObject width="110.265625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>GetSecretValue</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(483.2890625, 298.56488037109375)"><g class="label" data-id="L_ECR_AppRunner_0" transform="translate(-58.4375, -12)"><foreignObject width="116.875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>pulled at deploy</p></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-Reader-0" data-look="classic" transform="translate(68.15625, 170.56488037109375)"><circle class="basic label-container" style="" r="60.15625" cx="0" cy="0"/><g class="label" style="" transform="translate(-52.65625, -12)"><rect/><foreignObject width="105.3125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Reader / Actor</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-Vercel-1" data-look="classic" transform="translate(283.53125, 170.56488037109375)"><rect class="basic label-container" style="" x="-89.265625" y="-39" width="178.53125" height="78"/><g class="label" style="" transform="translate(-59.265625, -24)"><rect/><foreignObject width="118.53125" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Vercel<br />Next.js frontend</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-AppRunner-3" data-look="classic" transform="translate(676.8046875, 234.56488037109375)"><rect class="basic label-container" style="" x="-98.9765625" y="-51" width="197.953125" height="102"/><g class="label" style="" transform="translate(-68.9765625, -36)"><rect/><foreignObject width="137.953125" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>AWS App Runner<br />ugjcs-backend<br />0.25 vCPU / 0.5 GB</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-RDS-5" data-look="classic" transform="translate(1057.6875, 63.155982971191406)"><path d="M0,15.770650669127827 a106.796875,15.770650669127827 0,0,0 213.59375,0 a106.796875,15.770650669127827 0,0,0 -213.59375,0 l0,78.77065066912783 a106.796875,15.770650669127827 0,0,0 213.59375,0 l0,-78.77065066912783" class="basic label-container outer-path" style="" transform="translate(-106.796875, -55.15597600369174)"/><g class="label" style="" transform="translate(-99.296875, -14)"><rect/><foreignObject width="198.59375" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>RDS PostgreSQL 16<br />private subnet, no public IP</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-S3b-7" data-look="classic" transform="translate(1057.6875, 234.56488037109375)"><path d="M0,15.16860836651428 a96.4296875,15.16860836651428 0,0,0 192.859375,0 a96.4296875,15.16860836651428 0,0,0 -192.859375,0 l0,102.16860836651428 a96.4296875,15.16860836651428 0,0,0 192.859375,0 l0,-102.16860836651428" class="basic label-container outer-path" style="" transform="translate(-96.4296875, -66.25291254977142)"/><g class="label" style="" transform="translate(-88.9296875, -26)"><rect/><foreignObject width="177.859375" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>S3<br />ugjcs-manuscripts-*<br />all public access blocked</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-SM-9" data-look="classic" transform="translate(1057.6875, 389.8177947998047)"><rect class="basic label-container" style="" x="-117.625" y="-39" width="235.25" height="78"/><g class="label" style="" transform="translate(-87.625, -24)"><rect/><foreignObject width="175.25" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Secrets Manager<br />jwt-secret, database-url</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-ECR-10" data-look="classic" transform="translate(283.53125, 298.56488037109375)"><rect class="basic label-container" style="" x="-105.21875" y="-39" width="210.4375" height="78"/><g class="label" style="" transform="translate(-75.21875, -24)"><rect/><foreignObject width="150.4375" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>ECR<br />ugjcs-backend image</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg></figure>
 
-<p>App Runner supplies its own <code>*.awsapprunner.com</code> TLS
-endpoint, which is what makes an HTTPS frontend able to reach the
-backend without a registered domain — the same guarantee the design
-specification's CloudFront strategy (section 7.3 of that document) was
-chosen for, over the same container image.</p>
-<h3
-id="133-the-gap-between-this-topology-and-the-specified-one--td-14">13.3
-The gap between this topology and the specified one — TD-14</h3>
-<p>The design specification (section 7.3) specifies
-<code>Reader → Vercel → CloudFront → ALB → ECS Fargate (api) → RDS / S3 / Redis → ECS Fargate (worker)</code>.
-What is deployed is
-<code>Reader → Vercel → App Runner → RDS / S3</code>, with no
-CloudFront, no ALB, no ECS, no Redis, and no worker service. This is
-recorded in the technical debt register as <strong>TD-14</strong>,
-deliberate and scheduled: provisioning the ECS/ALB/CloudFront stack — a
-target group, listener rules, a CloudFront distribution, task
-definitions, and the IAM wiring between all of it — was measured at 4–6
-hours against a 48-hour budget that, at the point the trade-off was
-made, still owed a working API, a working frontend, and five
-accompanying documents. No functional capability is lost by the
-substitution: App Runner supplies the identical
-trusted-TLS-without-a-registered-domain guarantee CloudFront was chosen
-for, over the same image, with less to operate and less to tear down.
-The absence of Redis and a worker service means the asynchronous
-submission-processing pipeline described in the design specification
-(section 10.2 of that document — text extraction, similarity screening,
-anonymised derivative generation) is not deployed either; this is
-restated in section 16 and section 17 rather than left implicit in the
-infrastructure diagram alone.</p>
-<h3 id="134-cicd">13.4 CI/CD</h3>
-<p><code>.github/workflows/backend-ci.yml</code> gates every push and
-pull request (section 11.3). Deployment itself is run
-<strong>locally</strong>, not from CI — a deliberate mitigation for
-TD-01: AWS root credentials are used only from the developer's
-workstation and are specifically not stored as a GitHub Actions secret,
-which meaningfully reduces exposure relative to a CI secret store,
-though it is a mitigation, not a resolution of the underlying debt. The
-frontend deploys through Vercel's Git integration on every push to the
-default branch.</p>
-<h3 id="135-operating-cost">13.5 Operating cost</h3>
-<p>Targeted at USD 35–55/month against AWS and Vercel free/low-cost
-tiers (design specification section 13, Section 16). App Runner at the
-smallest instance size (0.25 vCPU / 0.5 GB) is a deliberate cost
-decision recorded directly in <code>infra/apprunner_service.tf</code>'s
-own comments: roughly USD 14/month against ~USD 57 for the next tier up,
-since App Runner bills provisioned capacity continuously while the
-health check keeps the instance active.</p>
-<hr />
-<h2 id="14-user-manual">14. User manual</h2>
-<p><code>docs/07-user-manual.md</code> is being written concurrently
-with this document and is the authoritative source once complete; this
-section summarises the system's user-facing surface directly from the
-implemented routes and roles (section 10.2,
-<code>docs/05-api-contract.md</code>) so that a reader has a usable
-account of "how to use the system" even before that document lands.
-Where the two disagree once <code>07-user-manual.md</code> exists, that
-document governs.</p>
-<h3 id="141-accounts-and-roles">14.1 Accounts and roles</h3>
-<p>Five roles exist (<code>Role</code> enum,
-<code>domain/enums.py</code>): <code>author</code>,
-<code>reviewer</code>, <code>editor</code>,
-<code>editor_in_chief</code>, <code>administrator</code>. A single
-account may hold several roles at once (section 4). Judge accounts used
-for acceptance testing (testing report section 5):</p>
-<div class="tablewrap"><table><colgroup><col style="width:44.64%" /><col style="width:55.36%" /></colgroup>
-<thead>
-<tr>
-<th>Role</th>
-<th>Account</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Author</td>
-<td><code>author@sdj.test</code></td>
-</tr>
-<tr>
-<td>Reviewer</td>
-<td><code>reviewer@sdj.test</code></td>
-</tr>
-<tr>
-<td>Editor</td>
-<td><code>editor@sdj.test</code></td>
-</tr>
-<tr>
-<td>Editor-in-Chief</td>
-<td><code>eic@sdj.test</code></td>
-</tr>
-<tr>
-<td>Administrator</td>
-<td><code>admin@sdj.test</code></td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="142-as-an-author">14.2 As an author</h3>
-<p>Log in at <code>/login</code>; the session lands on
-<code>/author</code>, listing your own submissions with status (never
-another author's). Submit a new manuscript at
-<code>/author/submit</code> with title, abstract, keywords and optional
-co-authors (JSON submission — there is no file-upload path in the
-delivered domain; see section 17). View a specific manuscript and its
-status at <code>/author/[trackingCode]</code>. If a manuscript is
-returned with <code>revision_requested</code>, resubmit from the same
-page; only the corresponding author may do so
-(<code>Action.RESUBMIT</code>, ownership-checked). A manuscript may be
-withdrawn from any of <code>submitted</code>,
-<code>under_screening</code>, <code>under_review</code>,
-<code>reviews_complete</code> or <code>revision_requested</code>, again
-corresponding-author-only.</p>
-<h3 id="143-as-a-reviewer">14.3 As a reviewer</h3>
-<p><code>GET /reviews/mine</code> (surfaced at
-<code>/reviewer/[trackingCode]</code>) lists only manuscripts you are
-assigned to review, in the <strong>blinded</strong> form: title,
-abstract, keywords, version and status — no author name, affiliation or
-identifier of any kind (section 8.4). Submit a recommendation and
-free-text comments; there are no per-criterion scores on the delivered
-wire format (a gap from the design specification's fuller
-<code>Review</code> model, noted in <code>docs/05-api-contract.md</code>
-section 8).</p>
-<h3 id="144-as-an-editor">14.4 As an editor</h3>
-<p><code>/editor</code> lists the screening queue (manuscripts in
-<code>submitted</code>). Screen a submission to move it into
-<code>under_screening</code>; from there, send to review, request
-pre-review changes, or desk-reject. Assign a reviewer directly by id —
-there is no candidate-recommendation UI in the delivered system (FR-08
-is planned, not built; section 17). Record a decision once the review
-quorum is met.</p>
-<h3 id="145-as-editor-in-chief">14.5 As Editor-in-Chief</h3>
-<p>All Editor capability, plus scheduling an accepted manuscript into an
-issue and publishing it — both denied to a plain Editor (verified:
-<code>test_a_plain_editor_cannot_schedule</code>,
-<code>test_a_plain_editor_cannot_publish</code>, testing report section
-3.4).</p>
-<h3 id="146-as-an-administrator">14.6 As an Administrator</h3>
-<p>Role management (<code>Action.MANAGE_USERS</code>) is granted and
-denied correctly at the policy layer, but has <strong>no frontend
-surface</strong> in this build — verified only by
-<code>test_administrator_may_manage_users</code> at the policy-test
-level (testing report section 5, section 6). There is no
-<code>/admin</code> route to walk through.</p>
-<h3 id="147-as-a-reader-no-account-required">14.7 As a reader (no
-account required)</h3>
-<p><code>/search</code> and <code>/(public)/papers</code> require no
-authentication. Browse and search published papers; download the
-original PDF of any published paper. Citation export (BibTeX/RIS) and
-OAI-PMH harvesting are specified (design specification section 10.3) but
-not present in the delivered API surface
-(<code>docs/05-api-contract.md</code> section 6 — no
-<code>/archive</code> citation-export or <code>/oai</code> route
-exists).</p>
-<hr />
-<h2 id="15-maintenance-strategy">15. Maintenance strategy</h2>
-<p>No maintenance has yet occurred — the system is newly deployed. This
-section states the strategy that would govern maintenance from this
-point, organised by the four classical ISO/IEC 14764 maintenance
-categories, and states plainly what monitoring exists today and what
-does not.</p>
-<h3 id="151-corrective-maintenance">15.1 Corrective maintenance</h3>
-<p>Defects are triaged by the same severity language the technical debt
-register already uses (Critical / Scheduled / Acceptable, section 12),
-so a newly discovered defect slots into the existing repayment sequence
-rather than requiring a new taxonomy. Given section 11.7's finding —
-that automated gates did not catch the defects that mattered —
-corrective maintenance should not rely on CI alone even after TD items
-are closed: a periodic manual review pass, and mutation testing once it
-exists in CI (currently absent, TD-11), are both load-bearing parts of
-this strategy, not optional extras. Every corrective fix should add the
-regression test that would have caught it, following the pattern already
-established for TD-12 and TD-13 (section 11.4).</p>
-<h3 id="152-adaptive-maintenance">15.2 Adaptive maintenance</h3>
-<p>Two adaptive pressures are already named and scheduled rather than
-hypothetical: <strong>TD-14</strong> (migrating from App Runner to the
-specified ECS/ALB/CloudFront topology, section 13.3) and the
-introduction of reviewer assignment as a first-class entity (the work
-that closes TD-02, TD-03 and TD-07 together, section 12.7). Both are
-adaptive in the ISO sense — changing the system to fit an environment (a
-scaled deployment target; a real reviewer-matching subsystem) rather
-than fixing a defect in the current one.</p>
-<h3 id="153-perfective-maintenance">15.3 Perfective maintenance</h3>
-<p>Ordered by the repayment sequence in section 12.7: TD-01
-(least-privilege IAM) first, as it blocks admitting real users; then the
-TD-02/TD-03/TD-07 reviewer-assignment work; then TD-04 (an external
-audit anchor); then TD-05/TD-06/TD-08 as convenient. Raising the
-coverage gate (TD-10) is low-cost and should be revisited whenever
-coverage is observed to drift, not on a fixed schedule.</p>
-<h3 id="154-preventive-maintenance">15.4 Preventive maintenance</h3>
-<p>Dependency and security updates are currently manual and ad hoc:
-<code>pip-audit</code> and <code>npm audit</code> are named as intended
-CI gates in the design specification (section 11) but are
-<strong>not</strong> present in
-<code>.github/workflows/backend-ci.yml</code> today (testing report
-section 6) — this is itself a preventive-maintenance gap, not only a
-testing gap, and should be the first thing added to CI once the
-critical-priority items in section 12.2 are closed. Systematic mutation
-testing (<code>mutmut</code> or <code>cosmic-ray</code>, TD-11) belongs
-in the same category: a preventive control against the specific class of
-defect section 11.4 shows this project's existing gates cannot see.</p>
-<h3 id="155-what-monitoring-exists-and-what-does-not">15.5 What
-monitoring exists, and what does not</h3>
-<p><strong>Exists:</strong> liveness and readiness probes
-(<code>/health</code>, <code>/ready</code>, NFR-11), consumed by App
-Runner's own health check to replace an unresponsive instance
-automatically — this is precisely the mechanism that surfaced defect
-section 11.4 #6 (a hung upload killed by the health check, not caught by
-any application-level alert).</p>
-<p><strong>Does not exist:</strong> no structured-log aggregation or
-trace export is deployed, despite NFR-15 specifying one (SRS section
-3.2) — App Runner's default logging is what is actually available, not
-the correlation-ID-carrying structured JSON the requirement describes.
-No alerting is configured beyond the platform's own instance-replacement
-behaviour. No dashboard exists for the editorial analytics FR-24
-specifies (that FR is itself unbuilt, section 10.4). No performance
-monitoring exists (NFR-08/NFR-09 are unverified in production, section
-11.6). A maintainer inheriting this system should treat "nothing paged
-me" as meaning nothing detectable paged, not as evidence of correct
-operation — the same caution section 12.6 draws about automated gates
-applies to monitoring that has never been exercised against a real
-incident.</p>
-<hr />
-<h2 id="16-future-evolution">16. Future evolution</h2>
-<p>Drawn from the technical debt register's scheduled items and the
-design specification's own future-work section (section 17 of that
-document), organised by size rather than by document of origin:</p>
-<p><strong>Reviewer matching with expertise scoring.</strong> The design
-specification (section 10.1) specifies a TF-IDF vocabulary over reviewer
-expertise and manuscript text, hard exclusions (author, affiliation
-match, prior decline, unavailability, capacity), and a
-Hungarian-algorithm (<code>scipy.optimize.linear_sum_assignment</code>)
-global assignment, editor-overridable. None of this is built; reviewer
-assignment today is a persistence-only record with no matching, no
-invitation lifecycle, and no conflict-of-interest check
-(<code>docs/05-api-contract.md</code> section 8). This is also the piece
-of work that retires TD-02, TD-03 and TD-07 together (section 12.7) —
-the highest-leverage single addition against the current debt
-register.</p>
-<p><strong>The asynchronous processing pipeline.</strong> Text
-extraction, MinHash/LSH similarity screening against the internal
-corpus, and metadata-stripped anonymised-derivative generation, enqueued
-on upload and keyed by content checksum for idempotency (design
-specification section 10.2). Requires the Redis/ARQ worker component
-that TD-14 also notes is absent from the current deployment (section
-13.3) — these two gaps compound, and closing the deployment gap first is
-a precondition for this one.</p>
-<p><strong>OAI-PMH and citation export.</strong>
-<code>Identify</code>/<code>ListMetadataFormats</code>/<code>ListIdentifiers</code>/<code>ListRecords</code>/
-<code>GetRecord</code> over Dublin Core with resumption tokens (FR-22),
-plus BibTeX/RIS export (FR-21) — both Should-have priority (section
-7.4), specified, and absent from the delivered <code>/archive</code>
-surface.</p>
-<p><strong>Full event sourcing.</strong> TD-09 records the current
-hybrid (materialised status + append-only event log) as an acceptable,
-revisitable trade-off. The stated condition for revisiting it: if
-projections multiply beyond the current single materialised view, or
-replaying history to a past state becomes a requirement, full event
-sourcing with rebuildable projections becomes worth its cost.</p>
-<p><strong>Multi-journal tenancy.</strong> Explicitly out of scope for
-this build (design specification section 4.2), but the codebase
-separates journal-configuration data from platform logic as a deliberate
-seam (design specification Appendix A) specifically so this remains
-reachable without restructuring — future evolution here is closer to
-"activate a seam" than "redesign."</p>
-<p><strong>Smaller items, in the same register:</strong> an external,
-tamper-resistant anchor for the audit chain (TD-04); automated detection
-or redaction of self-identifying text in manuscript bodies beyond
-metadata stripping (TD-05, judged a research problem in its own right —
-a bad redaction that leaks one name would undermine the guarantee more
-than not attempting it); a <code>BlindedEvent</code> projection for a
-future reviewer-facing audit view (TD-06); embedding-based reviewer
-matching to replace TF-IDF, ORCID authentication, real Crossref DOI
-registration, a production typesetting/galley pipeline, reviewer
-reputation modelling, blue-green deployment, and read-replica scaling
-for the archive (design specification section 17, none yet begun).</p>
-<hr />
-<h2 id="17-limitations">17. Limitations</h2>
-<p>Stated plainly, each cross-referenced to where it is verified or
-recorded, following the same convention as SRS section 7 and the
-technical debt register.</p>
-<ul>
-<li><strong>This system was built in 48 hours by one developer with AI
-assistance.</strong> Every limitation below is a direct consequence of
-that constraint, not of an unconsidered choice; section 7.5 explains why
-the resulting scope decisions were nonetheless estimation-driven rather
-than ad hoc.</li>
-<li><strong>Anonymisation strips PDF metadata but not author names typed
-into the body.</strong> <code>blind()</code> (section 8.4) is
-structurally guaranteed to omit author fields from the type a reviewer
-receives — but <code>title</code>, <code>abstract</code> and
-<code>keywords</code> are copied verbatim. An author who writes their
-own name into the title, or an abstract that reads "extending our
-earlier work in [Obeng 2025]," reaches the reviewer unchanged.
-Double-blind integrity therefore depends partly on author compliance
-with submission guidance, not entirely on what the system enforces
-(TD-05).</li>
-<li><strong>The audit chain has no external anchor.</strong> Hash
-chaining detects alteration, reordering and removal <em>within</em> the
-chain (section 8.5), and a database trigger blocks direct tampering —
-but truncation of the chain's tail, or a forged event appended through
-the legitimate API, is <strong>undetectable by the application
-alone</strong>, because there is no periodically published,
-independently held checkpoint of the latest <code>event_hash</code> to
-compare against (TD-04).</li>
-<li><strong>A reviewer's conflict of interest is not checked by the
-authorisation layer</strong>, and submitted reviews are counted rather
-than identity-checked against an assignment (TD-02, TD-03, section 12.2)
-— both critical, both unresolved as of this document.</li>
-<li><strong>Deployment runs on AWS root credentials.</strong> Mitigated
-by never storing them as a CI secret, but not resolved (TD-01, section
-12.2, section 13.4) — this is the single highest-priority open item in
-the project.</li>
-<li><strong>The deployed architecture is smaller than the specified
-one.</strong> App Runner, not ECS Fargate behind an ALB and CloudFront;
-no Redis; no asynchronous worker (TD-14, section 13.3). No functional
-capability is lost on the read/write paths that exist, but the
-asynchronous processing pipeline described in the design specification
-(section 10.2 of that document, and section 16 of this one) cannot run
-without the missing worker component.</li>
-<li><strong>No load testing.</strong> NFR-08 and NFR-09's performance
-objectives (archive pages within 500 ms p95, search within 800 ms p95)
-were sized at design time and have never been measured against the
-running system (section 11.6).</li>
-<li><strong>No automated security scanning.</strong> No SAST tool,
-dependency vulnerability scanner, or DAST pass runs in CI, despite both
-being named in the design specification (section 11) as intended gates
-(section 11.6, section 15.4).</li>
-<li><strong>No browser-matrix or committed end-to-end testing.</strong>
-UAT was run in a single Chromium-based session;
-<code>@playwright/test</code> is a declared dependency with no committed
-spec files (section 11.6).</li>
-<li><strong>No file upload exists in the delivered domain.</strong>
-<code>POST /manuscripts</code> is JSON-only — submission of an actual
-PDF, and the anonymisation/similarity pipeline that would process one,
-are specified (design specification section 10.2) but not built
-(<code>docs/05-api-contract.md</code> section 8, section 16 of this
-document).</li>
-<li><strong>Explicit, permanent out-of-scope items</strong> (design
-specification section 4.2), restated as hard limits rather than soft
-gaps: no payment or article-processing-charge handling; no copy-editing
-or typesetting workflow; no multi-journal tenancy (though the seam for
-it exists, section 16); no ORCID federation; identifiers are
-DOI-<em>shaped</em> but not registered with Crossref; similarity
-screening, when built, will be against the internal corpus only, never
-the open web; email deliverability is guaranteed through a single
-transactional provider only — and today, no live provider is wired in at
-all (<code>infrastructure/email/logging_sender.py</code> logs rather
-than sends, section 10.2).</li>
-</ul>
-<hr />
-<h2 id="18-conclusion">18. Conclusion</h2>
-<h3 id="181-what-was-estimated-and-what-was-delivered">18.1 What was
-estimated, and what was delivered</h3>
-<p>Use Case Points sized the Must-have subset of this system (UC1–UC18)
-at 2,514 person-hours, and the full specified system at 3,262
-person-hours; COCOMO II's independent cross-check placed the full system
-at approximately 7,170 person-hours (section 7.2). The 48-hour window
-available for this final project is roughly 1.5–1.9% of either figure.
-The delivery — a working domain layer with 812 lines of framework-free,
-fully tested code; a complete API and frontend; a deployed,
-HTTPS-reachable system; and six supporting documents including this one
-— took a small fraction of the classically estimated effort. Section 7.5
-explains why this does not invalidate the method: UCP measured the
-<em>problem's</em> size correctly, and what changed was the
-<em>rate</em> at which AI-assisted development converts that size into
-elapsed hours — a change in method, not evidence the sizing was wrong.
-The formal accounting of realised productivity is left to the mechanical
-procedure specified in effort estimation section 10.3, to be computed
-from commit history rather than asserted here.</p>
-<h3 id="182-what-that-trade-bought-and-what-it-cost">18.2 What that
-trade bought, and what it cost</h3>
-<p>It bought a system that meets its three sharpest objectives (section
-3) more convincingly than most final projects reach in the available
-time: <strong>O1</strong> (no illegal transition reachable through any
-interface) is enforced by an exhaustively tested state machine (section
-8.2, section 11.2); <strong>O2</strong> (structural double-blind
-integrity) is enforced by a projection type with nowhere to put an
-author field (section 8.4); <strong>O3</strong> (a tamper-evident audit
-trail) is enforced by a hash chain and two database triggers, the second
-one added specifically because the first didn't cover every statement
-class (section 8.5, section 11.4). It bought a hexagonal architecture
-whose separation is not aspirational but mechanically checked on every
-commit by two import-linter contracts (section 9.2). And it bought a
-technical debt register and testing report that state their own
-limitations more precisely than most fully-staffed projects manage,
-because — per section 12.6 — this project's clearest lesson is about
-what automated rigour does and does not catch.</p>
-<p>It cost what section 7.5 named in advance rather than discovered
-afterward: test depth below what a fully-priced 2,514-hour effort would
-buy (partially offset by the mutation-testing pass that found what
-coverage alone missed, section 11.4); documentation formality reduced to
-what six documents and inline code comments provide, rather than a
-fuller set of architecture decision records; and security hardening that
-verifies the NFR-01–NFR-06 baseline without attempting threat modelling
-or penetration testing beyond it. It cost the three critical,
-currently-open items in section 12.2 — root AWS credentials, an
-unenforced reviewer conflict-of-interest check, and an uncounted review
-quorum — none of which are hypothetical risks; all three are
-load-bearing gaps in a system whose stated purpose is enforcing exactly
-the guarantees they undermine.</p>
-<h3 id="183-the-honest-summary">18.3 The honest summary</h3>
-<p>The SDJ Editorial Portal demonstrates that a domain-first,
-hexagonally-architected system, built under AI-assisted development, can
-deliver mechanically-enforced correctness for the properties that were
-designed in from the start — the lifecycle, the blinding, the audit
-chain's internal consistency — within a timeframe that would be absurd
-for the same guarantees built by conventional estimation. It
-demonstrates equally clearly, through its own technical debt register
-and testing report, that passing every automated gate available to this
-project — linting, strict typing, an architecture contract, and a full
-test suite at 100% coverage — was necessary and not sufficient, and that
-the defects and gaps that mattered most were found by a human, or an
-agent acting as one, reading code against what it claimed to do, or by
-using the deployed system as an actual actor would. That finding, not
-the deployment URL, is this final project's most transferable
-result.</p>
-<hr />
-<h2 id="19-references">19. References</h2>
-<ul>
-<li>IEEE Std 830-1998, <em>Recommended Practice for Software
-Requirements Specifications</em>.</li>
-<li>ISO/IEC/IEEE 29148:2018, <em>Systems and software engineering — Life
-cycle processes — Requirements engineering</em>.</li>
-<li>ISO/IEC 14764, <em>Software Engineering — Software Life Cycle
-Processes — Maintenance</em> (maintenance category taxonomy used in
-section 15).</li>
-<li>Karner, G. (1993). <em>Use Case Points</em> method for effort
-estimation, as codified in Cockburn, A. (2000), <em>Writing Effective
-Use Cases</em>, and Schneider &amp; Winters (1998), <em>Applying Use
-Cases: A Practical Guide</em>.</li>
-<li>Boehm, B. et al. (2000). <em>Software Cost Estimation with COCOMO
-II</em> — Early Design model.</li>
-<li>Fowler, M. — technical debt quadrant (deliberate/inadvertent ×
-reckless/prudent), the classification basis for
-<code>docs/04-technical-debt-register.md</code>.</li>
-<li>IETF RFC 9457, <em>Problem Details for HTTP APIs</em> — the
-platform's error-response format (section 9.3).</li>
-<li>Open Archives Initiative, <em>OAI-PMH 2.0 specification</em>
-(section 16, future evolution).</li>
-</ul>
-<p><strong>Project documents (this repository):</strong></p>
-<ul>
-<li><code>docs/02-srs.md</code> — Software Requirements
-Specification</li>
-<li><code>docs/03-effort-estimation.md</code> — Effort estimation</li>
-<li><code>docs/04-technical-debt-register.md</code> — Technical debt
-register</li>
-<li><code>docs/05-api-contract.md</code> — API contract</li>
-<li><code>docs/06-testing-report.md</code> — Testing report</li>
-<li><code>docs/07-user-manual.md</code> — User manual (in progress at
-the time of writing; section 14 stands in until it is complete)</li>
-<li><code>docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md</code>
-— Design specification</li>
-</ul>
-<p><strong>AI-assisted development acknowledgement.</strong> Consistent
-with the acknowledgement recorded in
-<code>docs/03-effort-estimation.md</code> section 9 and section 11, this
-document — and the code, tests and documents it consolidates — were
-produced with Claude Code (Anthropic), an AI coding assistant, under the
-direction and review of the author. The assistant drafted prose and code
-from the author's instructions and the design specification; the author
-directed the work, reviewed every output, and accepts sole
-responsibility for its correctness and for the claims and conclusions
-recorded in this document.</p>
-</main>
-<footer class="site">SDJ Editorial Portal — Advanced Software Engineering final project · Roger Koranteng Obeng · 22424140</footer>
-</body>
-</html>
+App Runner supplies its own `*.awsapprunner.com` TLS endpoint, which is what makes an HTTPS
+frontend able to reach the backend without a registered domain — the same guarantee the design
+specification's CloudFront strategy (section 7.3 of that document) was chosen for, over the same
+container image.
+
+### 13.3 The gap between this topology and the specified one — TD-14
+
+The design specification (section 7.3) specifies `Reader → Vercel → CloudFront → ALB → ECS Fargate (api)
+→ RDS / S3 / Redis → ECS Fargate (worker)`. What is deployed is `Reader → Vercel → App Runner →
+RDS / S3`, with no CloudFront, no ALB, no ECS, no Redis, and no worker service. This is recorded
+in the technical debt register as **TD-14**, deliberate and scheduled: provisioning the
+ECS/ALB/CloudFront stack — a target group, listener rules, a CloudFront distribution, task
+definitions, and the IAM wiring between all of it — was measured at 4–6 hours against a 48-hour
+budget that, at the point the trade-off was made, still owed a working API, a working frontend,
+and five accompanying documents. No functional capability is lost by the substitution: App
+Runner supplies the identical trusted-TLS-without-a-registered-domain guarantee CloudFront was
+chosen for, over the same image, with less to operate and less to tear down. The absence of Redis
+and a worker service means the asynchronous submission-processing pipeline described in the
+design specification (section 10.2 of that document — text extraction, similarity screening, anonymised
+derivative generation) is not deployed either; this is restated in section 16 and section 17 rather than left
+implicit in the infrastructure diagram alone.
+
+### 13.4 CI/CD
+
+`.github/workflows/backend-ci.yml` gates every push and pull request (section 11.3). Deployment itself is
+run **locally**, not from CI — a deliberate mitigation for TD-01: AWS root credentials are used
+only from the developer's workstation and are specifically not stored as a GitHub Actions secret,
+which meaningfully reduces exposure relative to a CI secret store, though it is a mitigation, not
+a resolution of the underlying debt. The frontend deploys through Vercel's Git integration on
+every push to the default branch.
+
+### 13.5 Operating cost
+
+Targeted at USD 35–55/month against AWS and Vercel free/low-cost tiers (design specification section 13,
+Section 16). App Runner at the smallest instance size (0.25 vCPU / 0.5 GB) is a deliberate cost decision
+recorded directly in `infra/apprunner_service.tf`'s own comments: roughly USD 14/month against
+~USD 57 for the next tier up, since App Runner bills provisioned capacity continuously while the
+health check keeps the instance active.
+
+---
+
+## 14. User manual
+
+`docs/07-user-manual.md` is being written concurrently with this document and is the authoritative
+source once complete; this section summarises the system's user-facing surface directly from the
+implemented routes and roles (section 10.2, `docs/05-api-contract.md`) so that a reader has a usable
+account of "how to use the system" even before that document lands. Where the two disagree once
+`07-user-manual.md` exists, that document governs.
+
+### 14.1 Accounts and roles
+
+Five roles exist (`Role` enum, `domain/enums.py`): `author`, `reviewer`, `editor`,
+`editor_in_chief`, `administrator`. A single account may hold several roles at once (section 4). Judge
+accounts used for acceptance testing (testing report section 5):
+
+| Role | Account |
+|---|---|
+| Author | `author@sdj.test` |
+| Reviewer | `reviewer@sdj.test` |
+| Editor | `editor@sdj.test` |
+| Editor-in-Chief | `eic@sdj.test` |
+| Administrator | `admin@sdj.test` |
+
+### 14.2 As an author
+
+Log in at `/login`; the session lands on `/author`, listing your own submissions with status
+(never another author's). Submit a new manuscript at `/author/submit` with title, abstract,
+keywords and optional co-authors (JSON submission — there is no file-upload path in the delivered
+domain; see section 17). View a specific manuscript and its status at
+`/author/[trackingCode]`. If a manuscript is returned with `revision_requested`, resubmit from the
+same page; only the corresponding author may do so (`Action.RESUBMIT`, ownership-checked). A
+manuscript may be withdrawn from any of `submitted`, `under_screening`, `under_review`,
+`reviews_complete` or `revision_requested`, again corresponding-author-only.
+
+### 14.3 As a reviewer
+
+`GET /reviews/mine` (surfaced at `/reviewer/[trackingCode]`) lists only manuscripts you are
+assigned to review, in the **blinded** form: title, abstract, keywords, version and status — no
+author name, affiliation or identifier of any kind (section 8.4). Submit a recommendation and free-text
+comments; there are no per-criterion scores on the delivered wire format (a gap from the design
+specification's fuller `Review` model, noted in `docs/05-api-contract.md` section 8).
+
+### 14.4 As an editor
+
+`/editor` lists the screening queue (manuscripts in `submitted`). Screen a submission to move it
+into `under_screening`; from there, send to review, request pre-review changes, or desk-reject.
+Assign a reviewer directly by id — there is no candidate-recommendation UI in the delivered
+system (FR-08 is planned, not built; section 17). Record a decision once the review quorum is met.
+
+### 14.5 As Editor-in-Chief
+
+All Editor capability, plus scheduling an accepted manuscript into an issue and publishing it —
+both denied to a plain Editor (verified: `test_a_plain_editor_cannot_schedule`,
+`test_a_plain_editor_cannot_publish`, testing report section 3.4).
+
+### 14.6 As an Administrator
+
+Role management (`Action.MANAGE_USERS`) is granted and denied correctly at the policy layer, but
+has **no frontend surface** in this build — verified only by `test_administrator_may_manage_users`
+at the policy-test level (testing report section 5, section 6). There is no `/admin` route to walk through.
+
+### 14.7 As a reader (no account required)
+
+`/search` and `/(public)/papers` require no authentication. Browse and search published papers;
+download the original PDF of any published paper. Citation export (BibTeX/RIS) and OAI-PMH
+harvesting are specified (design specification section 10.3) but not present in the delivered API
+surface (`docs/05-api-contract.md` section 6 — no `/archive` citation-export or `/oai` route exists).
+
+---
+
+## 15. Maintenance strategy
+
+No maintenance has yet occurred — the system is newly deployed. This section states the strategy
+that would govern maintenance from this point, organised by the four classical ISO/IEC 14764
+maintenance categories, and states plainly what monitoring exists today and what does not.
+
+### 15.1 Corrective maintenance
+
+Defects are triaged by the same severity language the technical debt register already uses
+(Critical / Scheduled / Acceptable, section 12), so a newly discovered defect slots into the existing
+repayment sequence rather than requiring a new taxonomy. Given section 11.7's finding — that automated
+gates did not catch the defects that mattered — corrective maintenance should not rely on CI alone
+even after TD items are closed: a periodic manual review pass, and mutation testing once it exists
+in CI (currently absent, TD-11), are both load-bearing parts of this strategy, not optional
+extras. Every corrective fix should add the regression test that would have caught it, following
+the pattern already established for TD-12 and TD-13 (section 11.4).
+
+### 15.2 Adaptive maintenance
+
+Two adaptive pressures are already named and scheduled rather than hypothetical: **TD-14**
+(migrating from App Runner to the specified ECS/ALB/CloudFront topology, section 13.3) and the
+introduction of reviewer assignment as a first-class entity (the work that closes TD-02, TD-03
+and TD-07 together, section 12.7). Both are adaptive in the ISO sense — changing the system to fit an
+environment (a scaled deployment target; a real reviewer-matching subsystem) rather than fixing a
+defect in the current one.
+
+### 15.3 Perfective maintenance
+
+Ordered by the repayment sequence in section 12.7: TD-01 (least-privilege IAM) first, as it blocks
+admitting real users; then the TD-02/TD-03/TD-07 reviewer-assignment work; then TD-04 (an external
+audit anchor); then TD-05/TD-06/TD-08 as convenient. Raising the coverage gate (TD-10) is
+low-cost and should be revisited whenever coverage is observed to drift, not on a fixed schedule.
+
+### 15.4 Preventive maintenance
+
+Dependency and security updates are currently manual and ad hoc: `pip-audit` and `npm audit` are
+named as intended CI gates in the design specification (section 11) but are **not** present in
+`.github/workflows/backend-ci.yml` today (testing report section 6) — this is itself a preventive-maintenance
+gap, not only a testing gap, and should be the first thing added to CI once the critical-priority
+items in section 12.2 are closed. Systematic mutation testing (`mutmut` or `cosmic-ray`, TD-11) belongs in
+the same category: a preventive control against the specific class of defect section 11.4 shows this
+project's existing gates cannot see.
+
+### 15.5 What monitoring exists, and what does not
+
+**Exists:** liveness and readiness probes (`/health`, `/ready`, NFR-11), consumed by App Runner's
+own health check to replace an unresponsive instance automatically — this is precisely the
+mechanism that surfaced defect section 11.4 #6 (a hung upload killed by the health check, not caught by
+any application-level alert).
+
+**Does not exist:** no structured-log aggregation or trace export is deployed, despite NFR-15
+specifying one (SRS section 3.2) — App Runner's default logging is what is actually available, not the
+correlation-ID-carrying structured JSON the requirement describes. No alerting is configured
+beyond the platform's own instance-replacement behaviour. No dashboard exists for the editorial
+analytics FR-24 specifies (that FR is itself unbuilt, section 10.4). No performance monitoring exists
+(NFR-08/NFR-09 are unverified in production, section 11.6). A maintainer inheriting this system should
+treat "nothing paged me" as meaning nothing detectable paged, not as evidence of correct
+operation — the same caution section 12.6 draws about automated gates applies to monitoring that has
+never been exercised against a real incident.
+
+---
+
+## 16. Future evolution
+
+Drawn from the technical debt register's scheduled items and the design specification's own
+future-work section (section 17 of that document), organised by size rather than by document of origin:
+
+**Reviewer matching with expertise scoring.** The design specification (section 10.1) specifies a
+TF-IDF vocabulary over reviewer expertise and manuscript text, hard exclusions (author,
+affiliation match, prior decline, unavailability, capacity), and a Hungarian-algorithm
+(`scipy.optimize.linear_sum_assignment`) global assignment, editor-overridable. None of this is
+built; reviewer assignment today is a persistence-only record with no matching, no invitation
+lifecycle, and no conflict-of-interest check (`docs/05-api-contract.md` section 8). This is also the
+piece of work that retires TD-02, TD-03 and TD-07 together (section 12.7) — the highest-leverage single
+addition against the current debt register.
+
+**The asynchronous processing pipeline.** Text extraction, MinHash/LSH similarity screening
+against the internal corpus, and metadata-stripped anonymised-derivative generation, enqueued on
+upload and keyed by content checksum for idempotency (design specification section 10.2). Requires the
+Redis/ARQ worker component that TD-14 also notes is absent from the current deployment (section 13.3) —
+these two gaps compound, and closing the deployment gap first is a precondition for this one.
+
+**OAI-PMH and citation export.** `Identify`/`ListMetadataFormats`/`ListIdentifiers`/`ListRecords`/
+`GetRecord` over Dublin Core with resumption tokens (FR-22), plus BibTeX/RIS export (FR-21) — both
+Should-have priority (section 7.4), specified, and absent from the delivered `/archive` surface.
+
+**Full event sourcing.** TD-09 records the current hybrid (materialised status + append-only
+event log) as an acceptable, revisitable trade-off. The stated condition for revisiting it: if
+projections multiply beyond the current single materialised view, or replaying history to a past
+state becomes a requirement, full event sourcing with rebuildable projections becomes worth its
+cost.
+
+**Multi-journal tenancy.** Explicitly out of scope for this build (design specification section 4.2), but
+the codebase separates journal-configuration data from platform logic as a deliberate seam
+(design specification Appendix A) specifically so this remains reachable without restructuring —
+future evolution here is closer to "activate a seam" than "redesign."
+
+**Smaller items, in the same register:** an external, tamper-resistant anchor for the audit chain
+(TD-04); automated detection or redaction of self-identifying text in manuscript bodies beyond
+metadata stripping (TD-05, judged a research problem in its own right — a bad redaction that leaks
+one name would undermine the guarantee more than not attempting it); a `BlindedEvent` projection
+for a future reviewer-facing audit view (TD-06); embedding-based reviewer matching to replace
+TF-IDF, ORCID authentication, real Crossref DOI registration, a production typesetting/galley
+pipeline, reviewer reputation modelling, blue-green deployment, and read-replica scaling for the
+archive (design specification section 17, none yet begun).
+
+---
+
+## 17. Limitations
+
+Stated plainly, each cross-referenced to where it is verified or recorded, following the same
+convention as SRS section 7 and the technical debt register.
+
+- **This system was built in 48 hours by one developer with AI assistance.** Every limitation
+  below is a direct consequence of that constraint, not of an unconsidered choice; section 7.5 explains
+  why the resulting scope decisions were nonetheless estimation-driven rather than ad hoc.
+- **Anonymisation strips PDF metadata but not author names typed into the body.** `blind()`
+  (section 8.4) is structurally guaranteed to omit author fields from the type a reviewer receives — but
+  `title`, `abstract` and `keywords` are copied verbatim. An author who writes their own name into
+  the title, or an abstract that reads "extending our earlier work in [Obeng 2025]," reaches the
+  reviewer unchanged. Double-blind integrity therefore depends partly on author compliance with
+  submission guidance, not entirely on what the system enforces (TD-05).
+- **The audit chain has no external anchor.** Hash chaining detects alteration, reordering and
+  removal *within* the chain (section 8.5), and a database trigger blocks direct tampering — but
+  truncation of the chain's tail, or a forged event appended through the legitimate API, is
+  **undetectable by the application alone**, because there is no periodically published,
+  independently held checkpoint of the latest `event_hash` to compare against (TD-04).
+- **A reviewer's conflict of interest is not checked by the authorisation layer**, and submitted
+  reviews are counted rather than identity-checked against an assignment (TD-02, TD-03, section 12.2) —
+  both critical, both unresolved as of this document.
+- **Deployment runs on AWS root credentials.** Mitigated by never storing them as a CI secret, but
+  not resolved (TD-01, section 12.2, section 13.4) — this is the single highest-priority open item in the
+  project.
+- **The deployed architecture is smaller than the specified one.** App Runner, not ECS Fargate
+  behind an ALB and CloudFront; no Redis; no asynchronous worker (TD-14, section 13.3). No functional
+  capability is lost on the read/write paths that exist, but the asynchronous processing pipeline
+  described in the design specification (section 10.2 of that document, and section 16 of this one) cannot run
+  without the missing worker component.
+- **No load testing.** NFR-08 and NFR-09's performance objectives (archive pages within 500 ms
+  p95, search within 800 ms p95) were sized at design time and have never been measured against
+  the running system (section 11.6).
+- **No automated security scanning.** No SAST tool, dependency vulnerability scanner, or DAST pass
+  runs in CI, despite both being named in the design specification (section 11) as intended gates
+  (section 11.6, section 15.4).
+- **No browser-matrix or committed end-to-end testing.** UAT was run in a single Chromium-based
+  session; `@playwright/test` is a declared dependency with no committed spec files (section 11.6).
+- **No file upload exists in the delivered domain.** `POST /manuscripts` is JSON-only —
+  submission of an actual PDF, and the anonymisation/similarity pipeline that would process one,
+  are specified (design specification section 10.2) but not built (`docs/05-api-contract.md` section 8, section 16 of
+  this document).
+- **Explicit, permanent out-of-scope items** (design specification section 4.2), restated as hard limits
+  rather than soft gaps: no payment or article-processing-charge handling; no copy-editing or
+  typesetting workflow; no multi-journal tenancy (though the seam for it exists, section 16); no ORCID
+  federation; identifiers are DOI-*shaped* but not registered with Crossref; similarity screening,
+  when built, will be against the internal corpus only, never the open web; email deliverability
+  is guaranteed through a single transactional provider only — and today, no live provider is
+  wired in at all (`infrastructure/email/logging_sender.py` logs rather than sends, section 10.2).
+
+---
+
+## 18. Conclusion
+
+### 18.1 What was estimated, and what was delivered
+
+Use Case Points sized the Must-have subset of this system (UC1–UC18) at 2,514 person-hours, and
+the full specified system at 3,262 person-hours; COCOMO II's independent cross-check placed the
+full system at approximately 7,170 person-hours (section 7.2). The 48-hour window available for this
+final project is roughly 1.5–1.9% of either figure. The delivery — a working domain layer with 812
+lines of framework-free, fully tested code; a complete API and frontend; a deployed, HTTPS-reachable
+system; and six supporting documents including this one — took a small fraction of the classically
+estimated effort. Section 7.5 explains why this does not invalidate the method: UCP measured the
+*problem's* size correctly, and what changed was the *rate* at which AI-assisted development
+converts that size into elapsed hours — a change in method, not evidence the sizing was wrong. The
+formal accounting of realised productivity is left to the mechanical procedure specified in effort
+estimation section 10.3, to be computed from commit history rather than asserted here.
+
+### 18.2 What that trade bought, and what it cost
+
+It bought a system that meets its three sharpest objectives (section 3) more convincingly than most
+final projects reach in the available time: **O1** (no illegal transition reachable through any
+interface) is enforced by an exhaustively tested state machine (section 8.2, section 11.2); **O2** (structural
+double-blind integrity) is enforced by a projection type with nowhere to put an author field
+(section 8.4); **O3** (a tamper-evident audit trail) is enforced by a hash chain and two database
+triggers, the second one added specifically because the first didn't cover every statement class
+(section 8.5, section 11.4). It bought a hexagonal architecture whose separation is not aspirational but
+mechanically checked on every commit by two import-linter contracts (section 9.2). And it bought a
+technical debt register and testing report that state their own limitations more precisely than
+most fully-staffed projects manage, because — per section 12.6 — this project's clearest lesson is about
+what automated rigour does and does not catch.
+
+It cost what section 7.5 named in advance rather than discovered afterward: test depth below what a
+fully-priced 2,514-hour effort would buy (partially offset by the mutation-testing pass that found
+what coverage alone missed, section 11.4); documentation formality reduced to what six documents and
+inline code comments provide, rather than a fuller set of architecture decision records; and
+security hardening that verifies the NFR-01–NFR-06 baseline without attempting threat modelling or
+penetration testing beyond it. It cost the three critical, currently-open items in section 12.2 — root AWS
+credentials, an unenforced reviewer conflict-of-interest check, and an uncounted review quorum —
+none of which are hypothetical risks; all three are load-bearing gaps in a system whose stated
+purpose is enforcing exactly the guarantees they undermine.
+
+### 18.3 The honest summary
+
+The SDJ Editorial Portal demonstrates that a domain-first, hexagonally-architected system, built under AI-assisted
+development, can deliver mechanically-enforced correctness for the properties that were designed
+in from the start — the lifecycle, the blinding, the audit chain's internal consistency — within a
+timeframe that would be absurd for the same guarantees built by conventional estimation. It
+demonstrates equally clearly, through its own technical debt register and testing report, that
+passing every automated gate available to this project — linting, strict typing, an architecture
+contract, and a full test suite at 100% coverage — was necessary and not sufficient, and that the
+defects and gaps that mattered most were found by a human, or an agent acting as one, reading code
+against what it claimed to do, or by using the deployed system as an actual actor would. That
+finding, not the deployment URL, is this final project's most transferable result.
+
+---
+
+## 19. References
+
+- IEEE Std 830-1998, *Recommended Practice for Software Requirements Specifications*.
+- ISO/IEC/IEEE 29148:2018, *Systems and software engineering — Life cycle processes — Requirements engineering*.
+- ISO/IEC 14764, *Software Engineering — Software Life Cycle Processes — Maintenance* (maintenance category taxonomy used in section 15).
+- Karner, G. (1993). *Use Case Points* method for effort estimation, as codified in Cockburn, A.
+  (2000), *Writing Effective Use Cases*, and Schneider & Winters (1998), *Applying Use Cases: A
+  Practical Guide*.
+- Boehm, B. et al. (2000). *Software Cost Estimation with COCOMO II* — Early Design model.
+- Fowler, M. — technical debt quadrant (deliberate/inadvertent × reckless/prudent), the
+  classification basis for `docs/04-technical-debt-register.md`.
+- IETF RFC 9457, *Problem Details for HTTP APIs* — the platform's error-response format (section 9.3).
+- Open Archives Initiative, *OAI-PMH 2.0 specification* (section 16, future evolution).
+
+**Project documents (this repository):**
+
+- `docs/02-srs.md` — Software Requirements Specification
+- `docs/03-effort-estimation.md` — Effort estimation
+- `docs/04-technical-debt-register.md` — Technical debt register
+- `docs/05-api-contract.md` — API contract
+- `docs/06-testing-report.md` — Testing report
+- `docs/07-user-manual.md` — User manual (in progress at the time of writing; section 14 stands in until
+  it is complete)
+- `docs/superpowers/specs/2026-08-12-ugjcs-journal-platform-design.md` — Design specification
+
+**AI-assisted development acknowledgement.** Consistent with the acknowledgement recorded in
+`docs/03-effort-estimation.md` section 9 and section 11, this document — and the code, tests and documents it
+consolidates — were produced with Claude Code (Anthropic), an AI coding assistant, under the
+direction and review of the author. The assistant drafted prose and code from the author's
+instructions and the design specification; the author directed the work, reviewed every output,
+and accepts sole responsibility for its correctness and for the claims and conclusions recorded
+in this document.
