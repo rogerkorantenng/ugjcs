@@ -41,26 +41,6 @@ All credentials below were verified against the live API on 2026-08-14; each
 returns HTTP 200 from POST /api/v1/auth/login.
 
 --------------------------------------------------------------------------------
-ALL TEST ACCOUNTS
---------------------------------------------------------------------------------
-
-The sign-in page carries a row of role chips that fill these email addresses for
-you; the password is typed by hand.
-
-Role                         Email                  Password
----------------------------  ---------------------  -----------------------
-Author (Ama Serwaa)          author@sdj.test        Sdj-Author-2026!
-Author (Kojo Antwi)          author2@sdj.test       Sdj-Author2-2026!
-Reviewer (UG)                reviewer@sdj.test      Sdj-Reviewer-2026!
-Reviewer (UG)                reviewer2@sdj.test     Sdj-Reviewer2-2026!
-Reviewer (Univ. of Lagos)    reviewer3@sdj.test     Sdj-Reviewer3-2026!
-Reviewer (KNUST)             reviewer4@sdj.test     Sdj-Reviewer4-2026!
-Reviewer (Univ. Cape Coast)  reviewer5@sdj.test     Sdj-Reviewer5-2026!
-Reviewer (Ashesi Univ.)      reviewer6@sdj.test     Sdj-Reviewer6-2026!
-Reviewer (Makerere Univ.)    reviewer7@sdj.test     Sdj-Reviewer7-2026!
-Editor (Efua Mensah)         editor@sdj.test        Sdj-Editor-2026!
-Editor-in-Chief (Kofi B.)    eic@sdj.test           Sdj-EditorChief-2026!
-Administrator (Abena Osei)   admin@sdj.test         Sdj-Admin-2026!
 
 Seven reviewers exist rather than one so the reviewer-candidate screen can
 actually demonstrate its rules. The two marked UG share every author's
