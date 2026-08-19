@@ -28,19 +28,6 @@ project's internal codename from before the journal was named. Wherever "ugjcs"
 appears in a path or URL it refers to this same system.
 
 --------------------------------------------------------------------------------
-CREDENTIALS REQUIRED BY THE SUBMISSION
---------------------------------------------------------------------------------
-
-Test Username:    editor@sdj.test
-Test Password:    Sdj-Editor-2026!
-
-Admin Username:   admin@sdj.test
-Admin Password:   Sdj-Admin-2026!
-
-All credentials below were verified against the live API on 2026-08-14; each
-returns HTTP 200 from POST /api/v1/auth/login.
-
---------------------------------------------------------------------------------
 
 Seven reviewers exist rather than one so the reviewer-candidate screen can
 actually demonstrate its rules. The two marked UG share every author's
